@@ -1,0 +1,6 @@
+
+# DUMP DB schema only (no data -s)
+pg_dump -s -C talool > talool-schema.backup
+
+# Restore Schema
+psql talool < talool-schema.backup 
