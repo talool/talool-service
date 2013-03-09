@@ -133,20 +133,17 @@ CREATE SEQUENCE address_address_id_seq
 ALTER TABLE public.address_address_id_seq OWNER TO talool;
 ALTER SEQUENCE address_address_id_seq OWNED BY address.address_id;
 
+CREATE TYPE sex_type AS ENUM ('M', 'F');
 
---
--- Name: customer; Type: TABLE; Schema: public; Owner: talool; Tablespace: 
---
 
 CREATE TABLE customer (
     customer_id bigint NOT NULL,
-    first_name character varying(64) NOT NULL,
-    last_name character varying(64) NOT NULL,
     email character varying(64) NOT NULL,
     password character varying(32) NOT NULL,
-    address_id bigint NULL,
-    facebook character varying(64),
-    twitter character varying(64),
+    first_name character varying(64)  NULL,
+    last_name character varying(64)  NULL,
+    sex_t sex_type NULL,
+    birth_date date NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL
 );
@@ -177,9 +174,53 @@ ALTER TABLE public.customer_customer_id_seq OWNER TO talool;
 ALTER SEQUENCE customer_customer_id_seq OWNED BY customer.customer_id;
 
 
---
--- Name: customer_loyalty_action; Type: TABLE; Schema: public; Owner: talool; Tablespace: 
---
+ALTER TABLE ONLY customer
+    ADD CONSTRAINT customer_pkey PRIMARY KEY (customer_id);
+
+CREATE SEQUENCE social_network_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+REVOKE ALL ON SEQUENCE social_network_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE social_network_id_seq FROM talool;
+GRANT ALL ON SEQUENCE social_network_id_seq TO talool;
+   
+CREATE TYPE account_type AS ENUM ('MER', 'CUS');
+
+CREATE TABLE social_network (
+    social_network_id bigint NOT NULL,
+    name character varying(32) NOT NULL,
+    website character varying(64) NOT NULL,
+    api_url character varying(64) NOT NULL,
+    PRIMARY KEY (social_network_id)
+);
+
+ALTER TABLE public.social_network OWNER TO talool;
+
+CREATE UNIQUE INDEX social_network_idx ON social_network (name);
+
+CREATE TABLE social_account (
+    user_id bigint NOT NULL,
+    account_t account_type NOT NULL,
+    social_network_id bigint NOT NULL,
+    login_id character varying(32) NOT NULL,
+    token character varying(64),
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    update_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY (user_id,account_t,social_network_id)
+);
+
+ALTER TABLE public.social_account OWNER TO talool;
+
+ALTER TABLE ONLY social_account
+    ADD CONSTRAINT "FK_CustomerSocialAccount_SocialNetwork" FOREIGN KEY (social_network_id) REFERENCES social_network(social_network_id);
+
+ALTER TABLE public.social_network_id_seq OWNER TO talool;
+ALTER SEQUENCE social_network_id_seq OWNED BY social_network.social_network_id;
+ALTER TABLE ONLY social_network ALTER COLUMN social_network_id SET DEFAULT nextval('social_network_id_seq'::regclass);
 
 CREATE TABLE customer_loyalty_action (
     customer_loyalty_action_id bigint NOT NULL,
@@ -677,9 +718,6 @@ ALTER TABLE ONLY customer_loyalty_summary
 -- Name: customer_pkey; Type: CONSTRAINT; Schema: public; Owner: talool; Tablespace: 
 --
 
-ALTER TABLE ONLY customer
-    ADD CONSTRAINT customer_pkey PRIMARY KEY (customer_id);
-
 
 --
 -- Name: customer_property_pkey; Type: CONSTRAINT; Schema: public; Owner: talool; Tablespace: 
@@ -770,6 +808,7 @@ CREATE TRIGGER update_merchant_location_update_dt BEFORE UPDATE ON merchant_loca
 CREATE TRIGGER update_address_update_dt BEFORE UPDATE ON address FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_phone_update_dt BEFORE UPDATE ON phone FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_merchant_phone_update_dt BEFORE UPDATE ON merchant_phone FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 
 --
 -- Name: FK_CustomerLoyaltySummary_LoyaltyProgram; Type: FK CONSTRAINT; Schema: public; Owner: talool
@@ -777,11 +816,6 @@ CREATE TRIGGER update_merchant_phone_update_dt BEFORE UPDATE ON merchant_phone F
 
 ALTER TABLE ONLY customer_loyalty_summary
     ADD CONSTRAINT "FK_CustomerLoyaltySummary_LoyaltyProgram" FOREIGN KEY (loyalty_program_id) REFERENCES loyalty_program(loyalty_program_id);
-
-
-ALTER TABLE ONLY customer
-    ADD CONSTRAINT "FK_Customer_Address" FOREIGN KEY (address_id)
-REFERENCES address(address_id);
 
 --
 -- Name: FK_CustomerLoyalty_ActionCustomer; Type: FK CONSTRAINT; Schema: public; Owner: talool
