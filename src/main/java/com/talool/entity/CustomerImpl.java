@@ -1,36 +1,40 @@
 package com.talool.entity;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.Where;
 
-import com.talool.core.Address;
 import com.talool.core.Customer;
+import com.talool.core.Sex;
+import com.talool.core.SocialAccount;
+import com.talool.persistence.GenericEnumUserType;
 
-/**
- * 
- * 
- * @author clintz
- */
 @Entity
 @Table(name = "customer", catalog = "public")
+@TypeDef(name = "sexType", typeClass = GenericEnumUserType.class, parameters = {
+		@Parameter(name = "enumClass", value = "com.talool.core.Sex"),
+		@Parameter(name = "identifierMethod", value = "getLetter"), @Parameter(name = "valueOfMethod", value = "valueByLetter") })
 public class CustomerImpl implements Customer
 {
 	private static final long serialVersionUID = 2498058366640693644L;
@@ -42,21 +46,37 @@ public class CustomerImpl implements Customer
 	@Column(name = "customer_id", unique = true, nullable = false)
 	private Long id;
 
-	private Address address;
+	@Type(type = "sexType")
+	// @Column(name = "sex_t", columnDefinition = "sex_type")
+	@Column(name = "sex_t", nullable = true, columnDefinition = "sex_type")
+	private Sex sex;
 
-	@Transient
-	private com.talool.thrift.Customer thriftCustomer;
+	@Column(name = "birth_date", unique = false, nullable = true)
+	private Date birthDate;
 
-	public CustomerImpl()
-	{
-		thriftCustomer = new com.talool.thrift.Customer();
-	}
+	@Column(name = "first_name", unique = false, nullable = true, length = 64)
+	private String firstName;
 
-	public CustomerImpl(com.talool.thrift.Customer customer)
-	{
-		this.thriftCustomer = customer;
-		this.address = new AddressImpl(customer.getAddress());
-	}
+	@Column(name = "last_name", unique = false, nullable = true, length = 64)
+	private String lastName;
+
+	@Column(name = "email", unique = true, nullable = true, length = 64)
+	private String email;
+
+	@Column(name = "password", unique = false, nullable = false, length = 64)
+	private String password;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = SocialAccountImpl.class, mappedBy = "primaryKey.userId")
+	/*
+	 * TODO - sucks - cant get a formula to work. Replace WHERE clause with
+	 * something dynamic that reads the enum to prevent any future bug (WHERE has
+	 * to be constant!)
+	 */
+	@Where(clause = "account_t='CUS'")
+	private Set<SocialAccount> socialAccounts;
+
+	@Embedded
+	private CreatedUpdated createdUpdated;
 
 	@Override
 	public Long getId()
@@ -65,70 +85,47 @@ public class CustomerImpl implements Customer
 	}
 
 	@Override
-	@Access(AccessType.PROPERTY)
-	@Column(name = "first_name", unique = false, nullable = false, length = 64)
 	public String getFirstName()
 	{
-		return thriftCustomer.firstName;
+		return firstName;
 	}
 
 	@Override
-	@Access(AccessType.PROPERTY)
-	@Column(name = "last_name", unique = false, nullable = false, length = 64)
 	public String getLastName()
 	{
-		return thriftCustomer.lastName;
+		return lastName;
 	}
 
 	@Override
-	@Access(AccessType.PROPERTY)
-	@Column(name = "email", unique = true, nullable = false, length = 64)
 	public String getEmail()
 	{
-		return thriftCustomer.email;
+		return email;
 	}
 
 	@Override
-	@Access(AccessType.PROPERTY)
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = AddressImpl.class)
-	@JoinColumn(name = "address_id")
-	public Address getAddress()
-	{
-		return address;
-	}
-
-	@Override
-	@Access(AccessType.PROPERTY)
-	@Column(name = "create_dt", insertable = false, updatable = false)
 	public Date getCreated()
 	{
-		return new Date(thriftCustomer.created);
+		return createdUpdated.getCreated();
 	}
 
 	@Override
-	@Access(AccessType.PROPERTY)
-	@Column(name = "update_dt", insertable = false, updatable = false)
 	public Date getUpdated()
 	{
-		return new Date(thriftCustomer.updated);
-	}
-
-	void setUpdated(final Date updated)
-	{
-		thriftCustomer.updated = updated.getTime();
-	}
-
-	void setCreated(final Date updated)
-	{
-		thriftCustomer.created = updated.getTime();
+		return createdUpdated.getUpdated();
 	}
 
 	@Override
 	@Access(AccessType.PROPERTY)
-	@Column(name = "password", unique = false, nullable = false, length = 64)
+	@Column(name = "birth_date", insertable = true, updatable = true, nullable = true)
+	public Date getBirthDate()
+	{
+		return birthDate;
+	}
+
+	@Override
 	public String getPassword()
 	{
-		return thriftCustomer.password;
+		return password;
 	}
 
 	@Override
@@ -162,45 +159,66 @@ public class CustomerImpl implements Customer
 			return false;
 		}
 
-		return new EqualsBuilder().append(getFirstName(), other.getFirstName())
-				.append(getLastName(), other.getLastName()).append(getEmail(), other.getEmail()).isEquals();
+		return new EqualsBuilder().append(getFirstName(), other.getFirstName()).append(getLastName(), other.getLastName())
+				.append(getEmail(), other.getEmail()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getFirstName()).append(getLastName())
-				.append(getEmail()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getFirstName()).append(getLastName()).append(getEmail()).hashCode();
 	}
 
 	@Override
 	public void setFirstName(String firstName)
 	{
-		thriftCustomer.firstName = firstName;
+		this.firstName = firstName;
 	}
 
 	@Override
 	public void setLastName(String lastName)
 	{
-		thriftCustomer.lastName = lastName;
+		this.lastName = lastName;
 	}
 
 	@Override
 	public void setEmail(String email)
 	{
-		thriftCustomer.email = email;
+		this.email = email;
 	}
 
 	@Override
 	public void setPassword(String password)
 	{
-		thriftCustomer.password = password;
+		this.password = password;
 	}
 
 	@Override
-	public void setAddress(Address address)
+	public Sex getSex()
 	{
-		this.address = address;
+		return sex;
+	}
+
+	@Override
+	public void setSex(Sex sex)
+	{
+		this.sex = sex;
+	}
+
+	@Override
+	public void setBirthDate(Date birthDate)
+	{
+		this.birthDate = birthDate;
+	}
+
+	public Set<SocialAccount> getSocialAccounts()
+	{
+		return socialAccounts;
+	}
+
+	public void setSocialAccounts(Set<SocialAccount> socialAccounts)
+	{
+		this.socialAccounts = socialAccounts;
 	}
 
 }

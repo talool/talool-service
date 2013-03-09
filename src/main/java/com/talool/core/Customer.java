@@ -3,7 +3,7 @@ package com.talool.core;
 import java.io.Serializable;
 import java.util.Date;
 
-public interface Customer extends Identifiable, Serializable
+public interface Customer extends Identifiable, Serializable, TimeAware
 {
 	public String getFirstName();
 
@@ -21,11 +21,12 @@ public interface Customer extends Identifiable, Serializable
 
 	public void setPassword(String password);
 
-	public Address getAddress();
+	public Sex getSex();
 
-	public void setAddress(Address address);
+	public void setSex(Sex sex);
 
-	public Date getCreated();
+	public Date getBirthDate();
 
-	public Date getUpdated();
+	public void setBirthDate(Date birthDate);
+
 }

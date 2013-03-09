@@ -1,7 +1,7 @@
 package com.talool.core.service;
 
-import com.talool.entity.AddressImpl;
-import com.talool.entity.CustomerImpl;
+import com.talool.core.Address;
+import com.talool.core.Customer;
 
 /**
  * 
@@ -11,16 +11,13 @@ import com.talool.entity.CustomerImpl;
  */
 public interface TaloolService
 {
-	public void registerCustomer(final CustomerImpl customer, final String password)
-			throws ServiceException;
+	public void registerCustomer(final Customer customer, final String password) throws ServiceException;
 
-	public void saveCustomer(final CustomerImpl customer) throws ServiceException;
+	public Customer authCustomer(final String email, final String password) throws ServiceException;
 
-	public CustomerImpl newCustomer();
+	public void saveCustomer(final Customer customer) throws ServiceException;
 
-	public CustomerImpl newCustomer(com.talool.thrift.Customer customer);
+	public Customer newCustomer();
 
-	public AddressImpl newAddress();
-
-	public AddressImpl newAddress(com.talool.thrift.Address address);
+	public Address newAddress();
 }

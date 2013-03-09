@@ -34,13 +34,17 @@ public class TaloolService {
 
   public interface Iface {
 
-    public void registerCustomer(Customer customer, String password) throws ServiceException, org.apache.thrift.TException;
+    public void registerCustomer(TCustomer customer, String password) throws TServiceException, org.apache.thrift.TException;
+
+    public TCustomer authCustomer(String email, String password) throws TServiceException, org.apache.thrift.TException;
 
   }
 
   public interface AsyncIface {
 
-    public void registerCustomer(Customer customer, String password, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.registerCustomer_call> resultHandler) throws org.apache.thrift.TException;
+    public void registerCustomer(TCustomer customer, String password, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.registerCustomer_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void authCustomer(String email, String password, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.authCustomer_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -64,13 +68,13 @@ public class TaloolService {
       super(iprot, oprot);
     }
 
-    public void registerCustomer(Customer customer, String password) throws ServiceException, org.apache.thrift.TException
+    public void registerCustomer(TCustomer customer, String password) throws TServiceException, org.apache.thrift.TException
     {
       send_registerCustomer(customer, password);
       recv_registerCustomer();
     }
 
-    public void send_registerCustomer(Customer customer, String password) throws org.apache.thrift.TException
+    public void send_registerCustomer(TCustomer customer, String password) throws org.apache.thrift.TException
     {
       registerCustomer_args args = new registerCustomer_args();
       args.setCustomer(customer);
@@ -78,7 +82,7 @@ public class TaloolService {
       sendBase("registerCustomer", args);
     }
 
-    public void recv_registerCustomer() throws ServiceException, org.apache.thrift.TException
+    public void recv_registerCustomer() throws TServiceException, org.apache.thrift.TException
     {
       registerCustomer_result result = new registerCustomer_result();
       receiveBase(result, "registerCustomer");
@@ -86,6 +90,33 @@ public class TaloolService {
         throw result.error;
       }
       return;
+    }
+
+    public TCustomer authCustomer(String email, String password) throws TServiceException, org.apache.thrift.TException
+    {
+      send_authCustomer(email, password);
+      return recv_authCustomer();
+    }
+
+    public void send_authCustomer(String email, String password) throws org.apache.thrift.TException
+    {
+      authCustomer_args args = new authCustomer_args();
+      args.setEmail(email);
+      args.setPassword(password);
+      sendBase("authCustomer", args);
+    }
+
+    public TCustomer recv_authCustomer() throws TServiceException, org.apache.thrift.TException
+    {
+      authCustomer_result result = new authCustomer_result();
+      receiveBase(result, "authCustomer");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      if (result.error != null) {
+        throw result.error;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "authCustomer failed: unknown result");
     }
 
   }
@@ -106,7 +137,7 @@ public class TaloolService {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void registerCustomer(Customer customer, String password, org.apache.thrift.async.AsyncMethodCallback<registerCustomer_call> resultHandler) throws org.apache.thrift.TException {
+    public void registerCustomer(TCustomer customer, String password, org.apache.thrift.async.AsyncMethodCallback<registerCustomer_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       registerCustomer_call method_call = new registerCustomer_call(customer, password, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
@@ -114,9 +145,9 @@ public class TaloolService {
     }
 
     public static class registerCustomer_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private Customer customer;
+      private TCustomer customer;
       private String password;
-      public registerCustomer_call(Customer customer, String password, org.apache.thrift.async.AsyncMethodCallback<registerCustomer_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public registerCustomer_call(TCustomer customer, String password, org.apache.thrift.async.AsyncMethodCallback<registerCustomer_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.customer = customer;
         this.password = password;
@@ -131,13 +162,48 @@ public class TaloolService {
         prot.writeMessageEnd();
       }
 
-      public void getResult() throws ServiceException, org.apache.thrift.TException {
+      public void getResult() throws TServiceException, org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
         (new Client(prot)).recv_registerCustomer();
+      }
+    }
+
+    public void authCustomer(String email, String password, org.apache.thrift.async.AsyncMethodCallback<authCustomer_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      authCustomer_call method_call = new authCustomer_call(email, password, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class authCustomer_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String email;
+      private String password;
+      public authCustomer_call(String email, String password, org.apache.thrift.async.AsyncMethodCallback<authCustomer_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.email = email;
+        this.password = password;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("authCustomer", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        authCustomer_args args = new authCustomer_args();
+        args.setEmail(email);
+        args.setPassword(password);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public TCustomer getResult() throws TServiceException, org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_authCustomer();
       }
     }
 
@@ -155,6 +221,7 @@ public class TaloolService {
 
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
       processMap.put("registerCustomer", new registerCustomer());
+      processMap.put("authCustomer", new authCustomer());
       return processMap;
     }
 
@@ -175,7 +242,31 @@ public class TaloolService {
         registerCustomer_result result = new registerCustomer_result();
         try {
           iface.registerCustomer(args.customer, args.password);
-        } catch (ServiceException error) {
+        } catch (TServiceException error) {
+          result.error = error;
+        }
+        return result;
+      }
+    }
+
+    public static class authCustomer<I extends Iface> extends org.apache.thrift.ProcessFunction<I, authCustomer_args> {
+      public authCustomer() {
+        super("authCustomer");
+      }
+
+      public authCustomer_args getEmptyArgsInstance() {
+        return new authCustomer_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public authCustomer_result getResult(I iface, authCustomer_args args) throws org.apache.thrift.TException {
+        authCustomer_result result = new authCustomer_result();
+        try {
+          result.success = iface.authCustomer(args.email, args.password);
+        } catch (TServiceException error) {
           result.error = error;
         }
         return result;
@@ -196,8 +287,8 @@ public class TaloolService {
       schemes.put(TupleScheme.class, new registerCustomer_argsTupleSchemeFactory());
     }
 
-    public Customer customer; // required
-    public String password; // required
+    private TCustomer customer; // required
+    private String password; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -265,7 +356,7 @@ public class TaloolService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.CUSTOMER, new org.apache.thrift.meta_data.FieldMetaData("customer", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Customer.class)));
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TCustomer.class)));
       tmpMap.put(_Fields.PASSWORD, new org.apache.thrift.meta_data.FieldMetaData("password", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -276,7 +367,7 @@ public class TaloolService {
     }
 
     public registerCustomer_args(
-      Customer customer,
+      TCustomer customer,
       String password)
     {
       this();
@@ -289,7 +380,7 @@ public class TaloolService {
      */
     public registerCustomer_args(registerCustomer_args other) {
       if (other.isSetCustomer()) {
-        this.customer = new Customer(other.customer);
+        this.customer = new TCustomer(other.customer);
       }
       if (other.isSetPassword()) {
         this.password = other.password;
@@ -300,18 +391,18 @@ public class TaloolService {
       return new registerCustomer_args(this);
     }
 
+    @Override
     public void clear() {
       this.customer = null;
       this.password = null;
     }
 
-    public Customer getCustomer() {
+    public TCustomer getCustomer() {
       return this.customer;
     }
 
-    public registerCustomer_args setCustomer(Customer customer) {
+    public void setCustomer(TCustomer customer) {
       this.customer = customer;
-      return this;
     }
 
     public void unsetCustomer() {
@@ -333,9 +424,8 @@ public class TaloolService {
       return this.password;
     }
 
-    public registerCustomer_args setPassword(String password) {
+    public void setPassword(String password) {
       this.password = password;
-      return this;
     }
 
     public void unsetPassword() {
@@ -359,7 +449,7 @@ public class TaloolService {
         if (value == null) {
           unsetCustomer();
         } else {
-          setCustomer((Customer)value);
+          setCustomer((TCustomer)value);
         }
         break;
 
@@ -519,7 +609,7 @@ public class TaloolService {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
       } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te.getMessage());
+        throw new java.io.IOException(te);
       }
     }
 
@@ -527,7 +617,7 @@ public class TaloolService {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te.getMessage());
+        throw new java.io.IOException(te);
       }
     }
 
@@ -551,7 +641,7 @@ public class TaloolService {
           switch (schemeField.id) {
             case 1: // CUSTOMER
               if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.customer = new Customer();
+                struct.customer = new TCustomer();
                 struct.customer.read(iprot);
                 struct.setCustomerIsSet(true);
               } else { 
@@ -572,8 +662,6 @@ public class TaloolService {
           iprot.readFieldEnd();
         }
         iprot.readStructEnd();
-
-        // check for required fields of primitive type, which can't be checked in the validate method
         struct.validate();
       }
 
@@ -629,7 +717,7 @@ public class TaloolService {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
-          struct.customer = new Customer();
+          struct.customer = new TCustomer();
           struct.customer.read(iprot);
           struct.setCustomerIsSet(true);
         }
@@ -653,7 +741,7 @@ public class TaloolService {
       schemes.put(TupleScheme.class, new registerCustomer_resultTupleSchemeFactory());
     }
 
-    public ServiceException error; // required
+    private TServiceException error; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -727,7 +815,7 @@ public class TaloolService {
     }
 
     public registerCustomer_result(
-      ServiceException error)
+      TServiceException error)
     {
       this();
       this.error = error;
@@ -738,7 +826,7 @@ public class TaloolService {
      */
     public registerCustomer_result(registerCustomer_result other) {
       if (other.isSetError()) {
-        this.error = new ServiceException(other.error);
+        this.error = new TServiceException(other.error);
       }
     }
 
@@ -746,17 +834,17 @@ public class TaloolService {
       return new registerCustomer_result(this);
     }
 
+    @Override
     public void clear() {
       this.error = null;
     }
 
-    public ServiceException getError() {
+    public TServiceException getError() {
       return this.error;
     }
 
-    public registerCustomer_result setError(ServiceException error) {
+    public void setError(TServiceException error) {
       this.error = error;
-      return this;
     }
 
     public void unsetError() {
@@ -780,7 +868,7 @@ public class TaloolService {
         if (value == null) {
           unsetError();
         } else {
-          setError((ServiceException)value);
+          setError((TServiceException)value);
         }
         break;
 
@@ -897,7 +985,7 @@ public class TaloolService {
       try {
         write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
       } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te.getMessage());
+        throw new java.io.IOException(te);
       }
     }
 
@@ -905,7 +993,7 @@ public class TaloolService {
       try {
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te.getMessage());
+        throw new java.io.IOException(te);
       }
     }
 
@@ -929,7 +1017,7 @@ public class TaloolService {
           switch (schemeField.id) {
             case 1: // ERROR
               if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.error = new ServiceException();
+                struct.error = new TServiceException();
                 struct.error.read(iprot);
                 struct.setErrorIsSet(true);
               } else { 
@@ -942,8 +1030,6 @@ public class TaloolService {
           iprot.readFieldEnd();
         }
         iprot.readStructEnd();
-
-        // check for required fields of primitive type, which can't be checked in the validate method
         struct.validate();
       }
 
@@ -988,7 +1074,914 @@ public class TaloolService {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.error = new ServiceException();
+          struct.error = new TServiceException();
+          struct.error.read(iprot);
+          struct.setErrorIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class authCustomer_args implements org.apache.thrift.TBase<authCustomer_args, authCustomer_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("authCustomer_args");
+
+    private static final org.apache.thrift.protocol.TField EMAIL_FIELD_DESC = new org.apache.thrift.protocol.TField("email", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField PASSWORD_FIELD_DESC = new org.apache.thrift.protocol.TField("password", org.apache.thrift.protocol.TType.STRING, (short)2);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new authCustomer_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new authCustomer_argsTupleSchemeFactory());
+    }
+
+    private String email; // required
+    private String password; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      EMAIL((short)1, "email"),
+      PASSWORD((short)2, "password");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // EMAIL
+            return EMAIL;
+          case 2: // PASSWORD
+            return PASSWORD;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.EMAIL, new org.apache.thrift.meta_data.FieldMetaData("email", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.PASSWORD, new org.apache.thrift.meta_data.FieldMetaData("password", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(authCustomer_args.class, metaDataMap);
+    }
+
+    public authCustomer_args() {
+    }
+
+    public authCustomer_args(
+      String email,
+      String password)
+    {
+      this();
+      this.email = email;
+      this.password = password;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public authCustomer_args(authCustomer_args other) {
+      if (other.isSetEmail()) {
+        this.email = other.email;
+      }
+      if (other.isSetPassword()) {
+        this.password = other.password;
+      }
+    }
+
+    public authCustomer_args deepCopy() {
+      return new authCustomer_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.email = null;
+      this.password = null;
+    }
+
+    public String getEmail() {
+      return this.email;
+    }
+
+    public void setEmail(String email) {
+      this.email = email;
+    }
+
+    public void unsetEmail() {
+      this.email = null;
+    }
+
+    /** Returns true if field email is set (has been assigned a value) and false otherwise */
+    public boolean isSetEmail() {
+      return this.email != null;
+    }
+
+    public void setEmailIsSet(boolean value) {
+      if (!value) {
+        this.email = null;
+      }
+    }
+
+    public String getPassword() {
+      return this.password;
+    }
+
+    public void setPassword(String password) {
+      this.password = password;
+    }
+
+    public void unsetPassword() {
+      this.password = null;
+    }
+
+    /** Returns true if field password is set (has been assigned a value) and false otherwise */
+    public boolean isSetPassword() {
+      return this.password != null;
+    }
+
+    public void setPasswordIsSet(boolean value) {
+      if (!value) {
+        this.password = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case EMAIL:
+        if (value == null) {
+          unsetEmail();
+        } else {
+          setEmail((String)value);
+        }
+        break;
+
+      case PASSWORD:
+        if (value == null) {
+          unsetPassword();
+        } else {
+          setPassword((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case EMAIL:
+        return getEmail();
+
+      case PASSWORD:
+        return getPassword();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case EMAIL:
+        return isSetEmail();
+      case PASSWORD:
+        return isSetPassword();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof authCustomer_args)
+        return this.equals((authCustomer_args)that);
+      return false;
+    }
+
+    public boolean equals(authCustomer_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_email = true && this.isSetEmail();
+      boolean that_present_email = true && that.isSetEmail();
+      if (this_present_email || that_present_email) {
+        if (!(this_present_email && that_present_email))
+          return false;
+        if (!this.email.equals(that.email))
+          return false;
+      }
+
+      boolean this_present_password = true && this.isSetPassword();
+      boolean that_present_password = true && that.isSetPassword();
+      if (this_present_password || that_present_password) {
+        if (!(this_present_password && that_present_password))
+          return false;
+        if (!this.password.equals(that.password))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(authCustomer_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      authCustomer_args typedOther = (authCustomer_args)other;
+
+      lastComparison = Boolean.valueOf(isSetEmail()).compareTo(typedOther.isSetEmail());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetEmail()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.email, typedOther.email);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetPassword()).compareTo(typedOther.isSetPassword());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPassword()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.password, typedOther.password);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("authCustomer_args(");
+      boolean first = true;
+
+      sb.append("email:");
+      if (this.email == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.email);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("password:");
+      if (this.password == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.password);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class authCustomer_argsStandardSchemeFactory implements SchemeFactory {
+      public authCustomer_argsStandardScheme getScheme() {
+        return new authCustomer_argsStandardScheme();
+      }
+    }
+
+    private static class authCustomer_argsStandardScheme extends StandardScheme<authCustomer_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, authCustomer_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // EMAIL
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.email = iprot.readString();
+                struct.setEmailIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // PASSWORD
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.password = iprot.readString();
+                struct.setPasswordIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, authCustomer_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.email != null) {
+          oprot.writeFieldBegin(EMAIL_FIELD_DESC);
+          oprot.writeString(struct.email);
+          oprot.writeFieldEnd();
+        }
+        if (struct.password != null) {
+          oprot.writeFieldBegin(PASSWORD_FIELD_DESC);
+          oprot.writeString(struct.password);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class authCustomer_argsTupleSchemeFactory implements SchemeFactory {
+      public authCustomer_argsTupleScheme getScheme() {
+        return new authCustomer_argsTupleScheme();
+      }
+    }
+
+    private static class authCustomer_argsTupleScheme extends TupleScheme<authCustomer_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, authCustomer_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetEmail()) {
+          optionals.set(0);
+        }
+        if (struct.isSetPassword()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetEmail()) {
+          oprot.writeString(struct.email);
+        }
+        if (struct.isSetPassword()) {
+          oprot.writeString(struct.password);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, authCustomer_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.email = iprot.readString();
+          struct.setEmailIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.password = iprot.readString();
+          struct.setPasswordIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class authCustomer_result implements org.apache.thrift.TBase<authCustomer_result, authCustomer_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("authCustomer_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
+    private static final org.apache.thrift.protocol.TField ERROR_FIELD_DESC = new org.apache.thrift.protocol.TField("error", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new authCustomer_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new authCustomer_resultTupleSchemeFactory());
+    }
+
+    private TCustomer success; // required
+    private TServiceException error; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success"),
+      ERROR((short)1, "error");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          case 1: // ERROR
+            return ERROR;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TCustomer.class)));
+      tmpMap.put(_Fields.ERROR, new org.apache.thrift.meta_data.FieldMetaData("error", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(authCustomer_result.class, metaDataMap);
+    }
+
+    public authCustomer_result() {
+    }
+
+    public authCustomer_result(
+      TCustomer success,
+      TServiceException error)
+    {
+      this();
+      this.success = success;
+      this.error = error;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public authCustomer_result(authCustomer_result other) {
+      if (other.isSetSuccess()) {
+        this.success = new TCustomer(other.success);
+      }
+      if (other.isSetError()) {
+        this.error = new TServiceException(other.error);
+      }
+    }
+
+    public authCustomer_result deepCopy() {
+      return new authCustomer_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+      this.error = null;
+    }
+
+    public TCustomer getSuccess() {
+      return this.success;
+    }
+
+    public void setSuccess(TCustomer success) {
+      this.success = success;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public TServiceException getError() {
+      return this.error;
+    }
+
+    public void setError(TServiceException error) {
+      this.error = error;
+    }
+
+    public void unsetError() {
+      this.error = null;
+    }
+
+    /** Returns true if field error is set (has been assigned a value) and false otherwise */
+    public boolean isSetError() {
+      return this.error != null;
+    }
+
+    public void setErrorIsSet(boolean value) {
+      if (!value) {
+        this.error = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((TCustomer)value);
+        }
+        break;
+
+      case ERROR:
+        if (value == null) {
+          unsetError();
+        } else {
+          setError((TServiceException)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      case ERROR:
+        return getError();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      case ERROR:
+        return isSetError();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof authCustomer_result)
+        return this.equals((authCustomer_result)that);
+      return false;
+    }
+
+    public boolean equals(authCustomer_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_error = true && this.isSetError();
+      boolean that_present_error = true && that.isSetError();
+      if (this_present_error || that_present_error) {
+        if (!(this_present_error && that_present_error))
+          return false;
+        if (!this.error.equals(that.error))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(authCustomer_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      authCustomer_result typedOther = (authCustomer_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetError()).compareTo(typedOther.isSetError());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetError()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.error, typedOther.error);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("authCustomer_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("error:");
+      if (this.error == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.error);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+      if (success != null) {
+        success.validate();
+      }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class authCustomer_resultStandardSchemeFactory implements SchemeFactory {
+      public authCustomer_resultStandardScheme getScheme() {
+        return new authCustomer_resultStandardScheme();
+      }
+    }
+
+    private static class authCustomer_resultStandardScheme extends StandardScheme<authCustomer_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, authCustomer_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.success = new TCustomer();
+                struct.success.read(iprot);
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 1: // ERROR
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.error = new TServiceException();
+                struct.error.read(iprot);
+                struct.setErrorIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, authCustomer_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          struct.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        if (struct.error != null) {
+          oprot.writeFieldBegin(ERROR_FIELD_DESC);
+          struct.error.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class authCustomer_resultTupleSchemeFactory implements SchemeFactory {
+      public authCustomer_resultTupleScheme getScheme() {
+        return new authCustomer_resultTupleScheme();
+      }
+    }
+
+    private static class authCustomer_resultTupleScheme extends TupleScheme<authCustomer_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, authCustomer_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        if (struct.isSetError()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetSuccess()) {
+          struct.success.write(oprot);
+        }
+        if (struct.isSetError()) {
+          struct.error.write(oprot);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, authCustomer_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.success = new TCustomer();
+          struct.success.read(iprot);
+          struct.setSuccessIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.error = new TServiceException();
           struct.error.read(iprot);
           struct.setErrorIsSet(true);
         }

@@ -14,9 +14,15 @@
 #import "TObjective-C.h"
 
 
+enum TSex {
+  TSex_M = 0,
+  TSex_F = 1,
+  TSex_U = 2
+};
+
 typedef int64_t Timestamp;
 
-@interface ServiceException : NSException <NSCoding> {
+@interface TServiceException : NSException <NSCoding> {
   int32_t __errorCode;
   NSString * __errorDesc;
 
@@ -49,7 +55,7 @@ typedef int64_t Timestamp;
 
 @end
 
-@interface Merchant : NSObject <NSCoding> {
+@interface TMerchant : NSObject <NSCoding> {
   NSString * __name;
   NSString * __email;
 
@@ -82,7 +88,7 @@ typedef int64_t Timestamp;
 
 @end
 
-@interface Address : NSObject <NSCoding> {
+@interface TAddress : NSObject <NSCoding> {
   int64_t __addressId;
   NSString * __address1;
   NSString * __address2;
@@ -178,13 +184,12 @@ typedef int64_t Timestamp;
 
 @end
 
-@interface Customer : NSObject <NSCoding> {
+@interface TCustomer : NSObject <NSCoding> {
   int64_t __customerId;
   NSString * __firstName;
   NSString * __lastName;
   NSString * __email;
-  NSString * __password;
-  Address * __address;
+  int __sex;
   Timestamp __created;
   Timestamp __updated;
 
@@ -192,8 +197,7 @@ typedef int64_t Timestamp;
   BOOL __firstName_isset;
   BOOL __lastName_isset;
   BOOL __email_isset;
-  BOOL __password_isset;
-  BOOL __address_isset;
+  BOOL __sex_isset;
   BOOL __created_isset;
   BOOL __updated_isset;
 }
@@ -203,14 +207,13 @@ typedef int64_t Timestamp;
 @property (nonatomic, retain, getter=firstName, setter=setFirstName:) NSString * firstName;
 @property (nonatomic, retain, getter=lastName, setter=setLastName:) NSString * lastName;
 @property (nonatomic, retain, getter=email, setter=setEmail:) NSString * email;
-@property (nonatomic, retain, getter=password, setter=setPassword:) NSString * password;
-@property (nonatomic, retain, getter=address, setter=setAddress:) Address * address;
+@property (nonatomic, getter=sex, setter=setSex:) int sex;
 @property (nonatomic, getter=created, setter=setCreated:) Timestamp created;
 @property (nonatomic, getter=updated, setter=setUpdated:) Timestamp updated;
 #endif
 
 - (id) init;
-- (id) initWithCustomerId: (int64_t) customerId firstName: (NSString *) firstName lastName: (NSString *) lastName email: (NSString *) email password: (NSString *) password address: (Address *) address created: (Timestamp) created updated: (Timestamp) updated;
+- (id) initWithCustomerId: (int64_t) customerId firstName: (NSString *) firstName lastName: (NSString *) lastName email: (NSString *) email sex: (int) sex created: (Timestamp) created updated: (Timestamp) updated;
 
 - (void) read: (id <TProtocol>) inProtocol;
 - (void) write: (id <TProtocol>) outProtocol;
@@ -240,16 +243,10 @@ typedef int64_t Timestamp;
 - (BOOL) emailIsSet;
 
 #if !__has_feature(objc_arc)
-- (NSString *) password;
-- (void) setPassword: (NSString *) password;
+- (int) sex;
+- (void) setSex: (int) sex;
 #endif
-- (BOOL) passwordIsSet;
-
-#if !__has_feature(objc_arc)
-- (Address *) address;
-- (void) setAddress: (Address *) address;
-#endif
-- (BOOL) addressIsSet;
+- (BOOL) sexIsSet;
 
 #if !__has_feature(objc_arc)
 - (Timestamp) created;
@@ -266,7 +263,8 @@ typedef int64_t Timestamp;
 @end
 
 @protocol TaloolService <NSObject>
-- (void) registerCustomer: (Customer *) customer password: (NSString *) password;  // throws ServiceException *, TException
+- (void) registerCustomer: (TCustomer *) customer password: (NSString *) password;  // throws TServiceException *, TException
+- (TCustomer *) authCustomer: (NSString *) email password: (NSString *) password;  // throws TServiceException *, TException
 @end
 
 @interface TaloolServiceClient : NSObject <TaloolService> {

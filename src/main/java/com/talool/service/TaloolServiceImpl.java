@@ -5,14 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.talool.core.Address;
+import com.talool.core.Customer;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.entity.AddressImpl;
 import com.talool.entity.CustomerImpl;
 import com.talool.persistence.DaoException;
 import com.talool.persistence.TaloolDao;
-import com.talool.thrift.Address;
-import com.talool.thrift.Customer;
 
 /**
  * Implementation of the TaloolService
@@ -42,11 +42,17 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Override
-	public void registerCustomer(CustomerImpl customer, String password) throws ServiceException
+	public void registerCustomer(Customer customer, String password) throws ServiceException
 	{
 		try
 		{
-			LOG.info("Encyrpting password: " + EncryptService.MD5(password));
+			final String md5pass = EncryptService.MD5(password);
+
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug("Encyrpting password: " + md5pass);
+			}
+			customer.setPassword(md5pass);
 			saveCustomer(customer);
 		}
 		catch (Exception e)
@@ -59,12 +65,11 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public void saveCustomer(CustomerImpl customer) throws ServiceException
+	public void saveCustomer(Customer customer) throws ServiceException
 	{
 		try
 		{
 			taloolDao.saveCustomer(customer);
-			// taloolDao.saveAddress(customer.getAddress());
 		}
 		catch (DaoException e)
 		{
@@ -76,27 +81,31 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public CustomerImpl newCustomer(Customer customer)
-	{
-		return new CustomerImpl(customer);
-	}
-
-	@Override
-	public AddressImpl newAddress()
+	public Address newAddress()
 	{
 		return new AddressImpl();
 	}
 
 	@Override
-	public CustomerImpl newCustomer()
+	public Customer newCustomer()
 	{
 		return new CustomerImpl();
 	}
 
 	@Override
-	public AddressImpl newAddress(Address address)
+	public Customer authCustomer(String email, String password) throws ServiceException
 	{
-		return new AddressImpl(address);
+		Customer customer;
+		try
+		{
+			customer = taloolDao.authCustomer(email, EncryptService.MD5(password));
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem authentication customer " + email, ex);
+		}
+
+		return customer;
 	}
 
 }
