@@ -9,8 +9,8 @@ import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
-import com.talool.entity.AddressImpl;
-import com.talool.entity.CustomerImpl;
+import com.talool.domain.AddressImpl;
+import com.talool.domain.CustomerImpl;
 import com.talool.persistence.DaoException;
 import com.talool.persistence.TaloolDao;
 

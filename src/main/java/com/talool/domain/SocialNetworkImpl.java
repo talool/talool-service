@@ -5,7 +5,7 @@
  * software is only allowed at the direction of Comcast Corporation. All allowed
  * modifications must be provided to Comcast Corporation.
  */
-package com.talool.entity;
+package com.talool.domain;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -40,8 +40,14 @@ public class SocialNetworkImpl implements SocialNetwork
 	@Column(name = "social_network_id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "name", unique = true, nullable = false, length = 32)
+	@Column(name = "name", unique = true, nullable = false, length = 64)
 	private String name;
+
+	@Column(name = "website", unique = true, nullable = false, length = 64)
+	private String website;
+
+	@Column(name = "api_url", unique = true, nullable = false, length = 64)
+	private String apiUrl;
 
 	@Override
 	public Long getId()
@@ -81,6 +87,31 @@ public class SocialNetworkImpl implements SocialNetwork
 		}
 
 		return new EqualsBuilder().append(getName(), other.getName()).isEquals();
+	}
+
+	public String getWebsite()
+	{
+		return website;
+	}
+
+	public void setWebsite(String website)
+	{
+		this.website = website;
+	}
+
+	public String getApiUrl()
+	{
+		return apiUrl;
+	}
+
+	public void setApiUrl(String apiUrl)
+	{
+		this.apiUrl = apiUrl;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	@Override

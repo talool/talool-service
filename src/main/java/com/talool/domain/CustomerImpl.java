@@ -1,4 +1,4 @@
-package com.talool.entity;
+package com.talool.domain;
 
 import java.util.Date;
 import java.util.Set;

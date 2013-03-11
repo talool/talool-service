@@ -17,4 +17,8 @@ public interface SocialNetwork extends Identifiable, Serializable
 {
 	public String getName();
 
+	public String getWebsite();
+
+	public String getApiUrl();
+
 }

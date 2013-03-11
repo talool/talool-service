@@ -5,7 +5,7 @@
  * software is only allowed at the direction of Comcast Corporation. All allowed
  * modifications must be provided to Comcast Corporation.
  */
-package com.talool.entity;
+package com.talool.domain;
 
 import java.io.Serializable;
 import java.util.Date;

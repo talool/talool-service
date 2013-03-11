@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.talool.core.Address;
 import com.talool.core.Customer;
-import com.talool.entity.CustomerImpl;
+import com.talool.domain.CustomerImpl;
 
 /**
  * concider http://code.google.com/p/hibernate-generic-dao/
