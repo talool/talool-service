@@ -1,7 +1,8 @@
 package com.talool.domain;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -13,6 +14,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -28,6 +30,7 @@ import org.hibernate.annotations.Where;
 import com.talool.core.Customer;
 import com.talool.core.Sex;
 import com.talool.core.SocialAccount;
+import com.talool.core.SocialNetwork;
 import com.talool.persistence.GenericEnumUserType;
 
 @Entity
@@ -73,7 +76,8 @@ public class CustomerImpl implements Customer
 	 * to be constant!)
 	 */
 	@Where(clause = "account_t='CUS'")
-	private Set<SocialAccount> socialAccounts;
+	@MapKey(name = "primaryKey.socialNetwork")
+	private final Map<SocialNetwork, SocialAccount> socialAccounts = new HashMap<SocialNetwork, SocialAccount>();
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -211,14 +215,16 @@ public class CustomerImpl implements Customer
 		this.birthDate = birthDate;
 	}
 
-	public Set<SocialAccount> getSocialAccounts()
+	@Override
+	public Map<SocialNetwork, SocialAccount> getSocialAccounts()
 	{
 		return socialAccounts;
 	}
 
-	public void setSocialAccounts(Set<SocialAccount> socialAccounts)
+	@Override
+	public void addSocialAccount(final SocialAccount socialAccount)
 	{
-		this.socialAccounts = socialAccounts;
+		socialAccounts.put(socialAccount.getSocialNetwork(), socialAccount);
 	}
 
 }

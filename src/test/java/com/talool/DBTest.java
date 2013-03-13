@@ -2,7 +2,7 @@ package com.talool;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.junit.Test;
+import org.junit.Ignore;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -16,7 +16,7 @@ public class DBTest
 {
 	private final AbstractApplicationContext context = new ClassPathXmlApplicationContext("applicationContext-test.xml");
 
-	@Test
+	@Ignore
 	public void testDb1()
 	{
 		SessionFactory sf = (SessionFactory) context.getBean("sessionFactory");
@@ -24,7 +24,7 @@ public class DBTest
 
 		try
 		{
-			ServiceFactory.get().getTaloolService().authCustomer("christopher5.justin@gmail.com", "pass123");
+			ServiceFactory.get().getTaloolService().authenticateCustomer("christopher5.justin@gmail.com", "pass123");
 		}
 		catch (ServiceException e)
 		{

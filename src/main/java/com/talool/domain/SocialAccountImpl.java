@@ -10,6 +10,9 @@ package com.talool.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
@@ -23,10 +26,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import com.talool.core.AccountType;
 import com.talool.core.SocialAccount;
 import com.talool.core.SocialNetwork;
+import com.talool.persistence.GenericEnumUserType;
 
 /**
  * @author clintz
@@ -34,29 +41,67 @@ import com.talool.core.SocialNetwork;
  */
 @Entity
 @Table(name = "social_account", catalog = "public")
+@TypeDef(name = "accountType", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.core.AccountType") })
 public class SocialAccountImpl implements SocialAccount
 {
 	private static final long serialVersionUID = -2070704416429180263L;
 
+	public SocialAccountImpl()
+	{
+		primaryKey = new SocialAccountPK();
+	}
+
 	@Embeddable
 	public static class SocialAccountPK implements Serializable
 	{
+		public SocialNetwork getSocialNetwork()
+		{
+			return socialNetwork;
+		}
+
+		public void setSocialNetwork(SocialNetwork socialNetwork)
+		{
+			this.socialNetwork = socialNetwork;
+		}
+
+		public Long getUserId()
+		{
+			return userId;
+		}
+
+		public void setUserId(Long userId)
+		{
+			this.userId = userId;
+		}
+
+		public AccountType getAccountType()
+		{
+			return accountType;
+		}
+
+		public void setAccountType(AccountType accountType)
+		{
+			this.accountType = accountType;
+		}
+
 		private static final long serialVersionUID = 3294959164705341195L;
 
-		@ManyToOne(fetch = FetchType.EAGER, targetEntity = SocialNetworkImpl.class)
-		@JoinColumn(name = "social_network_id")
+		@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = SocialNetworkImpl.class)
+		@Access(AccessType.PROPERTY)
+		@JoinColumn(name = "social_network_id", nullable = false)
 		private SocialNetwork socialNetwork;
 
 		@Column(name = "user_id", unique = false, nullable = false)
 		private Long userId;
 
-		@Column(name = "account_t", unique = false, nullable = false, columnDefinition = "account_type")
+		@Type(type = "accountType")
+		@Column(name = "account_t", unique = true, nullable = false, columnDefinition = "account_type")
 		@Enumerated(EnumType.STRING)
 		private AccountType accountType;
 	}
 
 	@EmbeddedId
-	private SocialAccountPK primaryKey;
+	private final SocialAccountPK primaryKey;
 
 	@Column(name = "token", unique = false, nullable = false)
 	private String token;

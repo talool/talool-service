@@ -2,6 +2,7 @@ package com.talool.core;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 public interface Customer extends Identifiable, Serializable, TimeAware
 {
@@ -28,5 +29,9 @@ public interface Customer extends Identifiable, Serializable, TimeAware
 	public Date getBirthDate();
 
 	public void setBirthDate(Date birthDate);
+
+	public Map<SocialNetwork, SocialAccount> getSocialAccounts();
+
+	public void addSocialAccount(SocialAccount socialAccount);
 
 }
