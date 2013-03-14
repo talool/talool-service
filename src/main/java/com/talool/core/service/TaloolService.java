@@ -1,5 +1,6 @@
 package com.talool.core.service;
 
+import com.talool.core.AccountType;
 import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.SocialAccount;
@@ -30,7 +31,7 @@ public interface TaloolService
 
 	public SocialNetwork getSocialNetwork(final String name) throws ServiceException;
 
-	public SocialAccount newSocialAccount();
+	public SocialAccount newSocialAccount(final String socialNetworkName, final AccountType accountType);
 
 	public Customer newCustomer();
 

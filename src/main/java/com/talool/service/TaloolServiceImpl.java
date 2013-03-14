@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.talool.core.AccountType;
 import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.SocialAccount;
@@ -144,8 +145,17 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public SocialAccount newSocialAccount()
+	public SocialAccount newSocialAccount(final String socialNetworkName, final AccountType accountType)
 	{
+		try
+		{
+			return new SocialAccountImpl(getSocialNetwork(socialNetworkName), accountType);
+		}
+		catch (ServiceException e)
+		{
+			LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
+		}
+
 		return new SocialAccountImpl();
 	}
 

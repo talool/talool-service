@@ -51,6 +51,13 @@ public class SocialAccountImpl implements SocialAccount
 		primaryKey = new SocialAccountPK();
 	}
 
+	public SocialAccountImpl(final SocialNetwork socialNetwork, final AccountType accountType)
+	{
+		primaryKey = new SocialAccountPK();
+		setSocialNetwork(socialNetwork);
+		setAccountType(accountType);
+	}
+
 	@Embeddable
 	public static class SocialAccountPK implements Serializable
 	{
