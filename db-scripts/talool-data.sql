@@ -1,7 +1,5 @@
 
 
-\connect talool
-
 INSERT INTO social_network(name, website, api_url)
     VALUES ( 'Facebook', 'http://www.facebook.com', 'https://api.facebook.com');
 
