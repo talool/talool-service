@@ -12,16 +12,19 @@
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
+	<tx:annotation-driven order="1" />
 	<aop:aspectj-autoproxy />
 
-	<tx:annotation-driven order="1" />
-
-	<bean id="taloolDaoImpl" class="com.talool.persistence.TaloolDaoImpl">
-		<property name="sessionFactory" ref="sessionFactory" />
+	<bean id="generalDAOImpl" class="com.googlecode.genericdao.dao.hibernate.GeneralDAOImpl">
+	      <property name="sessionFactory" ref="sessionFactory"/>   
+	</bean>
+	
+	<bean id="daoDispatcher" class=" com.googlecode.genericdao.dao.hibernate.DAODispatcher">
+	   <property name="generalDAO" ref="generalDAOImpl"/>
 	</bean>
 
 	<bean id="taloolServiceImpl" class="com.talool.service.TaloolServiceImpl">
-		<property name="taloolDao" ref="taloolDaoImpl" />
+		<property name="daoDispatcher" ref="daoDispatcher" />
 	</bean>
 
 	<!-- a PlatformTransactionManager is still required -->
@@ -31,35 +34,26 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<!-- FLush Session Aspect , Hibernate4 is different than Hibernate3 -->
-	<bean id="sessionFlushAspect" class="com.talool.hibernate.SessionFlushAspect">
-	 	<property name="order" value="2"/>
-		<property name="sessionFactory">
-			<ref bean="sessionFactory" />
-		</property>
-	</bean>
-
-
 	<!-- Annotations supported in hibernate4 -->
 	<bean id="sessionFactory"
-		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 
 		<property name="dataSource">
 			<ref bean="dataSource" />
 		</property>
 		<property name="packagesToScan">
 			<list>
-				<value>com/talool/domain</value>
+				<value>com.talool.domain</value>
 			</list>
 		</property>
 
 		<property name="hibernateProperties">
 			<props>
+
+
 				<prop key="hibernate.dialect">
 					org.hibernate.dialect.PostgreSQLDialect
 				</prop>
-				<!-- <prop key="hibernate.connection.datasource"> java:/comp/env/jdbc/postgres 
-					</prop> -->
 				<prop key="hibernate.jdbc.use_get_generated_keys">
 					false
 				</prop>
@@ -67,6 +61,7 @@
 				</prop>
 				<prop key="hibernate.format_sql">true</prop>
 				<prop key="hibernate.show_sql">true</prop>
+				<!--  -->
 				<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
 
 				<prop key="hibernate.generate_statistics">true</prop>
@@ -74,8 +69,10 @@
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>
 				<prop key="hibernate.cache.use_query_cache">true</prop>
 
+<!--
 				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
 				</prop>
+				  -->
 
 				<prop key="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</prop>
 
@@ -84,24 +81,20 @@
 
 	</bean>
 
-
-	<!-- Using patched HibernateInterceptor because there isnt one for Hibernate4 
-		Spring yet https://jira.springsource.org/browse/SPR-9028 -->
-	<bean id="hibernateInterceptor" class="com.talool.hibernate.HibernateInterceptor">
+	<bean name="openSessionInViewInterceptor"
+		class="org.springframework.orm.hibernate3.support.OpenSessionInViewInterceptor">
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>
 	</bean>
 
 
-	<bean id="taloolServiceTarget" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<property name="target" ref="taloolServiceImpl" />
-		<!-- make sure these are in order! hibernateInterceptor 1st -->
-		<property name="interceptorNames">
-			<list>
-				<value>hibernateInterceptor</value>
-			</list>
-		</property>
-	</bean>
+	<!-- Using patched HibernateInterceptor because there isnt one for Hibernate4 
+		Spring yet https://jira.springsource.org/browse/SPR-9028 <bean id="hibernateInterceptor" 
+		class="com.talool.hibernate.HibernateInterceptor"> <property name="sessionFactory"> 
+		<ref bean="sessionFactory" /> </property> </bean> <bean id="taloolServiceTarget" 
+		class="org.springframework.aop.framework.ProxyFactoryBean"> <property name="target" 
+		ref="taloolServiceImpl" /> <property name="interceptorNames"> <list> <value>hibernateInterceptor</value> 
+		</list> </property> </bean> -->
 
 </beans>

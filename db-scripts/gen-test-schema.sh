@@ -6,8 +6,8 @@
 # Please note you must have ~/.pgpass working so no prompts occur
 #    Example:
 #
-#    localhost:5432:talool-test:talool:talool
-#    localhost:5432:postgres:postgres:postgres
+#    localhost:5432:talool-test:talool:XXXXXX
+#    localhost:5432:postgres:postgres:XXXXXX
 #
 ##################################################################
 

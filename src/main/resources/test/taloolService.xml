@@ -13,10 +13,11 @@
             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
 	<tx:annotation-driven order="1" />
+	
+	<import resource="./dataSource.xml" />
+	<import resource="../taloolHibernateContext.xml" />
 
-    <import resource="./dataSource.xml" />
-	<import resource="./taloolHibernateContext.xml" />
-
+ 
 
 	<bean id="serviceFactory" class="com.talool.service.ServiceFactory" factory-method="createInstance">
 		<constructor-arg ref="taloolServiceImpl"/>

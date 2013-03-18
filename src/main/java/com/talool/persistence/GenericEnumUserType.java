@@ -9,7 +9,6 @@ import java.sql.Types;
 import java.util.Properties;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
 import org.hibernate.type.TypeResolver;
 import org.hibernate.usertype.ParameterizedType;
@@ -41,7 +40,8 @@ public class GenericEnumUserType implements UserType, ParameterizedType
 			throw new HibernateException("Enum class not found", exception);
 		}
 
-		String identifierMethodName = parameters.getProperty("identifierMethod", defaultIdentifierMethodName);
+		String identifierMethodName = parameters.getProperty("identifierMethod",
+				defaultIdentifierMethodName);
 
 		try
 		{
@@ -128,30 +128,10 @@ public class GenericEnumUserType implements UserType, ParameterizedType
 	}
 
 	@Override
-	public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor arg3) throws HibernateException,
+	public Object nullSafeGet(ResultSet rs, String[] names, Object obj) throws HibernateException,
 			SQLException
 	{
-		try
-		{
-			Object identifier = value != null ? identifierMethod.invoke(value, new Object[0]) : null;
-			// VERY IMPORTANT TO SET Types.OTHER or you will get a Postgres error
-			// about
-			// character varying
-			st.setObject(index, identifier, Types.OTHER);
-		}
-		catch (Exception exception)
-		{
-			throw new HibernateException("Exception while invoking identifierMethod of enumeration class: ", exception);
-
-		}
-
-	}
-
-	@Override
-	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor simpl, Object objectOwner)
-			throws HibernateException, SQLException
-	{
-		Object identifier = type.get(rs, names[0], simpl);
+		Object identifier = type.get(rs, names[0]);
 		if (rs.wasNull())
 		{
 			return null;
@@ -163,8 +143,26 @@ public class GenericEnumUserType implements UserType, ParameterizedType
 		}
 		catch (Exception e)
 		{
-			throw new HibernateException("Exception while invoking valueOf method '" + valueOfMethod.getName() + "' of "
-					+ "enumeration class '" + enumClass + "'", e);
+			throw new HibernateException("Exception while invoking valueOf method '"
+					+ valueOfMethod.getName() + "' of " + "enumeration class '" + enumClass + "'", e);
+		}
+	}
+
+	public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException,
+			SQLException
+	{
+		try
+		{
+			Object identifier = value != null ? identifierMethod.invoke(value, new Object[0]) : null;
+			// VERY IMPORTANT TO SET Types.OTHER or you will get a Postgres error
+			// about
+			// character varying
+			st.setObject(index, identifier, Types.OTHER);
+		}
+		catch (Exception e)
+		{
+			throw new HibernateException("Exception while invoking identifierMethod '"
+					+ identifierMethod.getName() + "' of " + "enumeration class '" + enumClass + "'", e);
 		}
 	}
 

@@ -19,7 +19,10 @@ public interface TaloolService
 
 	public void createAccount(final Customer customer, final String password) throws ServiceException;
 
-	public Customer authenticateCustomer(final String email, final String password) throws ServiceException;
+	public void deleteCustomer(final Long id) throws ServiceException;
+
+	public Customer authenticateCustomer(final String email, final String password)
+			throws ServiceException;
 
 	public void save(final Customer customer) throws ServiceException;
 
@@ -27,11 +30,14 @@ public interface TaloolService
 
 	public Customer getCustomerByEmail(final String email) throws ServiceException;
 
+	public boolean customerEmailExists(final String email) throws ServiceException;
+
 	// Talool Social
 
 	public SocialNetwork getSocialNetwork(final String name) throws ServiceException;
 
-	public SocialAccount newSocialAccount(final String socialNetworkName, final AccountType accountType);
+	public SocialAccount newSocialAccount(final String socialNetworkName,
+			final AccountType accountType);
 
 	public Customer newCustomer();
 

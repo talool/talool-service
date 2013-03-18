@@ -69,7 +69,7 @@ public class CustomerImpl implements Customer
 	@Column(name = "password", unique = false, nullable = false, length = 64)
 	private String password;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = SocialAccountImpl.class, mappedBy = "primaryKey.userId")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SocialAccountImpl.class, mappedBy = "primaryKey.userId")
 	/*
 	 * TODO - sucks - cant get a formula to work. Replace WHERE clause with
 	 * something dynamic that reads the enum to prevent any future bug (WHERE has

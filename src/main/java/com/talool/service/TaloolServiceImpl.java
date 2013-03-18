@@ -2,9 +2,12 @@ package com.talool.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
+import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
 import com.talool.core.Address;
 import com.talool.core.Customer;
@@ -15,8 +18,7 @@ import com.talool.core.service.TaloolService;
 import com.talool.domain.AddressImpl;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.SocialAccountImpl;
-import com.talool.persistence.DaoException;
-import com.talool.persistence.TaloolDao;
+import com.talool.domain.SocialNetworkImpl;
 
 /**
  * Implementation of the TaloolService
@@ -25,28 +27,19 @@ import com.talool.persistence.TaloolDao;
  * @author clintz
  */
 @Transactional(readOnly = true)
+@Service
 public class TaloolServiceImpl implements TaloolService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
 
-	private TaloolDao taloolDao;
+	private DAODispatcher daoDispatcher;
 
 	public TaloolServiceImpl()
 	{}
 
-	public TaloolDao getTaloolDao()
-	{
-		return taloolDao;
-	}
-
-	public void setTaloolDao(TaloolDao taloolDao)
-	{
-		this.taloolDao = taloolDao;
-	}
-
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Override
-	public void createAccount(Customer customer, String password) throws ServiceException
+	public void createAccount(final Customer customer, final String password) throws ServiceException
 	{
 		try
 		{
@@ -58,6 +51,11 @@ public class TaloolServiceImpl implements TaloolService
 			}
 			customer.setPassword(md5pass);
 			save(customer);
+			daoDispatcher.flush(CustomerImpl.class);
+			daoDispatcher.refresh((CustomerImpl) customer);
+
+			LOG.info(customer.toString());
+
 		}
 		catch (Exception e)
 		{
@@ -69,13 +67,14 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public void save(Customer customer) throws ServiceException
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final Customer customer) throws ServiceException
 	{
 		try
 		{
-			taloolDao.save(customer);
+			daoDispatcher.save((CustomerImpl) customer);
 		}
-		catch (DaoException e)
+		catch (Exception e)
 		{
 			final String err = "There was a problem saving customer " + customer;
 			LOG.error(err, e);
@@ -97,19 +96,22 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public Customer authenticateCustomer(String email, String password) throws ServiceException
+	public Customer authenticateCustomer(final String email, final String password)
+			throws ServiceException
 	{
-		Customer customer;
+		final Search search = new Search(CustomerImpl.class);
+		search.addFilterEqual("email", email);
 		try
 		{
-			customer = taloolDao.authenticateCustomer(email, EncryptService.MD5(password));
+			search.addFilterEqual("password", EncryptService.MD5(password));
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem authentication customer " + email, ex);
+			throw new ServiceException("Problem authenticating", ex);
 		}
 
-		return customer;
+		return (Customer) daoDispatcher.searchUnique(search);
+
 	}
 
 	@Override
@@ -118,7 +120,7 @@ public class TaloolServiceImpl implements TaloolService
 		Customer customer;
 		try
 		{
-			customer = taloolDao.getCustomerById(id);
+			customer = daoDispatcher.find(CustomerImpl.class, id);
 		}
 		catch (Exception ex)
 		{
@@ -131,10 +133,13 @@ public class TaloolServiceImpl implements TaloolService
 	@Override
 	public Customer getCustomerByEmail(final String email) throws ServiceException
 	{
-		Customer customer;
+		Customer customer = null;
+
 		try
 		{
-			customer = taloolDao.getCustomerByEmail(email);
+			Search search = new Search(CustomerImpl.class);
+			search.addFilterEqual("email", email);
+			customer = (Customer) daoDispatcher.searchUnique(search);
 		}
 		catch (Exception ex)
 		{
@@ -145,7 +150,8 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public SocialAccount newSocialAccount(final String socialNetworkName, final AccountType accountType)
+	public SocialAccount newSocialAccount(final String socialNetworkName,
+			final AccountType accountType)
 	{
 		try
 		{
@@ -165,7 +171,10 @@ public class TaloolServiceImpl implements TaloolService
 		SocialNetwork snet;
 		try
 		{
-			snet = taloolDao.getSocialNetwork(name);
+			final Search search = new Search(SocialNetworkImpl.class);
+			search.addFilterEqual("name", name);
+			snet = (SocialNetwork) daoDispatcher.searchUnique(search);
+
 		}
 		catch (Exception ex)
 		{
@@ -173,6 +182,48 @@ public class TaloolServiceImpl implements TaloolService
 		}
 
 		return snet;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteCustomer(final Long id) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.removeById(CustomerImpl.class, id);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem deleteing customer", ex);
+		}
+
+	}
+
+	public DAODispatcher getDaoDispatcher()
+	{
+		return daoDispatcher;
+	}
+
+	public void setDaoDispatcher(DAODispatcher daoDispatcher)
+	{
+		this.daoDispatcher = daoDispatcher;
+	}
+
+	@Override
+	public boolean customerEmailExists(final String email) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(CustomerImpl.class);
+			search.addField("id");
+			search.addFilterEqual("email", email);
+			final Long id = (Long) daoDispatcher.searchUnique(search);
+			return id == null ? false : true;
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem customerEmailExists  " + email, ex);
+		}
 	}
 
 }
