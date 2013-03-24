@@ -192,16 +192,17 @@ public class AddressImpl implements Address
 			return false;
 		}
 
-		return new EqualsBuilder().append(getAddress1(), other.getAddress1()).append(getAddress2(), other.getAddress2())
-				.append(getCity(), other.getCity()).append(getStateProvinceCounty(), other.getStateProvinceCounty())
+		return new EqualsBuilder().append(getAddress1(), other.getAddress1())
+				.append(getAddress2(), other.getAddress2()).append(getCity(), other.getCity())
+				.append(getStateProvinceCounty(), other.getStateProvinceCounty())
 				.append(getCountry(), other.getCountry()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getAddress1()).append(getAddress2()).append(getCity())
-				.append(getStateProvinceCounty()).append(getCountry()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getAddress1()).append(getAddress2())
+				.append(getCity()).append(getStateProvinceCounty()).append(getCountry()).hashCode();
 	}
 
 	@Override
@@ -215,4 +216,5 @@ public class AddressImpl implements Address
 	{
 		return address1;
 	}
+
 }

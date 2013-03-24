@@ -26,7 +26,6 @@
 			<groupId>javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.4.GA</version>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.genericdao</groupId>

@@ -26,6 +26,8 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
 import com.talool.core.Sex;
@@ -37,9 +39,12 @@ import com.talool.persistence.GenericEnumUserType;
 @Table(name = "customer", catalog = "public")
 @TypeDef(name = "sexType", typeClass = GenericEnumUserType.class, parameters = {
 		@Parameter(name = "enumClass", value = "com.talool.core.Sex"),
-		@Parameter(name = "identifierMethod", value = "getLetter"), @Parameter(name = "valueOfMethod", value = "valueByLetter") })
+		@Parameter(name = "identifierMethod", value = "getLetter"),
+		@Parameter(name = "valueOfMethod", value = "valueByLetter") })
 public class CustomerImpl implements Customer
 {
+	private static final Logger LOG = LoggerFactory.getLogger(CustomerImpl.class);
+
 	private static final long serialVersionUID = 2498058366640693644L;
 
 	@Id
@@ -163,14 +168,15 @@ public class CustomerImpl implements Customer
 			return false;
 		}
 
-		return new EqualsBuilder().append(getFirstName(), other.getFirstName()).append(getLastName(), other.getLastName())
-				.append(getEmail(), other.getEmail()).isEquals();
+		return new EqualsBuilder().append(getFirstName(), other.getFirstName())
+				.append(getLastName(), other.getLastName()).append(getEmail(), other.getEmail()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getFirstName()).append(getLastName()).append(getEmail()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getFirstName()).append(getLastName())
+				.append(getEmail()).hashCode();
 	}
 
 	@Override

@@ -11,22 +11,18 @@
 #
 ##################################################################
 
-testSchema=$(dirname $0)/test-schema.sql
 taloolSchema=$(dirname $0)/talool-schema.sql
 taloolData=$(dirname $0)/talool-data.sql
-testDbName="talool_test"
+testDbName="talool"
 
 echo "Dropping Database '$testDbName' ..."
 dropdb -U postgres -w $testDbName
-
-echo "Creating $testSchema from $taloolSchema..."
-sed -e "s/CREATE DATABASE talool/CREATE DATABASE talool-test/g;s/ALTER DATABASE talool/ALTER DATABASE talool-test/g;s/connect talool/connect $testDbName/" talool-schema.sql > $testSchema 
 
 echo "Creating Database '$testDbName' ..."
 createdb -U postgres -w $testDbName
 
 echo "Importing $testDbName schema..."
-psql -U talool -w $testDbName < $testSchema
+psql -U postgres -w $testDbName < $taloolSchema
 
 echo "Importing $taloolData into Database '$testDbName' ..."
-psql -U talool -w $testDbName < $taloolData
+psql -U postgres -w $testDbName < $taloolData

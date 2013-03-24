@@ -177,6 +177,8 @@ CREATE TABLE merchant (
     merchant_id bigint NOT NULL,
     merchant_parent_id bigint,
     merchant_name character varying(64) NOT NULL,
+    email character varying(64) NOT NULL,
+    password character varying(32) NOT NULL,
     website_url character varying(128),
     logo_url character varying(64) NOT NULL,
     phone character varying(48),
@@ -186,7 +188,8 @@ CREATE TABLE merchant (
     is_active boolean DEFAULT true NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY (merchant_id)
+    PRIMARY KEY (merchant_id),
+    UNIQUE (merchant_name,address_id)
 );
 
 ALTER TABLE public.merchant OWNER TO talool;
@@ -206,6 +209,7 @@ ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (mer
 CREATE INDEX merchant_latitude_idx ON merchant (latitude);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
 CREATE INDEX merchant_longitude_idx ON merchant (longitude);
+CREATE UNIQUE INDEX merchant_email_idx ON merchant (email);
 
 CREATE TABLE merchant_deal (
     merchant_deal_id bigint NOT NULL,
