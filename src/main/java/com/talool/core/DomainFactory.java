@@ -23,4 +23,6 @@ public interface DomainFactory
 	public Customer newCustomer();
 
 	public DealBookPurchase newDealBookPurchase(final DealBook dealBook, final Customer customer);
+
+	public Location newLocation(final Double longitude, final Double latitude);
 }

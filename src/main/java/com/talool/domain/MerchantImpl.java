@@ -21,10 +21,12 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Address;
+import com.talool.core.Location;
 import com.talool.core.Merchant;
 
 /**
@@ -67,12 +69,6 @@ public class MerchantImpl implements Merchant
 	@Column(name = "phone", unique = true, nullable = true, length = 48)
 	private String phone;
 
-	@Column(name = "longitude", unique = false, nullable = true)
-	private Double longitude;
-
-	@Column(name = "latitude", unique = false, nullable = true)
-	private Double latitude;
-
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = AddressImpl.class)
 	@JoinColumn(name = "address_id")
 	private Address address;
@@ -82,6 +78,10 @@ public class MerchantImpl implements Merchant
 
 	@Column(name = "is_active", unique = false, nullable = true)
 	private boolean isActive = true;
+
+	@Embedded
+	@Target(LocationImpl.class)
+	private Location location;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -134,26 +134,6 @@ public class MerchantImpl implements Merchant
 	public void setPhone(String phone)
 	{
 		this.phone = phone;
-	}
-
-	public Double getLongitude()
-	{
-		return longitude;
-	}
-
-	public void setLongitude(Double longitude)
-	{
-		this.longitude = longitude;
-	}
-
-	public Double getLatitude()
-	{
-		return latitude;
-	}
-
-	public void setLatitude(Double latitude)
-	{
-		this.latitude = latitude;
 	}
 
 	public Address getAddress()
@@ -262,6 +242,18 @@ public class MerchantImpl implements Merchant
 	public void setEmail(final String email)
 	{
 		this.email = email;
+	}
+
+	@Override
+	public Location getLocation()
+	{
+		return location;
+	}
+
+	@Override
+	public void setLocation(Location location)
+	{
+		this.location = location;
 	}
 
 }

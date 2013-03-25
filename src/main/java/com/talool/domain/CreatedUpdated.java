@@ -21,7 +21,6 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class CreatedUpdated
 {
-
 	@Access(AccessType.FIELD)
 	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
 	private Date updated;

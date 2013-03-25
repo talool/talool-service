@@ -19,10 +19,12 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.DealBook;
+import com.talool.core.Location;
 import com.talool.core.Merchant;
 
 /**
@@ -52,12 +54,6 @@ public class DealBookImpl implements DealBook
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
-	@Column(name = "longitude", unique = false, nullable = true)
-	private Double longitude;
-
-	@Column(name = "latitude", unique = false, nullable = true)
-	private Double latitude;
-
 	@Column(name = "title", unique = false, nullable = true, length = 256)
 	private String title;
 
@@ -78,6 +74,10 @@ public class DealBookImpl implements DealBook
 
 	@Column(name = "is_active", unique = false, nullable = true)
 	private boolean isActive = true;
+
+	@Embedded
+	@Target(LocationImpl.class)
+	private Location location;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -112,30 +112,6 @@ public class DealBookImpl implements DealBook
 	public Merchant getMerchant()
 	{
 		return merchant;
-	}
-
-	@Override
-	public Double getLongitude()
-	{
-		return longitude;
-	}
-
-	@Override
-	public void setLongitude(Double longitude)
-	{
-		this.longitude = longitude;
-	}
-
-	@Override
-	public Double getLatitude()
-	{
-		return latitude;
-	}
-
-	@Override
-	public void setLatitude(Double latitude)
-	{
-		this.latitude = latitude;
 	}
 
 	@Override
@@ -270,6 +246,16 @@ public class DealBookImpl implements DealBook
 	{
 		this.merchant = merchant;
 
+	}
+
+	public Location getLocation()
+	{
+		return location;
+	}
+
+	public void setLocation(Location location)
+	{
+		this.location = location;
 	}
 
 }

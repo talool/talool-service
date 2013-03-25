@@ -11,6 +11,7 @@ import com.talool.core.DealBookContent;
 import com.talool.core.DealBookPurchase;
 import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
+import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantDeal;
 import com.talool.core.SocialAccount;
@@ -85,6 +86,12 @@ final class DomainFactoryImpl implements DomainFactory
 	public Customer newCustomer()
 	{
 		return new CustomerImpl();
+	}
+
+	@Override
+	public Location newLocation(Double longitude, Double latitude)
+	{
+		return new LocationImpl(longitude, latitude);
 	}
 
 }

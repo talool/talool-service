@@ -34,13 +34,9 @@ public interface Merchant extends Identifiable, Serializable, TimeAware
 
 	public void setPhone(String phone);
 
-	public Double getLongitude();
+	public Location getLocation();
 
-	public void setLongitude(Double longitude);
-
-	public Double getLatitude();
-
-	public void setLatitude(Double latitude);
+	public void setLocation(Location location);
 
 	public Address getAddress();
 

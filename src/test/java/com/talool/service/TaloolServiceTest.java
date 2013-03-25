@@ -20,6 +20,7 @@ import com.talool.core.DealBookContent;
 import com.talool.core.DealBookPurchase;
 import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
+import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantDeal;
 import com.talool.core.service.ServiceException;
@@ -210,8 +211,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		dealBook.setCost(9.99f);
 		dealBook.setDetails("details-" + now);
 		dealBook.setExpires(new Date());
-		dealBook.setLatitude(44.012893d);
-		dealBook.setLatitude(-79.441833d);
+
+		Location location = domainFactory.newLocation(33.981, -76.002);
+		dealBook.setLocation(location);
+
 		dealBook.setSummary("Summary-" + now);
 		dealBook.setTitle("Title-" + now);
 
@@ -231,8 +234,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		Merchant merchant = domainFactory.newMerchant();
 		merchant.setName("Merch" + now);
-		merchant.setLatitude(-10.564142);
-		merchant.setLongitude(-74.047852);
+
+		Location location = domainFactory.newLocation(-10.564142, -74.047852);
+		merchant.setLocation(location);
+
 		merchant.setPhone("781-818-1212");
 		merchant.setWebsiteUrl("http://merch1.com" + now);
 		merchant.setEmail("billyjohnson" + now + "@gmail.com");

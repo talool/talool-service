@@ -11,18 +11,9 @@ import java.util.Date;
  */
 public interface DealBook extends Identifiable, Serializable, TimeAware
 {
-
 	public Merchant getMerchant();
 
 	public void setMerchant(Merchant merchant);
-
-	public Double getLongitude();
-
-	public void setLongitude(Double longitude);
-
-	public Double getLatitude();
-
-	public void setLatitude(Double latitude);
 
 	public void setTitle(String title);
 
@@ -39,6 +30,10 @@ public interface DealBook extends Identifiable, Serializable, TimeAware
 	public void setCode(String code);
 
 	public String getCode();
+
+	public Location getLocation();
+
+	public void setLocation(Location location);
 
 	public void setCost(Float cost);
 
