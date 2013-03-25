@@ -25,6 +25,7 @@
 
 	<bean id="taloolServiceImpl" class="com.talool.service.TaloolServiceImpl">
 		<property name="daoDispatcher" ref="daoDispatcher" />
+	     <property name="sessionFactory" ref="sessionFactory"/>   
 	</bean>
 
 	<!-- a PlatformTransactionManager is still required -->
@@ -80,21 +81,5 @@
 		</property>
 
 	</bean>
-
-	<bean name="openSessionInViewInterceptor"
-		class="org.springframework.orm.hibernate3.support.OpenSessionInViewInterceptor">
-		<property name="sessionFactory">
-			<ref bean="sessionFactory" />
-		</property>
-	</bean>
-
-
-	<!-- Using patched HibernateInterceptor because there isnt one for Hibernate4 
-		Spring yet https://jira.springsource.org/browse/SPR-9028 <bean id="hibernateInterceptor" 
-		class="com.talool.hibernate.HibernateInterceptor"> <property name="sessionFactory"> 
-		<ref bean="sessionFactory" /> </property> </bean> <bean id="taloolServiceTarget" 
-		class="org.springframework.aop.framework.ProxyFactoryBean"> <property name="target" 
-		ref="taloolServiceImpl" /> <property name="interceptorNames"> <list> <value>hibernateInterceptor</value> 
-		</list> </property> </bean> -->
 
 </beans>

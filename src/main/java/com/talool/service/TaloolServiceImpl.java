@@ -2,6 +2,7 @@ package com.talool.service;
 
 import java.util.List;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,20 +12,22 @@ import org.springframework.transaction.annotation.Transactional;
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
-import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.DealBook;
+import com.talool.core.DealBookContent;
+import com.talool.core.DealBookPurchase;
 import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
-import com.talool.core.SocialAccount;
+import com.talool.core.MerchantDeal;
 import com.talool.core.SocialNetwork;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
-import com.talool.domain.AddressImpl;
 import com.talool.domain.CustomerImpl;
+import com.talool.domain.DealBookContentImpl;
 import com.talool.domain.DealBookImpl;
+import com.talool.domain.DealBookPurchaseImpl;
+import com.talool.domain.MerchantDealImpl;
 import com.talool.domain.MerchantImpl;
-import com.talool.domain.SocialAccountImpl;
 import com.talool.domain.SocialNetworkImpl;
 
 /**
@@ -37,9 +40,20 @@ import com.talool.domain.SocialNetworkImpl;
 @Service
 public class TaloolServiceImpl implements TaloolService
 {
+	public SessionFactory getSessionFactory()
+	{
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory)
+	{
+		this.sessionFactory = sessionFactory;
+	}
+
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
 
 	private DAODispatcher daoDispatcher;
+	private SessionFactory sessionFactory;
 
 	public TaloolServiceImpl()
 	{}
@@ -66,18 +80,6 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(err, e);
 		}
 
-	}
-
-	@Override
-	public Address newAddress()
-	{
-		return new AddressImpl();
-	}
-
-	@Override
-	public Customer newCustomer()
-	{
-		return new CustomerImpl();
 	}
 
 	@Override
@@ -135,22 +137,6 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public SocialAccount newSocialAccount(final String socialNetworkName,
-			final AccountType accountType)
-	{
-		try
-		{
-			return new SocialAccountImpl(getSocialNetwork(socialNetworkName), accountType);
-		}
-		catch (ServiceException e)
-		{
-			LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
-		}
-
-		return new SocialAccountImpl();
-	}
-
-	@Override
 	public SocialNetwork getSocialNetwork(final String name) throws ServiceException
 	{
 		SocialNetwork snet;
@@ -173,15 +159,7 @@ public class TaloolServiceImpl implements TaloolService
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteCustomer(final Long id) throws ServiceException
 	{
-		try
-		{
-			daoDispatcher.removeById(CustomerImpl.class, id);
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException("Problem deleteing customer", ex);
-		}
-
+		removeElement(id, CustomerImpl.class);
 	}
 
 	public DAODispatcher getDaoDispatcher()
@@ -212,12 +190,6 @@ public class TaloolServiceImpl implements TaloolService
 		{
 			throw new ServiceException("Problem emailExists  " + email, ex);
 		}
-	}
-
-	@Override
-	public Merchant newMerchant()
-	{
-		return new MerchantImpl();
 	}
 
 	private void createAccount(final AccountType accountType, final Identifiable account,
@@ -267,15 +239,7 @@ public class TaloolServiceImpl implements TaloolService
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteMerchant(final Long id) throws ServiceException
 	{
-		try
-		{
-			daoDispatcher.removeById(MerchantImpl.class, id);
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException("Problem deleteing customer", ex);
-		}
-
+		removeElement(id, MerchantImpl.class);
 	}
 
 	@Override
@@ -330,18 +294,14 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public DealBook newDealBook(final Merchant merchant)
-	{
-		return new DealBookImpl(merchant);
-	}
-
-	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void save(final DealBook dealBook) throws ServiceException
 	{
 		try
 		{
 			daoDispatcher.save((DealBookImpl) dealBook);
+			daoDispatcher.flush(DealBookImpl.class);
+			daoDispatcher.refresh(dealBook);
 		}
 		catch (Exception e)
 		{
@@ -359,7 +319,8 @@ public class TaloolServiceImpl implements TaloolService
 
 		try
 		{
-			final Search search = new Search(DealBookImpl.class);
+			final Search search = new Search();
+			search.setSearchClass(DealBookImpl.class);
 			search.addFilterEqual("merchant.email", email);
 			dealBooks = daoDispatcher.search(search);
 		}
@@ -371,18 +332,155 @@ public class TaloolServiceImpl implements TaloolService
 		return dealBooks;
 	}
 
+	private void removeElement(final Long id, Class clazz) throws ServiceException
+	{
+		boolean deleted = false;
+		try
+		{
+			deleted = daoDispatcher.removeById(clazz, id);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem removing ID '%d' for domain %s", id,
+					clazz.getSimpleName()), ex);
+		}
+
+		if (!deleted)
+		{
+			throw new ServiceException((String.format("Element ID '%d' not found for domain %s", id,
+					clazz.getSimpleName())));
+		}
+	}
+
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteDealBook(final Long id) throws ServiceException
 	{
+		removeElement(id, DealBookImpl.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantDeal> getMerchantDeals(final Long merchantId, final Boolean isActive)
+			throws ServiceException
+	{
+		List<MerchantDeal> merchantDeals = null;
+
 		try
 		{
-			daoDispatcher.removeById(DealBookImpl.class, id);
+			final Search search = new Search(MerchantDealImpl.class);
+			search.addFilterEqual("merchant.id", merchantId);
+			if (isActive != null)
+			{
+				search.addFilterEqual("isActive", isActive);
+			}
+			merchantDeals = daoDispatcher.search(search);
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem deleteDealBook", ex);
+			throw new ServiceException("Problem getMerchantDeals for merchantId " + merchantId, ex);
 		}
 
+		return merchantDeals;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final MerchantDeal merchantDeal) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save((MerchantDealImpl) merchantDeal);
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem saving merchantDeal " + merchantDeal;
+			throw new ServiceException(err, e);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteMerchantDeal(final Long id) throws ServiceException
+	{
+		removeElement(id, MerchantDealImpl.class);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final DealBookContent dealBookContent) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save((DealBookContentImpl) dealBookContent);
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem saving dealBookContent " + dealBookContent;
+			throw new ServiceException(err, e);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteDealBookContent(final Long id) throws ServiceException
+	{
+		removeElement(id, DealBookContentImpl.class);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final DealBookPurchase dealBookPurchase) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save((DealBookPurchaseImpl) dealBookPurchase);
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem saving dealBookPurchase " + dealBookPurchase;
+			throw new ServiceException(err, e);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealBookPurchase> getPurchases(final AccountType accountType, final Long accountId)
+			throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(DealBookPurchaseImpl.class);
+			search.addFilterEqual(
+					accountType == AccountType.CUS ? "customer.id" : "dealBook.merchant.id", accountId);
+
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealBookPurchasesById %s %d ",
+					accountType, accountId), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealBookPurchase> getPurchasesByDealBookId(final Long dealBookId)
+			throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(DealBookPurchaseImpl.class);
+			search.addFilterEqual("dealBook.id", dealBookId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getPurchasesByDealBookId %s", dealBookId),
+					ex);
+		}
 	}
 }

@@ -1,6 +1,5 @@
 package com.talool.core.service;
 
-import com.talool.core.AccountType;
 import com.talool.core.Customer;
 
 /**
@@ -11,8 +10,6 @@ import com.talool.core.Customer;
  */
 public interface CustomerService
 {
-	public Customer newCustomer();
-
 	public void createAccount(final Customer customer, final String password) throws ServiceException;
 
 	public void deleteCustomer(final Long id) throws ServiceException;
@@ -25,8 +22,5 @@ public interface CustomerService
 	public Customer getCustomerById(final Long id) throws ServiceException;
 
 	public Customer getCustomerByEmail(final String email) throws ServiceException;
-
-	public boolean emailExists(final AccountType accountType, final String email)
-			throws ServiceException;
 
 }

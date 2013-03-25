@@ -20,6 +20,16 @@
 
 	<bean id="serviceFactory" class="com.talool.service.ServiceFactory" factory-method="createInstance">
 		<constructor-arg ref="taloolServiceImpl"/>
-		</bean>
+   </bean>
+		
+				
+	<bean id="domainFactory" class="com.talool.domain.DomainFactoryImpl"/>
+	
+	<bean id="factoryManager" class="com.talool.core.FactoryManager" factory-method="createInstance">
+	    <constructor-arg ref="serviceFactory"/>
+	    <constructor-arg ref="domainFactory"/>
+	</bean>
+	
+
 
 </beans>

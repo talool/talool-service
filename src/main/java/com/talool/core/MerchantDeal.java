@@ -9,20 +9,9 @@ import java.util.Date;
  * @author clintz
  * 
  */
-public interface DealBook extends Identifiable, Serializable, TimeAware
+public interface MerchantDeal extends Identifiable, Serializable, TimeAware
 {
-
 	public Merchant getMerchant();
-
-	public void setMerchant(Merchant merchant);
-
-	public Double getLongitude();
-
-	public void setLongitude(Double longitude);
-
-	public Double getLatitude();
-
-	public void setLatitude(Double latitude);
 
 	public void setTitle(String title);
 
@@ -40,9 +29,9 @@ public interface DealBook extends Identifiable, Serializable, TimeAware
 
 	public String getCode();
 
-	public void setCost(Float cost);
+	public void setImageUrl(String imageUrl);
 
-	public Float getCost();
+	public String getImageUrl();
 
 	public void setExpires(Date expires);
 

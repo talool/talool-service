@@ -18,12 +18,11 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.talool.core.DealBook;
 import com.talool.core.Merchant;
+import com.talool.core.MerchantDeal;
 
 /**
  * Deal Book implementation
@@ -34,17 +33,17 @@ import com.talool.core.Merchant;
  * 
  */
 @Entity
-@Table(name = "deal_book", catalog = "public")
-public class DealBookImpl implements DealBook
+@Table(name = "merchant_deal", catalog = "public")
+public class MerchantDealImpl implements MerchantDeal
 {
-	private static final Logger LOG = LoggerFactory.getLogger(DealBookImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MerchantDealImpl.class);
 	private static final long serialVersionUID = -452436060657087167L;
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_deal_book_seq")
-	@SequenceGenerator(name = "my_deal_book_seq", sequenceName = "deal_book_deal_book_id_seq")
-	@Column(name = "deal_book_id", unique = true, nullable = false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_merchant_deal_seq")
+	@SequenceGenerator(name = "my_merchant_deal_seq", sequenceName = "merchant_deal_merchant_deal_id_seq")
+	@Column(name = "merchant_deal_id", unique = true, nullable = false)
 	private Long id;
 
 	@Access(AccessType.FIELD)
@@ -52,14 +51,11 @@ public class DealBookImpl implements DealBook
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
-	@Column(name = "longitude", unique = false, nullable = true)
-	private Double longitude;
-
-	@Column(name = "latitude", unique = false, nullable = true)
-	private Double latitude;
-
 	@Column(name = "title", unique = false, nullable = true, length = 256)
 	private String title;
+
+	@Column(name = "image_url", unique = false, nullable = true, length = 128)
+	private String imageUrl;
 
 	@Column(name = "summary", unique = false, nullable = true, length = 256)
 	private String summary;
@@ -70,9 +66,6 @@ public class DealBookImpl implements DealBook
 	@Column(name = "code", unique = false, nullable = true, length = 128)
 	private String code;
 
-	@Column(name = "cost", unique = false, nullable = true, precision = 10, scale = 2)
-	private Float cost;
-
 	@Column(name = "expires", unique = false, nullable = true)
 	private Date expires;
 
@@ -82,10 +75,10 @@ public class DealBookImpl implements DealBook
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
-	public DealBookImpl()
+	public MerchantDealImpl()
 	{}
 
-	public DealBookImpl(final Merchant merchant)
+	public MerchantDealImpl(final Merchant merchant)
 	{
 		this.merchant = merchant;
 	}
@@ -112,30 +105,6 @@ public class DealBookImpl implements DealBook
 	public Merchant getMerchant()
 	{
 		return merchant;
-	}
-
-	@Override
-	public Double getLongitude()
-	{
-		return longitude;
-	}
-
-	@Override
-	public void setLongitude(Double longitude)
-	{
-		this.longitude = longitude;
-	}
-
-	@Override
-	public Double getLatitude()
-	{
-		return latitude;
-	}
-
-	@Override
-	public void setLatitude(Double latitude)
-	{
-		this.latitude = latitude;
 	}
 
 	@Override
@@ -188,18 +157,6 @@ public class DealBookImpl implements DealBook
 	}
 
 	@Override
-	public void setCost(Float cost)
-	{
-		this.cost = cost;
-	}
-
-	@Override
-	public Float getCost()
-	{
-		return cost;
-	}
-
-	@Override
 	public void setExpires(Date expires)
 	{
 		this.expires = expires;
@@ -237,12 +194,12 @@ public class DealBookImpl implements DealBook
 			return false;
 		}
 
-		if (!(obj instanceof DealBookImpl))
+		if (!(obj instanceof MerchantDealImpl))
 		{
 			return false;
 		}
 
-		final DealBookImpl other = (DealBookImpl) obj;
+		final MerchantDealImpl other = (MerchantDealImpl) obj;
 
 		if (getId() != other.getId())
 		{
@@ -260,16 +217,15 @@ public class DealBookImpl implements DealBook
 	}
 
 	@Override
-	public String toString()
+	public void setImageUrl(String imageUrl)
 	{
-		return ReflectionToStringBuilder.toString(this);
+		this.imageUrl = imageUrl;
 	}
 
 	@Override
-	public void setMerchant(Merchant merchant)
+	public String getImageUrl()
 	{
-		this.merchant = merchant;
-
+		return imageUrl;
 	}
 
 }

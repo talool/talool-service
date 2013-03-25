@@ -16,11 +16,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.talool.core.FactoryManager;
 import com.talool.core.service.TaloolService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-@ContextConfiguration("classpath:test/taloolService.xml")
+@ContextConfiguration("classpath:test/taloolService-test.xml")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 /**
  * Before/After behave like OpenSessionInViewFilter
@@ -30,7 +31,7 @@ import com.talool.core.service.TaloolService;
 public abstract class HibernateFunctionalTestBase extends AbstractJUnit4SpringContextTests
 {
 	@Autowired
-	protected ServiceFactory serviceFactory;
+	protected FactoryManager serviceFactory;
 
 	@Autowired
 	protected TaloolService taloolService;

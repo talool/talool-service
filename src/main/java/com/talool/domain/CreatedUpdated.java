@@ -21,12 +21,13 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class CreatedUpdated
 {
+
 	@Access(AccessType.FIELD)
 	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
 	private Date updated;
 
 	@Access(AccessType.FIELD)
-	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
+	@Column(name = "create_dt", unique = false, insertable = false, updatable = false)
 	private Date created;
 
 	public Date getUpdated()
