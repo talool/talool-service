@@ -2,6 +2,7 @@ package com.talool.service;
 
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -482,5 +483,65 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(String.format("Problem getPurchasesByDealBookId %s", dealBookId),
 					ex);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getMerchantsByCustomerId(final Long customerId) throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory
+					.getCurrentSession()
+					.createQuery(
+							"select distinct m from DealBookPurchaseImpl dbp,  MerchantDealImpl md, MerchantImpl m, DealBookContentImpl dbc "
+									+ "where dbp.customer.id=:customerId AND dbp.dealBook.id=dbc.dealBook.id AND dbc.merchantDeal.merchant.id=md.merchant.id AND dbc.merchantDeal.merchant.id=m.id");
+
+			query.setParameter("customerId", customerId);
+			return query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getMerchantsByCustomerId %s", customerId),
+					ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantDeal> getDealsByMerchantId(final Long merchantId) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(MerchantDealImpl.class);
+			search.addFilterEqual("merchant.id", merchantId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealsByMerchantId %s", merchantId), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantDeal> getDealsByCustomerId(final Long accountId) throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory
+					.getCurrentSession()
+					.createQuery(
+							"from MerchantDealImpl md, DealBookPurchaseImpl dbp where dbp.merchantId=md.id and dbp.customerId=:customerId");
+
+			query.setParameter("customerId", accountId);
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealsByCustomerId %d", accountId), ex);
+		}
+
 	}
 }

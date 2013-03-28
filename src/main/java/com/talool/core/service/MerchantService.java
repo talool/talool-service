@@ -47,6 +47,26 @@ public interface MerchantService
 
 	public void save(final DealBookPurchase dealBookPurchase) throws ServiceException;
 
+	/**
+	 * Gets Merchants associated with a customer (via paid deal books or free)
+	 * 
+	 * @param customerId
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Merchant> getMerchantsByCustomerId(final Long customerId) throws ServiceException;
+
+	/**
+	 * Gets deals by merchantId
+	 * 
+	 * @param merchantId
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<MerchantDeal> getDealsByMerchantId(final Long merchantId) throws ServiceException;
+
+	public List<MerchantDeal> getDealsByCustomerId(final Long accountId) throws ServiceException;
+
 	public List<DealBookPurchase> getPurchases(final AccountType accountType, final Long accountId)
 			throws ServiceException;
 

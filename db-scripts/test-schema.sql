@@ -94,15 +94,20 @@ CREATE TABLE customer (
 
 ALTER TABLE public.customer OWNER TO talool;
 
-CREATE SEQUENCE customer_id_seq
+CREATE SEQUENCE customer_customer_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+    
+ALTER TABLE public.customer_customer_id_seq OWNER TO talool;
+ALTER SEQUENCE customer_customer_id_seq OWNED BY customer.customer_id;
 
-ALTER TABLE public.customer_id_seq OWNER TO talool;
-ALTER SEQUENCE customer_id_seq OWNED BY customer.customer_id;
+ALTER TABLE ONLY customer ALTER COLUMN customer_id SET DEFAULT nextval('customer_customer_id_seq'::regclass);
+
+CREATE UNIQUE INDEX customer_email_idx ON customer (email);
+
 
 CREATE SEQUENCE address_address_id_seq
     START WITH 1
@@ -113,20 +118,6 @@ CREATE SEQUENCE address_address_id_seq
 
 ALTER TABLE public.address_address_id_seq OWNER TO talool;
 ALTER SEQUENCE address_address_id_seq OWNED BY address.address_id;
-
-CREATE UNIQUE INDEX customer_email_idx ON customer (email);
-
-CREATE SEQUENCE customer_customer_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.customer_customer_id_seq OWNER TO talool;
-
-ALTER SEQUENCE customer_customer_id_seq OWNED BY customer.customer_id;
 
 CREATE SEQUENCE social_network_id_seq 
  	START WITH 1
@@ -256,7 +247,8 @@ CREATE TABLE deal_book (
     is_active boolean DEFAULT true NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY (deal_book_id)
+    PRIMARY KEY (deal_book_id),
+    UNIQUE(merchant_id,title,is_active)
 );
 
 ALTER TABLE public.deal_book OWNER TO talool;
@@ -365,8 +357,6 @@ CREATE INDEX merchant_deal_longitude_idx ON merchant_deal_redeemed (longitude);
 ALTER TABLE ONLY address ALTER COLUMN address_id SET DEFAULT nextval('address_address_id_seq'::regclass);
 
 CREATE UNIQUE INDEX address_idx ON address (address1,address2,city,state_province_county,zip,country);
-
-ALTER TABLE ONLY customer ALTER COLUMN customer_id SET DEFAULT nextval('customer_customer_id_seq'::regclass);
 
 ALTER TABLE ONLY address  ADD CONSTRAINT address_pkey PRIMARY KEY (address_id);
 
