@@ -7,5 +7,5 @@ package com.talool.core;
  */
 public enum DealType
 {
-	PaidBook, FreeBook, PaidDeal, FreeDeal;
+	PAID_BOOK, FREE_BOOK, PAID_DEAL, FREE_DEAL;
 }

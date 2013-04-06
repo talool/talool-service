@@ -68,7 +68,7 @@ public class CustomerImpl implements Customer
 	@Column(name = "last_name", unique = false, nullable = true, length = 64)
 	private String lastName;
 
-	@Column(name = "email", unique = true, nullable = true, length = 64)
+	@Column(name = "email", unique = true, nullable = true, length = 128)
 	private String email;
 
 	@Column(name = "password", unique = false, nullable = false, length = 64)

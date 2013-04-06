@@ -72,7 +72,7 @@ public class DealAquireHistoryImpl implements DealAquireHistory
 	@Column(name = "share_cnt", unique = false, nullable = true)
 	private Integer shareCount;
 
-	@Column(name = "update_dt", unique = false, nullable = true)
+	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
 	private Date updated;
 
 	@Override

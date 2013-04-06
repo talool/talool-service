@@ -94,7 +94,7 @@ CREATE TYPE sex_type AS ENUM ('M', 'F');
 
 CREATE TABLE customer (
     customer_id bigint NOT NULL,
-    email character varying(64) NOT NULL,
+    email character varying(128) NOT NULL,
     password character varying(32) NOT NULL,
     first_name character varying(64)  NULL,
     last_name character varying(64)  NULL,
@@ -116,25 +116,38 @@ CREATE SEQUENCE customer_customer_id_seq
     
 ALTER TABLE public.customer_customer_id_seq OWNER TO talool;
 ALTER SEQUENCE customer_customer_id_seq OWNED BY customer.customer_id;
-
 ALTER TABLE ONLY customer ALTER COLUMN customer_id SET DEFAULT nextval('customer_customer_id_seq'::regclass);
 
 CREATE UNIQUE INDEX customer_email_idx ON customer (email);
 
-CREATE TYPE relationship_status AS ENUM ('Pending', 'Friend','Blocked');
+CREATE TYPE relationship_status AS ENUM ('PENDING', 'FRIEND','BLOCKED');
 
 CREATE TABLE friend_request (
     friend_request_id bigint NOT NULL,
     customer_id bigint NOT NULL,
     friend_facebook_id character varying(32),
-    friend_email character varying(32),
+    friend_email character varying(128),
     deal_id bigint,
     created_dt timestamp NOT NULL DEFAULT NOW(),
-    PRIMARY KEY(friend_request_id)
+    PRIMARY KEY(friend_request_id),
+    UNIQUE(customer_id,friend_facebook_id,friend_email)
 );
 
 ALTER TABLE public.friend_request OWNER TO talool;
+
+CREATE SEQUENCE friend_request_friend_request_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+    
+ALTER TABLE public.friend_request_friend_request_id_seq OWNER TO talool;
+ALTER SEQUENCE friend_request_friend_request_id_seq OWNED BY friend_request.friend_request_id;
+ALTER TABLE ONLY friend_request ALTER COLUMN friend_request_id SET DEFAULT nextval('friend_request_friend_request_id_seq'::regclass);
 ALTER TABLE ONLY friend_request ADD CONSTRAINT "FK_FriendRequest_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+CREATE INDEX friend_request_customer_idx ON friend_request (customer_id);
+
 
 CREATE TABLE relationship (
 	relationship_id bigint NOT NULL,
@@ -147,8 +160,21 @@ CREATE TABLE relationship (
 );
 
 ALTER TABLE public.relationship OWNER TO talool;
+
+CREATE SEQUENCE relationship_relationship_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+    
+ALTER TABLE public.relationship_relationship_id_seq OWNER TO talool;
+ALTER SEQUENCE relationship_relationship_id_seq OWNED BY relationship.relationship_id;
+ALTER TABLE ONLY relationship ALTER COLUMN relationship_id SET DEFAULT nextval('relationship_relationship_id_seq'::regclass);
 ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_Friend" FOREIGN KEY (friend_id) REFERENCES customer(customer_id);
+CREATE INDEX relationship_customer_id_idx ON relationship (customer_id);
+CREATE INDEX relationship_friend_id_idx ON relationship (friend_id);
 
 CREATE SEQUENCE tag_id_seq 
  	START WITH 1
@@ -214,7 +240,7 @@ ALTER TABLE ONLY social_network ALTER COLUMN social_network_id SET DEFAULT nextv
 CREATE TABLE merchant_location (
     merchant_location_id bigint NOT NULL,
     merchant_location_name character varying(64),
-    email character varying(64) NOT NULL,
+    email character varying(128) NOT NULL,
     website_url character varying(128),
     logo_url character varying(64) NOT NULL,
     phone character varying(48),
@@ -271,7 +297,7 @@ ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (mer
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_MechantLocation" FOREIGN KEY (primary_location_id) REFERENCES merchant_location(merchant_location_id);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
 
-CREATE SEQUENCE merchant_managed_location_id_seq
+CREATE SEQUENCE merchant_managed_location_merchant_managed_location_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -287,16 +313,16 @@ CREATE TABLE merchant_managed_location (
 );
 
 ALTER TABLE public.merchant_managed_location OWNER TO talool;
-ALTER TABLE public.merchant_managed_location_id_seq OWNER TO talool;
-ALTER SEQUENCE merchant_managed_location_id_seq OWNED BY merchant_managed_location.merchant_managed_location_id;
-ALTER TABLE ONLY merchant_managed_location ALTER COLUMN merchant_managed_location_id SET DEFAULT nextval('merchant_managed_location_id_seq'::regclass);
+ALTER TABLE public.merchant_managed_location_merchant_managed_location_id_seq OWNER TO talool;
+ALTER SEQUENCE merchant_managed_location_merchant_managed_location_id_seq OWNED BY merchant_managed_location.merchant_managed_location_id;
+ALTER TABLE ONLY merchant_managed_location ALTER COLUMN merchant_managed_location_id SET DEFAULT nextval('merchant_managed_location_merchant_managed_location_id_seq'::regclass);
 ALTER TABLE ONLY merchant_managed_location ADD CONSTRAINT "FK_MerchantManagedLocation_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY merchant_managed_location ADD CONSTRAINT "FK_MerchantManagedLocation_MerchantLocation" FOREIGN KEY (merchant_location_id) REFERENCES merchant_location(merchant_location_id);
 
 CREATE TABLE merchant_account (
  	merchant_account_id bigint NOT NULL,
  	merchant_id bigint NOT NULL,
-    email character varying(64) NOT NULL,
+    email character varying(128) NOT NULL,
     password character varying(32) NOT NULL,
     role_title character varying(64) NOT NULL,
     allow_deal_creation bool NOT NULL,
@@ -320,8 +346,7 @@ ALTER TABLE ONLY merchant_account ALTER COLUMN merchant_account_id SET DEFAULT n
 ALTER TABLE ONLY merchant_account ADD CONSTRAINT "FK_MerchantAccount_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 
 CREATE UNIQUE INDEX merchant_account_email_idx ON merchant_account (email);
-
-CREATE TYPE deal_type AS ENUM ('PaidBook','FreeBook','PaidDeal','FreeDeal');
+CREATE TYPE deal_type AS ENUM ('PAID_BOOK','FREE_BOOK','PAID_DEAL','FREE_DEAL');
 
 CREATE TABLE deal_offer (
     deal_offer_id bigint NOT NULL,
@@ -364,10 +389,24 @@ CREATE TABLE deal_offer_purchase (
 );
 
 ALTER TABLE public.deal_offer_purchase OWNER TO talool;
+
+CREATE SEQUENCE deal_offer_purchase_deal_offer_purchase_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+    
+ALTER TABLE public.deal_offer_purchase_deal_offer_purchase_id_seq OWNER TO talool;
+ALTER SEQUENCE deal_offer_purchase_deal_offer_purchase_id_seq OWNED BY deal_offer_purchase.deal_offer_purchase_id;
+ALTER TABLE ONLY deal_offer_purchase ALTER COLUMN deal_offer_purchase_id SET DEFAULT nextval('deal_offer_purchase_deal_offer_purchase_id_seq'::regclass);
+
 ALTER TABLE ONLY deal_offer_purchase ADD CONSTRAINT "FK_DealOfferPurchase_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
 ALTER TABLE ONLY deal_offer_purchase ADD CONSTRAINT "FK_DealOfferPurchase_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 CREATE INDEX deal_offer_purchase_deal_offer_idx ON deal_offer_purchase (deal_offer_id);
 CREATE INDEX deal_offer_purchase_customer_idx ON deal_offer_purchase (customer_id);
+CREATE INDEX deal_offer_purchase_latitude_idx ON deal_offer_purchase (latitude);
+CREATE INDEX deal_offer_purchase_longitude_idx ON deal_offer_purchase (longitude);
 
 CREATE TABLE deal (
     deal_id bigint NOT NULL,   
@@ -387,15 +426,27 @@ CREATE TABLE deal (
 );
 
 ALTER TABLE public.deal OWNER TO talool;
+
+CREATE SEQUENCE deal_deal_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+    
+ALTER TABLE public.deal_deal_id_seq OWNER TO talool;
+ALTER SEQUENCE deal_deal_id_seq OWNED BY deal.deal_id;
+ALTER TABLE ONLY deal ALTER COLUMN deal_id SET DEFAULT nextval('deal_deal_id_seq'::regclass);
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_DealDetail_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_DealDetail_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+CREATE INDEX deal_deal_offer_id_idx ON deal (deal_offer_id);
+CREATE INDEX deal_merchant_id_idx ON deal (merchant_id);
 
 CREATE TABLE deal_tag (
-    deal_tag_id bigint NOT NULL,   
     deal_id bigint NOT NULL,
     tag_id smallint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY(deal_tag_id)
+    PRIMARY KEY(deal_id,tag_id)
 );
 
 ALTER TABLE public.deal_tag OWNER TO talool;
@@ -403,15 +454,15 @@ ALTER TABLE ONLY deal_tag ADD CONSTRAINT "FK_DealTag_Deal" FOREIGN KEY (deal_id)
 ALTER TABLE ONLY deal_tag ADD CONSTRAINT "FK_DealTag_Tag" FOREIGN KEY (tag_id) REFERENCES tag(tag_id);
 CREATE INDEX deal_tag_deal_id_idx ON deal_tag (deal_id);
 CREATE INDEX deal_tag_tag_id_idx ON deal_tag (tag_id);
-
+    
 CREATE TABLE merchant_tag (
-    merchant_tag_id bigint NOT NULL,   
     merchant_id bigint NOT NULL,
-    tag_id bigint NOT NULL,
+    tag_id smallint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY(merchant_tag_id)
+    PRIMARY KEY(merchant_id,tag_id)
 );
 
+ALTER TABLE public.merchant_tag OWNER TO talool;
 ALTER TABLE ONLY merchant_tag ADD CONSTRAINT "FK_MerchantTag_Deal" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY merchant_tag ADD CONSTRAINT "FK_MerchantTag_Tag" FOREIGN KEY (tag_id) REFERENCES tag(tag_id);
 CREATE INDEX merchant_tag_merchant_id_idx ON merchant_tag (merchant_id);
@@ -457,12 +508,26 @@ CREATE TABLE deal_aquire (
 );
 
 ALTER TABLE public.deal_aquire OWNER TO talool;
+
+CREATE SEQUENCE deal_aquire_deal_aquire_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+    
+ALTER TABLE public.deal_aquire_deal_aquire_id_seq OWNER TO talool;
+ALTER SEQUENCE deal_aquire_deal_aquire_id_seq OWNED BY deal_aquire.deal_aquire_id;
+ALTER TABLE ONLY deal_aquire ALTER COLUMN deal_aquire_id SET DEFAULT nextval('deal_aquire_deal_aquire_id_seq'::regclass);
 ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_DealDetail" FOREIGN KEY (deal_id) REFERENCES deal(deal_id);
 ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_AquireStatus" FOREIGN KEY (aquire_status_id) REFERENCES aquire_status(aquire_status_id);
-
+CREATE INDEX deal_aquire_deal_id_idx ON deal_aquire (deal_id);
+CREATE INDEX deal_aquire_customer_id_idx ON deal_aquire (customer_id);
+CREATE INDEX deal_aquire_shared_by_customer_id_idx ON deal_aquire (shared_by_customer_id);
+CREATE INDEX deal_aquire_shared_by_merchant_id_idx ON deal_aquire (shared_by_merchant_id);
 
 CREATE TABLE deal_aquire_history (
     deal_aquire_history_id bigint NOT NULL,  
@@ -477,11 +542,26 @@ CREATE TABLE deal_aquire_history (
 );
 
 ALTER TABLE public.deal_aquire_history OWNER TO talool;
+
+CREATE SEQUENCE deal_aquire_history_deal_aquire_history_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+    
+ALTER TABLE public.deal_aquire_history_deal_aquire_history_id_seq OWNER TO talool;
+ALTER SEQUENCE deal_aquire_history_deal_aquire_history_id_seq OWNED BY deal_aquire_history.deal_aquire_id;
+ALTER TABLE ONLY deal_aquire_history ALTER COLUMN deal_aquire_id SET DEFAULT nextval('deal_aquire_history_deal_aquire_history_id_seq'::regclass);
+
 ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_DealAquire" FOREIGN KEY (deal_aquire_id) REFERENCES deal_aquire(deal_aquire_id);
 ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_AquireStatus" FOREIGN KEY (aquire_status_id) REFERENCES aquire_status(aquire_status_id);
+
+
+
 
 CREATE TRIGGER update_merchant_update_dt BEFORE UPDATE ON merchant FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_customer_update_dt BEFORE UPDATE ON customer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();

@@ -1,0 +1,161 @@
+package com.talool.domain;
+
+import java.util.Date;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+
+import com.talool.core.Customer;
+import com.talool.core.RelationShip;
+import com.talool.core.RelationshipStatus;
+import com.talool.persistence.GenericEnumUserType;
+
+/**
+ * 
+ * @author clintz
+ * 
+ */
+@Entity
+@Table(name = "relationship", catalog = "public")
+@TypeDef(name = "relationshipStatus", typeClass = GenericEnumUserType.class)
+public class RelationshipImpl implements RelationShip
+{
+	private static final long serialVersionUID = -8998925353726298712L;
+
+	@Id
+	@Access(AccessType.FIELD)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_rel_seq")
+	@SequenceGenerator(name = "my_rel_seq", sequenceName = "relationship_relationship_id_seq")
+	@Column(name = "relationship_id", unique = true, nullable = false)
+	private Long id;
+
+	@Access(AccessType.FIELD)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
+	@JoinColumn(name = "customer_id")
+	private Customer customer;
+
+	@Access(AccessType.FIELD)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
+	@JoinColumn(name = "friend_id")
+	private Customer friend;
+
+	@Type(type = "relationshipStatus")
+	@Column(name = "status", nullable = false, columnDefinition = "relationship_status")
+	private RelationshipStatus relationshipStatus;
+
+	@Embedded
+	private CreatedUpdated createdUpdated;
+
+	@Override
+	public Long getId()
+	{
+		return id;
+	}
+
+	@Override
+	public Date getCreated()
+	{
+		return createdUpdated.getCreated();
+	}
+
+	@Override
+	public Date getUpdated()
+	{
+		return createdUpdated.getUpdated();
+	}
+
+	@Override
+	public Customer getCustomer()
+	{
+		return customer;
+	}
+
+	@Override
+	public void setCustomer(Customer customer)
+	{
+		this.customer = customer;
+	}
+
+	@Override
+	public Customer getFriend()
+	{
+		return friend;
+	}
+
+	@Override
+	public void setFriend(Customer friend)
+	{
+		this.friend = friend;
+	}
+
+	@Override
+	public RelationshipStatus getRelationshipStatus()
+	{
+		return relationshipStatus;
+	}
+
+	@Override
+	public void setRelationshipStatus(RelationshipStatus relationShipStatus)
+	{
+		this.relationshipStatus = relationShipStatus;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+
+		if (obj == null)
+		{
+			return false;
+		}
+
+		if (!(obj instanceof RelationshipImpl))
+		{
+			return false;
+		}
+
+		final RelationshipImpl other = (RelationshipImpl) obj;
+
+		if (getId() != other.getId())
+		{
+			return false;
+		}
+
+		return new EqualsBuilder().append(getCustomer(), other.getCustomer())
+				.append(getFriend(), other.getFriend()).isEquals();
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return new HashCodeBuilder(17, 37).append(getCustomer()).append(getFriend()).hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return ReflectionToStringBuilder.toString(this);
+	}
+
+}
