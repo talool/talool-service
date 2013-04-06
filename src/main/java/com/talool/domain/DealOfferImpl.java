@@ -1,0 +1,243 @@
+package com.talool.domain;
+
+import java.util.Date;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+
+import com.talool.core.DealOffer;
+import com.talool.core.DealType;
+import com.talool.core.Merchant;
+import com.talool.persistence.GenericEnumUserType;
+
+/**
+ * DealOffer Impl
+ * 
+ * TODO Create Money object and replace price
+ * 
+ * @author clintz
+ * 
+ */
+@Entity
+@Table(name = "deal_offer", catalog = "public")
+@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class)
+public class DealOfferImpl implements DealOffer
+{
+	private static final long serialVersionUID = 5159454091663842874L;
+
+	@Id
+	@Access(AccessType.FIELD)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_deal_offer_seq")
+	@SequenceGenerator(name = "my_deal_offer_seq", sequenceName = "deal_offer_deal_offer_id_seq")
+	@Column(name = "deal_offer_id", unique = true, nullable = false)
+	private Long id;
+
+	@Access(AccessType.FIELD)
+	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "created_by_merchant_account_id")
+	private Merchant createdByMerchant;
+
+	@Column(name = "image_url", unique = false, nullable = true, length = 128)
+	private String imageUrl;
+
+	@Column(name = "summary", unique = false, nullable = true, length = 256)
+	private String summary;
+
+	@Column(name = "code", unique = false, nullable = true, length = 128)
+	private String code;
+
+	@Column(name = "expires", unique = false, nullable = true)
+	private Date expires;
+
+	@Column(name = "is_active", unique = false, nullable = true)
+	private boolean isActive = true;
+
+	@Column(name = "price", unique = false, nullable = true)
+	private Float price;
+
+	@Type(type = "dealType")
+	@Column(name = "deal_type", nullable = false, columnDefinition = "deal_type")
+	private DealType dealType;
+
+	@Embedded
+	private CreatedUpdated createdUpdated;
+
+	public DealOfferImpl()
+	{}
+
+	public DealOfferImpl(final Merchant merchant)
+	{
+		this.createdByMerchant = merchant;
+	}
+
+	@Override
+	public Long getId()
+	{
+		return id;
+	}
+
+	@Override
+	public Date getCreated()
+	{
+		return createdUpdated.getCreated();
+	}
+
+	@Override
+	public Date getUpdated()
+	{
+		return createdUpdated.getUpdated();
+	}
+
+	@Override
+	public void setSummary(String summary)
+	{
+		this.summary = summary;
+	}
+
+	@Override
+	public String getSummary()
+	{
+		return summary;
+	}
+
+	@Override
+	public void setCode(String code)
+	{
+		this.code = code;
+	}
+
+	@Override
+	public String getCode()
+	{
+		return code;
+	}
+
+	@Override
+	public void setExpires(Date expires)
+	{
+		this.expires = expires;
+
+	}
+
+	@Override
+	public Date getExpires()
+	{
+		return expires;
+	}
+
+	@Override
+	public boolean isActive()
+	{
+		return isActive;
+	}
+
+	@Override
+	public void setActive(boolean isActive)
+	{
+		this.isActive = isActive;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+
+		if (obj == null)
+		{
+			return false;
+		}
+
+		if (!(obj instanceof DealImpl))
+		{
+			return false;
+		}
+
+		final DealOfferImpl other = (DealOfferImpl) obj;
+
+		if (getId() != other.getId())
+		{
+			return false;
+		}
+
+		return new EqualsBuilder().append(getSummary(), other.getSummary())
+				.append(getCreatedByMerchant(), other.getCreatedByMerchant()).isEquals();
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return new HashCodeBuilder(17, 37).append(getSummary()).append(getCreatedByMerchant())
+				.hashCode();
+	}
+
+	@Override
+	public void setImageUrl(String imageUrl)
+	{
+		this.imageUrl = imageUrl;
+	}
+
+	@Override
+	public String getImageUrl()
+	{
+		return imageUrl;
+	}
+
+	@Override
+	public Merchant getCreatedByMerchant()
+	{
+		return createdByMerchant;
+	}
+
+	@Override
+	public void setPrice(Float price)
+	{
+		this.price = price;
+
+	}
+
+	@Override
+	public Float getPrice()
+	{
+		return price;
+	}
+
+	@Override
+	public void setDealType(DealType dealType)
+	{
+		this.dealType = dealType;
+
+	}
+
+	@Override
+	public DealType getType()
+	{
+		return dealType;
+	}
+
+	@Override
+	public String toString()
+	{
+		return ReflectionToStringBuilder.toString(this);
+	}
+
+}

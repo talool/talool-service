@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ERDiagram version="1.1">
+  <Connection session="Postgres9" database="public" />
+  <Drawing gridVisible="false" snapOn="false" fastRouting="false" labelsVisible="true" />
+  <Tables>
+    <Table name="address">
+      <Drawing expanded="true" location="-697,2212" dimensions="269,208" />
+      <Columns>
+        <Column name="address_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="address1" primary_key="false" foreign_key="false" required="false" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="address2" primary_key="false" foreign_key="false" required="false" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="city" primary_key="false" foreign_key="false" required="true" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="state_province_county" primary_key="false" foreign_key="false" required="true" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="zip" primary_key="false" foreign_key="false" required="false" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="country" primary_key="false" foreign_key="false" required="false" unique="true">
+          <Data type="varchar" size="4" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="aquire_status">
+      <Drawing expanded="true" location="255,925" dimensions="235,108" />
+      <Columns>
+        <Column name="aquire_status_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int2" size="5" />
+        </Column>
+        <Column name="status" primary_key="false" foreign_key="false" required="false" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="customer">
+      <Drawing expanded="true" location="-317,875" dimensions="247,208" />
+      <Columns>
+        <Column name="customer_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="email" primary_key="false" foreign_key="false" required="true" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="password" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="32" />
+        </Column>
+        <Column name="first_name" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="last_name" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="sex_t" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="sex_type" size="2147483647" />
+        </Column>
+        <Column name="birth_date" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="date" size="13" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="deal">
+      <Drawing expanded="true" location="590,836" dimensions="215,286" />
+      <Columns>
+        <Column name="deal_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="deal_offer_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="merchant_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="deal_index" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="int4" size="10" />
+        </Column>
+        <Column name="title" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="256" />
+        </Column>
+        <Column name="summary" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="256" />
+        </Column>
+        <Column name="details" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="256" />
+        </Column>
+        <Column name="code" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="128" />
+        </Column>
+        <Column name="image_url" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="128" />
+        </Column>
+        <Column name="expires" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="is_active" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="bool" size="1" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="deal_aquire">
+      <Drawing expanded="true" location="246,333" dimensions="268,263" />
+      <Columns>
+        <Column name="deal_aquire_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="deal_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="aquire_status_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int2" size="5" />
+        </Column>
+        <Column name="customer_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="shared_by_merchant_id" primary_key="false" foreign_key="true" required="false" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="shared_by_customer_id" primary_key="false" foreign_key="true" required="false" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="share_cnt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="int4" size="10" />
+        </Column>
+        <Column name="latitude" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="float8" size="10,17" />
+        </Column>
+        <Column name="longitude" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="float8" size="10,17" />
+        </Column>
+        <Column name="redemption_dt" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="deal_aquire_history">
+      <Drawing expanded="true" location="-478,0" dimensions="270,183" />
+      <Columns>
+        <Column name="deal_aquire_history_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="deal_aquire_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="aquire_status_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int2" size="5" />
+        </Column>
+        <Column name="customer_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="shared_by_merchant_id" primary_key="false" foreign_key="true" required="false" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="shared_by_customer_id" primary_key="false" foreign_key="true" required="false" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="share_cnt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="int4" size="10" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="deal_offer">
+      <Drawing expanded="true" location="-900,1222" dimensions="367,247" />
+      <Columns>
+        <Column name="deal_offer_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="created_by_merchant_account_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="deal_type" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="deal_type" size="2147483647" />
+        </Column>
+        <Column name="summary" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="256" />
+        </Column>
+        <Column name="code" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="128" />
+        </Column>
+        <Column name="image_url" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="128" />
+        </Column>
+        <Column name="expires" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="price" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="numeric" size="10,2" />
+        </Column>
+        <Column name="is_active" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="bool" size="1" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="deal_offer_purchase">
+      <Drawing expanded="true" location="-877,391" dimensions="272,146" />
+      <Columns>
+        <Column name="deal_offer_purchase_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="deal_offer_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="customer_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="latitude" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="float8" size="10,17" />
+        </Column>
+        <Column name="longitude" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="float8" size="10,17" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="deal_tag">
+      <Drawing expanded="true" location="744,411" dimensions="206,106" />
+      <Columns>
+        <Column name="deal_tag_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="deal_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="tag_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int2" size="5" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="friend_request">
+      <Drawing expanded="true" location="-505,391" dimensions="244,147" />
+      <Columns>
+        <Column name="friend_request_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="customer_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="friend_facebook_id" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="32" />
+        </Column>
+        <Column name="friend_email" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="32" />
+        </Column>
+        <Column name="deal_id" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="created_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="merchant">
+      <Drawing expanded="true" location="81,1619" dimensions="254,146" />
+      <Columns>
+        <Column name="merchant_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="merchant_parent_id" primary_key="false" foreign_key="true" required="false" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="primary_location_id" primary_key="false" foreign_key="true" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="merchant_name" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="merchant_account">
+      <Drawing expanded="true" location="1232,1252" dimensions="262,187" />
+      <Columns>
+        <Column name="merchant_account_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="merchant_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="email" primary_key="false" foreign_key="false" required="true" unique="true">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="password" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="32" />
+        </Column>
+        <Column name="role_title" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="allow_deal_creation" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="bool" size="1" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="merchant_location">
+      <Drawing expanded="true" location="-700,1865" dimensions="276,247" />
+      <Columns>
+        <Column name="merchant_location_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="merchant_location_name" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="email" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="website_url" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="128" />
+        </Column>
+        <Column name="logo_url" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="phone" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="varchar" size="48" />
+        </Column>
+        <Column name="latitude" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="float8" size="10,17" />
+        </Column>
+        <Column name="longitude" primary_key="false" foreign_key="false" required="false" unique="false">
+          <Data type="float8" size="10,17" />
+        </Column>
+        <Column name="address_id" primary_key="false" foreign_key="true" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="merchant_managed_location">
+      <Drawing expanded="true" location="-1281,1292" dimensions="320,106" />
+      <Columns>
+        <Column name="merchant_managed_location_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="merchant_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="merchant_location_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="merchant_tag">
+      <Drawing expanded="true" location="1050,411" dimensions="236,106" />
+      <Columns>
+        <Column name="merchant_tag_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="merchant_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="tag_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="relationship">
+      <Drawing expanded="true" location="-169,391" dimensions="316,146" />
+      <Columns>
+        <Column name="relationship_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="customer_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="friend_id" primary_key="false" foreign_key="true" required="true" unique="false">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="status" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="relationship_status" size="2147483647" />
+        </Column>
+        <Column name="created_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="updated_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="social_account">
+      <Drawing expanded="true" location="-328,2243" dimensions="302,146" />
+      <Columns>
+        <Column name="user_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="account_t" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="account_type" size="2147483647" />
+        </Column>
+        <Column name="social_network_id" primary_key="true" foreign_key="true" required="true" unique="true">
+          <Data type="int8" size="19" />
+        </Column>
+        <Column name="login_id" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="32" />
+        </Column>
+        <Column name="create_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+        <Column name="update_dt" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="timestamp" size="10,6" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="social_network">
+      <Drawing expanded="true" location="-481,2520" dimensions="222,108" />
+      <Columns>
+        <Column name="social_network_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="bigserial" size="19" />
+        </Column>
+        <Column name="name" primary_key="false" foreign_key="false" required="true" unique="true">
+          <Data type="varchar" size="32" />
+        </Column>
+        <Column name="website" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+        <Column name="api_url" primary_key="false" foreign_key="false" required="true" unique="false">
+          <Data type="varchar" size="64" />
+        </Column>
+      </Columns>
+    </Table>
+    <Table name="tag">
+      <Drawing expanded="true" location="929,945" dimensions="149,68" />
+      <Columns>
+        <Column name="tag_id" primary_key="true" foreign_key="false" required="true" unique="true">
+          <Data type="int2" size="5" />
+        </Column>
+        <Column name="name" primary_key="false" foreign_key="false" required="true" unique="true">
+          <Data type="varchar" size="32" />
+        </Column>
+      </Columns>
+    </Table>
+  </Tables>
+  <Relationships>
+    <Relationship name="FK_DealDetail_DealOffer">
+      <Details primary_table="deal_offer" foreign_table="deal">
+        <PrimaryKeys>
+          <ColumnName name="deal_offer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="deal_offer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealDetail_Merchant">
+      <Details primary_table="merchant" foreign_table="deal">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="merchant_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquire_SharedByMerchant">
+      <Details primary_table="merchant" foreign_table="deal_aquire">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="shared_by_merchant_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquire_DealDetail">
+      <Details primary_table="deal" foreign_table="deal_aquire">
+        <PrimaryKeys>
+          <ColumnName name="deal_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="deal_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquire_Customer">
+      <Details primary_table="customer" foreign_table="deal_aquire">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="customer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquire_AquireStatus">
+      <Details primary_table="aquire_status" foreign_table="deal_aquire">
+        <PrimaryKeys>
+          <ColumnName name="aquire_status_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="aquire_status_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquire_SharedByCustomer">
+      <Details primary_table="customer" foreign_table="deal_aquire">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="shared_by_customer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquireHistory_SharedByMerchant">
+      <Details primary_table="merchant" foreign_table="deal_aquire_history">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="shared_by_merchant_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquireHistory_Customer">
+      <Details primary_table="customer" foreign_table="deal_aquire_history">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="customer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquireHistory_SharedByCustomer">
+      <Details primary_table="customer" foreign_table="deal_aquire_history">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="shared_by_customer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquireHistory_DealAquire">
+      <Details primary_table="deal_aquire" foreign_table="deal_aquire_history">
+        <PrimaryKeys>
+          <ColumnName name="deal_aquire_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="deal_aquire_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealAquireHistory_AquireStatus">
+      <Details primary_table="aquire_status" foreign_table="deal_aquire_history">
+        <PrimaryKeys>
+          <ColumnName name="aquire_status_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="aquire_status_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_Deal_Merchant">
+      <Details primary_table="merchant" foreign_table="deal_offer">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="created_by_merchant_account_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealOfferPurchase_Customer">
+      <Details primary_table="customer" foreign_table="deal_offer_purchase">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="customer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealOfferPurchase_DealOffer">
+      <Details primary_table="deal_offer" foreign_table="deal_offer_purchase">
+        <PrimaryKeys>
+          <ColumnName name="deal_offer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="deal_offer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealTag_Tag">
+      <Details primary_table="tag" foreign_table="deal_tag">
+        <PrimaryKeys>
+          <ColumnName name="tag_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="tag_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_DealTag_Deal">
+      <Details primary_table="deal" foreign_table="deal_tag">
+        <PrimaryKeys>
+          <ColumnName name="deal_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="deal_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_FriendRequest_Customer">
+      <Details primary_table="customer" foreign_table="friend_request">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="customer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_Merchant_Merchant">
+      <Details primary_table="merchant" foreign_table="merchant">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="merchant_parent_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_Merchant_MechantLocation">
+      <Details primary_table="merchant_location" foreign_table="merchant">
+        <PrimaryKeys>
+          <ColumnName name="merchant_location_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="primary_location_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_MerchantAccount_Merchant">
+      <Details primary_table="merchant" foreign_table="merchant_account">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="merchant_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_MerchantLocation_Address">
+      <Details primary_table="address" foreign_table="merchant_location">
+        <PrimaryKeys>
+          <ColumnName name="address_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="address_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_MerchantManagedLocation_MerchantLocation">
+      <Details primary_table="merchant_location" foreign_table="merchant_managed_location">
+        <PrimaryKeys>
+          <ColumnName name="merchant_location_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="merchant_location_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_MerchantManagedLocation_Merchant">
+      <Details primary_table="merchant" foreign_table="merchant_managed_location">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="merchant_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_MerchantTag_Deal">
+      <Details primary_table="merchant" foreign_table="merchant_tag">
+        <PrimaryKeys>
+          <ColumnName name="merchant_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="merchant_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_MerchantTag_Tag">
+      <Details primary_table="tag" foreign_table="merchant_tag">
+        <PrimaryKeys>
+          <ColumnName name="tag_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="tag_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_Relationship_Customer">
+      <Details primary_table="customer" foreign_table="relationship">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="customer_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_Relationship_Friend">
+      <Details primary_table="customer" foreign_table="relationship">
+        <PrimaryKeys>
+          <ColumnName name="customer_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="friend_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+    <Relationship name="FK_CustomerSocialAccount_SocialNetwork">
+      <Details primary_table="social_network" foreign_table="social_account">
+        <PrimaryKeys>
+          <ColumnName name="social_network_id" />
+        </PrimaryKeys>
+        <ForeignKeys>
+          <ColumnName name="social_network_id" />
+        </ForeignKeys>
+      </Details>
+      <Drawing routingType="0" />
+    </Relationship>
+  </Relationships>
+</ERDiagram>
+
