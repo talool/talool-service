@@ -18,11 +18,15 @@ testDbName="talool"
 echo "Dropping Database '$testDbName' ..."
 dropdb -U postgres -w $testDbName
 
+if [ $? -eq 1 ]; then
+  exit
+fi
+
 echo "Creating Database '$testDbName' ..."
 createdb -U postgres -w $testDbName
 
 echo "Importing $testDbName schema..."
 psql -U postgres -w $testDbName < $taloolSchema
 
-echo "Importing $taloolData into Database '$testDbName' ..."
-psql -U postgres -w $testDbName < $taloolData
+#echo "Importing $taloolData into Database '$testDbName' ..."
+#psql -U postgres -w $testDbName < $taloolData

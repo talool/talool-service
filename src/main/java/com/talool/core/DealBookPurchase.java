@@ -3,7 +3,6 @@ package com.talool.core;
 import java.io.Serializable;
 
 /**
- * DealBookPurchase
  * 
  * @author clintz
  * 

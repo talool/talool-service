@@ -1,9 +1,11 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -12,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -21,8 +25,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.talool.core.Deal;
+import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
-import com.talool.core.MerchantDeal;
+import com.talool.core.Tag;
 
 /**
  * Deal Book implementation
@@ -33,23 +39,28 @@ import com.talool.core.MerchantDeal;
  * 
  */
 @Entity
-@Table(name = "merchant_deal", catalog = "public")
-public class MerchantDealImpl implements MerchantDeal
+@Table(name = "deal", catalog = "public")
+public class DealImpl implements Deal
 {
-	private static final Logger LOG = LoggerFactory.getLogger(MerchantDealImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DealImpl.class);
 	private static final long serialVersionUID = -452436060657087167L;
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_merchant_deal_seq")
-	@SequenceGenerator(name = "my_merchant_deal_seq", sequenceName = "merchant_deal_merchant_deal_id_seq")
-	@Column(name = "merchant_deal_id", unique = true, nullable = false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_deal_seq")
+	@SequenceGenerator(name = "my_deal_seq", sequenceName = "deal_deal_id_seq")
+	@Column(name = "deal_id", unique = true, nullable = false)
 	private Long id;
 
 	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
+
+	@Access(AccessType.FIELD)
+	@OneToOne(targetEntity = DealOfferImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "deal_offer_id")
+	private DealOffer dealOffer;
 
 	@Column(name = "title", unique = false, nullable = true, length = 256)
 	private String title;
@@ -69,16 +80,20 @@ public class MerchantDealImpl implements MerchantDeal
 	@Column(name = "expires", unique = false, nullable = true)
 	private Date expires;
 
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
+	@JoinTable(name = "deal_tag", joinColumns = { @JoinColumn(name = "deal_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
+	private Set<Tag> tags;
+
 	@Column(name = "is_active", unique = false, nullable = true)
 	private boolean isActive = true;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
-	public MerchantDealImpl()
+	public DealImpl()
 	{}
 
-	public MerchantDealImpl(final Merchant merchant)
+	public DealImpl(final Merchant merchant)
 	{
 		this.merchant = merchant;
 	}
@@ -194,26 +209,26 @@ public class MerchantDealImpl implements MerchantDeal
 			return false;
 		}
 
-		if (!(obj instanceof MerchantDealImpl))
+		if (!(obj instanceof DealImpl))
 		{
 			return false;
 		}
 
-		final MerchantDealImpl other = (MerchantDealImpl) obj;
+		final DealImpl other = (DealImpl) obj;
 
 		if (getId() != other.getId())
 		{
 			return false;
 		}
 
-		return new EqualsBuilder().append(getTitle(), other.getTitle())
-				.append(getMerchant(), other.getMerchant()).isEquals();
+		return new EqualsBuilder().append(getDealOffer(), other.getDealOffer())
+				.append(getTitle(), other.getTitle()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getTitle()).append(getMerchant()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getTitle()).append(getDealOffer()).hashCode();
 	}
 
 	@Override
@@ -226,6 +241,30 @@ public class MerchantDealImpl implements MerchantDeal
 	public String getImageUrl()
 	{
 		return imageUrl;
+	}
+
+	@Override
+	public DealOffer getDealOffer()
+	{
+		return dealOffer;
+	}
+
+	@Override
+	public void setDealOffer(DealOffer dealOffer)
+	{
+		this.dealOffer = dealOffer;
+	}
+
+	@Override
+	public void setMerchant(Merchant merchant)
+	{
+		this.merchant = merchant;
+	}
+
+	@Override
+	public Set<Tag> getTags()
+	{
+		return tags;
 	}
 
 }

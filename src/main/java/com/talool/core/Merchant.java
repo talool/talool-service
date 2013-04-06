@@ -1,6 +1,7 @@
 package com.talool.core;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Merchant interface
@@ -14,36 +15,14 @@ public interface Merchant extends Identifiable, Serializable, TimeAware
 
 	public void setName(String name);
 
-	public String getEmail();
+	public MerchantLocation getPrimaryLocation();
 
-	public void setEmail(String email);
+	public void setPrimaryLocation(MerchantLocation merchantLocation);
 
-	public String getPassword();
+	public Merchant getParent();
 
-	public void setPassword(String password);
+	public void setParent(Merchant merchant);
 
-	public String getWebsiteUrl();
-
-	public void setWebsiteUrl(String websiteUrl);
-
-	public String getLogoUrl();
-
-	public void setLogoUrl(String logoUrl);
-
-	public String getPhone();
-
-	public void setPhone(String phone);
-
-	public Location getLocation();
-
-	public void setLocation(Location location);
-
-	public Address getAddress();
-
-	public void setAddress(Address address);
-
-	public boolean isActive();
-
-	public void setActive(boolean isActive);
+	public Set<Tag> getTags();
 
 }

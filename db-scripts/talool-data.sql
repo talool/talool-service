@@ -28,14 +28,14 @@ INSERT INTO address(address1, address2, city, state_province_county, zip, countr
             VALUES ('1750 30th St.', 'PO Box 195', 'Boulder', 'CO', '80301', 'US');
 
 -- insert payBackbook
-INSERT INTO merchant(merchant_name, email, password,  website_url, logo_url, phone, latitude, longitude, 
+INSERT INTO merchant(merchant_name, email, website_url, logo_url, phone, latitude, longitude, 
                      address_id, is_active)
-    VALUES ('Payback Book', 'paybackbook@aol.com','32250170a0dca92d53ec9624f336ca24', 'http://www.paybackbook.com', 'http://www.paybackbook.com', 
+    VALUES ('Payback Book', 'paybackbook@aol.com','http://www.paybackbook.com', 'http://www.paybackbook.com', 
                     '303.447.1252', null, null, (select address_id from address where address1='1750 30th St.'),'true');
 
-INSERT INTO merchant(merchant_name, email, password,  website_url, logo_url, phone, latitude, longitude, 
+INSERT INTO merchant(merchant_name, email, website_url, logo_url, phone, latitude, longitude, 
                      address_id, is_active)
-    VALUES ('Chipotle', 'management@chipotle.com','32250170a0dca92d53ec9624f336ca24', 'http://www.chipotle.com', 'http://talk.onevietnam.org/assets/2011/10/chipotle.png', 
+    VALUES ('Chipotle', 'management@chipotle.com', 'http://www.chipotle.com', 'http://talk.onevietnam.org/assets/2011/10/chipotle.png', 
                     '303.333.3333', null, null, 1,'true');
                     
 INSERT INTO merchant_deal(merchant_id, title, summary, details, code, 
@@ -55,9 +55,9 @@ INSERT INTO address(address1, address2, city, state_province_county, zip, countr
             VALUES ('900 Walnut Street', null, 'Boulder', 'CO', '80202', 'US');
 
 
-INSERT INTO merchant(merchant_name, email, password,  website_url, logo_url, phone, latitude, longitude, 
+INSERT INTO merchant(merchant_name, email,  website_url, logo_url, phone, latitude, longitude, 
                      address_id, is_active)
-   		 VALUES ('St Julien Hotel & Spa', 'team@','32250170a0dca92d53ec9624f336ca24', 'http://www.stjulien.com', 'http://www.stjulien.com/images/stjulien-logo.png', 
+   		 VALUES ('St Julien Hotel & Spa', 'team@', 'http://www.stjulien.com', 'http://www.stjulien.com/images/stjulien-logo.png', 
                  '1.877.303.0900', null, null, (select address_id from address where address1='900 Walnut Street'),'true');
                     
                     

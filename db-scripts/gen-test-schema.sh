@@ -28,5 +28,5 @@ createdb -U postgres -w $testDbName
 echo "Importing $testDbName schema..."
 psql -U talool -w $testDbName < $testSchema
 
-echo "Importing $taloolData into Database '$testDbName' ..."
-psql -U talool -w $testDbName < $taloolData
+#echo "Importing $taloolData into Database '$testDbName' ..."
+#psql -U talool -w $testDbName < $taloolData

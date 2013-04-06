@@ -14,12 +14,12 @@ import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
 import com.talool.core.Customer;
+import com.talool.core.Deal;
 import com.talool.core.DealBook;
 import com.talool.core.DealBookContent;
 import com.talool.core.DealBookPurchase;
 import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
-import com.talool.core.MerchantDeal;
 import com.talool.core.SocialNetwork;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
@@ -27,7 +27,7 @@ import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealBookContentImpl;
 import com.talool.domain.DealBookImpl;
 import com.talool.domain.DealBookPurchaseImpl;
-import com.talool.domain.MerchantDealImpl;
+import com.talool.domain.DealImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.SocialNetworkImpl;
 
@@ -207,7 +207,7 @@ public class TaloolServiceImpl implements TaloolService
 
 			if (accountType == AccountType.MER)
 			{
-				((MerchantImpl) (account)).setPassword(md5pass);
+				// ((MerchantImpl) (account)).setPassword(md5pass);
 				save((MerchantImpl) account);
 				// daoDispatcher.flush(MerchantImpl.class);
 				// daoDispatcher.refresh((MerchantImpl) account);
@@ -362,14 +362,14 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantDeal> getMerchantDeals(final Long merchantId, final Boolean isActive)
+	public List<Deal> getMerchantDeals(final Long merchantId, final Boolean isActive)
 			throws ServiceException
 	{
-		List<MerchantDeal> merchantDeals = null;
+		List<Deal> merchantDeals = null;
 
 		try
 		{
-			final Search search = new Search(MerchantDealImpl.class);
+			final Search search = new Search(DealImpl.class);
 			search.addFilterEqual("merchant.id", merchantId);
 			if (isActive != null)
 			{
@@ -387,11 +387,11 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void save(final MerchantDeal merchantDeal) throws ServiceException
+	public void save(final Deal merchantDeal) throws ServiceException
 	{
 		try
 		{
-			daoDispatcher.save((MerchantDealImpl) merchantDeal);
+			daoDispatcher.save((DealImpl) merchantDeal);
 		}
 		catch (Exception e)
 		{
@@ -405,7 +405,7 @@ public class TaloolServiceImpl implements TaloolService
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteMerchantDeal(final Long id) throws ServiceException
 	{
-		removeElement(id, MerchantDealImpl.class);
+		removeElement(id, DealImpl.class);
 	}
 
 	@Override
@@ -510,11 +510,11 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantDeal> getDealsByMerchantId(final Long merchantId) throws ServiceException
+	public List<Deal> getDealsByMerchantId(final Long merchantId) throws ServiceException
 	{
 		try
 		{
-			final Search search = new Search(MerchantDealImpl.class);
+			final Search search = new Search(DealImpl.class);
 			search.addFilterEqual("merchant.id", merchantId);
 			return daoDispatcher.search(search);
 		}
@@ -526,7 +526,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantDeal> getDealsByCustomerId(final Long accountId) throws ServiceException
+	public List<Deal> getDealsByCustomerId(final Long accountId) throws ServiceException
 	{
 		try
 		{

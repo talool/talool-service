@@ -11,7 +11,7 @@ import java.io.Serializable;
 public interface MerchantDealRedeemed extends Identifiable, Serializable, TimeAware
 {
 
-	public MerchantDeal getMerchantDeal();
+	public Deal getMerchantDeal();
 
 	public Customer getCustomer();
 

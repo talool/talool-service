@@ -1,6 +1,7 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -13,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
@@ -21,17 +24,15 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.hibernate.annotations.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.talool.core.Address;
-import com.talool.core.Location;
 import com.talool.core.Merchant;
+import com.talool.core.MerchantLocation;
+import com.talool.core.Tag;
 
 /**
  * 
- * TODO Verify hashcode/equals makes sense
  * 
  * @author clintz
  * 
@@ -57,31 +58,13 @@ public class MerchantImpl implements Merchant
 	@Column(name = "merchant_name", unique = false, nullable = false, length = 64)
 	private String name;
 
-	@Column(name = "email", unique = true, nullable = true, length = 64)
-	private String email;
+	@OneToOne(targetEntity = MerchantLocationImpl.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "primary_location_id")
+	private MerchantLocation primaryLocation;
 
-	@Column(name = "website_url", unique = false, nullable = true, length = 128)
-	private String websiteUrl;
-
-	@Column(name = "logo_url", unique = false, nullable = true, length = 64)
-	private String logoUrl;
-
-	@Column(name = "phone", unique = true, nullable = true, length = 48)
-	private String phone;
-
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = AddressImpl.class)
-	@JoinColumn(name = "address_id")
-	private Address address;
-
-	@Column(name = "password", unique = false, nullable = false, length = 64)
-	private String password;
-
-	@Column(name = "is_active", unique = false, nullable = true)
-	private boolean isActive = true;
-
-	@Embedded
-	@Target(LocationImpl.class)
-	private Location location;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
+	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
+	private Set<Tag> tags;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -104,56 +87,6 @@ public class MerchantImpl implements Merchant
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-
-	public String getWebsiteUrl()
-	{
-		return websiteUrl;
-	}
-
-	public void setWebsiteUrl(String websiteUrl)
-	{
-		this.websiteUrl = websiteUrl;
-	}
-
-	public String getLogoUrl()
-	{
-		return logoUrl;
-	}
-
-	public void setLogoUrl(String logoUrl)
-	{
-		this.logoUrl = logoUrl;
-	}
-
-	public String getPhone()
-	{
-		return phone;
-	}
-
-	public void setPhone(String phone)
-	{
-		this.phone = phone;
-	}
-
-	public Address getAddress()
-	{
-		return address;
-	}
-
-	public void setAddress(Address address)
-	{
-		this.address = address;
-	}
-
-	public boolean isActive()
-	{
-		return isActive;
-	}
-
-	public void setActive(boolean isActive)
-	{
-		this.isActive = isActive;
 	}
 
 	@Override
@@ -210,50 +143,32 @@ public class MerchantImpl implements Merchant
 		}
 
 		return new EqualsBuilder().append(getName(), other.getName())
-				.append(getAddress(), other.getAddress()).isEquals();
+				.append(getPrimaryLocation(), other.getPrimaryLocation()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getName()).append(getAddress()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getName()).append(getPrimaryLocation()).hashCode();
 	}
 
 	@Override
-	public String getPassword()
+	public MerchantLocation getPrimaryLocation()
 	{
-		return password;
+		return primaryLocation;
 	}
 
 	@Override
-	public void setPassword(String password)
+	public void setPrimaryLocation(MerchantLocation merchantLocation)
 	{
-		this.password = password;
+		this.primaryLocation = merchantLocation;
 
 	}
 
 	@Override
-	public String getEmail()
+	public Set<Tag> getTags()
 	{
-		return email;
-	}
-
-	@Override
-	public void setEmail(final String email)
-	{
-		this.email = email;
-	}
-
-	@Override
-	public Location getLocation()
-	{
-		return location;
-	}
-
-	@Override
-	public void setLocation(Location location)
-	{
-		this.location = location;
+		return tags;
 	}
 
 }

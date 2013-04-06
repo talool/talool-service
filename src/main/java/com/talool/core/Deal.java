@@ -2,6 +2,7 @@ package com.talool.core;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Deal Book
@@ -9,9 +10,15 @@ import java.util.Date;
  * @author clintz
  * 
  */
-public interface MerchantDeal extends Identifiable, Serializable, TimeAware
+public interface Deal extends Identifiable, Serializable, TimeAware
 {
+	public DealOffer getDealOffer();
+
+	public void setDealOffer(DealOffer dealOffer);
+
 	public Merchant getMerchant();
+
+	public void setMerchant(Merchant merchant);
 
 	public void setTitle(String title);
 
@@ -40,5 +47,7 @@ public interface MerchantDeal extends Identifiable, Serializable, TimeAware
 	public boolean isActive();
 
 	public void setActive(boolean isActive);
+
+	public Set<Tag> getTags();
 
 }

@@ -6,7 +6,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -35,8 +33,8 @@ import com.talool.core.Merchant;
  * @author clintz
  * 
  */
-@Entity
-@Table(name = "deal_book", catalog = "public")
+// @Entity
+// @Table(name = "deal_book", catalog = "public")
 public class DealBookImpl implements DealBook
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DealBookImpl.class);

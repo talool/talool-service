@@ -7,7 +7,6 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -23,9 +21,9 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.talool.core.Deal;
 import com.talool.core.DealBook;
 import com.talool.core.DealBookContent;
-import com.talool.core.MerchantDeal;
 
 /**
  * Deal Book Content implmentation
@@ -33,8 +31,8 @@ import com.talool.core.MerchantDeal;
  * @author clintz
  * 
  */
-@Entity
-@Table(name = "deal_book_content", catalog = "public")
+// @Entity
+// @Table(name = "deal_book_content", catalog = "public")
 public class DealBookContentImpl implements DealBookContent
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DealBookContentImpl.class);
@@ -54,9 +52,9 @@ public class DealBookContentImpl implements DealBookContent
 	@JoinColumn(name = "deal_book_id")
 	private DealBook dealBook;
 
-	@OneToOne(targetEntity = MerchantDealImpl.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(targetEntity = DealImpl.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "merchant_deal_id")
-	private MerchantDeal merchantDeal;
+	private Deal merchantDeal;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -64,7 +62,7 @@ public class DealBookContentImpl implements DealBookContent
 	public DealBookContentImpl()
 	{}
 
-	public DealBookContentImpl(final MerchantDeal merchantDeal, final DealBook dealBook)
+	public DealBookContentImpl(final Deal merchantDeal, final DealBook dealBook)
 	{
 		this.merchantDeal = merchantDeal;
 		this.dealBook = dealBook;
@@ -95,7 +93,7 @@ public class DealBookContentImpl implements DealBookContent
 	}
 
 	@Override
-	public MerchantDeal getMerchantDeal()
+	public Deal getMerchantDeal()
 	{
 		return merchantDeal;
 	}

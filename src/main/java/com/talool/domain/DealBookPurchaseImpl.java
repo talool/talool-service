@@ -7,7 +7,6 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -33,8 +31,8 @@ import com.talool.core.DealBookPurchase;
  * @author clintz
  * 
  */
-@Entity
-@Table(name = "deal_book_purchase", catalog = "public")
+// @Entity
+// @Table(name = "deal_book_purchase", catalog = "public")
 public class DealBookPurchaseImpl implements DealBookPurchase
 {
 	private static final long serialVersionUID = -2356911722279787849L;

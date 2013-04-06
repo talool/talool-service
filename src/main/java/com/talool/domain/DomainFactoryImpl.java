@@ -13,7 +13,7 @@ import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.Merchant;
-import com.talool.core.MerchantDeal;
+import com.talool.core.Deal;
 import com.talool.core.SocialAccount;
 
 /**
@@ -65,13 +65,13 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public MerchantDeal newMerchantDeal(final Merchant merchant)
+	public Deal newMerchantDeal(final Merchant merchant)
 	{
-		return new MerchantDealImpl(merchant);
+		return new DealImpl(merchant);
 	}
 
 	@Override
-	public DealBookContent newDealBookContent(final MerchantDeal merchantDeal, final DealBook dealBook)
+	public DealBookContent newDealBookContent(final Deal merchantDeal, final DealBook dealBook)
 	{
 		return new DealBookContentImpl(merchantDeal, dealBook);
 	}

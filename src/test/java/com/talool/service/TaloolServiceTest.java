@@ -15,6 +15,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import com.talool.core.AccountType;
 import com.talool.core.Address;
 import com.talool.core.Customer;
+import com.talool.core.Deal;
 import com.talool.core.DealBook;
 import com.talool.core.DealBookContent;
 import com.talool.core.DealBookPurchase;
@@ -22,7 +23,6 @@ import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.Merchant;
-import com.talool.core.MerchantDeal;
 import com.talool.core.service.ServiceException;
 import com.talool.domain.DealBookImpl;
 
@@ -72,7 +72,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Merchant merchant = createMerchant();
 		taloolService.createAccount(merchant, "pass123");
 
-		MerchantDeal merchantDeal = createMerchantDeal(merchant);
+		Deal merchantDeal = createMerchantDeal(merchant);
 		taloolService.save(merchantDeal);
 
 		DealBook dealBook = createDealBook(merchant);
@@ -96,18 +96,18 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	private DealBookContent createDealBookContent(MerchantDeal merchantDeal, DealBook dealBook)
+	private DealBookContent createDealBookContent(Deal merchantDeal, DealBook dealBook)
 	{
 		DealBookContent dealBookContent = domainFactory.newDealBookContent(merchantDeal, dealBook);
 
 		return dealBookContent;
 	}
 
-	private MerchantDeal createMerchantDeal(Merchant merchant)
+	private Deal createMerchantDeal(Merchant merchant)
 	{
 		Long now = System.currentTimeMillis();
 
-		MerchantDeal merchantDeal = FactoryManager.get().getDomainFactory().newMerchantDeal(merchant);
+		Deal merchantDeal = FactoryManager.get().getDomainFactory().newMerchantDeal(merchant);
 
 		merchantDeal.setCode("code-" + now);
 		merchantDeal.setDetails("details-" + now);
@@ -131,12 +131,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		final Merchant merchant = createMerchant();
 		taloolService.createAccount(merchant, "pass123");
 
-		MerchantDeal merchantDeal = createMerchantDeal(merchant);
+		Deal merchantDeal = createMerchantDeal(merchant);
 
 		taloolService.save(merchantDeal);
 
-		List<MerchantDeal> merchantDeals = taloolService.getMerchantDeals(merchant.getId(),
-				Boolean.TRUE);
+		List<Deal> merchantDeals = taloolService.getMerchantDeals(merchant.getId(), Boolean.TRUE);
 
 		Assert.assertEquals(1, merchantDeals.size());
 		Assert.assertEquals(merchantDeal, merchantDeals.get(0));
@@ -192,12 +191,13 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		// System.out.println(purchases.get(0).getCreated());
 
-		List<DealBook> books = taloolService.getDealBooksByEmail(merchant.getEmail());
+		// List<DealBook> books =
+		// taloolService.getDealBooksByEmail(merchant.getEmail());
 
-		for (DealBook dbw : books)
-		{
-			System.out.println(dbw);
-		}
+		// for (DealBook dbw : books)
+		// {
+		// System.out.println(dbw);
+		// }
 
 	}
 
@@ -236,12 +236,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		merchant.setName("Merch" + now);
 
 		Location location = domainFactory.newLocation(-10.564142, -74.047852);
-		merchant.setLocation(location);
-
-		merchant.setPhone("781-818-1212");
-		merchant.setWebsiteUrl("http://merch1.com" + now);
-		merchant.setEmail("billyjohnson" + now + "@gmail.com");
-		merchant.setLogoUrl("http://merch.logos.com/logo.png");
+		// merchant.setLocation(location);
+		// merchant.setPhone("781-818-1212");
+		// merchant.setWebsiteUrl("http://merch1.com" + now);
+		// merchant.setEmail("billyjohnson" + now + "@gmail.com");
+		// merchant.setLogoUrl("http://merch.logos.com/logo.png");
 
 		Address address = domainFactory.newAddress();
 		address.setAddress1(now + " East Street");
@@ -251,7 +250,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		address.setZip("80218");
 		address.setCountry("US");
 
-		merchant.setAddress(address);
+		// merchant.setAddress(address);
 
 		return merchant;
 	}

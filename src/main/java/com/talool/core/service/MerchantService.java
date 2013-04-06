@@ -7,7 +7,7 @@ import com.talool.core.DealBook;
 import com.talool.core.DealBookContent;
 import com.talool.core.DealBookPurchase;
 import com.talool.core.Merchant;
-import com.talool.core.MerchantDeal;
+import com.talool.core.Deal;
 
 /**
  * Merchant Service
@@ -30,14 +30,14 @@ public interface MerchantService
 
 	public List<DealBook> getDealBooksByEmail(final String email) throws ServiceException;
 
-	public List<MerchantDeal> getMerchantDeals(final Long merchantId, final Boolean isActive)
+	public List<Deal> getMerchantDeals(final Long merchantId, final Boolean isActive)
 			throws ServiceException;
 
 	public void save(final DealBook dealBook) throws ServiceException;
 
 	public void save(final DealBookContent dealBookContenet) throws ServiceException;
 
-	public void save(final MerchantDeal merchantDeal) throws ServiceException;
+	public void save(final Deal merchantDeal) throws ServiceException;
 
 	public void deleteDealBook(final Long id) throws ServiceException;
 
@@ -63,9 +63,9 @@ public interface MerchantService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public List<MerchantDeal> getDealsByMerchantId(final Long merchantId) throws ServiceException;
+	public List<Deal> getDealsByMerchantId(final Long merchantId) throws ServiceException;
 
-	public List<MerchantDeal> getDealsByCustomerId(final Long accountId) throws ServiceException;
+	public List<Deal> getDealsByCustomerId(final Long accountId) throws ServiceException;
 
 	public List<DealBookPurchase> getPurchases(final AccountType accountType, final Long accountId)
 			throws ServiceException;

@@ -16,9 +16,9 @@ public interface DomainFactory
 
 	public DealBook newDealBook(final Merchant merchant);
 
-	public MerchantDeal newMerchantDeal(final Merchant merchant);
+	public Deal newMerchantDeal(final Merchant merchant);
 
-	public DealBookContent newDealBookContent(final MerchantDeal merchantDeal, final DealBook dealBook);
+	public DealBookContent newDealBookContent(final Deal merchantDeal, final DealBook dealBook);
 
 	public Customer newCustomer();
 
