@@ -217,4 +217,12 @@ public class AddressImpl implements Address
 		return address1;
 	}
 
+	@Override
+	public String getNiceCityState()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(city).append(", ").append(stateProvinceCounty);
+		return sb.toString();
+	}
+
 }

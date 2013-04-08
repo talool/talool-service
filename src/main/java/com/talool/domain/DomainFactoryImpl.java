@@ -6,15 +6,17 @@ import org.slf4j.LoggerFactory;
 import com.talool.core.AccountType;
 import com.talool.core.Address;
 import com.talool.core.Customer;
-import com.talool.core.DealBook;
-import com.talool.core.DealBookContent;
-import com.talool.core.DealBookPurchase;
+import com.talool.core.Deal;
+import com.talool.core.DealOffer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.Merchant;
-import com.talool.core.Deal;
+import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantLocation;
 import com.talool.core.SocialAccount;
+import com.talool.core.Tag;
 
 /**
  * Default Factory for all domain objects
@@ -59,27 +61,15 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public DealBook newDealBook(final Merchant merchant)
+	public Deal newDeal(final DealOffer dealOffer)
 	{
-		return new DealBookImpl();
+		return new DealImpl(dealOffer);
 	}
 
 	@Override
-	public Deal newMerchantDeal(final Merchant merchant)
+	public DealOfferPurchase newDealOfferPurchase(final DealOffer dealOffer, final Customer customer)
 	{
-		return new DealImpl(merchant);
-	}
-
-	@Override
-	public DealBookContent newDealBookContent(final Deal merchantDeal, final DealBook dealBook)
-	{
-		return new DealBookContentImpl(merchantDeal, dealBook);
-	}
-
-	@Override
-	public DealBookPurchase newDealBookPurchase(final DealBook dealBook, final Customer customer)
-	{
-		return new DealBookPurchaseImpl(dealBook, customer);
+		return new DealOfferPurchaseImpl(customer, dealOffer);
 	}
 
 	@Override
@@ -89,9 +79,40 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public Location newLocation(Double longitude, Double latitude)
+	public Location newLocation(final Double longitude, final Double latitude)
 	{
 		return new LocationImpl(longitude, latitude);
 	}
 
+	@Override
+	public MerchantLocation newMerchantLocation()
+	{
+		return new MerchantLocationImpl();
+	}
+
+	@Override
+	public Tag newTag(String tagName)
+	{
+		Tag tag = new TagImpl();
+		tag.setName(tagName);
+		return tag;
+	}
+
+	@Override
+	public MerchantAccount newMerchantAccount(final Merchant merchant)
+	{
+		return new MerchantAccountImpl(merchant);
+	}
+
+	@Override
+	public DealOffer newDealOffer(final Merchant merchant, final MerchantAccount createdByMerchant)
+	{
+		return new DealOfferImpl(merchant, createdByMerchant);
+	}
+
+	@Override
+	public DealOfferPurchase newDealOfferPurchase(Customer customer, DealOffer dealOffer)
+	{
+		return new DealOfferPurchaseImpl(customer, dealOffer);
+	}
 }

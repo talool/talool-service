@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -40,19 +39,13 @@ public class AquireStatusImpl implements AquireStatus
 	@Column(name = "status", unique = true, nullable = false, length = 64)
 	private String status;
 
-	@Embedded
-	private CreatedUpdated createdUpdated;
+	@Column(name = "create_dt", unique = false, insertable = false, updatable = false)
+	private Date created;
 
 	@Override
 	public Date getCreated()
 	{
-		return createdUpdated.getCreated();
-	}
-
-	@Override
-	public Date getUpdated()
-	{
-		return createdUpdated.getUpdated();
+		return created;
 	}
 
 	@Override

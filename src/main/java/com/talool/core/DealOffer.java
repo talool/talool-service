@@ -11,11 +11,17 @@ import java.util.Date;
  */
 public interface DealOffer extends Identifiable, Serializable, TimeAware
 {
-	public Merchant getCreatedByMerchant();
+	public MerchantAccount getCreatedByMerchant();
+
+	public Merchant getMerchant();
 
 	public void setDealType(DealType dealType);
 
 	public DealType getType();
+
+	public void setTitle(String title);
+
+	public String getTitle();
 
 	public void setSummary(String summary);
 

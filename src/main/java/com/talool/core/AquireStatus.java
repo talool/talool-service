@@ -1,6 +1,7 @@
 package com.talool.core;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Aquire Status Interface
@@ -8,10 +9,12 @@ import java.io.Serializable;
  * @author clintz
  * 
  */
-public interface AquireStatus extends Serializable, TimeAware
+public interface AquireStatus extends Serializable
 {
 	public Integer getId();
 
 	public String getStatus();
+
+	public Date getCreated();
 
 }

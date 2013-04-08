@@ -14,15 +14,21 @@ public interface DomainFactory
 
 	public Merchant newMerchant();
 
-	public DealBook newDealBook(final Merchant merchant);
+	public DealOffer newDealOffer(final Merchant merchant, final MerchantAccount createdByMerchant);
 
-	public Deal newMerchantDeal(final Merchant merchant);
+	public DealOfferPurchase newDealOfferPurchase(final Customer customer, final DealOffer dealOffer);
 
-	public DealBookContent newDealBookContent(final Deal merchantDeal, final DealBook dealBook);
+	public Deal newDeal(final DealOffer dealOffer);
+
+	public MerchantLocation newMerchantLocation();
+
+	public MerchantAccount newMerchantAccount(Merchant merchant);
 
 	public Customer newCustomer();
 
-	public DealBookPurchase newDealBookPurchase(final DealBook dealBook, final Customer customer);
+	public Tag newTag(String tag);
+
+	public DealOfferPurchase newDealOfferPurchase(final DealOffer dealOffer, final Customer customer);
 
 	public Location newLocation(final Double longitude, final Double latitude);
 }

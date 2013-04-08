@@ -54,9 +54,28 @@ CREATE FUNCTION update_dt_column() RETURNS trigger
 	   RETURN NEW;
 	END;
 	$$;
+	
 
 
 ALTER FUNCTION public.update_dt_column() OWNER TO talool;
+
+CREATE FUNCTION deal_offer_purchase() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  rec deal%rowtype;
+BEGIN
+  FOR rec IN SELECT * FROM deal WHERE deal_offer_id = NEW.deal_offer_id
+  LOOP
+    INSERT INTO deal_aquire(deal_id,aquire_status_id,customer_id) 
+       VALUES( rec.deal_id,(select aquire_status_id from aquire_status where status='PURCHASE'),NEW.customer_id);
+  end loop;
+  return NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.deal_offer_purchase() OWNER TO talool;
 
 SET default_tablespace = '';
 
@@ -176,7 +195,7 @@ ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_Friend" FOREIGN KE
 CREATE INDEX relationship_customer_id_idx ON relationship (customer_id);
 CREATE INDEX relationship_friend_id_idx ON relationship (friend_id);
 
-CREATE SEQUENCE tag_id_seq 
+CREATE SEQUENCE tag_tag_id_seq 
  	START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -189,9 +208,9 @@ CREATE TABLE tag (
 );
 
 ALTER TABLE public.tag OWNER TO talool;
-ALTER TABLE public.tag_id_seq OWNER TO talool;
-ALTER SEQUENCE tag_id_seq OWNED BY tag.tag_id;
-ALTER TABLE ONLY tag ALTER COLUMN tag_id SET DEFAULT nextval('tag_id_seq'::regclass);
+ALTER TABLE public.tag_tag_id_seq OWNER TO talool;
+ALTER SEQUENCE tag_tag_id_seq OWNED BY tag.tag_id;
+ALTER TABLE ONLY tag ALTER COLUMN tag_id SET DEFAULT nextval('tag_tag_id_seq'::regclass);
 CREATE UNIQUE INDEX tag_name_idx ON tag (name);
 
 CREATE SEQUENCE social_network_id_seq 
@@ -350,9 +369,11 @@ CREATE TYPE deal_type AS ENUM ('PAID_BOOK','FREE_BOOK','PAID_DEAL','FREE_DEAL');
 
 CREATE TABLE deal_offer (
     deal_offer_id bigint NOT NULL,
+    merchant_id bigint NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
     deal_type deal_type NOT NULL,
-    summary character varying(256) NOT NULL,
+    title character varying(256) NOT NULL,
+    summary character varying(256),
     code character varying(128), 
     image_url character varying(128), 
     expires timestamp without time zone,
@@ -375,8 +396,11 @@ CREATE SEQUENCE deal_offer_deal_offer_id_seq
 ALTER TABLE public.deal_offer_deal_offer_id_seq OWNER TO talool;
 ALTER SEQUENCE deal_offer_deal_offer_id_seq OWNED BY deal_offer.deal_offer_id;
 ALTER TABLE ONLY deal_offer ALTER COLUMN deal_offer_id SET DEFAULT nextval('deal_offer_deal_offer_id_seq'::regclass);
-ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant(merchant_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_MerchantAccount" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+
 CREATE INDEX deal_offer_created_by_merchant_account_id_idx ON deal_offer (created_by_merchant_account_id);
+CREATE INDEX deal_offer_merchant_id_idx ON deal_offer (merchant_id);
 
 CREATE TABLE deal_offer_purchase (
     deal_offer_purchase_id bigint NOT NULL,   
@@ -472,7 +496,6 @@ CREATE TABLE aquire_status (
     aquire_status_id smallint NOT NULL,   
     status character varying(64),
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    update_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY(aquire_status_id)
 );
 
@@ -567,6 +590,8 @@ CREATE TRIGGER update_merchant_update_dt BEFORE UPDATE ON merchant FOR EACH ROW 
 CREATE TRIGGER update_customer_update_dt BEFORE UPDATE ON customer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_address_update_dt BEFORE UPDATE ON address FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+
+CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();
 
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;

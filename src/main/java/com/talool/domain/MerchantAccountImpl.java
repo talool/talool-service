@@ -19,9 +19,12 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.service.EncryptService;
 
 /**
  * 
@@ -32,6 +35,7 @@ import com.talool.core.MerchantAccount;
 @Table(name = "merchant_account", catalog = "public")
 public class MerchantAccountImpl implements MerchantAccount
 {
+	private static final Logger LOG = LoggerFactory.getLogger(MerchantAccountImpl.class);
 	private static final long serialVersionUID = -5479442982443424394L;
 
 	@Id
@@ -60,6 +64,14 @@ public class MerchantAccountImpl implements MerchantAccount
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
+
+	public MerchantAccountImpl()
+	{}
+
+	public MerchantAccountImpl(Merchant merchant)
+	{
+		this.merchant = merchant;
+	}
 
 	@Override
 	public Long getId()
@@ -107,7 +119,18 @@ public class MerchantAccountImpl implements MerchantAccount
 	@Override
 	public void setPassword(String password)
 	{
-		this.password = password;
+		String md5pass = null;
+
+		try
+		{
+			md5pass = EncryptService.MD5(password);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem encrypting set password", e);
+		}
+
+		this.password = md5pass;
 	}
 
 	@Override

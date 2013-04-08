@@ -37,7 +37,4 @@ public interface SocialAccount extends TimeAware, Serializable
 
 	public void setAccountType(AccountType accountType);
 
-	public String getToken();
-
-	public void setToken(String token);
 }

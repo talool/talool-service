@@ -39,4 +39,6 @@ public interface Address extends Identifiable, Serializable
 
 	public Date getUpdated();
 
+	public String getNiceCityState();
+
 }

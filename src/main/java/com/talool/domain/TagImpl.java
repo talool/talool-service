@@ -1,6 +1,13 @@
 package com.talool.domain;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -18,7 +25,14 @@ import com.talool.core.Tag;
 @Table(name = "tag", catalog = "public")
 public class TagImpl implements Tag
 {
+	@Id
+	@Access(AccessType.FIELD)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_tag_seq")
+	@SequenceGenerator(name = "my_tag_seq", sequenceName = "tag_tag_id_seq")
+	@Column(name = "tag_id", unique = true, nullable = false)
 	private Integer id;
+
+	@Column(name = "name", unique = true, nullable = false, length = 32)
 	private String name;
 
 	@Override
@@ -73,4 +87,9 @@ public class TagImpl implements Tag
 		return ReflectionToStringBuilder.toString(this);
 	}
 
+	@Override
+	public void setName(String tagName)
+	{
+		this.name = tagName;
+	}
 }

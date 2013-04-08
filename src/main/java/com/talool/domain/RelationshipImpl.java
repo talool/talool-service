@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -34,7 +35,7 @@ import com.talool.persistence.GenericEnumUserType;
  */
 @Entity
 @Table(name = "relationship", catalog = "public")
-@TypeDef(name = "relationshipStatus", typeClass = GenericEnumUserType.class)
+@TypeDef(name = "relationshipStatus", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.core.RelationshipStatus") })
 public class RelationshipImpl implements RelationShip
 {
 	private static final long serialVersionUID = -8998925353726298712L;

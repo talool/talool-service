@@ -1,7 +1,10 @@
 package com.talool.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -15,21 +18,23 @@ import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
-import com.talool.core.DealBook;
-import com.talool.core.DealBookContent;
-import com.talool.core.DealBookPurchase;
+import com.talool.core.DealOffer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
+import com.talool.core.MerchantAccount;
 import com.talool.core.SocialNetwork;
+import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.domain.CustomerImpl;
-import com.talool.domain.DealBookContentImpl;
-import com.talool.domain.DealBookImpl;
-import com.talool.domain.DealBookPurchaseImpl;
 import com.talool.domain.DealImpl;
+import com.talool.domain.DealOfferImpl;
+import com.talool.domain.DealOfferPurchaseImpl;
+import com.talool.domain.MerchantAccountImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.SocialNetworkImpl;
+import com.talool.domain.TagImpl;
 
 /**
  * Implementation of the TaloolService
@@ -207,10 +212,9 @@ public class TaloolServiceImpl implements TaloolService
 
 			if (accountType == AccountType.MER)
 			{
-				// ((MerchantImpl) (account)).setPassword(md5pass);
 				save((MerchantImpl) account);
-				// daoDispatcher.flush(MerchantImpl.class);
-				// daoDispatcher.refresh((MerchantImpl) account);
+				daoDispatcher.flush(MerchantImpl.class);
+				daoDispatcher.refresh((MerchantImpl) account);
 			}
 			else
 			{
@@ -227,13 +231,6 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(err, e);
 		}
 
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void createAccount(final Merchant merchant, final String password) throws ServiceException
-	{
-		createAccount(AccountType.MER, merchant, password);
 	}
 
 	@Override
@@ -275,62 +272,24 @@ public class TaloolServiceImpl implements TaloolService
 		return merchant;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Merchant getMerchantByEmail(final String email) throws ServiceException
+	public List<Merchant> getMerchantByName(final String name) throws ServiceException
 	{
-		Merchant merchant = null;
+		List<Merchant> merchants = null;
 
 		try
 		{
 			final Search search = new Search(MerchantImpl.class);
-			search.addFilterEqual("email", email);
-			merchant = (Merchant) daoDispatcher.searchUnique(search);
+			search.addFilterEqual("name", name);
+			merchants = daoDispatcher.search(search);
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem getMerchantByEmail  " + email, ex);
+			throw new ServiceException("Problem getMerchantByName  " + name, ex);
 		}
 
-		return merchant;
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void save(final DealBook dealBook) throws ServiceException
-	{
-		try
-		{
-			daoDispatcher.save((DealBookImpl) dealBook);
-			daoDispatcher.flush(DealBookImpl.class);
-			daoDispatcher.refresh(dealBook);
-		}
-		catch (Exception e)
-		{
-			final String err = "There was a problem saving dealBook " + dealBook;
-			throw new ServiceException(err, e);
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<DealBook> getDealBooksByEmail(final String email) throws ServiceException
-	{
-		List<DealBook> dealBooks = null;
-
-		try
-		{
-			final Search search = new Search();
-			search.setSearchClass(DealBookImpl.class);
-			search.addFilterEqual("merchant.email", email);
-			dealBooks = daoDispatcher.search(search);
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException("Problem getDealBooksByEmail  " + email, ex);
-		}
-
-		return dealBooks;
+		return merchants;
 	}
 
 	private void removeElement(final Long id, Class clazz) throws ServiceException
@@ -351,13 +310,6 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException((String.format("Element ID '%d' not found for domain %s", id,
 					clazz.getSimpleName())));
 		}
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void deleteDealBook(final Long id) throws ServiceException
-	{
-		removeElement(id, DealBookImpl.class);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -399,90 +351,6 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(err, e);
 		}
 
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void deleteMerchantDeal(final Long id) throws ServiceException
-	{
-		removeElement(id, DealImpl.class);
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void save(final DealBookContent dealBookContent) throws ServiceException
-	{
-		try
-		{
-			daoDispatcher.save((DealBookContentImpl) dealBookContent);
-		}
-		catch (Exception e)
-		{
-			final String err = "There was a problem saving dealBookContent " + dealBookContent;
-			throw new ServiceException(err, e);
-		}
-
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void deleteDealBookContent(final Long id) throws ServiceException
-	{
-		removeElement(id, DealBookContentImpl.class);
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void save(final DealBookPurchase dealBookPurchase) throws ServiceException
-	{
-		try
-		{
-			daoDispatcher.save((DealBookPurchaseImpl) dealBookPurchase);
-		}
-		catch (Exception e)
-		{
-			final String err = "There was a problem saving dealBookPurchase " + dealBookPurchase;
-			throw new ServiceException(err, e);
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<DealBookPurchase> getPurchases(final AccountType accountType, final Long accountId)
-			throws ServiceException
-	{
-		try
-		{
-			final Search search = new Search(DealBookPurchaseImpl.class);
-			search.addFilterEqual(
-					accountType == AccountType.CUS ? "customer.id" : "dealBook.merchant.id", accountId);
-
-			return daoDispatcher.search(search);
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem getDealBookPurchasesById %s %d ",
-					accountType, accountId), ex);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<DealBookPurchase> getPurchasesByDealBookId(final Long dealBookId)
-			throws ServiceException
-	{
-		try
-		{
-			final Search search = new Search(DealBookPurchaseImpl.class);
-			search.addFilterEqual("dealBook.id", dealBookId);
-			return daoDispatcher.search(search);
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem getPurchasesByDealBookId %s", dealBookId),
-					ex);
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -544,4 +412,271 @@ public class TaloolServiceImpl implements TaloolService
 		}
 
 	}
+
+	@Override
+	public Tag getTag(final String tagName) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(TagImpl.class);
+			search.addFilterEqual("name", tagName);
+			return (Tag) daoDispatcher.searchUnique(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getTag %s", tagName), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Tag> getTags() throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(TagImpl.class);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getTags", ex);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addTags(final List<Tag> tags) throws ServiceException
+	{
+		try
+		{
+			for (Tag tag : tags)
+			{
+				daoDispatcher.save((TagImpl) tag);
+			}
+
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem adding tags", e);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final MerchantAccount merchantAccount) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save((MerchantAccountImpl) merchantAccount);
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem saving merchantAccount " + merchantAccount;
+			throw new ServiceException(err, e);
+		}
+	}
+
+	@Override
+	public void refresh(final Object obj) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.flush(obj.getClass());
+			daoDispatcher.refresh(obj);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem refreshing", e);
+		}
+	}
+
+	@Override
+	public MerchantAccount authenticateMerchantAccount(final Long merchantId, final String email,
+			final String password) throws ServiceException
+	{
+		try
+		{
+			final String md5pass = EncryptService.MD5(password);
+			final Query query = sessionFactory
+					.getCurrentSession()
+					.createQuery(
+							"from MerchantAccountImpl where merchant.id=:merchantId and email=:email and password=:pass");
+
+			query.setParameter("merchantId", merchantId);
+			query.setParameter("email", email);
+			query.setParameter("pass", md5pass);
+			return (MerchantAccount) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem authenticateMerchantAccount %d %d",
+					merchantId, email), ex);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final DealOffer dealOffer) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(dealOffer);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem saving dealOffer ", e);
+		}
+
+	}
+
+	@Override
+	public DealOffer getDealOffer(final Long dealOfferId) throws ServiceException
+	{
+		try
+		{
+			return daoDispatcher.find(DealOfferImpl.class, dealOfferId);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem in getDealOfferById", e);
+		}
+	}
+
+	@Override
+	public Deal getDeal(final Long dealId) throws ServiceException
+	{
+		try
+		{
+			return daoDispatcher.find(DealImpl.class, dealId);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem in getDeal " + dealId, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Deal> getDealsByDealOfferId(final Long dealOfferId) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(DealImpl.class);
+			search.addFilterEqual("dealOffer.id", dealOfferId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getDealsByDealOfferId for dealOfferId " + dealOfferId, ex);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final Long customerId)
+			throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(DealOfferPurchaseImpl.class);
+			search.addFilterEqual("customer.id", customerId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealBookPurchasesByCustomerId %s",
+					customerId), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final Long dealOfferId)
+			throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(DealOfferPurchaseImpl.class);
+			search.addFilterEqual("dealOffer.id", dealOfferId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealBookPurchasesByDealOfferId %s",
+					dealOfferId), ex);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(dealOfferPurchase);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem saving dealOfferPurchase ", e);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getMerchants() throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(MerchantImpl.class);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getMerchants"), ex);
+		}
+	}
+
+	@Override
+	public Long sizeOfCollection(Object collection) throws ServiceException
+	{
+		return ((Long) getSessionFactory().getCurrentSession()
+				.createFilter(collection, "select count(*)").list().get(0)).longValue();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Set<Tag> getDealOfferTags(final Long dealOfferId) throws ServiceException
+	{
+		Set<Tag> tags = null;
+
+		try
+		{
+			final Query query = getSessionFactory()
+					.getCurrentSession()
+					.createSQLQuery(
+							"select distinct t.* from tag as t, deal_tag as dt,deal_offer as dof, deal as d where t.tag_id=dt.tag_id and dof.deal_offer_id=d.deal_offer_id and d.deal_offer_id=:dealOfferId and d.deal_id=dt.deal_id")
+					.addEntity(TagImpl.class);
+
+			query.setParameter("dealOfferId", dealOfferId);
+
+			final List<Tag> tagList = (query.list());
+
+			if (CollectionUtils.isNotEmpty(tagList))
+			{
+				tags = new HashSet<Tag>();
+				tags.addAll(tagList);
+			}
+
+			return tags;
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealOfferTags %s", dealOfferId), ex);
+		}
+	}
+
 }

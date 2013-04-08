@@ -12,11 +12,7 @@ public interface DealOfferPurchase extends Identifiable, Serializable
 {
 	public DealOffer getDealOffer();
 
-	public void setDealOffer(DealOffer dealOffer);
-
 	public Customer getCustomer();
-
-	public void setCustomer(Customer customer);
 
 	public Location getLocation();
 

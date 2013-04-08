@@ -63,12 +63,6 @@ public class MerchantLocationImpl implements MerchantLocation
 	@JoinColumn(name = "address_id")
 	private Address address;
 
-	@Column(name = "password", unique = false, nullable = false, length = 64)
-	private String password;
-
-	@Column(name = "is_active", unique = false, nullable = true)
-	private boolean isActive = true;
-
 	@Embedded
 	@Target(LocationImpl.class)
 	private Location location;
@@ -146,11 +140,6 @@ public class MerchantLocationImpl implements MerchantLocation
 		this.address = address;
 	}
 
-	public boolean isActive()
-	{
-		return isActive;
-	}
-
 	@Override
 	public Date getCreated()
 	{
@@ -202,19 +191,6 @@ public class MerchantLocationImpl implements MerchantLocation
 	public int hashCode()
 	{
 		return new HashCodeBuilder(17, 37).append(getLocationName()).append(getAddress()).hashCode();
-	}
-
-	@Override
-	public String getPassword()
-	{
-		return password;
-	}
-
-	@Override
-	public void setPassword(String password)
-	{
-		this.password = password;
-
 	}
 
 	@Override

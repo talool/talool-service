@@ -50,4 +50,6 @@ public interface Deal extends Identifiable, Serializable, TimeAware
 
 	public Set<Tag> getTags();
 
+	public void addTag(Tag tag);
+
 }

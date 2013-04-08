@@ -50,7 +50,7 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	private DealOffer dealOffer;
 
 	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = DealOfferImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = CustomerImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
@@ -58,8 +58,17 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	@Target(LocationImpl.class)
 	private Location location;
 
-	@Column(name = "created_dt", unique = false, nullable = true)
+	@Column(name = "create_dt", unique = false, nullable = true, insertable = false, updatable = false)
 	private Date created;
+
+	public DealOfferPurchaseImpl()
+	{}
+
+	public DealOfferPurchaseImpl(final Customer customer, final DealOffer dealOffer)
+	{
+		this.customer = customer;
+		this.dealOffer = dealOffer;
+	}
 
 	@Override
 	public Long getId()
@@ -74,22 +83,9 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	}
 
 	@Override
-	public void setDealOffer(DealOffer dealOffer)
-	{
-		this.dealOffer = dealOffer;
-	}
-
-	@Override
 	public Customer getCustomer()
 	{
 		return customer;
-	}
-
-	@Override
-	public void setCustomer(Customer customer)
-	{
-		this.customer = customer;
-
 	}
 
 	@Override

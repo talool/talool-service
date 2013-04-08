@@ -1,6 +1,7 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -82,7 +83,7 @@ public class DealImpl implements Deal
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "deal_tag", joinColumns = { @JoinColumn(name = "deal_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
-	private Set<Tag> tags;
+	private Set<Tag> tags = new HashSet<Tag>();
 
 	@Column(name = "is_active", unique = false, nullable = true)
 	private boolean isActive = true;
@@ -93,9 +94,10 @@ public class DealImpl implements Deal
 	public DealImpl()
 	{}
 
-	public DealImpl(final Merchant merchant)
+	public DealImpl(final DealOffer dealOffer)
 	{
-		this.merchant = merchant;
+		this.merchant = dealOffer.getMerchant();
+		this.dealOffer = dealOffer;
 	}
 
 	@Override
@@ -265,6 +267,12 @@ public class DealImpl implements Deal
 	public Set<Tag> getTags()
 	{
 		return tags;
+	}
+
+	@Override
+	public void addTag(Tag tag)
+	{
+		tags.add(tag);
 	}
 
 }

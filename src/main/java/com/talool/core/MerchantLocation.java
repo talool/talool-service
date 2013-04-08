@@ -12,10 +12,6 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public void setEmail(String email);
 
-	public String getPassword();
-
-	public void setPassword(String password);
-
 	public String getWebsiteUrl();
 
 	public void setWebsiteUrl(String websiteUrl);

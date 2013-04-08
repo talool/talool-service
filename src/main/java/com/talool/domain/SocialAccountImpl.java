@@ -110,9 +110,6 @@ public class SocialAccountImpl implements SocialAccount
 	@EmbeddedId
 	private final SocialAccountPK primaryKey;
 
-	@Column(name = "token", unique = false, nullable = false)
-	private String token;
-
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
@@ -223,17 +220,5 @@ public class SocialAccountImpl implements SocialAccount
 	public Date getUpdated()
 	{
 		return createdUpdated.getCreated();
-	}
-
-	@Override
-	public String getToken()
-	{
-		return token;
-	}
-
-	@Override
-	public void setToken(String token)
-	{
-		this.token = token;
 	}
 }

@@ -21,8 +21,21 @@ public interface Merchant extends Identifiable, Serializable, TimeAware
 
 	public Merchant getParent();
 
+	public Set<MerchantAccount> getMerchantAccounts();
+
 	public void setParent(Merchant merchant);
 
 	public Set<Tag> getTags();
+
+	public void addTag(Tag tag);
+
+	/**
+	 * Get number of merchant accounts (without loading all objects to count them)
+	 * 
+	 * Nice optimization on the persistent store
+	 * 
+	 * @return
+	 */
+	public Long getNumberOfMerchantAccounts();
 
 }

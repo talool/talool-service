@@ -1,6 +1,7 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -17,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -28,8 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Merchant;
+import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
 import com.talool.core.Tag;
+import com.talool.core.service.ServiceException;
+import com.talool.service.ServiceFactory;
 
 /**
  * 
@@ -64,7 +69,11 @@ public class MerchantImpl implements Merchant
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
-	private Set<Tag> tags;
+	private Set<Tag> tags = new HashSet<Tag>();
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = MerchantAccountImpl.class)
+	@JoinColumn(name = "merchant_id")
+	private Set<MerchantAccount> merchantAccounts = new HashSet<MerchantAccount>();
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -171,4 +180,31 @@ public class MerchantImpl implements Merchant
 		return tags;
 	}
 
+	@Override
+	public void addTag(final Tag tag)
+	{
+		tags.add(tag);
+	}
+
+	@Override
+	public Set<MerchantAccount> getMerchantAccounts()
+	{
+		return merchantAccounts;
+	}
+
+	@Override
+	public Long getNumberOfMerchantAccounts()
+	{
+		Long size = null;
+		try
+		{
+			size = ServiceFactory.get().getTaloolService().sizeOfCollection(merchantAccounts);
+		}
+		catch (ServiceException e)
+		{
+			e.printStackTrace();
+		}
+
+		return size;
+	}
 }

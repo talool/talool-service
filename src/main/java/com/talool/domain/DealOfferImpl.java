@@ -19,12 +19,14 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import com.talool.core.DealOffer;
 import com.talool.core.DealType;
 import com.talool.core.Merchant;
+import com.talool.core.MerchantAccount;
 import com.talool.persistence.GenericEnumUserType;
 
 /**
@@ -37,7 +39,7 @@ import com.talool.persistence.GenericEnumUserType;
  */
 @Entity
 @Table(name = "deal_offer", catalog = "public")
-@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class)
+@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.core.DealType") })
 public class DealOfferImpl implements DealOffer
 {
 	private static final long serialVersionUID = 5159454091663842874L;
@@ -50,9 +52,14 @@ public class DealOfferImpl implements DealOffer
 	private Long id;
 
 	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "created_by_merchant_account_id")
-	private Merchant createdByMerchant;
+	private MerchantAccount createdByMerchant;
+
+	@Access(AccessType.FIELD)
+	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "merchant_id")
+	private Merchant merchant;
 
 	@Column(name = "image_url", unique = false, nullable = true, length = 128)
 	private String imageUrl;
@@ -72,6 +79,9 @@ public class DealOfferImpl implements DealOffer
 	@Column(name = "price", unique = false, nullable = true)
 	private Float price;
 
+	@Column(name = "title", unique = false, nullable = true, length = 256)
+	private String title;
+
 	@Type(type = "dealType")
 	@Column(name = "deal_type", nullable = false, columnDefinition = "deal_type")
 	private DealType dealType;
@@ -82,9 +92,10 @@ public class DealOfferImpl implements DealOffer
 	public DealOfferImpl()
 	{}
 
-	public DealOfferImpl(final Merchant merchant)
+	public DealOfferImpl(final Merchant merchant, final MerchantAccount createdByMerchantAccount)
 	{
-		this.createdByMerchant = merchant;
+		this.createdByMerchant = createdByMerchantAccount;
+		this.merchant = merchant;
 	}
 
 	@Override
@@ -203,7 +214,7 @@ public class DealOfferImpl implements DealOffer
 	}
 
 	@Override
-	public Merchant getCreatedByMerchant()
+	public MerchantAccount getCreatedByMerchant()
 	{
 		return createdByMerchant;
 	}
@@ -238,6 +249,24 @@ public class DealOfferImpl implements DealOffer
 	public String toString()
 	{
 		return ReflectionToStringBuilder.toString(this);
+	}
+
+	@Override
+	public Merchant getMerchant()
+	{
+		return merchant;
+	}
+
+	@Override
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
+
+	@Override
+	public String getTitle()
+	{
+		return title;
 	}
 
 }
