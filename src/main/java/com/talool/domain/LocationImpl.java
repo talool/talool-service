@@ -15,6 +15,8 @@ import com.talool.core.Location;
 @Embeddable
 public class LocationImpl implements Location
 {
+	private static final long serialVersionUID = 6198741717898788920L;
+
 	@Column(name = "longitude", unique = false, nullable = true)
 	@Access(AccessType.FIELD)
 	private Double longitude;
