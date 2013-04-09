@@ -1,5 +1,7 @@
 package com.talool.core.service;
 
+import java.util.List;
+
 import com.talool.core.Customer;
 
 /**
@@ -22,5 +24,9 @@ public interface CustomerService
 	public Customer getCustomerById(final Long id) throws ServiceException;
 
 	public Customer getCustomerByEmail(final String email) throws ServiceException;
+	
+	public List<Customer> getCustomers() throws ServiceException;
+	
+	public List<Customer> getFriends(final Long id) throws ServiceException;
 
 }

@@ -679,4 +679,51 @@ public class TaloolServiceImpl implements TaloolService
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOffer> getDealOffers() throws ServiceException {
+		try
+		{
+			final Search search = new Search(DealOfferImpl.class);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealOffers"), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Customer> getCustomers() throws ServiceException {
+		try
+		{
+			final Search search = new Search(CustomerImpl.class);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getCustomers"), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Customer> getFriends(Long id) throws ServiceException {
+		try
+		{
+			final Query query = sessionFactory
+					.getCurrentSession()
+					.createQuery(
+							"from CustomerImpl c, RelationshipImpl r where c.customerId=r.customerId and r.friendId=:customerId");
+
+			query.setParameter("customerId", id);
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getFriends %d", id), ex);
+		}
+	}
+
 }
