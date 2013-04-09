@@ -726,4 +726,21 @@ public class TaloolServiceImpl implements TaloolService
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOffer> getDealOffersByMerchantId(Long merchantId)
+			throws ServiceException {
+		try
+		{
+			final Search search = new Search(DealOfferImpl.class);
+			search.addFilterEqual("merchant.id", merchantId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealOffersByMerchantId %s",
+					merchantId), ex);
+		}
+	}
+
 }
