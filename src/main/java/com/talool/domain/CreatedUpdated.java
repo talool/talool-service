@@ -7,6 +7,7 @@
  */
 package com.talool.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Access;
@@ -19,8 +20,10 @@ import javax.persistence.Embeddable;
  * 
  */
 @Embeddable
-public class CreatedUpdated
+public class CreatedUpdated implements Serializable
 {
+	private static final long serialVersionUID = -2421165785196580283L;
+
 	@Access(AccessType.FIELD)
 	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
 	private Date updated;

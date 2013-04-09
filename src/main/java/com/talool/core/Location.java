@@ -1,12 +1,14 @@
 package com.talool.core;
 
+import java.io.Serializable;
+
 /**
  * Location
  * 
  * @author clintz
  * 
  */
-public interface Location
+public interface Location extends Serializable
 {
 	public Double getLongitude();
 
