@@ -60,6 +60,8 @@ public interface MerchantService
 	public void save(final DealOffer dealOffer) throws ServiceException;
 
 	public DealOffer getDealOffer(final Long dealOfferId) throws ServiceException;
+	
+	public List<DealOffer> getDealOffers() throws ServiceException;
 
 	public void save(final Deal deal) throws ServiceException;
 
