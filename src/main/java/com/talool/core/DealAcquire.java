@@ -8,15 +8,15 @@ import java.util.Date;
  * @author clintz
  * 
  */
-public interface DealAquire extends Identifiable, Serializable, TimeAware
+public interface DealAcquire extends Identifiable, Serializable, TimeAware
 {
 	public Deal getDeal();
 
 	public void setDeal(Deal deal);
 
-	public AquireStatus getAquireStatus();
+	public AcquireStatus getAcquireStatus();
 
-	public void setAquireStatus(AquireStatus aquireStatus);
+	public void setAcquireStatus(AcquireStatus acquireStatus);
 
 	public Customer getCustomer();
 

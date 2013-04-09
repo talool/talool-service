@@ -22,10 +22,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.Target;
 
-import com.talool.core.AquireStatus;
+import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
-import com.talool.core.DealAquire;
+import com.talool.core.DealAcquire;
 import com.talool.core.Location;
 import com.talool.core.Merchant;
 
@@ -35,16 +35,16 @@ import com.talool.core.Merchant;
  * 
  */
 @Entity
-@Table(name = "deal_aquire", catalog = "public")
-public class DealAquireImpl implements DealAquire
+@Table(name = "deal_acquire", catalog = "public")
+public class DealAcquireImpl implements DealAcquire
 {
 	private static final long serialVersionUID = -4850285379175281009L;
 
 	@Id
 	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_dealaq_seq")
-	@SequenceGenerator(name = "my_dealaq_seq", sequenceName = "deal_aquire_deal_aquire_id_seq")
-	@Column(name = "deal_aquire_id", unique = true, nullable = false)
+	@SequenceGenerator(name = "my_dealaq_seq", sequenceName = "deal_acquire_deal_acquire_id_seq")
+	@Column(name = "deal_acquire_id", unique = true, nullable = false)
 	private Long id;
 
 	@Access(AccessType.FIELD)
@@ -53,9 +53,9 @@ public class DealAquireImpl implements DealAquire
 	private Deal deal;
 
 	@Access(AccessType.FIELD)
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AquireStatusImpl.class)
-	@JoinColumn(name = "aquire_status_id")
-	private AquireStatus status;
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AcquireStatusImpl.class)
+	@JoinColumn(name = "acquire_status_id")
+	private AcquireStatus status;
 
 	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
@@ -116,15 +116,15 @@ public class DealAquireImpl implements DealAquire
 	}
 
 	@Override
-	public AquireStatus getAquireStatus()
+	public AcquireStatus getAcquireStatus()
 	{
 		return status;
 	}
 
 	@Override
-	public void setAquireStatus(AquireStatus aquireStatus)
+	public void setAcquireStatus(AcquireStatus acquireStatus)
 	{
-		this.status = aquireStatus;
+		this.status = acquireStatus;
 	}
 
 	@Override
@@ -209,26 +209,26 @@ public class DealAquireImpl implements DealAquire
 			return false;
 		}
 
-		if (!(obj instanceof DealAquireImpl))
+		if (!(obj instanceof DealAcquireImpl))
 		{
 			return false;
 		}
 
-		final DealAquireImpl other = (DealAquireImpl) obj;
+		final DealAcquireImpl other = (DealAcquireImpl) obj;
 
 		if (getId() != other.getId())
 		{
 			return false;
 		}
 
-		return new EqualsBuilder().append(getAquireStatus(), other.getAquireStatus())
+		return new EqualsBuilder().append(getAcquireStatus(), other.getAcquireStatus())
 				.append(getDeal(), other.getDeal()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getAquireStatus()).append(getDeal()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getAcquireStatus()).append(getDeal()).hashCode();
 	}
 
 	@Override

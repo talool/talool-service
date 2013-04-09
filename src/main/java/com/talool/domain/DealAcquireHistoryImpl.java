@@ -20,10 +20,10 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
-import com.talool.core.AquireStatus;
+import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
-import com.talool.core.DealAquire;
-import com.talool.core.DealAquireHistory;
+import com.talool.core.DealAcquire;
+import com.talool.core.DealAcquireHistory;
 import com.talool.core.Merchant;
 
 /**
@@ -32,27 +32,27 @@ import com.talool.core.Merchant;
  * 
  */
 @Entity
-@Table(name = "deal_aquire_history", catalog = "public")
-public class DealAquireHistoryImpl implements DealAquireHistory
+@Table(name = "deal_acquire_history", catalog = "public")
+public class DealAcquireHistoryImpl implements DealAcquireHistory
 {
 	private static final long serialVersionUID = 7508266282237562791L;
 
 	@Id
 	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_dealaq_h_seq")
-	@SequenceGenerator(name = "my_dealaq_h_seq", sequenceName = "deal_aquire_history_deal_aquire_history_id_seq")
-	@Column(name = "deal_aquire_history_id", unique = true, nullable = false)
+	@SequenceGenerator(name = "my_dealaq_h_seq", sequenceName = "deal_acquire_history_deal_acquire_history_id_seq")
+	@Column(name = "deal_acquire_history_id", unique = true, nullable = false)
 	private Long id;
 
 	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = DealAquireImpl.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "deal_aquire_id")
-	private DealAquire dealAquire;
+	@OneToOne(targetEntity = DealAcquireImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "deal_acquire_id")
+	private DealAcquire dealAcquire;
 
 	@Access(AccessType.FIELD)
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AquireStatusImpl.class)
-	@JoinColumn(name = "aquire_status_id")
-	private AquireStatus status;
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AcquireStatusImpl.class)
+	@JoinColumn(name = "acquire_status_id")
+	private AcquireStatus status;
 
 	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
@@ -88,7 +88,7 @@ public class DealAquireHistoryImpl implements DealAquireHistory
 	}
 
 	@Override
-	public AquireStatus getAquireStatus()
+	public AcquireStatus getAcquireStatus()
 	{
 		return status;
 	}
@@ -137,12 +137,12 @@ public class DealAquireHistoryImpl implements DealAquireHistory
 			return false;
 		}
 
-		if (!(obj instanceof DealAquireHistoryImpl))
+		if (!(obj instanceof DealAcquireHistoryImpl))
 		{
 			return false;
 		}
 
-		final DealAquireHistoryImpl other = (DealAquireHistoryImpl) obj;
+		final DealAcquireHistoryImpl other = (DealAcquireHistoryImpl) obj;
 
 		if (getId() != other.getId())
 		{
@@ -150,13 +150,13 @@ public class DealAquireHistoryImpl implements DealAquireHistory
 		}
 
 		return new EqualsBuilder().append(getUpdated(), other.getUpdated())
-				.append(getDealAquire(), other.getDealAquire()).isEquals();
+				.append(getDealAcquire(), other.getDealAcquire()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getUpdated()).append(getDealAquire()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getUpdated()).append(getDealAcquire()).hashCode();
 	}
 
 	@Override
@@ -166,9 +166,9 @@ public class DealAquireHistoryImpl implements DealAquireHistory
 	}
 
 	@Override
-	public DealAquire getDealAquire()
+	public DealAcquire getDealAcquire()
 	{
-		return dealAquire;
+		return dealAcquire;
 	}
 
 }

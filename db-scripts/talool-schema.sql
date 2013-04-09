@@ -67,8 +67,8 @@ DECLARE
 BEGIN
   FOR rec IN SELECT * FROM deal WHERE deal_offer_id = NEW.deal_offer_id
   LOOP
-    INSERT INTO deal_aquire(deal_id,aquire_status_id,customer_id) 
-       VALUES( rec.deal_id,(select aquire_status_id from aquire_status where status='PURCHASE'),NEW.customer_id);
+    INSERT INTO deal_acquire(deal_id,acquire_status_id,customer_id) 
+       VALUES( rec.deal_id,(select acquire_status_id from acquire_status where status='PURCHASE'),NEW.customer_id);
   end loop;
   return NEW;
 END;
@@ -492,32 +492,32 @@ ALTER TABLE ONLY merchant_tag ADD CONSTRAINT "FK_MerchantTag_Tag" FOREIGN KEY (t
 CREATE INDEX merchant_tag_merchant_id_idx ON merchant_tag (merchant_id);
 CREATE INDEX merchant_tag_tag_id_idx ON merchant_tag (tag_id);
 
-CREATE TABLE aquire_status (
-    aquire_status_id smallint NOT NULL,   
+CREATE TABLE acquire_status (
+    acquire_status_id smallint NOT NULL,   
     status character varying(64),
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY(aquire_status_id)
+    PRIMARY KEY(acquire_status_id)
 );
 
-ALTER TABLE public.aquire_status OWNER TO talool;
+ALTER TABLE public.acquire_status OWNER TO talool;
 
-CREATE SEQUENCE aquire_status_aquire_status_id_seq
+CREATE SEQUENCE acquire_status_acquire_status_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     MAXVALUE 100
     CACHE 1;
     
-ALTER TABLE public.aquire_status_aquire_status_id_seq OWNER TO talool;
-ALTER SEQUENCE aquire_status_aquire_status_id_seq OWNED BY aquire_status.aquire_status_id;
-ALTER TABLE ONLY aquire_status ALTER COLUMN aquire_status_id SET DEFAULT nextval('aquire_status_aquire_status_id_seq'::regclass);
-CREATE UNIQUE INDEX aquire_status_status_idx ON aquire_status (status);
+ALTER TABLE public.acquire_status_acquire_status_id_seq OWNER TO talool;
+ALTER SEQUENCE acquire_status_acquire_status_id_seq OWNED BY acquire_status.acquire_status_id;
+ALTER TABLE ONLY acquire_status ALTER COLUMN acquire_status_id SET DEFAULT nextval('acquire_status_acquire_status_id_seq'::regclass);
+CREATE UNIQUE INDEX acquire_status_status_idx ON acquire_status (status);
 
 
-CREATE TABLE deal_aquire (
-    deal_aquire_id bigint NOT NULL,   
+CREATE TABLE deal_acquire (
+    deal_acquire_id bigint NOT NULL,   
     deal_id bigint NOT NULL,
-    aquire_status_id smallint NOT NULL, 
+    acquire_status_id smallint NOT NULL, 
     customer_id bigint NOT NULL,
     shared_by_merchant_id bigint,
     shared_by_customer_id bigint,
@@ -527,61 +527,61 @@ CREATE TABLE deal_aquire (
     redemption_dt timestamp without time zone,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY(deal_aquire_id)
+    PRIMARY KEY(deal_acquire_id)
 );
 
-ALTER TABLE public.deal_aquire OWNER TO talool;
+ALTER TABLE public.deal_acquire OWNER TO talool;
 
-CREATE SEQUENCE deal_aquire_deal_aquire_id_seq
+CREATE SEQUENCE deal_acquire_deal_acquire_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
     
-ALTER TABLE public.deal_aquire_deal_aquire_id_seq OWNER TO talool;
-ALTER SEQUENCE deal_aquire_deal_aquire_id_seq OWNED BY deal_aquire.deal_aquire_id;
-ALTER TABLE ONLY deal_aquire ALTER COLUMN deal_aquire_id SET DEFAULT nextval('deal_aquire_deal_aquire_id_seq'::regclass);
-ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_DealDetail" FOREIGN KEY (deal_id) REFERENCES deal(deal_id);
-ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
-ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY deal_aquire ADD CONSTRAINT "FK_DealAquire_AquireStatus" FOREIGN KEY (aquire_status_id) REFERENCES aquire_status(aquire_status_id);
-CREATE INDEX deal_aquire_deal_id_idx ON deal_aquire (deal_id);
-CREATE INDEX deal_aquire_customer_id_idx ON deal_aquire (customer_id);
-CREATE INDEX deal_aquire_shared_by_customer_id_idx ON deal_aquire (shared_by_customer_id);
-CREATE INDEX deal_aquire_shared_by_merchant_id_idx ON deal_aquire (shared_by_merchant_id);
+ALTER TABLE public.deal_acquire_deal_acquire_id_seq OWNER TO talool;
+ALTER SEQUENCE deal_acquire_deal_acquire_id_seq OWNED BY deal_acquire.deal_acquire_id;
+ALTER TABLE ONLY deal_acquire ALTER COLUMN deal_acquire_id SET DEFAULT nextval('deal_acquire_deal_acquire_id_seq'::regclass);
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_DealDetail" FOREIGN KEY (deal_id) REFERENCES deal(deal_id);
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_acquireStatus" FOREIGN KEY (acquire_status_id) REFERENCES acquire_status(acquire_status_id);
+CREATE INDEX deal_acquire_deal_id_idx ON deal_acquire (deal_id);
+CREATE INDEX deal_acquire_customer_id_idx ON deal_acquire (customer_id);
+CREATE INDEX deal_acquire_shared_by_customer_id_idx ON deal_acquire (shared_by_customer_id);
+CREATE INDEX deal_acquire_shared_by_merchant_id_idx ON deal_acquire (shared_by_merchant_id);
 
-CREATE TABLE deal_aquire_history (
-    deal_aquire_history_id bigint NOT NULL,  
-    deal_aquire_id bigint NOT NULL,
-    aquire_status_id smallint NOT NULL, 
+CREATE TABLE deal_acquire_history (
+    deal_acquire_history_id bigint NOT NULL,  
+    deal_acquire_id bigint NOT NULL,
+    acquire_status_id smallint NOT NULL, 
     customer_id bigint NOT NULL,
     shared_by_merchant_id bigint,
     shared_by_customer_id bigint,
     share_cnt int NOT NULL DEFAULT 0,
     update_dt timestamp without time zone NOT NULL,
-    PRIMARY KEY(deal_aquire_history_id)
+    PRIMARY KEY(deal_acquire_history_id)
 );
 
-ALTER TABLE public.deal_aquire_history OWNER TO talool;
+ALTER TABLE public.deal_acquire_history OWNER TO talool;
 
-CREATE SEQUENCE deal_aquire_history_deal_aquire_history_id_seq
+CREATE SEQUENCE deal_acquire_history_deal_acquire_history_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
     
-ALTER TABLE public.deal_aquire_history_deal_aquire_history_id_seq OWNER TO talool;
-ALTER SEQUENCE deal_aquire_history_deal_aquire_history_id_seq OWNED BY deal_aquire_history.deal_aquire_id;
-ALTER TABLE ONLY deal_aquire_history ALTER COLUMN deal_aquire_id SET DEFAULT nextval('deal_aquire_history_deal_aquire_history_id_seq'::regclass);
+ALTER TABLE public.deal_acquire_history_deal_acquire_history_id_seq OWNER TO talool;
+ALTER SEQUENCE deal_acquire_history_deal_acquire_history_id_seq OWNED BY deal_acquire_history.deal_acquire_id;
+ALTER TABLE ONLY deal_acquire_history ALTER COLUMN deal_acquire_id SET DEFAULT nextval('deal_acquire_history_deal_acquire_history_id_seq'::regclass);
 
-ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_DealAquire" FOREIGN KEY (deal_aquire_id) REFERENCES deal_aquire(deal_aquire_id);
-ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
-ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY deal_aquire_history ADD CONSTRAINT "FK_DealAquireHistory_AquireStatus" FOREIGN KEY (aquire_status_id) REFERENCES aquire_status(aquire_status_id);
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Dealacquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_acquireStatus" FOREIGN KEY (acquire_status_id) REFERENCES acquire_status(acquire_status_id);
 
 
 

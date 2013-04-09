@@ -27,7 +27,7 @@ INSERT INTO address(address1, address2, city, state_province_county, zip, countr
 INSERT INTO address(address1, address2, city, state_province_county, zip, country)
             VALUES ('1750 30th St.', 'PO Box 195', 'Boulder', 'CO', '80301', 'US');
 
-INSERT INTO aquire_status(status) VALUES ('PURCHASE');
-INSERT INTO aquire_status(status) VALUES ('MERCHANT_SHARE');
-INSERT INTO aquire_status(status) VALUES ('CUSTOMER_SHARE');
+INSERT INTO acquire_status(status) VALUES ('PURCHASE');
+INSERT INTO acquire_status(status) VALUES ('MERCHANT_SHARE');
+INSERT INTO acquire_status(status) VALUES ('CUSTOMER_SHARE');
 
