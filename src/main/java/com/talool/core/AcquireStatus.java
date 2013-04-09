@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Aquire Status Interface
+ * Acquire Status Interface
  * 
  * @author clintz
  * 
  */
-public interface AquireStatus extends Serializable
+public interface AcquireStatus extends Serializable
 {
 	public Integer getId();
 

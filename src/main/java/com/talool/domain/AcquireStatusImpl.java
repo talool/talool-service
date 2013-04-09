@@ -16,24 +16,24 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
-import com.talool.core.AquireStatus;
+import com.talool.core.AcquireStatus;
 
 /**
- * Aquire Status Impl
+ * Acquire Status Impl
  * 
  * @author clintz
  * 
  */
 @Entity
-@Table(name = "aquire_status", catalog = "public")
-public class AquireStatusImpl implements AquireStatus
+@Table(name = "acquire_status", catalog = "public")
+public class AcquireStatusImpl implements AcquireStatus
 {
 	private static final long serialVersionUID = 3720511015708695704L;
 	@Id
 	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_aq_seq")
-	@SequenceGenerator(name = "my_aq_seq", sequenceName = "aquire_status_aquire_status_id_seq")
-	@Column(name = "aquire_status_id", unique = true, nullable = false)
+	@SequenceGenerator(name = "my_aq_seq", sequenceName = "acquire_status_acquire_status_id_seq")
+	@Column(name = "acquire_status_id", unique = true, nullable = false)
 	private Integer id;
 
 	@Column(name = "status", unique = true, nullable = false, length = 64)
@@ -73,12 +73,12 @@ public class AquireStatusImpl implements AquireStatus
 			return false;
 		}
 
-		if (!(obj instanceof AquireStatusImpl))
+		if (!(obj instanceof AcquireStatusImpl))
 		{
 			return false;
 		}
 
-		final AquireStatusImpl other = (AquireStatusImpl) obj;
+		final AcquireStatusImpl other = (AcquireStatusImpl) obj;
 
 		if (getId() != other.getId())
 		{
