@@ -44,7 +44,7 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "merchant_location_id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "merchant_location_name", unique = false, nullable = false, length = 64)
+	@Column(name = "merchant_location_name", unique = false, nullable = true, length = 64)
 	private String locationName;
 
 	@Column(name = "email", unique = true, nullable = true, length = 64)
