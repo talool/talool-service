@@ -41,6 +41,7 @@ import com.talool.core.Tag;
  */
 @Entity
 @Table(name = "deal", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DealImpl implements Deal
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DealImpl.class);

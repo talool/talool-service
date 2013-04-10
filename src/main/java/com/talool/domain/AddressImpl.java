@@ -24,6 +24,7 @@ import com.talool.core.Address;
  */
 @Entity
 @Table(name = "address", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class AddressImpl implements Address
 {
 	private static final long serialVersionUID = 958137187646742761L;

@@ -33,6 +33,7 @@ import com.talool.core.Location;
  */
 @Entity
 @Table(name = "deal_offer_purchase", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DealOfferPurchaseImpl implements DealOfferPurchase
 {
 	private static final long serialVersionUID = -8559023014062619642L;

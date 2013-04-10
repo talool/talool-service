@@ -40,6 +40,7 @@ import com.talool.persistence.GenericEnumUserType;
 @Entity
 @Table(name = "deal_offer", catalog = "public")
 @TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.core.DealType") })
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DealOfferImpl implements DealOffer
 {
 	private static final long serialVersionUID = 5159454091663842874L;

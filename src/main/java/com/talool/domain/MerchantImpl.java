@@ -45,6 +45,7 @@ import com.talool.service.ServiceFactory;
  */
 @Entity
 @Table(name = "merchant", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class MerchantImpl implements Merchant
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantImpl.class);

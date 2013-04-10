@@ -33,6 +33,7 @@ import com.talool.core.MerchantLocation;
  */
 @Entity
 @Table(name = "merchant_location", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class MerchantLocationImpl implements MerchantLocation
 {
 	private static final long serialVersionUID = 3716227130006204917L;

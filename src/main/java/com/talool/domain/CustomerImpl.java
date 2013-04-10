@@ -41,6 +41,7 @@ import com.talool.persistence.GenericEnumUserType;
 		@Parameter(name = "enumClass", value = "com.talool.core.Sex"),
 		@Parameter(name = "identifierMethod", value = "getLetter"),
 		@Parameter(name = "valueOfMethod", value = "valueByLetter") })
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class CustomerImpl implements Customer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CustomerImpl.class);
