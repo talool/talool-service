@@ -1,6 +1,7 @@
 package com.talool.core;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,9 +26,15 @@ public interface Merchant extends Identifiable, Serializable, TimeAware
 
 	public void setParent(Merchant merchant);
 
+	public void clearTags();
+
 	public Set<Tag> getTags();
 
+	public void setTags(Set<Tag> tags);
+
 	public void addTag(Tag tag);
+
+	public void addTags(List<Tag> tag);
 
 	/**
 	 * Get number of merchant accounts (without loading all objects to count them)

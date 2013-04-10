@@ -2,6 +2,7 @@ package com.talool.domain;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -69,7 +70,7 @@ public class MerchantImpl implements Merchant
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
-	private Set<Tag> tags = new HashSet<Tag>();
+	private Set<Tag> tags;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = MerchantAccountImpl.class)
 	@JoinColumn(name = "merchant_id")
@@ -207,4 +208,26 @@ public class MerchantImpl implements Merchant
 
 		return size;
 	}
+
+	@Override
+	public void addTags(final List<Tag> _tags)
+	{
+		for (Tag tag : _tags)
+		{
+			tags.add(tag);
+		}
+	}
+
+	@Override
+	public void clearTags()
+	{
+		tags.clear();
+	}
+
+	@Override
+	public void setTags(Set<Tag> tags)
+	{
+		this.tags = tags;
+	}
+
 }

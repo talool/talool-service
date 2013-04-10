@@ -25,6 +25,9 @@ import com.talool.core.Tag;
 @Table(name = "tag", catalog = "public")
 public class TagImpl implements Tag
 {
+
+	private static final long serialVersionUID = 2955686897079229757L;
+
 	@Id
 	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_tag_seq")

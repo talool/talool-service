@@ -1,6 +1,7 @@
 package com.talool.core.service;
 
 import java.util.List;
+import java.util.Set;
 
 import com.talool.core.AccountType;
 import com.talool.core.SocialNetwork;
@@ -22,6 +23,8 @@ public interface TaloolService extends MerchantService, CustomerService
 	public List<Tag> getTags() throws ServiceException;
 
 	public void addTags(List<Tag> tags) throws ServiceException;
+
+	public Set<Tag> getOrCreateTags(String... tags) throws ServiceException;
 
 	public void refresh(Object obj) throws ServiceException;
 

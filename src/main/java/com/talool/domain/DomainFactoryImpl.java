@@ -94,7 +94,7 @@ final class DomainFactoryImpl implements DomainFactory
 	public Tag newTag(String tagName)
 	{
 		Tag tag = new TagImpl();
-		tag.setName(tagName);
+		tag.setName(tagName.trim().toLowerCase());
 		return tag;
 	}
 

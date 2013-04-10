@@ -1,11 +1,13 @@
 package com.talool.core;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author clintz
  * 
  */
-public interface Tag
+public interface Tag extends Serializable
 {
 	public Integer getId();
 

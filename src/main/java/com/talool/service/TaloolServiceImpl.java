@@ -9,6 +9,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.FactoryManager;
 import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
@@ -44,6 +46,7 @@ import com.talool.domain.TagImpl;
  */
 @Transactional(readOnly = true)
 @Service
+@Repository
 public class TaloolServiceImpl implements TaloolService
 {
 	public SessionFactory getSessionFactory()
@@ -257,6 +260,7 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public Merchant getMerchantById(Long id) throws ServiceException
 	{
 		Merchant merchant;
@@ -681,7 +685,8 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOffer> getDealOffers() throws ServiceException {
+	public List<DealOffer> getDealOffers() throws ServiceException
+	{
 		try
 		{
 			final Search search = new Search(DealOfferImpl.class);
@@ -695,7 +700,8 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Customer> getCustomers() throws ServiceException {
+	public List<Customer> getCustomers() throws ServiceException
+	{
 		try
 		{
 			final Search search = new Search(CustomerImpl.class);
@@ -709,7 +715,8 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Customer> getFriends(Long id) throws ServiceException {
+	public List<Customer> getFriends(Long id) throws ServiceException
+	{
 		try
 		{
 			final Query query = sessionFactory
@@ -728,8 +735,8 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOffer> getDealOffersByMerchantId(Long merchantId)
-			throws ServiceException {
+	public List<DealOffer> getDealOffersByMerchantId(Long merchantId) throws ServiceException
+	{
 		try
 		{
 			final Search search = new Search(DealOfferImpl.class);
@@ -738,9 +745,41 @@ public class TaloolServiceImpl implements TaloolService
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getDealOffersByMerchantId %s",
-					merchantId), ex);
+			throw new ServiceException(String.format("Problem getDealOffersByMerchantId %s", merchantId),
+					ex);
 		}
+	}
+
+	private String cleanTagName(final String tagName)
+	{
+		return tagName.trim();
+	}
+
+	/**
+	 * TODO read tags from a TagCache or use 2nd level caching!
+	 */
+	@Override
+	public Set<Tag> getOrCreateTags(final String... tags) throws ServiceException
+	{
+		Set<Tag> tagList = new HashSet<Tag>();
+
+		for (final String tagName : tags)
+		{
+
+			Tag _tag = getTag(cleanTagName(tagName));
+			if (_tag != null)
+			{
+				tagList.add(_tag);
+			}
+			else
+			{
+				_tag = FactoryManager.get().getDomainFactory().newTag(tagName);
+				_tag.setName(tagName);
+				tagList.add(_tag);
+			}
+		}
+
+		return tagList;
 	}
 
 }
