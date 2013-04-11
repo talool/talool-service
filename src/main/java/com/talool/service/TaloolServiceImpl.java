@@ -841,6 +841,7 @@ public class TaloolServiceImpl implements TaloolService
 	{
 		try
 		{
+			daoDispatcher.save((MerchantLocationImpl) merchantManagedLocation.getMerchantLocation());
 			daoDispatcher.save((MerchantManagedLocationImpl) merchantManagedLocation);
 		}
 		catch (Exception e)
