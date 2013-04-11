@@ -25,7 +25,7 @@ import com.talool.core.FactoryManager;
 import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
-import com.talool.core.MerchantLocation;
+import com.talool.core.MerchantManagedLocation;
 import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
@@ -37,6 +37,7 @@ import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.MerchantAccountImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantLocationImpl;
+import com.talool.domain.MerchantManagedLocationImpl;
 import com.talool.domain.SocialNetworkImpl;
 import com.talool.domain.TagImpl;
 
@@ -803,12 +804,12 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantLocation> getLocationsForMerchant(Long merchantId)
+	public List<MerchantManagedLocation> getLocationsForMerchant(Long merchantId)
 			throws ServiceException {
 		try
 		{
-			final Search search = new Search(MerchantLocationImpl.class);
-			search.addFilterEqual("id", merchantId);
+			final Search search = new Search(MerchantManagedLocationImpl.class);
+			search.addFilterEqual("merchant.id", merchantId);
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -819,16 +820,16 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public MerchantLocation getMerchantLocationById(Long merchantLocationId)
+	public MerchantManagedLocation getMerchantLocationById(Long merchantManagedLocationId)
 			throws ServiceException {
-		MerchantLocation merchantLocation;
+		MerchantManagedLocation merchantLocation;
 		try
 		{
-			merchantLocation = daoDispatcher.find(MerchantLocationImpl.class, merchantLocationId);
+			merchantLocation = daoDispatcher.find(MerchantManagedLocationImpl.class, merchantManagedLocationId);
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem getMerchantLocationById  " + merchantLocationId, ex);
+			throw new ServiceException("Problem getMerchantLocationById  " + merchantManagedLocationId, ex);
 		}
 
 		return merchantLocation;
@@ -836,15 +837,15 @@ public class TaloolServiceImpl implements TaloolService
 	
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void save(final MerchantLocation merchantLocation) throws ServiceException
+	public void save(final MerchantManagedLocation merchantManagedLocation) throws ServiceException
 	{
 		try
 		{
-			daoDispatcher.save((MerchantLocationImpl) merchantLocation);
+			daoDispatcher.save((MerchantManagedLocationImpl) merchantManagedLocation);
 		}
 		catch (Exception e)
 		{
-			final String err = "There was a problem saving merchantLocation " + merchantLocation;
+			final String err = "There was a problem saving MerchantManagedLocation " + merchantManagedLocation;
 			throw new ServiceException(err, e);
 		}
 

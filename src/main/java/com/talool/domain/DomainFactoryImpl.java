@@ -15,6 +15,7 @@ import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
+import com.talool.core.MerchantManagedLocation;
 import com.talool.core.SocialAccount;
 import com.talool.core.Tag;
 
@@ -114,5 +115,13 @@ final class DomainFactoryImpl implements DomainFactory
 	public DealOfferPurchase newDealOfferPurchase(Customer customer, DealOffer dealOffer)
 	{
 		return new DealOfferPurchaseImpl(customer, dealOffer);
+	}
+
+	@Override
+	public MerchantManagedLocation newMerchantManagedLocation(Merchant merchant) {
+		MerchantManagedLocation mml = new MerchantManagedLocationImpl();
+		mml.setMerchant(merchant);
+		mml.setMerchantLocation(newMerchantLocation());
+		return mml;
 	}
 }
