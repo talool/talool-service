@@ -19,13 +19,7 @@ INSERT INTO customer(email, password, first_name, last_name, sex_t)
 
 INSERT INTO customer(email, password, first_name, last_name, sex_t)
        VALUES ('douglasmccuen@gmail.com', '32250170a0dca92d53ec9624f336ca24', 'Doug', 'Mccuen', 'M');      
-       
--- insert merchant deal    
-INSERT INTO address(address1, address2, city, state_province_county, zip, country)
-            VALUES ('1401 WYNKOOP ST', 'STE 500', 'Denver', 'CO', '80202', 'US');
-            
-INSERT INTO address(address1, address2, city, state_province_county, zip, country)
-            VALUES ('1750 30th St.', 'PO Box 195', 'Boulder', 'CO', '80301', 'US');
+      
 
 INSERT INTO acquire_status(status) VALUES ('PURCHASE');
 INSERT INTO acquire_status(status) VALUES ('MERCHANT_SHARE');

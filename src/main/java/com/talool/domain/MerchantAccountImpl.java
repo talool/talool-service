@@ -40,7 +40,7 @@ public class MerchantAccountImpl implements MerchantAccount
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_ma_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_ma_seq")
 	@SequenceGenerator(name = "my_ma_seq", sequenceName = "merchant_account_merchant_account_id_seq")
 	@Column(name = "merchant_account_id", unique = true, nullable = false)
 	private Long id;

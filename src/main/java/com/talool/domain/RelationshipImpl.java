@@ -42,7 +42,7 @@ public class RelationshipImpl implements RelationShip
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_rel_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_rel_seq")
 	@SequenceGenerator(name = "my_rel_seq", sequenceName = "relationship_relationship_id_seq")
 	@Column(name = "relationship_id", unique = true, nullable = false)
 	private Long id;

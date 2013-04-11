@@ -33,18 +33,19 @@ import com.talool.core.MerchantLocation;
  */
 @Entity
 @Table(name = "merchant_location", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class MerchantLocationImpl implements MerchantLocation
 {
 	private static final long serialVersionUID = 3716227130006204917L;
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_loc_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_loc_seq")
 	@SequenceGenerator(name = "my_loc_seq", sequenceName = "merchant_location_merchant_location_id_seq")
 	@Column(name = "merchant_location_id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "merchant_location_name", unique = false, nullable = false, length = 64)
+	@Column(name = "merchant_location_name", unique = false, nullable = true, length = 64)
 	private String locationName;
 
 	@Column(name = "email", unique = true, nullable = true, length = 64)

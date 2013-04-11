@@ -39,7 +39,7 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_dealaq_h_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_dealaq_h_seq")
 	@SequenceGenerator(name = "my_dealaq_h_seq", sequenceName = "deal_acquire_history_deal_acquire_history_id_seq")
 	@Column(name = "deal_acquire_history_id", unique = true, nullable = false)
 	private Long id;

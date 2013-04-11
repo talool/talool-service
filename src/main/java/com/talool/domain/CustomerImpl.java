@@ -41,6 +41,7 @@ import com.talool.persistence.GenericEnumUserType;
 		@Parameter(name = "enumClass", value = "com.talool.core.Sex"),
 		@Parameter(name = "identifierMethod", value = "getLetter"),
 		@Parameter(name = "valueOfMethod", value = "valueByLetter") })
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class CustomerImpl implements Customer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CustomerImpl.class);
@@ -49,7 +50,7 @@ public class CustomerImpl implements Customer
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_customer_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_customer_seq")
 	@SequenceGenerator(name = "my_customer_seq", sequenceName = "customer_customer_id_seq")
 	@Column(name = "customer_id", unique = true, nullable = false)
 	private Long id;

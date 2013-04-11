@@ -41,6 +41,7 @@ import com.talool.core.Tag;
  */
 @Entity
 @Table(name = "deal", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DealImpl implements Deal
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DealImpl.class);
@@ -48,7 +49,7 @@ public class DealImpl implements Deal
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_deal_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_deal_seq")
 	@SequenceGenerator(name = "my_deal_seq", sequenceName = "deal_deal_id_seq")
 	@Column(name = "deal_id", unique = true, nullable = false)
 	private Long id;

@@ -45,6 +45,7 @@ import com.talool.service.ServiceFactory;
  */
 @Entity
 @Table(name = "merchant", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class MerchantImpl implements Merchant
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantImpl.class);
@@ -52,7 +53,7 @@ public class MerchantImpl implements Merchant
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_merchant_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_merchant_seq")
 	@SequenceGenerator(name = "my_merchant_seq", sequenceName = "merchant_merchant_id_seq")
 	@Column(name = "merchant_id", unique = true, nullable = false)
 	private Long id;
@@ -221,7 +222,10 @@ public class MerchantImpl implements Merchant
 	@Override
 	public void clearTags()
 	{
-		tags.clear();
+		if (tags != null)
+		{
+			tags.clear();
+		}
 	}
 
 	@Override

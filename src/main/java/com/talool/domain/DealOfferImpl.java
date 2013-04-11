@@ -40,13 +40,14 @@ import com.talool.persistence.GenericEnumUserType;
 @Entity
 @Table(name = "deal_offer", catalog = "public")
 @TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.core.DealType") })
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DealOfferImpl implements DealOffer
 {
 	private static final long serialVersionUID = 5159454091663842874L;
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_deal_offer_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_deal_offer_seq")
 	@SequenceGenerator(name = "my_deal_offer_seq", sequenceName = "deal_offer_deal_offer_id_seq")
 	@Column(name = "deal_offer_id", unique = true, nullable = false)
 	private Long id;
