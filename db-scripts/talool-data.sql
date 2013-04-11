@@ -21,7 +21,9 @@ INSERT INTO customer(email, password, first_name, last_name, sex_t)
        VALUES ('douglasmccuen@gmail.com', '32250170a0dca92d53ec9624f336ca24', 'Doug', 'Mccuen', 'M');      
       
 
-INSERT INTO acquire_status(status) VALUES ('PURCHASE');
-INSERT INTO acquire_status(status) VALUES ('MERCHANT_SHARE');
-INSERT INTO acquire_status(status) VALUES ('CUSTOMER_SHARE');
+INSERT INTO acquire_status(status) VALUES ('PURCHASED');
+INSERT INTO acquire_status(status) VALUES ('ACCEPTED_MERCHANT_SHARE');
+INSERT INTO acquire_status(status) VALUES ('ACCEPTED_CUSTOMER_SHARE');
+INSERT INTO acquire_status(status) VALUES ('PENDING_ACCEPT_MERCHANT_SHARE');
+INSERT INTO acquire_status(status) VALUES ('PENDING_ACCEPT_CUSTOMER_SHARE');
 

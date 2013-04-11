@@ -36,7 +36,6 @@ import com.talool.domain.DealOfferImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.MerchantAccountImpl;
 import com.talool.domain.MerchantImpl;
-import com.talool.domain.MerchantLocationImpl;
 import com.talool.domain.MerchantManagedLocationImpl;
 import com.talool.domain.SocialNetworkImpl;
 import com.talool.domain.TagImpl;
@@ -787,8 +786,8 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantAccount> getAccountsForMerchant(Long merchantId)
-			throws ServiceException {
+	public List<MerchantAccount> getAccountsForMerchant(Long merchantId) throws ServiceException
+	{
 		try
 		{
 			final Search search = new Search(MerchantAccountImpl.class);
@@ -797,15 +796,15 @@ public class TaloolServiceImpl implements TaloolService
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getAccountsForMerchant %s", merchantId),
-					ex);
+			throw new ServiceException(String.format("Problem getAccountsForMerchant %s", merchantId), ex);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<MerchantManagedLocation> getLocationsForMerchant(Long merchantId)
-			throws ServiceException {
+			throws ServiceException
+	{
 		try
 		{
 			final Search search = new Search(MerchantManagedLocationImpl.class);
@@ -821,40 +820,43 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Override
 	public MerchantManagedLocation getMerchantLocationById(Long merchantManagedLocationId)
-			throws ServiceException {
+			throws ServiceException
+	{
 		MerchantManagedLocation merchantLocation;
 		try
 		{
-			merchantLocation = daoDispatcher.find(MerchantManagedLocationImpl.class, merchantManagedLocationId);
+			merchantLocation = daoDispatcher.find(MerchantManagedLocationImpl.class,
+					merchantManagedLocationId);
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem getMerchantLocationById  " + merchantManagedLocationId, ex);
+			throw new ServiceException("Problem getMerchantLocationById  " + merchantManagedLocationId,
+					ex);
 		}
 
 		return merchantLocation;
 	}
-	
+
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void save(final MerchantManagedLocation merchantManagedLocation) throws ServiceException
 	{
 		try
 		{
-			daoDispatcher.save((MerchantLocationImpl) merchantManagedLocation.getMerchantLocation());
 			daoDispatcher.save((MerchantManagedLocationImpl) merchantManagedLocation);
 		}
 		catch (Exception e)
 		{
-			final String err = "There was a problem saving MerchantManagedLocation " + merchantManagedLocation;
+			final String err = "There was a problem saving MerchantManagedLocation "
+					+ merchantManagedLocation;
 			throw new ServiceException(err, e);
 		}
 
 	}
 
 	@Override
-	public MerchantAccount getMerchantAccountById(Long merchantAccountId)
-			throws ServiceException {
+	public MerchantAccount getMerchantAccountById(Long merchantAccountId) throws ServiceException
+	{
 		MerchantAccount merchantAccount;
 		try
 		{

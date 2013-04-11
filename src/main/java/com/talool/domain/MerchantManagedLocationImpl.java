@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -47,7 +48,7 @@ public class MerchantManagedLocationImpl implements MerchantManagedLocation
 	private Merchant merchant;
 
 	@Access(AccessType.FIELD)
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantLocationImpl.class)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = MerchantLocationImpl.class)
 	@JoinColumn(name = "merchant_location_id")
 	private MerchantLocation merchantLocation;
 
