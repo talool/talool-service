@@ -25,6 +25,7 @@ import com.talool.core.FactoryManager;
 import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantLocation;
 import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
@@ -35,6 +36,7 @@ import com.talool.domain.DealOfferImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.MerchantAccountImpl;
 import com.talool.domain.MerchantImpl;
+import com.talool.domain.MerchantLocationImpl;
 import com.talool.domain.SocialNetworkImpl;
 import com.talool.domain.TagImpl;
 
@@ -780,6 +782,88 @@ public class TaloolServiceImpl implements TaloolService
 		}
 
 		return tagList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantAccount> getAccountsForMerchant(Long merchantId)
+			throws ServiceException {
+		try
+		{
+			final Search search = new Search(MerchantAccountImpl.class);
+			search.addFilterEqual("merchant.id", merchantId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getAccountsForMerchant %s", merchantId),
+					ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantLocation> getLocationsForMerchant(Long merchantId)
+			throws ServiceException {
+		try
+		{
+			final Search search = new Search(MerchantLocationImpl.class);
+			search.addFilterEqual("id", merchantId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getLocationsForMerchant %s", merchantId),
+					ex);
+		}
+	}
+
+	@Override
+	public MerchantLocation getMerchantLocationById(Long merchantLocationId)
+			throws ServiceException {
+		MerchantLocation merchantLocation;
+		try
+		{
+			merchantLocation = daoDispatcher.find(MerchantLocationImpl.class, merchantLocationId);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantLocationById  " + merchantLocationId, ex);
+		}
+
+		return merchantLocation;
+	}
+	
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final MerchantLocation merchantLocation) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save((MerchantLocationImpl) merchantLocation);
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem saving merchantLocation " + merchantLocation;
+			throw new ServiceException(err, e);
+		}
+
+	}
+
+	@Override
+	public MerchantAccount getMerchantAccountById(Long merchantAccountId)
+			throws ServiceException {
+		MerchantAccount merchantAccount;
+		try
+		{
+			merchantAccount = daoDispatcher.find(MerchantAccountImpl.class, merchantAccountId);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantLocationById  " + merchantAccountId, ex);
+		}
+
+		return merchantAccount;
 	}
 
 }

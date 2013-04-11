@@ -8,6 +8,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantLocation;
 import com.talool.core.Tag;
 
 /**
@@ -80,5 +81,15 @@ public interface MerchantService
 	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException;
 
 	public Set<Tag> getDealOfferTags(final Long dealOfferId) throws ServiceException;
+	
+	public List<MerchantAccount> getAccountsForMerchant(final Long merchantId) throws ServiceException;
+	
+	public List<MerchantLocation> getLocationsForMerchant(final Long merchantId) throws ServiceException;
+	
+	public MerchantLocation getMerchantLocationById(final Long merchantLocationId) throws ServiceException;
+	
+	public void save(final MerchantLocation merchantLocation) throws ServiceException;
+	
+	public MerchantAccount getMerchantAccountById(final Long merchantAccountId) throws ServiceException;
 
 }
