@@ -36,7 +36,7 @@ public class FriendRequestImpl implements FriendRequest
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_friendr_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_friendr_seq")
 	@SequenceGenerator(name = "my_friendr_seq", sequenceName = "friend_request_friend_request_id_seq")
 	@Column(name = "friend_request_id", unique = true, nullable = false)
 	private Long id;

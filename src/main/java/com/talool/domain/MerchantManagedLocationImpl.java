@@ -36,7 +36,7 @@ public class MerchantManagedLocationImpl implements MerchantManagedLocation
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_mml_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_mml_seq")
 	@SequenceGenerator(name = "my_mml_seq", sequenceName = "merchant_managed_location_merchant_managed_location_id_seq")
 	@Column(name = "merchant_managed_location_id", unique = true, nullable = false)
 	private Long id;

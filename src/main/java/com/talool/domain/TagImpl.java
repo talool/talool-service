@@ -30,7 +30,7 @@ public class TagImpl implements Tag
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_tag_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_tag_seq")
 	@SequenceGenerator(name = "my_tag_seq", sequenceName = "tag_tag_id_seq")
 	@Column(name = "tag_id", unique = true, nullable = false)
 	private Integer id;

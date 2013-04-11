@@ -42,7 +42,7 @@ public class DealAcquireImpl implements DealAcquire
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_dealaq_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_dealaq_seq")
 	@SequenceGenerator(name = "my_dealaq_seq", sequenceName = "deal_acquire_deal_acquire_id_seq")
 	@Column(name = "deal_acquire_id", unique = true, nullable = false)
 	private Long id;

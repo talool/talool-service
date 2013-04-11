@@ -53,7 +53,7 @@ public class MerchantImpl implements Merchant
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_merchant_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_merchant_seq")
 	@SequenceGenerator(name = "my_merchant_seq", sequenceName = "merchant_merchant_id_seq")
 	@Column(name = "merchant_id", unique = true, nullable = false)
 	private Long id;
@@ -222,7 +222,10 @@ public class MerchantImpl implements Merchant
 	@Override
 	public void clearTags()
 	{
-		tags.clear();
+		if (tags != null)
+		{
+			tags.clear();
+		}
 	}
 
 	@Override

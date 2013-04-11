@@ -40,7 +40,7 @@ public class MerchantLocationImpl implements MerchantLocation
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_loc_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_loc_seq")
 	@SequenceGenerator(name = "my_loc_seq", sequenceName = "merchant_location_merchant_location_id_seq")
 	@Column(name = "merchant_location_id", unique = true, nullable = false)
 	private Long id;

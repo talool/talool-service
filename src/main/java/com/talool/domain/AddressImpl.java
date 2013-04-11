@@ -31,7 +31,7 @@ public class AddressImpl implements Address
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_address_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_address_seq")
 	@SequenceGenerator(name = "my_address_seq", sequenceName = "address_address_id_seq")
 	@Column(name = "address_id", unique = true, nullable = false)
 	private Long id;

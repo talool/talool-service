@@ -31,7 +31,7 @@ public class AcquireStatusImpl implements AcquireStatus
 	private static final long serialVersionUID = 3720511015708695704L;
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_aq_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_aq_seq")
 	@SequenceGenerator(name = "my_aq_seq", sequenceName = "acquire_status_acquire_status_id_seq")
 	@Column(name = "acquire_status_id", unique = true, nullable = false)
 	private Integer id;

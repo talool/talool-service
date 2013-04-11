@@ -50,7 +50,7 @@ public class CustomerImpl implements Customer
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_customer_seq")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_customer_seq")
 	@SequenceGenerator(name = "my_customer_seq", sequenceName = "customer_customer_id_seq")
 	@Column(name = "customer_id", unique = true, nullable = false)
 	private Long id;
