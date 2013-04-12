@@ -724,7 +724,7 @@ public class TaloolServiceImpl implements TaloolService
 			final Query query = sessionFactory
 					.getCurrentSession()
 					.createQuery(
-							"from CustomerImpl c, RelationshipImpl r where c.customerId=r.customerId and r.friendId=:customerId");
+							"from CustomerImpl c, RelationshipImpl r where c.id=r.customer.id and r.friend.id=:customerId");
 
 			query.setParameter("customerId", id);
 			return query.list();
