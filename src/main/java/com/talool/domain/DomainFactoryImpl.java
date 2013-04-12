@@ -16,6 +16,8 @@ import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantManagedLocation;
+import com.talool.core.Relationship;
+import com.talool.core.RelationshipStatus;
 import com.talool.core.SocialAccount;
 import com.talool.core.Tag;
 
@@ -118,10 +120,22 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public MerchantManagedLocation newMerchantManagedLocation(Merchant merchant) {
+	public MerchantManagedLocation newMerchantManagedLocation(Merchant merchant)
+	{
 		MerchantManagedLocation mml = new MerchantManagedLocationImpl();
 		mml.setMerchant(merchant);
 		mml.setMerchantLocation(newMerchantLocation());
 		return mml;
+	}
+
+	@Override
+	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer,
+			final RelationshipStatus status)
+	{
+		final Relationship rel = new RelationshipImpl();
+		rel.setFromCustomer(fromCustomer);
+		rel.setToCustomer(toCustomer);
+		rel.setRelationshipStatus(status);
+		return rel;
 	}
 }

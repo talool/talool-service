@@ -16,35 +16,6 @@
 
 <tx:annotation-driven order="1" />
 
-<!--  
-<jdbc:embedded-database id="dataSource2" type="H2">
-    <jdbc:script location="classpath:db-schema.sql"/>
-    <jdbc:script location="classpath:db-test-data.sql"/>
-    
-</jdbc:embedded-database>
--->
-
-<!-- http://stackoverflow.com/questions/2012292/spring-configuration-for-embedded-h2-database-for-tests -->
-<bean id="dataSource" class="org.h2.jdbcx.JdbcConnectionPool" destroy-method="dispose">
-    <constructor-arg>
-        <bean class="org.h2.jdbcx.JdbcDataSource">
-            <property name="URL" value="jdbc:h2:talool"/>
-            <property name="user" value="user"/>
-            <property name="password" value="password"/>
-         </bean>
-    </constructor-arg>
-</bean> 
-<!-- 
-<bean id="database.dataSource" class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
-    <constructor-arg>
-        <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-            <property name="driverClass" value="org.h2.Driver" />
-            <property name="url"
-                value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=Oracle;TRACE_LEVEL_SYSTEM_OUT=2" />
-        </bean>
-    </constructor-arg>
-</bean>
- -->
 
 </beans>
 

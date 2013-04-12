@@ -28,6 +28,8 @@ import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
+import com.talool.core.Relationship;
+import com.talool.core.RelationshipStatus;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 
@@ -56,8 +58,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void testCustomerIntegration() throws Exception
 	{
 		// yes if this were a "unit" test, these would not be dependent.
-		// this is an integration test hacked together via JUnit, so deal with it :)
+		// this is an integration test hacked together via JUnit, so no big deal!
 		cleanTest();
+
+		testRelationship();
 
 		Customer customer = testCreateCustomer();
 
@@ -65,9 +69,27 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		MerchantAccount testMerchantAccount = testMerchantAccount(testMerchant);
 
-		testDealOffers(testMerchant, testMerchantAccount, customer);
+		// testDealOffers(testMerchant, testMerchantAccount, customer);
 
 		// testDeleteMerchant();
+	}
+
+	public void testRelationship() throws Exception
+	{
+		Customer fromCustomer = testCreateCustomer();
+		Customer toCustomer = testCreateCustomer();
+
+		taloolService.save(domainFactory.newRelationship(fromCustomer, toCustomer,
+				RelationshipStatus.FRIEND));
+
+		List<Relationship> rels = taloolService.getRelationshipsFrom(fromCustomer.getId());
+		Assert.assertEquals(1, rels.size());
+		Assert.assertEquals(rels.get(0).getToCustomer(), toCustomer);
+
+		rels = taloolService.getRelationshipsTo(toCustomer.getId());
+		Assert.assertEquals(1, rels.size());
+		Assert.assertEquals(rels.get(0).getFromCustomer(), fromCustomer);
+
 	}
 
 	public void testDealOffers(final Merchant merchant, final MerchantAccount merchantAccount,

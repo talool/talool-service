@@ -23,7 +23,7 @@ public interface DomainFactory
 	public MerchantLocation newMerchantLocation();
 
 	public MerchantManagedLocation newMerchantManagedLocation(Merchant merchant);
-	
+
 	public MerchantAccount newMerchantAccount(Merchant merchant);
 
 	public Customer newCustomer();
@@ -33,4 +33,7 @@ public interface DomainFactory
 	public DealOfferPurchase newDealOfferPurchase(final DealOffer dealOffer, final Customer customer);
 
 	public Location newLocation(final Double longitude, final Double latitude);
+
+	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer,
+			final RelationshipStatus status);
 }

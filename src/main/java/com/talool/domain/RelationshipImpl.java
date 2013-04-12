@@ -24,7 +24,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import com.talool.core.Customer;
-import com.talool.core.RelationShip;
+import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.persistence.GenericEnumUserType;
 
@@ -36,7 +36,7 @@ import com.talool.persistence.GenericEnumUserType;
 @Entity
 @Table(name = "relationship", catalog = "public")
 @TypeDef(name = "relationshipStatus", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.core.RelationshipStatus") })
-public class RelationshipImpl implements RelationShip
+public class RelationshipImpl implements Relationship
 {
 	private static final long serialVersionUID = -8998925353726298712L;
 
@@ -49,13 +49,13 @@ public class RelationshipImpl implements RelationShip
 
 	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
-	@JoinColumn(name = "customer_id")
-	private Customer customer;
+	@JoinColumn(name = "from_customer_id")
+	private Customer fromCustomer;
 
 	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
-	@JoinColumn(name = "friend_id")
-	private Customer friend;
+	@JoinColumn(name = "to_customer_id")
+	private Customer toCustomer;
 
 	@Type(type = "relationshipStatus")
 	@Column(name = "status", nullable = false, columnDefinition = "relationship_status")
@@ -83,27 +83,27 @@ public class RelationshipImpl implements RelationShip
 	}
 
 	@Override
-	public Customer getCustomer()
+	public Customer getFromCustomer()
 	{
-		return customer;
+		return fromCustomer;
 	}
 
 	@Override
-	public void setCustomer(Customer customer)
+	public void setFromCustomer(Customer customer)
 	{
-		this.customer = customer;
+		this.fromCustomer = customer;
 	}
 
 	@Override
-	public Customer getFriend()
+	public Customer getToCustomer()
 	{
-		return friend;
+		return toCustomer;
 	}
 
 	@Override
-	public void setFriend(Customer friend)
+	public void setToCustomer(Customer friend)
 	{
-		this.friend = friend;
+		this.toCustomer = friend;
 	}
 
 	@Override
@@ -143,14 +143,14 @@ public class RelationshipImpl implements RelationShip
 			return false;
 		}
 
-		return new EqualsBuilder().append(getCustomer(), other.getCustomer())
-				.append(getFriend(), other.getFriend()).isEquals();
+		return new EqualsBuilder().append(getFromCustomer(), other.getFromCustomer())
+				.append(getToCustomer(), other.getToCustomer()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getCustomer()).append(getFriend()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getFromCustomer()).append(getToCustomer()).hashCode();
 	}
 
 	@Override

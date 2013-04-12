@@ -147,7 +147,7 @@ CREATE TABLE friend_request (
     friend_facebook_id character varying(32),
     friend_email character varying(128),
     deal_id bigint,
-    created_dt timestamp NOT NULL DEFAULT NOW(),
+    create_dt timestamp NOT NULL DEFAULT NOW(),
     PRIMARY KEY(friend_request_id),
     UNIQUE(customer_id,friend_facebook_id,friend_email)
 );
@@ -170,11 +170,11 @@ CREATE INDEX friend_request_customer_idx ON friend_request (customer_id);
 
 CREATE TABLE relationship (
 	relationship_id bigint NOT NULL,
-    customer_id bigint NOT NULL,
-    friend_id bigint NOT NULL,
+    from_customer_id bigint NOT NULL,
+    to_customer_id bigint NOT NULL,
     status relationship_status NOT NULL,
-    created_dt timestamp NOT NULL DEFAULT NOW(),
-    updated_dt timestamp NOT NULL DEFAULT NOW(),
+    create_dt timestamp NOT NULL DEFAULT NOW(),
+    update_dt timestamp NOT NULL DEFAULT NOW(),
     PRIMARY KEY(relationship_id)
 );
 
@@ -284,6 +284,7 @@ CREATE SEQUENCE merchant_location_merchant_location_id_seq
 ALTER TABLE public. merchant_location_merchant_location_id_seq OWNER TO talool;
 ALTER SEQUENCE merchant_location_merchant_location_id_seq OWNED BY merchant_location.merchant_location_id;
 ALTER TABLE ONLY merchant_location ALTER COLUMN merchant_location_id SET DEFAULT nextval('merchant_location_merchant_location_id_seq'::regclass);
+
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Address" FOREIGN KEY (address_id) REFERENCES address(address_id);
 CREATE INDEX merchant_location_name_idx ON merchant_location (merchant_location_name);
 CREATE INDEX merchant_location_latitude_idx ON merchant_location (latitude);
@@ -622,6 +623,14 @@ GRANT ALL ON TABLE customer TO talool;
 REVOKE ALL ON SEQUENCE customer_customer_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE customer_customer_id_seq FROM talool;
 GRANT ALL ON SEQUENCE customer_customer_id_seq TO talool;
+
+REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM talool;
+GRANT ALL ON SEQUENCE merchant_merchant_id_seq TO talool;
+
+REVOKE ALL ON SEQUENCE merchant_location_merchant_location_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE merchant_location_merchant_location_id_seq FROM talool;
+GRANT ALL ON SEQUENCE merchant_location_merchant_location_id_seq TO talool;
 
 
 

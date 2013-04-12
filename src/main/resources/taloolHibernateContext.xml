@@ -63,8 +63,8 @@
 				</prop>
 				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory
 				</prop>
-				<prop key="hibernate.format_sql">true</prop>
-				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">${hibernate.format.sql}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show.sql}</prop>
 				<!-- -->
 				<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
 

@@ -147,7 +147,7 @@ CREATE TABLE friend_request (
     friend_facebook_id character varying(32),
     friend_email character varying(128),
     deal_id bigint,
-    created_dt timestamp NOT NULL DEFAULT NOW(),
+    create_dt timestamp NOT NULL DEFAULT NOW(),
     PRIMARY KEY(friend_request_id),
     UNIQUE(customer_id,friend_facebook_id,friend_email)
 );
@@ -170,11 +170,11 @@ CREATE INDEX friend_request_customer_idx ON friend_request (customer_id);
 
 CREATE TABLE relationship (
 	relationship_id bigint NOT NULL,
-    customer_id bigint NOT NULL,
-    friend_id bigint NOT NULL,
+    from_customer_id bigint NOT NULL,
+    to_customer_id bigint NOT NULL,
     status relationship_status NOT NULL,
-    created_dt timestamp NOT NULL DEFAULT NOW(),
-    updated_dt timestamp NOT NULL DEFAULT NOW(),
+    create_dt timestamp NOT NULL DEFAULT NOW(),
+    update_dt timestamp NOT NULL DEFAULT NOW(),
     PRIMARY KEY(relationship_id)
 );
 

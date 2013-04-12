@@ -26,6 +26,7 @@ import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantManagedLocation;
+import com.talool.core.Relationship;
 import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
@@ -37,6 +38,7 @@ import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.MerchantAccountImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantManagedLocationImpl;
+import com.talool.domain.RelationshipImpl;
 import com.talool.domain.SocialNetworkImpl;
 import com.talool.domain.TagImpl;
 
@@ -717,7 +719,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Customer> getFriends(Long id) throws ServiceException
+	public List<Customer> getFriends(final Long id) throws ServiceException
 	{
 		try
 		{
@@ -870,4 +872,52 @@ public class TaloolServiceImpl implements TaloolService
 		return merchantAccount;
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final Relationship relationship) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(relationship);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format(
+					"Problem saving relationship fromCustomer '%s' toCustomer '%s' "
+							+ relationship.getFromCustomer(), relationship.getToCustomer(), ex));
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Relationship> getRelationshipsFrom(final Long customerId) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(RelationshipImpl.class);
+			search.addFilterEqual("fromCustomer.id", customerId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getRelationshipsFrom %s", customerId), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Relationship> getRelationshipsTo(final Long customerId) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(RelationshipImpl.class);
+			search.addFilterEqual("toCustomer.id", customerId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getRelationshipsTo %s", customerId), ex);
+		}
+	}
 }
