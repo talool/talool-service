@@ -2,6 +2,7 @@ package com.talool.core;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,8 +49,14 @@ public interface Deal extends Identifiable, Serializable, TimeAware
 
 	public void setActive(boolean isActive);
 
+	public void clearTags();
+
 	public Set<Tag> getTags();
 
+	public void setTags(Set<Tag> tags);
+
 	public void addTag(Tag tag);
+
+	public void addTags(List<Tag> tag);
 
 }

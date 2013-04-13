@@ -2,6 +2,7 @@ package com.talool.domain;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -274,6 +275,30 @@ public class DealImpl implements Deal
 	public void addTag(Tag tag)
 	{
 		tags.add(tag);
+	}
+
+	@Override
+	public void addTags(final List<Tag> _tags)
+	{
+		for (Tag tag : _tags)
+		{
+			tags.add(tag);
+		}
+	}
+
+	@Override
+	public void clearTags()
+	{
+		if (tags != null)
+		{
+			tags.clear();
+		}
+	}
+
+	@Override
+	public void setTags(Set<Tag> tags)
+	{
+		this.tags = tags;
 	}
 
 }
