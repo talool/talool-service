@@ -20,6 +20,8 @@ public interface DomainFactory
 
 	public Deal newDeal(final DealOffer dealOffer);
 
+	public Deal newDeal();
+
 	public MerchantLocation newMerchantLocation();
 
 	public MerchantManagedLocation newMerchantManagedLocation(Merchant merchant);

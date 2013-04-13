@@ -7,6 +7,8 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -25,6 +27,7 @@ import com.talool.core.FactoryManager;
 import com.talool.core.Identifiable;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantManagedLocation;
 import com.talool.core.Relationship;
 import com.talool.core.SocialNetwork;
@@ -36,6 +39,7 @@ import com.talool.domain.DealImpl;
 import com.talool.domain.DealOfferImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.MerchantAccountImpl;
+import com.talool.domain.MerchantIdentityImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantManagedLocationImpl;
 import com.talool.domain.RelationshipImpl;
@@ -964,6 +968,33 @@ public class TaloolServiceImpl implements TaloolService
 		}
 
 		return null;
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
+			throws ServiceException
+	{
+		List<MerchantIdentity> identies;
+
+		try
+		{
+			final Query query = getSessionFactory()
+					.getCurrentSession()
+					.createSQLQuery(
+							"select m.merchant_id as id, m.merchant_name as name from merchant as m order by m.merchant_name asc")
+					.addScalar("id", StandardBasicTypes.LONG).addScalar("name", StandardBasicTypes.STRING)
+					.setResultTransformer(Transformers.aliasToBean(MerchantIdentityImpl.class));
+
+			identies = query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getAuthorizedMerchants " + merchantAccountId, ex);
+		}
+
+		return identies;
 
 	}
 }

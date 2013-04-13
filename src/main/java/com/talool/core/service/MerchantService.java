@@ -8,6 +8,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantManagedLocation;
 import com.talool.core.Tag;
 
@@ -109,4 +110,6 @@ public interface MerchantService
 	public MerchantAccount getMerchantAccountById(final Long merchantAccountId)
 			throws ServiceException;
 
+	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
+			throws ServiceException;
 }
