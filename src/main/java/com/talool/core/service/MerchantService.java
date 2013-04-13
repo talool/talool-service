@@ -8,7 +8,6 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
-import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantManagedLocation;
 import com.talool.core.Tag;
 
@@ -21,6 +20,19 @@ import com.talool.core.Tag;
 public interface MerchantService
 {
 	public void save(final MerchantAccount merchantAccount) throws ServiceException;
+
+	/**
+	 * For now it will throw an error if there are more than 1 MerchantAccounts
+	 * for the given email . In order to support multiple accounts, do a separate
+	 * call to get the MerchantAccounts for the email
+	 * 
+	 * @param email
+	 * @param password
+	 * @return
+	 * @throws ServiceException
+	 */
+	public MerchantAccount authenticateMerchantAccount(final String email, final String password)
+			throws ServiceException;
 
 	public MerchantAccount authenticateMerchantAccount(final Long merchantId, final String email,
 			final String password) throws ServiceException;
@@ -62,9 +74,9 @@ public interface MerchantService
 	public void save(final DealOffer dealOffer) throws ServiceException;
 
 	public DealOffer getDealOffer(final Long dealOfferId) throws ServiceException;
-	
+
 	public List<DealOffer> getDealOffers() throws ServiceException;
-	
+
 	public List<DealOffer> getDealOffersByMerchantId(final Long merchantId) throws ServiceException;
 
 	public void save(final Deal deal) throws ServiceException;
@@ -82,15 +94,19 @@ public interface MerchantService
 	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException;
 
 	public Set<Tag> getDealOfferTags(final Long dealOfferId) throws ServiceException;
-	
-	public List<MerchantAccount> getAccountsForMerchant(final Long merchantId) throws ServiceException;
-	
-	public List<MerchantManagedLocation> getLocationsForMerchant(final Long merchantId) throws ServiceException;
-	
-	public MerchantManagedLocation getMerchantLocationById(final Long merchantManagedLocationId) throws ServiceException;
-	
+
+	public List<MerchantAccount> getAccountsForMerchant(final Long merchantId)
+			throws ServiceException;
+
+	public List<MerchantManagedLocation> getLocationsForMerchant(final Long merchantId)
+			throws ServiceException;
+
+	public MerchantManagedLocation getMerchantLocationById(final Long merchantManagedLocationId)
+			throws ServiceException;
+
 	public void save(final MerchantManagedLocation merchantManagedLocation) throws ServiceException;
-	
-	public MerchantAccount getMerchantAccountById(final Long merchantAccountId) throws ServiceException;
+
+	public MerchantAccount getMerchantAccountById(final Long merchantAccountId)
+			throws ServiceException;
 
 }

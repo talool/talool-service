@@ -920,4 +920,50 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(String.format("Problem getRelationshipsTo %s", customerId), ex);
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public MerchantAccount authenticateMerchantAccount(final String email, final String password)
+			throws ServiceException
+	{
+		List<MerchantAccount> accounts = null;
+
+		try
+		{
+			final Search search = new Search(MerchantAccountImpl.class);
+			search.addFilterEqual("email", email);
+			accounts = daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem authenticateMerchantAccount %s", email), ex);
+		}
+
+		if (CollectionUtils.isNotEmpty(accounts))
+		{
+			if (accounts.size() > 1)
+			{
+				throw new ServiceException(
+						String
+								.format(
+										"%s is associated with mutliple merchant accounts. Cannot authenticate via a simple email/pass",
+										email));
+			}
+
+			try
+			{
+				if (accounts.get(0).getPassword().equals(EncryptService.MD5(password)))
+				{
+					return accounts.get(0);
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException("Problem authentication merchant account for email " + email, ex);
+			}
+		}
+
+		return null;
+
+	}
 }

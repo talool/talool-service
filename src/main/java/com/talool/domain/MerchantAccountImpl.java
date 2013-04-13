@@ -46,7 +46,7 @@ public class MerchantAccountImpl implements MerchantAccount
 	private Long id;
 
 	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 

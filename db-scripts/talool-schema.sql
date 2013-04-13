@@ -141,6 +141,20 @@ CREATE UNIQUE INDEX customer_email_idx ON customer (email);
 
 CREATE TYPE relationship_status AS ENUM ('PENDING', 'FRIEND','BLOCKED');
 
+CREATE TABLE deal_offer_auth (
+   deal_offer_auth_id bigint NOT NULL,  
+   request_by_merchant_id bigint NOT NULL,
+   request_for_merchant_id bigint NOT NULL,
+   auth_status_id smallint NOT NULL, 
+   request_by_account_id bigint,
+   received_by_account_id bigint,
+   allow_group_deal_create bool DEFAULT false,
+   allow_deal_create bool DEFAULT false,
+   create_dt timestamp without time zone NOT NULL,
+   update_dt timestamp without time zone NOT NULL,
+   PRIMARY KEY(deal_offer_auth_id)
+);
+
 CREATE TABLE friend_request (
     friend_request_id bigint NOT NULL,
     customer_id bigint NOT NULL,
@@ -190,10 +204,10 @@ CREATE SEQUENCE relationship_relationship_id_seq
 ALTER TABLE public.relationship_relationship_id_seq OWNER TO talool;
 ALTER SEQUENCE relationship_relationship_id_seq OWNED BY relationship.relationship_id;
 ALTER TABLE ONLY relationship ALTER COLUMN relationship_id SET DEFAULT nextval('relationship_relationship_id_seq'::regclass);
-ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_Friend" FOREIGN KEY (friend_id) REFERENCES customer(customer_id);
-CREATE INDEX relationship_customer_id_idx ON relationship (customer_id);
-CREATE INDEX relationship_friend_id_idx ON relationship (friend_id);
+ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_FromCustomer" FOREIGN KEY (from_customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_ToCustomer" FOREIGN KEY (to_customer_id) REFERENCES customer(customer_id);
+CREATE INDEX relationship_from_customer_id_idx ON relationship (from_customer_id);
+CREATE INDEX relationship_to_customer_id_idx ON relationship (to_customer_id);
 
 CREATE SEQUENCE tag_tag_id_seq 
  	START WITH 1
@@ -316,6 +330,38 @@ ALTER TABLE ONLY merchant ALTER COLUMN merchant_id SET DEFAULT nextval('merchant
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (merchant_parent_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_MechantLocation" FOREIGN KEY (primary_location_id) REFERENCES merchant_location(merchant_location_id);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
+
+CREATE TABLE property_type (
+    property_type_id smallint NOT NULL,
+    name character varying(64),
+    type character varying(64),
+    PRIMARY KEY(property_type_id),
+    UNIQUE(name)
+);
+
+CREATE TABLE merchant_property (
+	merchant_property_id bigint NOT NULL,
+	merchant_id bigint NOT NULL,
+    property_type_id smallint NOT NULL,
+    property_value character varying(128),
+    PRIMARY KEY(merchant_property_id)
+);
+
+CREATE TYPE request_status AS ENUM ('PENDING', 'APPROVED');
+
+CREATE TABLE merchant_request (
+   merchant_request_id bigint NOT NULL,  
+   request_by_merchant_id bigint NOT NULL,
+   request_for_merchant_id bigint NOT NULL,
+   request_property_id smallint NOT NULL,
+   status request_status NOT NULL, 
+   request_by_account_id bigint,
+   response_by_account_id bigint,
+   create_dt timestamp without time zone NOT NULL,
+   update_dt timestamp without time zone NOT NULL,
+   PRIMARY KEY(merchant_request_id)
+);
+
 
 CREATE SEQUENCE merchant_managed_location_merchant_managed_location_id_seq
     START WITH 1
