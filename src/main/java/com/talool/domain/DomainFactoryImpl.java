@@ -64,6 +64,12 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
+	public Deal newDeal()
+	{
+		return new DealImpl();
+	}
+	
+	@Override
 	public Deal newDeal(final DealOffer dealOffer)
 	{
 		return new DealImpl(dealOffer);
