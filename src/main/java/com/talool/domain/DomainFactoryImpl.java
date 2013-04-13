@@ -144,4 +144,10 @@ final class DomainFactoryImpl implements DomainFactory
 		rel.setRelationshipStatus(status);
 		return rel;
 	}
+
+	@Override
+	public Deal newDeal()
+	{
+		return new DealImpl();
+	}
 }
