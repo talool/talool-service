@@ -13,6 +13,12 @@ public class MerchantIdentityImpl implements MerchantIdentity
 	private Long id;
 	private String name;
 
+	public MerchantIdentityImpl(Long id, String name)
+	{
+		this.id = id;
+		this.name = name;
+	}
+
 	public MerchantIdentityImpl()
 	{}
 

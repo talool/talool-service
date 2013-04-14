@@ -14,6 +14,7 @@ import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantManagedLocation;
 import com.talool.core.Relationship;
@@ -143,5 +144,11 @@ final class DomainFactoryImpl implements DomainFactory
 	public Deal newDeal()
 	{
 		return new DealImpl();
+	}
+
+	@Override
+	public MerchantIdentity newMerchantIdentity(final Long id, final String name)
+	{
+		return new MerchantIdentityImpl();
 	}
 }
