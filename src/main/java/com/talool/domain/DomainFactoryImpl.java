@@ -63,7 +63,7 @@ final class DomainFactoryImpl implements DomainFactory
 	{
 		return new MerchantImpl();
 	}
-
+	
 	@Override
 	public Deal newDeal(final DealOffer dealOffer)
 	{
