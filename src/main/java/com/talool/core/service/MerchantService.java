@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.talool.core.Deal;
+import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
@@ -112,4 +113,6 @@ public interface MerchantService
 
 	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
 			throws ServiceException;
+	
+	public List<DealAcquire> getDealAcquiresByCustomerId(final Long customerId) throws ServiceException;
 }

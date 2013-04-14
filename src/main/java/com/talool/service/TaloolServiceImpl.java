@@ -21,6 +21,7 @@ import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
+import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.FactoryManager;
@@ -35,6 +36,7 @@ import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.domain.CustomerImpl;
+import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealImpl;
 import com.talool.domain.DealOfferImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
@@ -996,5 +998,21 @@ public class TaloolServiceImpl implements TaloolService
 
 		return identies;
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquire> getDealAcquiresByCustomerId(Long customerId)
+			throws ServiceException {
+		try
+		{
+			final Search search = new Search(DealAcquireImpl.class);
+			search.addFilterEqual("customer.id", customerId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealAcquiresByCustomerId %s", customerId), ex);
+		}
 	}
 }
