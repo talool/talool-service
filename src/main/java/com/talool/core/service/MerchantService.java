@@ -113,6 +113,10 @@ public interface MerchantService
 
 	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
 			throws ServiceException;
-	
-	public List<DealAcquire> getDealAcquiresByCustomerId(final Long customerId) throws ServiceException;
+
+	public List<DealAcquire> getDealAcquiresByCustomerId(final Long customerId)
+			throws ServiceException;
+
+	public List<Deal> getAllRelatedDealsForMerchantId(final Long merchantId) throws ServiceException;
+
 }

@@ -1002,8 +1002,30 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealAcquire> getDealAcquiresByCustomerId(Long customerId)
-			throws ServiceException {
+	public List<Deal> getAllRelatedDealsForMerchantId(final Long merchantId) throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory
+					.getCurrentSession()
+					.createQuery(
+							"select distinct d from DealImpl d where d.merchant.id=:merchantId OR d.dealOffer.createdByMerchant.merchant.id=:merchantId");
+
+			query.setParameter("merchantId", merchantId);
+			return query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getAllRelatedDealsForMerchantId %s",
+					merchantId), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquire> getDealAcquiresByCustomerId(Long customerId) throws ServiceException
+	{
 		try
 		{
 			final Search search = new Search(DealAcquireImpl.class);
@@ -1012,7 +1034,8 @@ public class TaloolServiceImpl implements TaloolService
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getDealAcquiresByCustomerId %s", customerId), ex);
+			throw new ServiceException(
+					String.format("Problem getDealAcquiresByCustomerId %s", customerId), ex);
 		}
 	}
 }
