@@ -59,4 +59,8 @@ public interface Deal extends Identifiable, Serializable, TimeAware
 
 	public void addTags(List<Tag> tag);
 
+	public String getCreatedByEmail();
+
+	public String getCreatedByMerchantName();
+
 }

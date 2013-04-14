@@ -301,4 +301,16 @@ public class DealImpl implements Deal
 		this.tags = tags;
 	}
 
+	@Override
+	public String getCreatedByEmail()
+	{
+		return getDealOffer().getCreatedByMerchant().getEmail();
+	}
+
+	@Override
+	public String getCreatedByMerchantName()
+	{
+		return getDealOffer().getCreatedByMerchant().getMerchant().getName();
+	}
+
 }
