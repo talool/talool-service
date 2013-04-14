@@ -115,8 +115,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(dealOffer.getTitle(), dealOfferResult.getTitle());
 		Assert.assertEquals(dealOffer.getImageUrl(), dealOfferResult.getImageUrl());
 		Assert.assertEquals(dealOffer.getSummary(), dealOfferResult.getSummary());
-		Assert.assertEquals(dealOffer.getCreatedByMerchant().getId(), dealOfferResult
-				.getCreatedByMerchant().getId());
+		Assert.assertEquals(dealOffer.getCreatedByMerchantAccount().getId(), dealOfferResult
+				.getCreatedByMerchantAccount().getId());
 		Assert.assertEquals(dealOffer.getPrice(), dealOfferResult.getPrice());
 		Assert.assertEquals(dealOffer.getExpires(), dealOfferResult.getExpires());
 		Assert.assertEquals(dealOffer.getType(), dealOfferResult.getType());

@@ -106,6 +106,7 @@ public class TaloolServiceImpl implements TaloolService
 			throws ServiceException
 	{
 		final Search search = new Search(CustomerImpl.class);
+
 		search.addFilterEqual("email", email);
 		try
 		{
@@ -1009,7 +1010,7 @@ public class TaloolServiceImpl implements TaloolService
 			final Query query = sessionFactory
 					.getCurrentSession()
 					.createQuery(
-							"select distinct d from DealImpl d where d.merchant.id=:merchantId OR d.dealOffer.createdByMerchant.merchant.id=:merchantId");
+							"select distinct d from DealImpl d where d.merchant.id=:merchantId OR d.dealOffer.createdByMerchantAccount.merchant.id=:merchantId");
 
 			query.setParameter("merchantId", merchantId);
 			return query.list();

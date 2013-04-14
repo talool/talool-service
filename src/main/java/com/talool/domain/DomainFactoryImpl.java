@@ -141,9 +141,9 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public Deal newDeal()
+	public Deal newDeal(final MerchantAccount createdByMerchantAccount)
 	{
-		return new DealImpl();
+		return new DealImpl(createdByMerchantAccount);
 	}
 
 	@Override

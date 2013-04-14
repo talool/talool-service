@@ -53,9 +53,14 @@ public class DealOfferImpl implements DealOffer
 	private Long id;
 
 	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "created_by_merchant_account_id")
-	private MerchantAccount createdByMerchant;
+	private MerchantAccount createdByMerchantAccount;
+
+	@Access(AccessType.FIELD)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "updated_by_merchant_account_id")
+	private MerchantAccount updatedByMerchantAccount;
 
 	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
@@ -95,7 +100,7 @@ public class DealOfferImpl implements DealOffer
 
 	public DealOfferImpl(final Merchant merchant, final MerchantAccount createdByMerchantAccount)
 	{
-		this.createdByMerchant = createdByMerchantAccount;
+		this.createdByMerchantAccount = createdByMerchantAccount;
 		this.merchant = merchant;
 	}
 
@@ -192,13 +197,13 @@ public class DealOfferImpl implements DealOffer
 		}
 
 		return new EqualsBuilder().append(getSummary(), other.getSummary())
-				.append(getCreatedByMerchant(), other.getCreatedByMerchant()).isEquals();
+				.append(getCreatedByMerchantAccount(), other.getCreatedByMerchantAccount()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getSummary()).append(getCreatedByMerchant())
+		return new HashCodeBuilder(17, 37).append(getSummary()).append(getCreatedByMerchantAccount())
 				.hashCode();
 	}
 
@@ -215,9 +220,9 @@ public class DealOfferImpl implements DealOffer
 	}
 
 	@Override
-	public MerchantAccount getCreatedByMerchant()
+	public MerchantAccount getCreatedByMerchantAccount()
 	{
-		return createdByMerchant;
+		return createdByMerchantAccount;
 	}
 
 	@Override
@@ -268,6 +273,59 @@ public class DealOfferImpl implements DealOffer
 	public String getTitle()
 	{
 		return title;
+	}
+
+	@Override
+	public String getCreatedByEmail()
+	{
+		if (createdByMerchantAccount != null)
+		{
+			return createdByMerchantAccount.getEmail();
+		}
+		return null;
+
+	}
+
+	@Override
+	public String getCreatedByMerchantName()
+	{
+		if (createdByMerchantAccount != null)
+		{
+			return createdByMerchantAccount.getMerchant().getName();
+		}
+		return null;
+	}
+
+	@Override
+	public MerchantAccount getUpdatedByMerchantAccount()
+	{
+		return updatedByMerchantAccount;
+	}
+
+	@Override
+	public String getUpdatedByEmail()
+	{
+		if (updatedByMerchantAccount != null)
+		{
+			return updatedByMerchantAccount.getEmail();
+		}
+		return null;
+	}
+
+	@Override
+	public String getUpdatedByMerchantName()
+	{
+		if (updatedByMerchantAccount != null)
+		{
+			return updatedByMerchantAccount.getMerchant().getName();
+		}
+		return null;
+	}
+
+	@Override
+	public void setUpdatedByMerchantAccount(MerchantAccount merchantAccount)
+	{
+		this.updatedByMerchantAccount = merchantAccount;
 	}
 
 }

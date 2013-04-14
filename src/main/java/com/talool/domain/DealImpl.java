@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
+import com.talool.core.MerchantAccount;
 import com.talool.core.Tag;
 
 /**
@@ -54,6 +55,16 @@ public class DealImpl implements Deal
 	@SequenceGenerator(name = "my_deal_seq", sequenceName = "deal_deal_id_seq")
 	@Column(name = "deal_id", unique = true, nullable = false)
 	private Long id;
+
+	@Access(AccessType.FIELD)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "updated_by_merchant_account_id")
+	private MerchantAccount updatedByMerchantAccount;
+
+	@Access(AccessType.FIELD)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "created_by_merchant_account_id")
+	private MerchantAccount createdByMerchantAccount;
 
 	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
@@ -93,6 +104,11 @@ public class DealImpl implements Deal
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
+	public DealImpl(MerchantAccount createdByMerchantAccount)
+	{
+		this.createdByMerchantAccount = createdByMerchantAccount;
+	}
+
 	public DealImpl()
 	{}
 
@@ -100,6 +116,12 @@ public class DealImpl implements Deal
 	{
 		this.merchant = dealOffer.getMerchant();
 		this.dealOffer = dealOffer;
+	}
+
+	@Override
+	public MerchantAccount getCreatedByMerchantAccount()
+	{
+		return createdByMerchantAccount;
 	}
 
 	@Override
@@ -304,13 +326,53 @@ public class DealImpl implements Deal
 	@Override
 	public String getCreatedByEmail()
 	{
-		return getDealOffer().getCreatedByMerchant().getEmail();
+		if (createdByMerchantAccount != null)
+		{
+			return createdByMerchantAccount.getEmail();
+		}
+		return null;
 	}
 
 	@Override
 	public String getCreatedByMerchantName()
 	{
-		return getDealOffer().getCreatedByMerchant().getMerchant().getName();
+		if (createdByMerchantAccount != null)
+		{
+			return createdByMerchantAccount.getMerchant().getName();
+		}
+		return null;
+	}
+
+	@Override
+	public MerchantAccount getUpdatedByMerchantAccount()
+	{
+		return updatedByMerchantAccount;
+	}
+
+	@Override
+	public String getUpdatedByEmail()
+	{
+		if (updatedByMerchantAccount != null)
+		{
+			return updatedByMerchantAccount.getEmail();
+		}
+		return null;
+	}
+
+	@Override
+	public String getUpdatedByMerchantName()
+	{
+		if (updatedByMerchantAccount != null)
+		{
+			return updatedByMerchantAccount.getMerchant().getName();
+		}
+		return null;
+	}
+
+	@Override
+	public void setUpdatedByMerchantAccount(MerchantAccount merchantAccount)
+	{
+		this.updatedByMerchantAccount = merchantAccount;
 	}
 
 }

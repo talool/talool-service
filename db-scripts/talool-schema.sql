@@ -418,6 +418,7 @@ CREATE TABLE deal_offer (
     deal_offer_id bigint NOT NULL,
     merchant_id bigint NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
+    updated_by_merchant_account_id bigint NOT NULL,
     deal_type deal_type NOT NULL,
     title character varying(256) NOT NULL,
     summary character varying(256),
@@ -443,10 +444,12 @@ CREATE SEQUENCE deal_offer_deal_offer_id_seq
 ALTER TABLE public.deal_offer_deal_offer_id_seq OWNER TO talool;
 ALTER SEQUENCE deal_offer_deal_offer_id_seq OWNED BY deal_offer.deal_offer_id;
 ALTER TABLE ONLY deal_offer ALTER COLUMN deal_offer_id SET DEFAULT nextval('deal_offer_deal_offer_id_seq'::regclass);
-ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_MerchantAccount" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_CreatedMerchantAccount" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_UpdatedMerchantAccount" FOREIGN KEY (updated_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 
 CREATE INDEX deal_offer_created_by_merchant_account_id_idx ON deal_offer (created_by_merchant_account_id);
+CREATE INDEX deal_offer_updated_by_merchant_account_id_idx ON deal_offer (updated_by_merchant_account_id);
 CREATE INDEX deal_offer_merchant_id_idx ON deal_offer (merchant_id);
 
 CREATE TABLE deal_offer_purchase (
@@ -483,7 +486,9 @@ CREATE TABLE deal (
     deal_id bigint NOT NULL,   
     deal_offer_id bigint NOT NULL,
     merchant_id bigint NOT NULL,
-    deal_index int,
+    created_by_merchant_account_id bigint NOT NULL,
+    updated_by_merchant_account_id bigint NOT NULL,
+    deal_illndex int,
     title character varying(256) NOT NULL,
     summary character varying(256) NOT NULL,
     details character varying(256) NOT NULL,
@@ -508,9 +513,13 @@ CREATE SEQUENCE deal_deal_id_seq
 ALTER TABLE public.deal_deal_id_seq OWNER TO talool;
 ALTER SEQUENCE deal_deal_id_seq OWNED BY deal.deal_id;
 ALTER TABLE ONLY deal ALTER COLUMN deal_id SET DEFAULT nextval('deal_deal_id_seq'::regclass);
-ALTER TABLE ONLY deal ADD CONSTRAINT "FK_DealDetail_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
-ALTER TABLE ONLY deal ADD CONSTRAINT "FK_DealDetail_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
-CREATE INDEX deal_deal_offer_id_idx ON deal (deal_offer_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_CreatedByMerchant" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_UpdatedByMerchant" FOREIGN KEY (updated_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+
+CREATE INDEX deal_created_by_merchant_account_id_idx ON deal (created_by_merchant_account_id);
+CREATE INDEX deal_updated_by_merchant_account_id_idx ON deal (updated_by_merchant_account_id);
 CREATE INDEX deal_merchant_id_idx ON deal (merchant_id);
 
 CREATE TABLE deal_tag (
