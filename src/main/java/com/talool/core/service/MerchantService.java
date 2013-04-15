@@ -119,4 +119,7 @@ public interface MerchantService
 
 	public List<Deal> getAllRelatedDealsForMerchantId(final Long merchantId) throws ServiceException;
 
+	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final Long merchantId)
+			throws ServiceException;
+
 }
