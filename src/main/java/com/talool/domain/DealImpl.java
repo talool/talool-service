@@ -18,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -44,6 +46,7 @@ import com.talool.core.Tag;
 @Entity
 @Table(name = "deal", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
+@NamedQueries({ @NamedQuery(name = "allRelatedDeals", query = "select distinct d from DealImpl d where d.merchant.id=:merchantId OR d.dealOffer.createdByMerchantAccount.merchant.id=:merchantId OR d.dealOffer.merchant.id=:merchantId order by d.createdUpdated.created desc") })
 public class DealImpl implements Deal
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DealImpl.class);

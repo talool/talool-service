@@ -1,5 +1,7 @@
 package com.talool.domain;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
 import com.talool.core.MerchantIdentity;
 
 /**
@@ -40,6 +42,12 @@ public class MerchantIdentityImpl implements MerchantIdentity
 	void setName(String name)
 	{
 		this.name = name;
+	}
+
+	@Override
+	public String toString()
+	{
+		return ReflectionToStringBuilder.toString(this);
 	}
 
 }

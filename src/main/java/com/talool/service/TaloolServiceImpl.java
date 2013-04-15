@@ -51,7 +51,6 @@ import com.talool.domain.TagImpl;
 /**
  * Implementation of the TaloolService
  * 
- * 
  * @author clintz
  */
 @Transactional(readOnly = true)
@@ -751,7 +750,9 @@ public class TaloolServiceImpl implements TaloolService
 		try
 		{
 			final Search search = new Search(DealOfferImpl.class);
-			search.addFilterEqual("merchant.id", merchantId);
+			// TODO return only deals they can see . For now we must return all Deal
+			// Offers available
+			// search.addFilterEqual("merchant.id", merchantId);
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -1007,14 +1008,11 @@ public class TaloolServiceImpl implements TaloolService
 	{
 		try
 		{
-			final Query query = sessionFactory
-					.getCurrentSession()
-					.createQuery(
-							"select distinct d from DealImpl d where d.merchant.id=:merchantId OR d.dealOffer.createdByMerchantAccount.merchant.id=:merchantId");
+			final Query query = sessionFactory.getCurrentSession().getNamedQuery("allRelatedDeals");
 
 			query.setParameter("merchantId", merchantId);
-			return query.list();
 
+			return query.list();
 		}
 		catch (Exception ex)
 		{
