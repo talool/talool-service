@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
+import com.googlecode.genericdao.search.Sort;
 import com.talool.core.AccountType;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
@@ -700,6 +701,7 @@ public class TaloolServiceImpl implements TaloolService
 		try
 		{
 			final Search search = new Search(DealOfferImpl.class);
+			search.addSort(Sort.desc("createdUpdated.updated"));
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -745,11 +747,12 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOffer> getDealOffersByMerchantId(Long merchantId) throws ServiceException
+	public List<DealOffer> getDealOffersByMerchantId(final Long merchantId) throws ServiceException
 	{
 		try
 		{
 			final Search search = new Search(DealOfferImpl.class);
+			search.addSort(Sort.desc("createdUpdated.updated"));
 			// TODO return only deals they can see . For now we must return all Deal
 			// Offers available
 			// search.addFilterEqual("merchant.id", merchantId);

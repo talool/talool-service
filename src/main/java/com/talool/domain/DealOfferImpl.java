@@ -328,4 +328,10 @@ public class DealOfferImpl implements DealOffer
 		this.updatedByMerchantAccount = merchantAccount;
 	}
 
+	@Override
+	public void setMerchant(Merchant merchant)
+	{
+		this.merchant = merchant;
+	}
+
 }

@@ -27,6 +27,8 @@ public interface DealOffer extends Identifiable, Serializable, TimeAware
 
 	public Merchant getMerchant();
 
+	public void setMerchant(final Merchant merchant);
+
 	public void setDealType(DealType dealType);
 
 	public DealType getType();
