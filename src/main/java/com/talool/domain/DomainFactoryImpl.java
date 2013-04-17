@@ -111,7 +111,9 @@ final class DomainFactoryImpl implements DomainFactory
 	@Override
 	public DealOffer newDealOffer(final Merchant merchant, final MerchantAccount createdByMerchant)
 	{
-		return new DealOfferImpl(merchant, createdByMerchant);
+		DealOffer dealOffer = new DealOfferImpl(merchant, createdByMerchant);
+		dealOffer.setUpdatedByMerchantAccount(createdByMerchant);
+		return dealOffer;
 	}
 
 	@Override
@@ -143,7 +145,9 @@ final class DomainFactoryImpl implements DomainFactory
 	@Override
 	public Deal newDeal(final MerchantAccount createdByMerchantAccount)
 	{
-		return new DealImpl(createdByMerchantAccount);
+		final Deal deal = new DealImpl(createdByMerchantAccount);
+		deal.setUpdatedByMerchantAccount(createdByMerchantAccount);
+		return deal;
 	}
 
 	@Override

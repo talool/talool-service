@@ -118,6 +118,8 @@ public class DealImpl implements Deal
 	public DealImpl(final DealOffer dealOffer)
 	{
 		this.merchant = dealOffer.getMerchant();
+		this.createdByMerchantAccount = dealOffer.getCreatedByMerchantAccount();
+		this.updatedByMerchantAccount = dealOffer.getUpdatedByMerchantAccount();
 		this.dealOffer = dealOffer;
 	}
 

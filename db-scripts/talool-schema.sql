@@ -1,6 +1,3 @@
---
--- PostgreSQL database dump
---
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -8,13 +5,8 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
---
--- Name: talool; Type: DATABASE; Schema: -; Owner: talool
---
-
 
 CREATE DATABASE talool WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US' LC_CTYPE = 'en_US';
-
 
 ALTER DATABASE talool OWNER TO talool;
 
@@ -26,25 +18,12 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
---
-
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
---
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
-
---
--- Name: update_dt_column(); Type: FUNCTION; Schema: public; Owner: talool
---
 
 CREATE FUNCTION update_dt_column() RETURNS trigger
     LANGUAGE plpgsql
@@ -55,7 +34,6 @@ CREATE FUNCTION update_dt_column() RETURNS trigger
 	END;
 	$$;
 	
-
 
 ALTER FUNCTION public.update_dt_column() OWNER TO talool;
 
@@ -68,7 +46,7 @@ BEGIN
   FOR rec IN SELECT * FROM deal WHERE deal_offer_id = NEW.deal_offer_id
   LOOP
     INSERT INTO deal_acquire(deal_id,acquire_status_id,customer_id) 
-       VALUES( rec.deal_id,(select acquire_status_id from acquire_status where status='PURCHASE'),NEW.customer_id);
+       VALUES( rec.deal_id,(select acquire_status_id from acquire_status where status='PURCHASED'),NEW.customer_id);
   end loop;
   return NEW;
 END;
@@ -649,56 +627,6 @@ CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FO
 
 CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();
 
-
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-GRANT ALL ON SCHEMA public TO talool;
-
-
-REVOKE ALL ON FUNCTION update_dt_column() FROM PUBLIC;
-REVOKE ALL ON FUNCTION update_dt_column() FROM talool;
-GRANT ALL ON FUNCTION update_dt_column() TO talool;
-
-
-REVOKE ALL ON TABLE address FROM PUBLIC;
-REVOKE ALL ON TABLE address FROM talool;
-GRANT ALL ON TABLE address TO talool;
-
-
-REVOKE ALL ON SEQUENCE address_address_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE address_address_id_seq FROM talool;
-GRANT ALL ON SEQUENCE address_address_id_seq TO talool;
-
-
-
-REVOKE ALL ON TABLE customer FROM PUBLIC;
-REVOKE ALL ON TABLE customer FROM talool;
-GRANT ALL ON TABLE customer TO talool;
-
-
-REVOKE ALL ON SEQUENCE customer_customer_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE customer_customer_id_seq FROM talool;
-GRANT ALL ON SEQUENCE customer_customer_id_seq TO talool;
-
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM talool;
-GRANT ALL ON SEQUENCE merchant_merchant_id_seq TO talool;
-
-REVOKE ALL ON SEQUENCE merchant_location_merchant_location_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE merchant_location_merchant_location_id_seq FROM talool;
-GRANT ALL ON SEQUENCE merchant_location_merchant_location_id_seq TO talool;
-
-
-
-
-REVOKE ALL ON TABLE merchant FROM PUBLIC;
-REVOKE ALL ON TABLE merchant FROM talool;
-GRANT ALL ON TABLE merchant TO talool;
-
-
-
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM talool;
-GRANT ALL ON SEQUENCE merchant_merchant_id_seq TO talool;
 
 
 

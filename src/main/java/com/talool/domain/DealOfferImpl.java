@@ -53,12 +53,12 @@ public class DealOfferImpl implements DealOffer
 	private Long id;
 
 	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "created_by_merchant_account_id")
 	private MerchantAccount createdByMerchantAccount;
 
 	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "updated_by_merchant_account_id")
 	private MerchantAccount updatedByMerchantAccount;
 

@@ -19,6 +19,7 @@ import com.talool.core.AccountType;
 import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
+import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.DealType;
@@ -69,9 +70,30 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		MerchantAccount testMerchantAccount = testMerchantAccount(testMerchant);
 
-		// testDealOffers(testMerchant, testMerchantAccount, customer);
+		final DealOffer dealOffer = testDealOffers(testMerchant, testMerchantAccount, customer);
 
-		// testDeleteMerchant();
+		final DealOfferPurchase dealOfferPurchase = testDealOfferPurchase(customer, dealOffer);
+
+		testDealAcquires(dealOfferPurchase, dealOffer);
+
+	}
+
+	public void testDealAcquires(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer)
+			throws ServiceException
+	{
+
+		List<DealAcquire> dealAcquires = taloolService.getDealAcquiresByCustomerId(dealOfferPurchase
+				.getCustomer().getId());
+
+		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId());
+
+		Assert.assertEquals(deals.size(), dealAcquires.size());
+
+		for (final DealAcquire dealAcquire : dealAcquires)
+		{
+			Assert.assertEquals(dealOffer.getId(), dealAcquire.getDeal().getDealOffer().getId());
+		}
+
 	}
 
 	public void testRelationship() throws Exception
@@ -92,7 +114,27 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	public void testDealOffers(final Merchant merchant, final MerchantAccount merchantAccount,
+	public DealOfferPurchase testDealOfferPurchase(final Customer customer, final DealOffer dealOffer)
+			throws ServiceException
+	{
+		// lets purchase!
+		DealOfferPurchase dealOfferPurchase = domainFactory.newDealOfferPurchase(customer, dealOffer);
+
+		taloolService.save(dealOfferPurchase);
+		taloolService.refresh(dealOfferPurchase);
+
+		List<DealOfferPurchase> dealOfferPurchaseResult = taloolService
+				.getDealOfferPurchasesByCustomerId(customer.getId());
+
+		Assert.assertEquals(1, dealOfferPurchaseResult.size());
+
+		Assert.assertEquals(dealOffer.getTitle(), dealOfferPurchaseResult.get(0).getDealOffer()
+				.getTitle());
+
+		return dealOfferPurchase;
+	}
+
+	public DealOffer testDealOffers(final Merchant merchant, final MerchantAccount merchantAccount,
 			final Customer customer) throws ServiceException
 	{
 		DealOffer dealOffer = domainFactory.newDealOffer(merchant, merchantAccount);
@@ -154,17 +196,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Set<Tag> dealOfferTags = taloolService.getDealOfferTags(dealOfferResult.getId());
 		Assert.assertEquals(2, dealOfferTags.size());
 
-		// lets purchase!
-		DealOfferPurchase dealOfferPurchase = domainFactory.newDealOfferPurchase(customer,
-				dealOfferResult);
-
-		taloolService.save(dealOfferPurchase);
-		taloolService.refresh(dealOfferPurchase);
-
-		List<DealOfferPurchase> dealOfferPurchaseResult = taloolService
-				.getDealOfferPurchasesByDealOfferId(dealOfferResult.getId());
-
-		Assert.assertEquals(1, dealOfferPurchaseResult.size());
+		return dealOffer;
 
 	}
 

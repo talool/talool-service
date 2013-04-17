@@ -1,6 +1,3 @@
---
--- PostgreSQL database dump
---
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -8,13 +5,8 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
---
--- Name: talool; Type: DATABASE; Schema: -; Owner: talool
---
-
 
 CREATE DATABASE talool-test WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US' LC_CTYPE = 'en_US';
-
 
 ALTER DATABASE talool-test OWNER TO talool;
 
@@ -26,25 +18,12 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
---
-
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
---
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
-
---
--- Name: update_dt_column(); Type: FUNCTION; Schema: public; Owner: talool
---
 
 CREATE FUNCTION update_dt_column() RETURNS trigger
     LANGUAGE plpgsql
@@ -55,7 +34,6 @@ CREATE FUNCTION update_dt_column() RETURNS trigger
 	END;
 	$$;
 	
-
 
 ALTER FUNCTION public.update_dt_column() OWNER TO talool;
 
@@ -68,7 +46,7 @@ BEGIN
   FOR rec IN SELECT * FROM deal WHERE deal_offer_id = NEW.deal_offer_id
   LOOP
     INSERT INTO deal_acquire(deal_id,acquire_status_id,customer_id) 
-       VALUES( rec.deal_id,(select acquire_status_id from acquire_status where status='PURCHASE'),NEW.customer_id);
+       VALUES( rec.deal_id,(select acquire_status_id from acquire_status where status='PURCHASED'),NEW.customer_id);
   end loop;
   return NEW;
 END;
@@ -141,6 +119,20 @@ CREATE UNIQUE INDEX customer_email_idx ON customer (email);
 
 CREATE TYPE relationship_status AS ENUM ('PENDING', 'FRIEND','BLOCKED');
 
+CREATE TABLE deal_offer_auth (
+   deal_offer_auth_id bigint NOT NULL,  
+   request_by_merchant_id bigint NOT NULL,
+   request_for_merchant_id bigint NOT NULL,
+   auth_status_id smallint NOT NULL, 
+   request_by_account_id bigint,
+   received_by_account_id bigint,
+   allow_group_deal_create bool DEFAULT false,
+   allow_deal_create bool DEFAULT false,
+   create_dt timestamp without time zone NOT NULL,
+   update_dt timestamp without time zone NOT NULL,
+   PRIMARY KEY(deal_offer_auth_id)
+);
+
 CREATE TABLE friend_request (
     friend_request_id bigint NOT NULL,
     customer_id bigint NOT NULL,
@@ -190,10 +182,10 @@ CREATE SEQUENCE relationship_relationship_id_seq
 ALTER TABLE public.relationship_relationship_id_seq OWNER TO talool;
 ALTER SEQUENCE relationship_relationship_id_seq OWNED BY relationship.relationship_id;
 ALTER TABLE ONLY relationship ALTER COLUMN relationship_id SET DEFAULT nextval('relationship_relationship_id_seq'::regclass);
-ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_Friend" FOREIGN KEY (friend_id) REFERENCES customer(customer_id);
-CREATE INDEX relationship_customer_id_idx ON relationship (customer_id);
-CREATE INDEX relationship_friend_id_idx ON relationship (friend_id);
+ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_FromCustomer" FOREIGN KEY (from_customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY relationship ADD CONSTRAINT "FK_Relationship_ToCustomer" FOREIGN KEY (to_customer_id) REFERENCES customer(customer_id);
+CREATE INDEX relationship_from_customer_id_idx ON relationship (from_customer_id);
+CREATE INDEX relationship_to_customer_id_idx ON relationship (to_customer_id);
 
 CREATE SEQUENCE tag_tag_id_seq 
  	START WITH 1
@@ -317,6 +309,38 @@ ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (mer
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_MechantLocation" FOREIGN KEY (primary_location_id) REFERENCES merchant_location(merchant_location_id);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
 
+CREATE TABLE property_type (
+    property_type_id smallint NOT NULL,
+    name character varying(64),
+    type character varying(64),
+    PRIMARY KEY(property_type_id),
+    UNIQUE(name)
+);
+
+CREATE TABLE merchant_property (
+	merchant_property_id bigint NOT NULL,
+	merchant_id bigint NOT NULL,
+    property_type_id smallint NOT NULL,
+    property_value character varying(128),
+    PRIMARY KEY(merchant_property_id)
+);
+
+CREATE TYPE request_status AS ENUM ('PENDING', 'APPROVED');
+
+CREATE TABLE merchant_request (
+   merchant_request_id bigint NOT NULL,  
+   request_by_merchant_id bigint NOT NULL,
+   request_for_merchant_id bigint NOT NULL,
+   request_property_id smallint NOT NULL,
+   status request_status NOT NULL, 
+   request_by_account_id bigint,
+   response_by_account_id bigint,
+   create_dt timestamp without time zone NOT NULL,
+   update_dt timestamp without time zone NOT NULL,
+   PRIMARY KEY(merchant_request_id)
+);
+
+
 CREATE SEQUENCE merchant_managed_location_merchant_managed_location_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -372,6 +396,7 @@ CREATE TABLE deal_offer (
     deal_offer_id bigint NOT NULL,
     merchant_id bigint NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
+    updated_by_merchant_account_id bigint NOT NULL,
     deal_type deal_type NOT NULL,
     title character varying(256) NOT NULL,
     summary character varying(256),
@@ -397,10 +422,12 @@ CREATE SEQUENCE deal_offer_deal_offer_id_seq
 ALTER TABLE public.deal_offer_deal_offer_id_seq OWNER TO talool;
 ALTER SEQUENCE deal_offer_deal_offer_id_seq OWNED BY deal_offer.deal_offer_id;
 ALTER TABLE ONLY deal_offer ALTER COLUMN deal_offer_id SET DEFAULT nextval('deal_offer_deal_offer_id_seq'::regclass);
-ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_MerchantAccount" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_CreatedMerchantAccount" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_UpdatedMerchantAccount" FOREIGN KEY (updated_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 
 CREATE INDEX deal_offer_created_by_merchant_account_id_idx ON deal_offer (created_by_merchant_account_id);
+CREATE INDEX deal_offer_updated_by_merchant_account_id_idx ON deal_offer (updated_by_merchant_account_id);
 CREATE INDEX deal_offer_merchant_id_idx ON deal_offer (merchant_id);
 
 CREATE TABLE deal_offer_purchase (
@@ -437,7 +464,9 @@ CREATE TABLE deal (
     deal_id bigint NOT NULL,   
     deal_offer_id bigint NOT NULL,
     merchant_id bigint NOT NULL,
-    deal_index int,
+    created_by_merchant_account_id bigint NOT NULL,
+    updated_by_merchant_account_id bigint NOT NULL,
+    deal_illndex int,
     title character varying(256) NOT NULL,
     summary character varying(256) NOT NULL,
     details character varying(256) NOT NULL,
@@ -462,9 +491,13 @@ CREATE SEQUENCE deal_deal_id_seq
 ALTER TABLE public.deal_deal_id_seq OWNER TO talool;
 ALTER SEQUENCE deal_deal_id_seq OWNED BY deal.deal_id;
 ALTER TABLE ONLY deal ALTER COLUMN deal_id SET DEFAULT nextval('deal_deal_id_seq'::regclass);
-ALTER TABLE ONLY deal ADD CONSTRAINT "FK_DealDetail_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
-ALTER TABLE ONLY deal ADD CONSTRAINT "FK_DealDetail_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
-CREATE INDEX deal_deal_offer_id_idx ON deal (deal_offer_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_CreatedByMerchant" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_UpdatedByMerchant" FOREIGN KEY (updated_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+
+CREATE INDEX deal_created_by_merchant_account_id_idx ON deal (created_by_merchant_account_id);
+CREATE INDEX deal_updated_by_merchant_account_id_idx ON deal (updated_by_merchant_account_id);
 CREATE INDEX deal_merchant_id_idx ON deal (merchant_id);
 
 CREATE TABLE deal_tag (
@@ -594,56 +627,6 @@ CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FO
 
 CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();
 
-
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-GRANT ALL ON SCHEMA public TO talool;
-
-
-REVOKE ALL ON FUNCTION update_dt_column() FROM PUBLIC;
-REVOKE ALL ON FUNCTION update_dt_column() FROM talool;
-GRANT ALL ON FUNCTION update_dt_column() TO talool;
-
-
-REVOKE ALL ON TABLE address FROM PUBLIC;
-REVOKE ALL ON TABLE address FROM talool;
-GRANT ALL ON TABLE address TO talool;
-
-
-REVOKE ALL ON SEQUENCE address_address_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE address_address_id_seq FROM talool;
-GRANT ALL ON SEQUENCE address_address_id_seq TO talool;
-
-
-
-REVOKE ALL ON TABLE customer FROM PUBLIC;
-REVOKE ALL ON TABLE customer FROM talool;
-GRANT ALL ON TABLE customer TO talool;
-
-
-REVOKE ALL ON SEQUENCE customer_customer_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE customer_customer_id_seq FROM talool;
-GRANT ALL ON SEQUENCE customer_customer_id_seq TO talool;
-
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM talool;
-GRANT ALL ON SEQUENCE merchant_merchant_id_seq TO talool;
-
-REVOKE ALL ON SEQUENCE merchant_location_merchant_location_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE merchant_location_merchant_location_id_seq FROM talool;
-GRANT ALL ON SEQUENCE merchant_location_merchant_location_id_seq TO talool;
-
-
-
-
-REVOKE ALL ON TABLE merchant FROM PUBLIC;
-REVOKE ALL ON TABLE merchant FROM talool;
-GRANT ALL ON TABLE merchant TO talool;
-
-
-
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE merchant_merchant_id_seq FROM talool;
-GRANT ALL ON SEQUENCE merchant_merchant_id_seq TO talool;
 
 
 
