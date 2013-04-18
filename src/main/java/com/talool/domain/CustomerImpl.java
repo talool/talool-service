@@ -6,26 +6,21 @@ import java.util.Map;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MapKey;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.Where;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +45,10 @@ public class CustomerImpl implements Customer
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_customer_seq")
-	@SequenceGenerator(name = "my_customer_seq", sequenceName = "customer_customer_id_seq")
-	@Column(name = "customer_id", unique = true, nullable = false)
-	private Long id;
+	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
+	@GeneratedValue(generator = "uuid_gen")
+	@Column(name = "customer_id", unique = true, nullable = false, columnDefinition = "character varying (36)")
+	private String id;
 
 	@Type(type = "sexType")
 	// @Column(name = "sex_t", columnDefinition = "sex_type")
@@ -75,21 +70,23 @@ public class CustomerImpl implements Customer
 	@Column(name = "password", unique = false, nullable = false, length = 64)
 	private String password;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SocialAccountImpl.class, mappedBy = "primaryKey.userId")
+	// @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity
+	// = SocialAccountImpl.class, mappedBy = "primaryKey.userId")
 	/*
 	 * TODO - sucks - cant get a formula to work. Replace WHERE clause with
 	 * something dynamic that reads the enum to prevent any future bug (WHERE has
 	 * to be constant!)
 	 */
-	@Where(clause = "account_t='CUS'")
-	@MapKey(name = "primaryKey.socialNetwork")
+	// @Where(clause = "account_t='CUS'")
+	// @MapKey(name = "primaryKey.socialNetwork")
+	@Transient
 	private final Map<SocialNetwork, SocialAccount> socialAccounts = new HashMap<SocialNetwork, SocialAccount>();
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
 	@Override
-	public Long getId()
+	public String getId()
 	{
 		return id;
 	}

@@ -71,12 +71,12 @@ public class SocialAccountImpl implements SocialAccount
 			this.socialNetwork = socialNetwork;
 		}
 
-		public Long getUserId()
+		public String getUserId()
 		{
 			return userId;
 		}
 
-		public void setUserId(Long userId)
+		public void setUserId(String userId)
 		{
 			this.userId = userId;
 		}
@@ -99,7 +99,7 @@ public class SocialAccountImpl implements SocialAccount
 		private SocialNetwork socialNetwork;
 
 		@Column(name = "user_id", unique = false, nullable = false)
-		private Long userId;
+		private String userId;
 
 		@Type(type = "accountType")
 		@Column(name = "account_t", unique = true, nullable = false, columnDefinition = "account_type")
@@ -139,13 +139,13 @@ public class SocialAccountImpl implements SocialAccount
 	}
 
 	@Override
-	public Long getUserId()
+	public String getUserId()
 	{
 		return primaryKey.userId;
 	}
 
 	@Override
-	public void setUserId(Long userId)
+	public void setUserId(String userId)
 	{
 		primaryKey.userId = userId;
 	}

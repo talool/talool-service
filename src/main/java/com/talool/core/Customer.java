@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-public interface Customer extends Identifiable, Serializable, TimeAware
+public interface Customer extends IdentifiableS, Serializable, TimeAware
 {
+	public String getId();
+
 	public String getFirstName();
 
 	public void setFirstName(String firstName);

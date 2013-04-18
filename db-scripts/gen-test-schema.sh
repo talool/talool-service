@@ -14,7 +14,7 @@
 testSchema=$(dirname $0)/test-schema.sql
 taloolSchema=$(dirname $0)/talool-schema.sql
 taloolData=$(dirname $0)/talool-data.sql
-testDbName="talool_test"
+testDbName="talooltest"
 
 echo "Dropping Database '$testDbName' ..."
 dropdb -U postgres -w $testDbName
@@ -26,7 +26,7 @@ echo "Creating Database '$testDbName' ..."
 createdb -U postgres -w $testDbName
 
 echo "Importing $testDbName schema..."
-psql -U talool -w $testDbName < $testSchema
+psql -U postgres -w $testDbName < $testSchema
 
 echo "Importing $taloolData into Database '$testDbName' ..."
-psql -U talool -w $testDbName < $taloolData
+psql -U postgres -w $testDbName < $taloolData

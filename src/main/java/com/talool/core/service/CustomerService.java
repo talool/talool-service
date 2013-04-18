@@ -22,7 +22,7 @@ public interface CustomerService
 
 	public void save(final Customer customer) throws ServiceException;
 
-	public Customer getCustomerById(final Long id) throws ServiceException;
+	public Customer getCustomerById(final String id) throws ServiceException;
 
 	public Customer getCustomerByEmail(final String email) throws ServiceException;
 
@@ -32,8 +32,8 @@ public interface CustomerService
 
 	public void save(final Relationship relationship) throws ServiceException;
 
-	public List<Relationship> getRelationshipsFrom(final Long customerId) throws ServiceException;
+	public List<Relationship> getRelationshipsFrom(final String customerId) throws ServiceException;
 
-	public List<Relationship> getRelationshipsTo(final Long customerId) throws ServiceException;
+	public List<Relationship> getRelationshipsTo(final String customerId) throws ServiceException;
 
 }

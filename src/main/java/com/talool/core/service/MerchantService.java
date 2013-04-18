@@ -87,7 +87,7 @@ public interface MerchantService
 
 	public List<Deal> getDealsByDealOfferId(final Long dealOfferId) throws ServiceException;
 
-	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final Long customerId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final String customerId)
 			throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final Long dealOfferId)
@@ -114,7 +114,7 @@ public interface MerchantService
 	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
 			throws ServiceException;
 
-	public List<DealAcquire> getDealAcquiresByCustomerId(final Long customerId)
+	public List<DealAcquire> getDealAcquiresByCustomerId(final String customerId)
 			throws ServiceException;
 
 	public List<Deal> getAllRelatedDealsForMerchantId(final Long merchantId) throws ServiceException;

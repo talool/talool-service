@@ -22,12 +22,12 @@ public interface SocialAccount extends TimeAware, Serializable
 	/**
 	 * gets merchant or customer Id (based on AccountType)
 	 */
-	public Long getUserId();
+	public String getUserId();
 
 	/**
 	 * sets merchant or customer Id (based on AccountType)
 	 */
-	public void setUserId(Long userId);
+	public void setUserId(String userId);
 
 	public String getLoginId();
 

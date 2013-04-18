@@ -10,7 +10,7 @@ CREATE DATABASE talool-test WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLA
 
 ALTER DATABASE talool-test OWNER TO talool;
 
-\connect talool_test
+\connect talooltest
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -19,6 +19,8 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+CREATE EXTENSION "uuid-ossp";
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
@@ -90,7 +92,8 @@ CREATE UNIQUE INDEX address_idx ON address (address1,address2,city,state_provinc
 CREATE TYPE sex_type AS ENUM ('M', 'F');
 
 CREATE TABLE customer (
-    customer_id bigint NOT NULL,
+  	customer_id character varying (36) NOT NULL DEFAULT uuid_generate_v4()::character(36),
+    --customer_id bigint NOT NULL,
     email character varying(128) NOT NULL,
     password character varying(32) NOT NULL,
     first_name character varying(64)  NULL,
@@ -103,17 +106,6 @@ CREATE TABLE customer (
 );
 
 ALTER TABLE public.customer OWNER TO talool;
-
-CREATE SEQUENCE customer_customer_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-    
-ALTER TABLE public.customer_customer_id_seq OWNER TO talool;
-ALTER SEQUENCE customer_customer_id_seq OWNED BY customer.customer_id;
-ALTER TABLE ONLY customer ALTER COLUMN customer_id SET DEFAULT nextval('customer_customer_id_seq'::regclass);
 
 CREATE UNIQUE INDEX customer_email_idx ON customer (email);
 
@@ -135,7 +127,7 @@ CREATE TABLE deal_offer_auth (
 
 CREATE TABLE friend_request (
     friend_request_id bigint NOT NULL,
-    customer_id bigint NOT NULL,
+    customer_id character varying (36) NOT NULL,
     friend_facebook_id character varying(32),
     friend_email character varying(128),
     deal_id bigint,
@@ -162,8 +154,8 @@ CREATE INDEX friend_request_customer_idx ON friend_request (customer_id);
 
 CREATE TABLE relationship (
 	relationship_id bigint NOT NULL,
-    from_customer_id bigint NOT NULL,
-    to_customer_id bigint NOT NULL,
+    from_customer_id character varying (36) NOT NULL,
+    to_customer_id character varying (36) NOT NULL,
     status relationship_status NOT NULL,
     create_dt timestamp NOT NULL DEFAULT NOW(),
     update_dt timestamp NOT NULL DEFAULT NOW(),
@@ -231,7 +223,7 @@ ALTER TABLE public.social_network OWNER TO talool;
 CREATE UNIQUE INDEX social_network_idx ON social_network (name);
 
 CREATE TABLE social_account (
-    user_id bigint NOT NULL,
+    user_id character varying(36) NOT NULL,
     account_t account_type NOT NULL,
     social_network_id bigint NOT NULL,
     login_id character varying(32) NOT NULL,
@@ -433,7 +425,7 @@ CREATE INDEX deal_offer_merchant_id_idx ON deal_offer (merchant_id);
 CREATE TABLE deal_offer_purchase (
     deal_offer_purchase_id bigint NOT NULL,   
     deal_offer_id bigint NOT NULL,
-    customer_id bigint NOT NULL,
+    customer_id character varying(36) NOT NULL,
     latitude double precision,
     longitude double precision,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
@@ -552,9 +544,9 @@ CREATE TABLE deal_acquire (
     deal_acquire_id bigint NOT NULL,   
     deal_id bigint NOT NULL,
     acquire_status_id smallint NOT NULL, 
-    customer_id bigint NOT NULL,
+    customer_id character varying(36) NOT NULL,
     shared_by_merchant_id bigint,
-    shared_by_customer_id bigint,
+    shared_by_customer_id character (36),
     share_cnt int NOT NULL DEFAULT 0,
     latitude double precision,
     longitude double precision,
@@ -590,9 +582,9 @@ CREATE TABLE deal_acquire_history (
     deal_acquire_history_id bigint NOT NULL,  
     deal_acquire_id bigint NOT NULL,
     acquire_status_id smallint NOT NULL, 
-    customer_id bigint NOT NULL,
+    customer_id character varying(36) NOT NULL,
     shared_by_merchant_id bigint,
-    shared_by_customer_id bigint,
+    shared_by_customer_id character varying (36),
     share_cnt int NOT NULL DEFAULT 0,
     update_dt timestamp without time zone NOT NULL,
     PRIMARY KEY(deal_acquire_history_id)

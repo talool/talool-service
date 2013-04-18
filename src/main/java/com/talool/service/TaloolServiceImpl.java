@@ -26,7 +26,7 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.FactoryManager;
-import com.talool.core.Identifiable;
+import com.talool.core.IdentifiableS;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
@@ -122,7 +122,7 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public Customer getCustomerById(final Long id) throws ServiceException
+	public Customer getCustomerById(final String id) throws ServiceException
 	{
 		Customer customer;
 		try
@@ -212,7 +212,7 @@ public class TaloolServiceImpl implements TaloolService
 		}
 	}
 
-	private void createAccount(final AccountType accountType, final Identifiable account,
+	private void createAccount(final AccountType accountType, final IdentifiableS account,
 			final String password) throws ServiceException
 	{
 		try
@@ -590,7 +590,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final Long customerId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final String customerId)
 			throws ServiceException
 	{
 		try
@@ -902,7 +902,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Relationship> getRelationshipsFrom(final Long customerId) throws ServiceException
+	public List<Relationship> getRelationshipsFrom(final String customerId) throws ServiceException
 	{
 		try
 		{
@@ -918,7 +918,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Relationship> getRelationshipsTo(final Long customerId) throws ServiceException
+	public List<Relationship> getRelationshipsTo(final String customerId) throws ServiceException
 	{
 		try
 		{
@@ -1026,7 +1026,8 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealAcquire> getDealAcquiresByCustomerId(Long customerId) throws ServiceException
+	public List<DealAcquire> getDealAcquiresByCustomerId(final String customerId)
+			throws ServiceException
 	{
 		try
 		{
