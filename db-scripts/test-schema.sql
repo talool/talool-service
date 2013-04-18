@@ -401,7 +401,7 @@ CREATE INDEX deal_offer_updated_by_merchant_account_id_idx ON deal_offer (update
 CREATE INDEX deal_offer_merchant_id_idx ON deal_offer (merchant_id);
 
 CREATE TABLE deal_offer_purchase (
-    deal_offer_purchase_id bigint NOT NULL,   
+	deal_offer_purchase_id character (36) NOT NULL DEFAULT uuid_generate_v4()::character(36),
     deal_offer_id character (36) NOT NULL,
     customer_id character (36) NOT NULL,
     latitude double precision,
@@ -411,17 +411,6 @@ CREATE TABLE deal_offer_purchase (
 );
 
 ALTER TABLE public.deal_offer_purchase OWNER TO talool;
-
-CREATE SEQUENCE deal_offer_purchase_deal_offer_purchase_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-    
-ALTER TABLE public.deal_offer_purchase_deal_offer_purchase_id_seq OWNER TO talool;
-ALTER SEQUENCE deal_offer_purchase_deal_offer_purchase_id_seq OWNED BY deal_offer_purchase.deal_offer_purchase_id;
-ALTER TABLE ONLY deal_offer_purchase ALTER COLUMN deal_offer_purchase_id SET DEFAULT nextval('deal_offer_purchase_deal_offer_purchase_id_seq'::regclass);
 
 ALTER TABLE ONLY deal_offer_purchase ADD CONSTRAINT "FK_DealOfferPurchase_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
 ALTER TABLE ONLY deal_offer_purchase ADD CONSTRAINT "FK_DealOfferPurchase_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);

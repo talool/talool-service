@@ -9,16 +9,15 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Target;
 
 import com.talool.core.Customer;
@@ -40,10 +39,10 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_dop_seq")
-	@SequenceGenerator(name = "my_dop_seq", sequenceName = "deal_offer_purchase_deal_offer_purchase_id_seq")
+	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
+	@GeneratedValue(generator = "uuid_gen")
 	@Column(name = "deal_offer_purchase_id", unique = true, nullable = false)
-	private Long id;
+	private String id;
 
 	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = DealOfferImpl.class, fetch = FetchType.LAZY)
@@ -72,7 +71,7 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	}
 
 	@Override
-	public Long getId()
+	public String getId()
 	{
 		return id;
 	}

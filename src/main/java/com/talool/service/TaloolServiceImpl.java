@@ -608,7 +608,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final Long dealOfferId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final String dealOfferId)
 			throws ServiceException
 	{
 		try

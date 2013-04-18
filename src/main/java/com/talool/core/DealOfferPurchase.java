@@ -8,7 +8,7 @@ import java.util.Date;
  * @author clintz
  * 
  */
-public interface DealOfferPurchase extends Identifiable, Serializable
+public interface DealOfferPurchase extends IdentifiableS, Serializable
 {
 	public DealOffer getDealOffer();
 

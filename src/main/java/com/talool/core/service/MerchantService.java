@@ -90,7 +90,7 @@ public interface MerchantService
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final String customerId)
 			throws ServiceException;
 
-	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final Long dealOfferId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final String dealOfferId)
 			throws ServiceException;
 
 	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException;
