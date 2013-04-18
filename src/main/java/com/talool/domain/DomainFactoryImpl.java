@@ -151,7 +151,7 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public MerchantIdentity newMerchantIdentity(final Long id, final String name)
+	public MerchantIdentity newMerchantIdentity(final String id, final String name)
 	{
 		return new MerchantIdentityImpl(id, name);
 	}

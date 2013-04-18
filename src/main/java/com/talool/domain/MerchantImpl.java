@@ -13,7 +13,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -21,12 +20,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,13 +52,13 @@ public class MerchantImpl implements Merchant
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_merchant_seq")
-	@SequenceGenerator(name = "my_merchant_seq", sequenceName = "merchant_merchant_id_seq")
+	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
+	@GeneratedValue(generator = "uuid_gen")
 	@Column(name = "merchant_id", unique = true, nullable = false)
-	private Long id;
+	private String id;
 
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
-	@JoinColumn(name = "merchant_parent_id")
+	@JoinColumn(name = "merchant_parent_id", columnDefinition = "character (36)")
 	private Merchant parent;
 
 	@Column(name = "merchant_name", unique = false, nullable = false, length = 64)
@@ -80,12 +79,12 @@ public class MerchantImpl implements Merchant
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
-	public Long getId()
+	public String getId()
 	{
 		return id;
 	}
 
-	public void setId(Long id)
+	public void setId(String id)
 	{
 		this.id = id;
 	}

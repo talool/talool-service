@@ -15,7 +15,7 @@ public interface CustomerService
 {
 	public void createAccount(final Customer customer, final String password) throws ServiceException;
 
-	public void deleteCustomer(final Long id) throws ServiceException;
+	public void deleteCustomer(final String id) throws ServiceException;
 
 	public Customer authenticateCustomer(final String email, final String password)
 			throws ServiceException;
@@ -28,7 +28,7 @@ public interface CustomerService
 
 	public List<Customer> getCustomers() throws ServiceException;
 
-	public List<Customer> getFriends(final Long id) throws ServiceException;
+	public List<Customer> getFriends(final String id) throws ServiceException;
 
 	public void save(final Relationship relationship) throws ServiceException;
 

@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public interface MerchantIdentity extends Serializable
 {
-	public Long getId();
+	public String getId();
 
 	public String getName();
 }

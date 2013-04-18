@@ -39,5 +39,5 @@ public interface DomainFactory
 	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer,
 			final RelationshipStatus status);
 
-	public MerchantIdentity newMerchantIdentity(final Long id, final String name);
+	public MerchantIdentity newMerchantIdentity(final String id, final String name);
 }

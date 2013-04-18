@@ -12,10 +12,10 @@ import com.talool.core.MerchantIdentity;
 public class MerchantIdentityImpl implements MerchantIdentity
 {
 	private static final long serialVersionUID = 9042040637750195480L;
-	private Long id;
+	private String id;
 	private String name;
 
-	public MerchantIdentityImpl(Long id, String name)
+	public MerchantIdentityImpl(String id, String name)
 	{
 		this.id = id;
 		this.name = name;
@@ -24,7 +24,7 @@ public class MerchantIdentityImpl implements MerchantIdentity
 	public MerchantIdentityImpl()
 	{}
 
-	public Long getId()
+	public String getId()
 	{
 		return id;
 	}
@@ -34,7 +34,7 @@ public class MerchantIdentityImpl implements MerchantIdentity
 		return name;
 	}
 
-	void setId(Long id)
+	void setId(String id)
 	{
 		this.id = id;
 	}

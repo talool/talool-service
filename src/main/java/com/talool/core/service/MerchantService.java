@@ -36,12 +36,12 @@ public interface MerchantService
 	public MerchantAccount authenticateMerchantAccount(final String email, final String password)
 			throws ServiceException;
 
-	public MerchantAccount authenticateMerchantAccount(final Long merchantId, final String email,
+	public MerchantAccount authenticateMerchantAccount(final String merchantId, final String email,
 			final String password) throws ServiceException;
 
-	public void deleteMerchant(final Long id) throws ServiceException;
+	public void deleteMerchant(final String id) throws ServiceException;
 
-	public Merchant getMerchantById(final Long id) throws ServiceException;
+	public Merchant getMerchantById(final String id) throws ServiceException;
 
 	public List<Merchant> getMerchantByName(final String name) throws ServiceException;
 
@@ -75,17 +75,17 @@ public interface MerchantService
 	// DealOffer stuff
 	public void save(final DealOffer dealOffer) throws ServiceException;
 
-	public DealOffer getDealOffer(final Long dealOfferId) throws ServiceException;
+	public DealOffer getDealOffer(final String dealOfferId) throws ServiceException;
 
 	public List<DealOffer> getDealOffers() throws ServiceException;
 
-	public List<DealOffer> getDealOffersByMerchantId(final Long merchantId) throws ServiceException;
+	public List<DealOffer> getDealOffersByMerchantId(final String merchantId) throws ServiceException;
 
 	public void save(final Deal deal) throws ServiceException;
 
 	public Deal getDeal(final Long dealId) throws ServiceException;
 
-	public List<Deal> getDealsByDealOfferId(final Long dealOfferId) throws ServiceException;
+	public List<Deal> getDealsByDealOfferId(final String dealOfferId) throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final String customerId)
 			throws ServiceException;
@@ -95,12 +95,12 @@ public interface MerchantService
 
 	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException;
 
-	public Set<Tag> getDealOfferTags(final Long dealOfferId) throws ServiceException;
+	public Set<Tag> getDealOfferTags(final String dealOfferId) throws ServiceException;
 
-	public List<MerchantAccount> getAccountsForMerchant(final Long merchantId)
+	public List<MerchantAccount> getAccountsForMerchant(final String merchantId)
 			throws ServiceException;
 
-	public List<MerchantManagedLocation> getLocationsForMerchant(final Long merchantId)
+	public List<MerchantManagedLocation> getLocationsForMerchant(final String merchantId)
 			throws ServiceException;
 
 	public MerchantManagedLocation getMerchantLocationById(final Long merchantManagedLocationId)
@@ -117,9 +117,10 @@ public interface MerchantService
 	public List<DealAcquire> getDealAcquiresByCustomerId(final String customerId)
 			throws ServiceException;
 
-	public List<Deal> getAllRelatedDealsForMerchantId(final Long merchantId) throws ServiceException;
+	public List<Deal> getAllRelatedDealsForMerchantId(final String merchantId)
+			throws ServiceException;
 
-	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final Long merchantId)
+	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final String merchantId)
 			throws ServiceException;
 
 }

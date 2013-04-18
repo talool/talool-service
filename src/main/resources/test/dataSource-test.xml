@@ -18,7 +18,7 @@
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" 
 		destroy-method="close">
 		<property name="driverClassName" value="org.postgresql.Driver" />
-		<property name="url" value="jdbc:postgresql://localhost:5432/talool_test" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/talooltest" />
 		<property name="username" value="talool" />
 		<property name="password" value="talool" />
 	</bean>

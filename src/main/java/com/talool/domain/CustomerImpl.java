@@ -47,7 +47,7 @@ public class CustomerImpl implements Customer
 	@Access(AccessType.FIELD)
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
-	@Column(name = "customer_id", unique = true, nullable = false, columnDefinition = "character varying (36)")
+	@Column(name = "customer_id", unique = true, nullable = false)
 	private String id;
 
 	@Type(type = "sexType")
