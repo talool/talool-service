@@ -1,5 +1,7 @@
 package com.talool.domain;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,7 +153,7 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public MerchantIdentity newMerchantIdentity(final String id, final String name)
+	public MerchantIdentity newMerchantIdentity(final UUID id, final String name)
 	{
 		return new MerchantIdentityImpl(id, name);
 	}

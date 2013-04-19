@@ -1,5 +1,7 @@
 package com.talool.domain;
 
+import java.util.UUID;
+
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import com.talool.core.MerchantIdentity;
@@ -12,10 +14,10 @@ import com.talool.core.MerchantIdentity;
 public class MerchantIdentityImpl implements MerchantIdentity
 {
 	private static final long serialVersionUID = 9042040637750195480L;
-	private String id;
+	private UUID id;
 	private String name;
 
-	public MerchantIdentityImpl(String id, String name)
+	public MerchantIdentityImpl(final UUID id, final String name)
 	{
 		this.id = id;
 		this.name = name;
@@ -24,17 +26,19 @@ public class MerchantIdentityImpl implements MerchantIdentity
 	public MerchantIdentityImpl()
 	{}
 
-	public String getId()
+	@Override
+	public UUID getId()
 	{
 		return id;
 	}
 
+	@Override
 	public String getName()
 	{
 		return name;
 	}
 
-	void setId(String id)
+	void setId(UUID id)
 	{
 		this.id = id;
 	}

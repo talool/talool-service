@@ -3,6 +3,7 @@ package com.talool.domain;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -47,8 +48,9 @@ public class CustomerImpl implements Customer
 	@Access(AccessType.FIELD)
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
+	@Type(type = "pg-uuid")
 	@Column(name = "customer_id", unique = true, nullable = false)
-	private String id;
+	private UUID id;
 
 	@Type(type = "sexType")
 	// @Column(name = "sex_t", columnDefinition = "sex_type")
@@ -86,7 +88,7 @@ public class CustomerImpl implements Customer
 	private CreatedUpdated createdUpdated;
 
 	@Override
-	public String getId()
+	public UUID getId()
 	{
 		return id;
 	}

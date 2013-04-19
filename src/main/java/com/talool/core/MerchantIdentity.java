@@ -1,6 +1,7 @@
 package com.talool.core;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * 
@@ -9,7 +10,7 @@ import java.io.Serializable;
  */
 public interface MerchantIdentity extends Serializable
 {
-	public String getId();
+	public UUID getId();
 
 	public String getName();
 }

@@ -10,7 +10,7 @@ import java.util.Set;
  * @author clintz
  * 
  */
-public interface Merchant extends IdentifiableS, Serializable, TimeAware
+public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 {
 	public String getName();
 

@@ -91,7 +91,7 @@ CREATE UNIQUE INDEX address_idx ON address (address1,address2,city,state_provinc
 CREATE TYPE sex_type AS ENUM ('M', 'F');
 
 CREATE TABLE customer (
-  	customer_id character (36) NOT NULL DEFAULT uuid_generate_v4()::character(36),
+  	customer_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     email character varying(128) NOT NULL,
     password character varying(32) NOT NULL,
     first_name character varying(64)  NULL,
@@ -125,7 +125,7 @@ CREATE TABLE deal_offer_auth (
 
 CREATE TABLE friend_request (
     friend_request_id bigint NOT NULL,
-    customer_id character (36) NOT NULL,
+    customer_id UUID NOT NULL,
     friend_facebook_id character varying(32),
     friend_email character varying(128),
     deal_id bigint,
@@ -152,8 +152,8 @@ CREATE INDEX friend_request_customer_idx ON friend_request (customer_id);
 
 CREATE TABLE relationship (
 	relationship_id bigint NOT NULL,
-    from_customer_id character (36) NOT NULL,
-    to_customer_id character (36) NOT NULL,
+    from_customer_id UUID NOT NULL,
+    to_customer_id UUID NOT NULL,
     status relationship_status NOT NULL,
     create_dt timestamp NOT NULL DEFAULT NOW(),
     update_dt timestamp NOT NULL DEFAULT NOW(),
@@ -273,8 +273,8 @@ CREATE INDEX merchant_location_latitude_idx ON merchant_location (latitude);
 CREATE INDEX merchant_location_longitude_idx ON merchant_location (longitude);
 
 CREATE TABLE merchant (
-	merchant_id character (36) NOT NULL DEFAULT uuid_generate_v4()::character(36),
-    merchant_parent_id character (36),
+	merchant_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    merchant_parent_id UUID,
     primary_location_id bigint NOT NULL,
     merchant_name character varying(64) NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
@@ -299,7 +299,7 @@ CREATE TABLE property_type (
 
 CREATE TABLE merchant_property (
 	merchant_property_id bigint NOT NULL,
-	merchant_id character (36) NOT NULL,
+	merchant_id UUID NOT NULL,
     property_type_id smallint NOT NULL,
     property_value character varying(128),
     PRIMARY KEY(merchant_property_id)
@@ -309,8 +309,8 @@ CREATE TYPE request_status AS ENUM ('PENDING', 'APPROVED');
 
 CREATE TABLE merchant_request (
    merchant_request_id bigint NOT NULL,  
-   request_by_merchant_id character (36) NOT NULL,
-   request_for_merchant_id character (36) NOT NULL,
+   request_by_merchant_id UUID NOT NULL,
+   request_for_merchant_id UUID NOT NULL,
    request_property_id smallint NOT NULL,
    status request_status NOT NULL, 
    request_by_account_id bigint,
@@ -330,7 +330,7 @@ CREATE SEQUENCE merchant_managed_location_merchant_managed_location_id_seq
     
 CREATE TABLE merchant_managed_location (
     merchant_managed_location_id bigint NOT NULL,
-    merchant_id character (36) NOT NULL,
+    merchant_id UUID NOT NULL,
     merchant_location_id bigint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY (merchant_managed_location_id)
@@ -345,7 +345,7 @@ ALTER TABLE ONLY merchant_managed_location ADD CONSTRAINT "FK_MerchantManagedLoc
 
 CREATE TABLE merchant_account (
  	merchant_account_id bigint NOT NULL,
- 	merchant_id character (36) NOT NULL,
+ 	merchant_id UUID NOT NULL,
     email character varying(128) NOT NULL,
     password character varying(32) NOT NULL,
     role_title character varying(64) NOT NULL,
@@ -373,8 +373,8 @@ CREATE UNIQUE INDEX merchant_account_email_idx ON merchant_account (email);
 CREATE TYPE deal_type AS ENUM ('PAID_BOOK','FREE_BOOK','PAID_DEAL','FREE_DEAL');
 
 CREATE TABLE deal_offer (
-    deal_offer_id character (36) NOT NULL DEFAULT uuid_generate_v4()::character(36),
-    merchant_id character (36) NOT NULL,
+    deal_offer_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
     updated_by_merchant_account_id bigint NOT NULL,
     deal_type deal_type NOT NULL,
@@ -401,9 +401,9 @@ CREATE INDEX deal_offer_updated_by_merchant_account_id_idx ON deal_offer (update
 CREATE INDEX deal_offer_merchant_id_idx ON deal_offer (merchant_id);
 
 CREATE TABLE deal_offer_purchase (
-	deal_offer_purchase_id character (36) NOT NULL DEFAULT uuid_generate_v4()::character(36),
-    deal_offer_id character (36) NOT NULL,
-    customer_id character (36) NOT NULL,
+	deal_offer_purchase_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    deal_offer_id UUID NOT NULL,
+    customer_id UUID NOT NULL,
     latitude double precision,
     longitude double precision,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
@@ -421,8 +421,8 @@ CREATE INDEX deal_offer_purchase_longitude_idx ON deal_offer_purchase (longitude
 
 CREATE TABLE deal (
     deal_id bigint NOT NULL,   
-    deal_offer_id character (36) NOT NULL,
-    merchant_id character (36) NOT NULL,
+    deal_offer_id UUID NOT NULL,
+    merchant_id UUID NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
     updated_by_merchant_account_id bigint NOT NULL,
     deal_illndex int,
@@ -473,7 +473,7 @@ CREATE INDEX deal_tag_deal_id_idx ON deal_tag (deal_id);
 CREATE INDEX deal_tag_tag_id_idx ON deal_tag (tag_id);
     
 CREATE TABLE merchant_tag (
-    merchant_id character (36) NOT NULL,
+    merchant_id UUID NOT NULL,
     tag_id smallint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY(merchant_id,tag_id)
@@ -511,9 +511,9 @@ CREATE TABLE deal_acquire (
     deal_acquire_id bigint NOT NULL,   
     deal_id bigint NOT NULL,
     acquire_status_id smallint NOT NULL, 
-    customer_id character (36) NOT NULL,
-    shared_by_merchant_id character (36),
-    shared_by_customer_id character (36),
+    customer_id UUID NOT NULL,
+    shared_by_merchant_id UUID,
+    shared_by_customer_id UUID,
     share_cnt int NOT NULL DEFAULT 0,
     latitude double precision,
     longitude double precision,
@@ -549,9 +549,9 @@ CREATE TABLE deal_acquire_history (
     deal_acquire_history_id bigint NOT NULL,  
     deal_acquire_id bigint NOT NULL,
     acquire_status_id smallint NOT NULL, 
-    customer_id character varying(36) NOT NULL,
-    shared_by_merchant_id character (36),
-    shared_by_customer_id character (36),
+    customer_id UUID NOT NULL,
+    shared_by_merchant_id UUID,
+    shared_by_customer_id UUID,
     share_cnt int NOT NULL DEFAULT 0,
     update_dt timestamp without time zone NOT NULL,
     PRIMARY KEY(deal_acquire_history_id)

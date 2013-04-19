@@ -3,6 +3,7 @@ package com.talool.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
@@ -27,6 +28,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.FactoryManager;
 import com.talool.core.IdentifiableS;
+import com.talool.core.IdentifiableUUID;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
@@ -122,7 +124,7 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public Customer getCustomerById(final String id) throws ServiceException
+	public Customer getCustomerById(final UUID id) throws ServiceException
 	{
 		Customer customer;
 		try
@@ -177,7 +179,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void deleteCustomer(final String id) throws ServiceException
+	public void deleteCustomer(final UUID id) throws ServiceException
 	{
 		removeElement(id, CustomerImpl.class);
 	}
@@ -203,7 +205,7 @@ public class TaloolServiceImpl implements TaloolService
 
 			search.addField("id");
 			search.addFilterEqual("email", email);
-			final String id = (String) daoDispatcher.searchUnique(search);
+			final UUID id = (UUID) daoDispatcher.searchUnique(search);
 			return id == null ? false : true;
 		}
 		catch (Exception ex)
@@ -247,6 +249,33 @@ public class TaloolServiceImpl implements TaloolService
 
 	}
 
+	private void createAccount(final AccountType accountType, final IdentifiableUUID account,
+			final String password) throws ServiceException
+	{
+		try
+		{
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug("Creating accountType:" + accountType + ": " + account.toString());
+			}
+
+			final String md5pass = EncryptService.MD5(password);
+
+			((CustomerImpl) (account)).setPassword(md5pass);
+			save((CustomerImpl) account);
+			daoDispatcher.flush(CustomerImpl.class);
+			daoDispatcher.refresh((CustomerImpl) account);
+
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem registering  " + account;
+			LOG.error(err, e);
+			throw new ServiceException(err, e);
+		}
+
+	}
+
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteMerchant(final String id) throws ServiceException
@@ -272,7 +301,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public Merchant getMerchantById(final String id) throws ServiceException
+	public Merchant getMerchantById(final UUID id) throws ServiceException
 	{
 		Merchant merchant;
 		try
@@ -307,6 +336,26 @@ public class TaloolServiceImpl implements TaloolService
 		return merchants;
 	}
 
+	private void removeElement(final UUID id, Class clazz) throws ServiceException
+	{
+		boolean deleted = false;
+		try
+		{
+			deleted = daoDispatcher.removeById(clazz, id);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem removing ID '%d' for domain %s", id,
+					clazz.getSimpleName()), ex);
+		}
+
+		if (!deleted)
+		{
+			throw new ServiceException((String.format("Element ID '%d' not found for domain %s", id,
+					clazz.getSimpleName())));
+		}
+	}
+
 	private void removeElement(final String id, Class clazz) throws ServiceException
 	{
 		boolean deleted = false;
@@ -329,7 +378,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getMerchantDeals(final Long merchantId, final Boolean isActive)
+	public List<Deal> getMerchantDeals(final UUID merchantId, final Boolean isActive)
 			throws ServiceException
 	{
 		List<Deal> merchantDeals = null;
@@ -393,7 +442,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getDealsByMerchantId(final Long merchantId) throws ServiceException
+	public List<Deal> getDealsByMerchantId(final UUID merchantId) throws ServiceException
 	{
 		try
 		{
@@ -409,7 +458,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getDealsByCustomerId(final Long accountId) throws ServiceException
+	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException
 	{
 		try
 		{
@@ -506,7 +555,7 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public MerchantAccount authenticateMerchantAccount(final String merchantId, final String email,
+	public MerchantAccount authenticateMerchantAccount(final UUID merchantId, final String email,
 			final String password) throws ServiceException
 	{
 		try
@@ -546,7 +595,7 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public DealOffer getDealOffer(final String dealOfferId) throws ServiceException
+	public DealOffer getDealOffer(final UUID dealOfferId) throws ServiceException
 	{
 		try
 		{
@@ -573,7 +622,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getDealsByDealOfferId(final String dealOfferId) throws ServiceException
+	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId) throws ServiceException
 	{
 		try
 		{
@@ -590,7 +639,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final String customerId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
 			throws ServiceException
 	{
 		try
@@ -608,7 +657,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final String dealOfferId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId)
 			throws ServiceException
 	{
 		try
@@ -663,7 +712,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Set<Tag> getDealOfferTags(final String dealOfferId) throws ServiceException
+	public Set<Tag> getDealOfferTags(final UUID dealOfferId) throws ServiceException
 	{
 		Set<Tag> tags = null;
 
@@ -727,7 +776,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Customer> getFriends(final String id) throws ServiceException
+	public List<Customer> getFriends(final UUID id) throws ServiceException
 	{
 		try
 		{
@@ -747,7 +796,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOffer> getDealOffersByMerchantId(final String merchantId) throws ServiceException
+	public List<DealOffer> getDealOffersByMerchantId(final UUID merchantId) throws ServiceException
 	{
 		try
 		{
@@ -799,7 +848,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantAccount> getAccountsForMerchant(final String merchantId)
+	public List<MerchantAccount> getAccountsForMerchant(final UUID merchantId)
 			throws ServiceException
 	{
 		try
@@ -816,7 +865,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantManagedLocation> getLocationsForMerchant(String merchantId)
+	public List<MerchantManagedLocation> getLocationsForMerchant(UUID merchantId)
 			throws ServiceException
 	{
 		try
@@ -903,7 +952,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Relationship> getRelationshipsFrom(final String customerId) throws ServiceException
+	public List<Relationship> getRelationshipsFrom(final UUID customerId) throws ServiceException
 	{
 		try
 		{
@@ -919,7 +968,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Relationship> getRelationshipsTo(final String customerId) throws ServiceException
+	public List<Relationship> getRelationshipsTo(final UUID customerId) throws ServiceException
 	{
 		try
 		{
@@ -992,7 +1041,8 @@ public class TaloolServiceImpl implements TaloolService
 					.getCurrentSession()
 					.createSQLQuery(
 							"select m.merchant_id as id, m.merchant_name as name from merchant as m order by m.merchant_name asc")
-					.addScalar("id", StandardBasicTypes.STRING).addScalar("name", StandardBasicTypes.STRING)
+					.addScalar("id", StandardBasicTypes.UUID_CHAR)
+					.addScalar("name", StandardBasicTypes.STRING)
 					.setResultTransformer(Transformers.aliasToBean(MerchantIdentityImpl.class));
 
 			identies = query.list();
@@ -1008,8 +1058,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getAllRelatedDealsForMerchantId(final String merchantId)
-			throws ServiceException
+	public List<Deal> getAllRelatedDealsForMerchantId(final UUID merchantId) throws ServiceException
 	{
 		try
 		{
@@ -1028,7 +1077,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealAcquire> getDealAcquiresByCustomerId(final String customerId)
+	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId)
 			throws ServiceException
 	{
 		try
@@ -1046,7 +1095,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final String merchantId)
+	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final UUID merchantId)
 			throws ServiceException
 	{
 		try

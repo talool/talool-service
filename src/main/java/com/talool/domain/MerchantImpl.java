@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -26,6 +27,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +56,9 @@ public class MerchantImpl implements Merchant
 	@Access(AccessType.FIELD)
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
+	@Type(type = "pg-uuid")
 	@Column(name = "merchant_id", unique = true, nullable = false)
-	private String id;
+	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
 	@JoinColumn(name = "merchant_parent_id", columnDefinition = "character (36)")
@@ -79,12 +82,12 @@ public class MerchantImpl implements Merchant
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
-	public String getId()
+	public UUID getId()
 	{
 		return id;
 	}
 
-	public void setId(String id)
+	public void setId(UUID id)
 	{
 		this.id = id;
 	}

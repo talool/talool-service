@@ -1,6 +1,7 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -48,8 +49,9 @@ public class DealOfferImpl implements DealOffer
 	@Access(AccessType.FIELD)
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
+	@Type(type = "pg-uuid")
 	@Column(name = "deal_offer_id", unique = true, nullable = false)
-	private String id;
+	private UUID id;
 
 	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER, optional = false)
@@ -104,7 +106,7 @@ public class DealOfferImpl implements DealOffer
 	}
 
 	@Override
-	public String getId()
+	public UUID getId()
 	{
 		return id;
 	}

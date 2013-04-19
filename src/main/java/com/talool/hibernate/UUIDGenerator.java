@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -18,9 +19,15 @@ import org.hibernate.id.IdentifierGenerator;
  */
 public class UUIDGenerator implements IdentifierGenerator
 {
-	private static Logger log = Logger.getLogger(UUIDGenerator.class);
+	private static Logger LOG = Logger.getLogger(UUIDGenerator.class);
 
-	public Serializable generate(SessionImplementor session, Object object) throws HibernateException
+	public Serializable generate(final SessionImplementor session, final Object object)
+			throws HibernateException
+	{
+		return generateDBUUID(session, object);
+	}
+
+	private static Serializable generateDBUUID(SessionImplementor session, Object object)
 	{
 		final Connection connection = session.connection();
 		try
@@ -30,15 +37,19 @@ public class UUIDGenerator implements IdentifierGenerator
 			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			{
-				final String uuid = rs.getString("uuid");
-				log.debug("Generated UUID: " + uuid);
+				final UUID uuid = UUID.fromString(rs.getString("uuid"));
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug("Generated UUID: " + uuid);
+				}
+
 				return uuid;
 			}
 
 		}
 		catch (SQLException e)
 		{
-			log.error(e);
+			LOG.error(e);
 			throw new HibernateException("Unable to generate UUID");
 		}
 		return null;

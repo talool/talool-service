@@ -2,6 +2,7 @@ package com.talool.core.service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
@@ -36,18 +37,18 @@ public interface MerchantService
 	public MerchantAccount authenticateMerchantAccount(final String email, final String password)
 			throws ServiceException;
 
-	public MerchantAccount authenticateMerchantAccount(final String merchantId, final String email,
+	public MerchantAccount authenticateMerchantAccount(final UUID merchantId, final String email,
 			final String password) throws ServiceException;
 
 	public void deleteMerchant(final String id) throws ServiceException;
 
-	public Merchant getMerchantById(final String id) throws ServiceException;
+	public Merchant getMerchantById(final UUID id) throws ServiceException;
 
 	public List<Merchant> getMerchantByName(final String name) throws ServiceException;
 
 	public void save(final Merchant merchant) throws ServiceException;
 
-	public List<Deal> getMerchantDeals(final Long merchantId, final Boolean isActive)
+	public List<Deal> getMerchantDeals(final UUID merchantId, final Boolean isActive)
 			throws ServiceException;
 
 	/**
@@ -68,39 +69,39 @@ public interface MerchantService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public List<Deal> getDealsByMerchantId(final Long merchantId) throws ServiceException;
+	public List<Deal> getDealsByMerchantId(final UUID merchantId) throws ServiceException;
 
-	public List<Deal> getDealsByCustomerId(final Long accountId) throws ServiceException;
+	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;
 
 	// DealOffer stuff
 	public void save(final DealOffer dealOffer) throws ServiceException;
 
-	public DealOffer getDealOffer(final String dealOfferId) throws ServiceException;
+	public DealOffer getDealOffer(final UUID dealOfferId) throws ServiceException;
 
 	public List<DealOffer> getDealOffers() throws ServiceException;
 
-	public List<DealOffer> getDealOffersByMerchantId(final String merchantId) throws ServiceException;
+	public List<DealOffer> getDealOffersByMerchantId(final UUID merchantId) throws ServiceException;
 
 	public void save(final Deal deal) throws ServiceException;
 
 	public Deal getDeal(final Long dealId) throws ServiceException;
 
-	public List<Deal> getDealsByDealOfferId(final String dealOfferId) throws ServiceException;
+	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId) throws ServiceException;
 
-	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final String customerId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
 			throws ServiceException;
 
-	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final String dealOfferId)
+	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId)
 			throws ServiceException;
 
 	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException;
 
-	public Set<Tag> getDealOfferTags(final String dealOfferId) throws ServiceException;
+	public Set<Tag> getDealOfferTags(final UUID dealOfferId) throws ServiceException;
 
-	public List<MerchantAccount> getAccountsForMerchant(final String merchantId)
+	public List<MerchantAccount> getAccountsForMerchant(final UUID merchantId)
 			throws ServiceException;
 
-	public List<MerchantManagedLocation> getLocationsForMerchant(final String merchantId)
+	public List<MerchantManagedLocation> getLocationsForMerchant(final UUID merchantId)
 			throws ServiceException;
 
 	public MerchantManagedLocation getMerchantLocationById(final Long merchantManagedLocationId)
@@ -114,13 +115,12 @@ public interface MerchantService
 	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
 			throws ServiceException;
 
-	public List<DealAcquire> getDealAcquiresByCustomerId(final String customerId)
+	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId)
 			throws ServiceException;
 
-	public List<Deal> getAllRelatedDealsForMerchantId(final String merchantId)
-			throws ServiceException;
+	public List<Deal> getAllRelatedDealsForMerchantId(final UUID merchantId) throws ServiceException;
 
-	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final String merchantId)
+	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final UUID merchantId)
 			throws ServiceException;
 
 }

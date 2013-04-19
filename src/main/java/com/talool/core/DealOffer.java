@@ -9,7 +9,7 @@ import java.util.Date;
  * @author clintz
  * 
  */
-public interface DealOffer extends IdentifiableS, Serializable, TimeAware
+public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
 {
 	public MerchantAccount getCreatedByMerchantAccount();
 

@@ -1,5 +1,7 @@
 package com.talool.core;
 
+import java.util.UUID;
+
 /**
  * 
  * @author clintz
@@ -39,5 +41,5 @@ public interface DomainFactory
 	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer,
 			final RelationshipStatus status);
 
-	public MerchantIdentity newMerchantIdentity(final String id, final String name);
+	public MerchantIdentity newMerchantIdentity(final UUID id, final String name);
 }
