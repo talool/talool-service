@@ -84,7 +84,7 @@ public interface MerchantService
 
 	public void save(final Deal deal) throws ServiceException;
 
-	public Deal getDeal(final Long dealId) throws ServiceException;
+	public Deal getDeal(final UUID dealId) throws ServiceException;
 
 	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId) throws ServiceException;
 

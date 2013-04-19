@@ -11,7 +11,7 @@ import java.util.Set;
  * @author clintz
  * 
  */
-public interface Deal extends Identifiable, Serializable, TimeAware
+public interface Deal extends IdentifiableUUID, Serializable, TimeAware
 {
 	public DealOffer getDealOffer();
 

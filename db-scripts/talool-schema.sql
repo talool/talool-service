@@ -420,7 +420,7 @@ CREATE INDEX deal_offer_purchase_latitude_idx ON deal_offer_purchase (latitude);
 CREATE INDEX deal_offer_purchase_longitude_idx ON deal_offer_purchase (longitude);
 
 CREATE TABLE deal (
-    deal_id bigint NOT NULL,   
+    deal_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     deal_offer_id UUID NOT NULL,
     merchant_id UUID NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
@@ -440,16 +440,6 @@ CREATE TABLE deal (
 
 ALTER TABLE public.deal OWNER TO talool;
 
-CREATE SEQUENCE deal_deal_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-    
-ALTER TABLE public.deal_deal_id_seq OWNER TO talool;
-ALTER SEQUENCE deal_deal_id_seq OWNED BY deal.deal_id;
-ALTER TABLE ONLY deal ALTER COLUMN deal_id SET DEFAULT nextval('deal_deal_id_seq'::regclass);
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_DealOffer" FOREIGN KEY (deal_offer_id) REFERENCES deal_offer(deal_offer_id);
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_CreatedByMerchant" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
@@ -460,7 +450,7 @@ CREATE INDEX deal_updated_by_merchant_account_id_idx ON deal (updated_by_merchan
 CREATE INDEX deal_merchant_id_idx ON deal (merchant_id);
 
 CREATE TABLE deal_tag (
-    deal_id bigint NOT NULL,
+    deal_id UUID NOT NULL,
     tag_id smallint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY(deal_id,tag_id)
@@ -509,7 +499,7 @@ CREATE UNIQUE INDEX acquire_status_status_idx ON acquire_status (status);
 
 CREATE TABLE deal_acquire (
     deal_acquire_id bigint NOT NULL,   
-    deal_id bigint NOT NULL,
+    deal_id UUID NOT NULL,
     acquire_status_id smallint NOT NULL, 
     customer_id UUID NOT NULL,
     shared_by_merchant_id UUID,

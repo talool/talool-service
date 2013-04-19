@@ -608,7 +608,7 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public Deal getDeal(final Long dealId) throws ServiceException
+	public Deal getDeal(final UUID dealId) throws ServiceException
 	{
 		try
 		{
