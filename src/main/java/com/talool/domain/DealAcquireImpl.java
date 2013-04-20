@@ -37,6 +37,7 @@ import com.talool.core.Merchant;
  */
 @Entity
 @Table(name = "deal_acquire", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DealAcquireImpl implements DealAcquire
 {
 	private static final long serialVersionUID = -4850285379175281009L;
@@ -111,7 +112,6 @@ public class DealAcquireImpl implements DealAcquire
 		return deal;
 	}
 
-	@Override
 	public void setDeal(Deal deal)
 	{
 		this.deal = deal;
@@ -123,7 +123,6 @@ public class DealAcquireImpl implements DealAcquire
 		return status;
 	}
 
-	@Override
 	public void setAcquireStatus(AcquireStatus acquireStatus)
 	{
 		this.status = acquireStatus;
@@ -147,7 +146,6 @@ public class DealAcquireImpl implements DealAcquire
 		return sharedByMerchant;
 	}
 
-	@Override
 	public void setSharedByMerchant(Merchant merchant)
 	{
 		this.setSharedByMerchant(merchant);
@@ -160,7 +158,6 @@ public class DealAcquireImpl implements DealAcquire
 		return sharedByCustomer;
 	}
 
-	@Override
 	public void setSharedByCusomer(Customer customer)
 	{
 		this.sharedByCustomer = customer;
@@ -173,11 +170,9 @@ public class DealAcquireImpl implements DealAcquire
 		return shareCount;
 	}
 
-	@Override
 	public void setShareCount(Integer shareCount)
 	{
 		this.shareCount = shareCount;
-
 	}
 
 	@Override
@@ -186,7 +181,6 @@ public class DealAcquireImpl implements DealAcquire
 		return location;
 	}
 
-	@Override
 	public void setLocation(Location location)
 	{
 		this.location = location;
@@ -237,6 +231,13 @@ public class DealAcquireImpl implements DealAcquire
 	public String toString()
 	{
 		return ReflectionToStringBuilder.toString(this);
+	}
+
+	@Override
+	public Integer incrementShareCount()
+	{
+		shareCount += 1;
+		return shareCount;
 	}
 
 }

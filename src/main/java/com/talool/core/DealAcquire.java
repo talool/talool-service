@@ -12,11 +12,7 @@ public interface DealAcquire extends IdentifiableUUID, Serializable, TimeAware
 {
 	public Deal getDeal();
 
-	public void setDeal(Deal deal);
-
 	public AcquireStatus getAcquireStatus();
-
-	public void setAcquireStatus(AcquireStatus acquireStatus);
 
 	public Customer getCustomer();
 
@@ -24,19 +20,13 @@ public interface DealAcquire extends IdentifiableUUID, Serializable, TimeAware
 
 	public Merchant getSharedByMerchant();
 
-	public void setSharedByMerchant(Merchant merchant);
-
 	public Customer getSharedByCustomer();
-
-	public void setSharedByCusomer(Customer customer);
 
 	public Integer getShareCount();
 
-	public void setShareCount(Integer shareCount);
+	public Integer incrementShareCount();
 
 	public Location getLocation();
-
-	public void setLocation(Location location);
 
 	public Date getRedemptionDate();
 

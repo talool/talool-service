@@ -561,6 +561,7 @@ CREATE TRIGGER update_customer_update_dt BEFORE UPDATE ON customer FOR EACH ROW 
 CREATE TRIGGER update_address_update_dt BEFORE UPDATE ON address FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_update_update_dt BEFORE UPDATE ON deal FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_offer_update_dt BEFORE UPDATE ON deal_offer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+CREATE TRIGGER deal_acquire_update_dt BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 
 CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();

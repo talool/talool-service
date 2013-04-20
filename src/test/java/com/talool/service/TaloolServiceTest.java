@@ -79,7 +79,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	}
 
 	public void testDealAcquires(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer)
-			throws ServiceException
+			throws Exception
 	{
 
 		List<DealAcquire> dealAcquires = taloolService.getDealAcquiresByCustomerId(dealOfferPurchase
@@ -93,6 +93,82 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		{
 			Assert.assertEquals(dealOffer.getId(), dealAcquire.getDeal().getDealOffer().getId());
 		}
+
+		// // update will trigger deal_acquire_history rows
+		// // evicting objects from session is needed because we are still under the
+		// // same Hibernate Session - if we dont daq will be the same object after
+		// // every get!
+		// List<DealAcquire> historyOfAcquires = new ArrayList<DealAcquire>();
+		//
+		// DealAcquire daq = dealAcquires.get(0);
+		//
+		// Customer originalCustomer = daq.getCustomer();
+		// Customer customerFriend = testCreateCustomer();
+		//
+		// // update #1 give to deal friend
+		// historyOfAcquires.add(daq);
+		// taloolService.evict(daq);
+		// daq = taloolService.getDealAcquire(daq.getId());
+		// taloolService.giveDeal(daq, customerFriend);
+		//
+		// // update #2 friend gives it back after accepting
+		// historyOfAcquires.add(daq);
+		// taloolService.evict(daq);
+		// daq = taloolService.getDealAcquire(daq.getId());
+		// taloolService.acceptDeal(daq);
+		//
+		// taloolService.evict(daq);
+		// daq = taloolService.getDealAcquire(daq.getId());
+		//
+		// List<DealAcquire> myAcquires = taloolService
+		// .getDealAcquiresByCustomerId(customerFriend.getId());
+		//
+		// Assert.assertEquals(1, myAcquires.size());
+		//
+		// Assert.assertEquals(new Integer(1), myAcquires.get(0).getShareCount());
+		//
+		// // test the history
+		//
+		// List<DealAcquireHistory> history =
+		// taloolService.getDealAcquireHistory(daq.getId());
+		// Assert.assertEquals(historyOfAcquires.size(), history.size());
+		//
+		// for (DealAcquire da : historyOfAcquires)
+		// {
+		// System.out.println(da.getUpdated());
+		// }
+		//
+		// System.out.println("----");
+		// for (DealAcquireHistory da : history)
+		// {
+		// System.out.println(da.getUpdated());
+		// }
+		//
+		// for (int i = 0; i < historyOfAcquires.size(); i++)
+		// {
+		//
+		// Assert.assertEquals(history.get(i).getUpdated(),
+		// historyOfAcquires.get(i).getUpdated());
+		//
+		// Assert.assertEquals(history.get(i).getCustomer(),
+		// historyOfAcquires.get(i).getCustomer());
+		//
+		// Assert.assertEquals(history.get(i).getShareCount(),
+		// historyOfAcquires.get(i).getShareCount());
+		//
+		// Assert.assertEquals(history.get(i).getSharedByCustomer(),
+		// historyOfAcquires.get(i)
+		// .getSharedByCustomer());
+		//
+		// Assert.assertEquals(history.get(i).getSharedByMerchant(),
+		// historyOfAcquires.get(i)
+		// .getSharedByMerchant());
+		//
+		// Assert.assertEquals(history.get(i).getAcquireStatus(),
+		// historyOfAcquires.get(i)
+		// .getAcquireStatus());
+		//
+		// }
 
 	}
 

@@ -15,6 +15,8 @@ INSERT INTO social_network(name, website, api_url)
     VALUES ( 'Pinterest', 'http://www.pinterest.com', 'https://api.pinterest.com');
 
 INSERT INTO acquire_status(status) VALUES ('PURCHASED');
+INSERT INTO acquire_status(status) VALUES ('REDEEMED');
+INSERT INTO acquire_status(status) VALUES ('REJECTED_CUSTOMER_SHARE');
 INSERT INTO acquire_status(status) VALUES ('ACCEPTED_MERCHANT_SHARE');
 INSERT INTO acquire_status(status) VALUES ('ACCEPTED_CUSTOMER_SHARE');
 INSERT INTO acquire_status(status) VALUES ('PENDING_ACCEPT_MERCHANT_SHARE');

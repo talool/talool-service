@@ -19,12 +19,16 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
+import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.Sort;
 import com.talool.core.AccountType;
+import com.talool.core.AcquireStatus;
+import com.talool.core.AcquireStatusType;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
+import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.FactoryManager;
@@ -39,7 +43,9 @@ import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
+import com.talool.domain.AcquireStatusImpl;
 import com.talool.domain.CustomerImpl;
+import com.talool.domain.DealAcquireHistoryImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealImpl;
 import com.talool.domain.DealOfferImpl;
@@ -1112,5 +1118,190 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(String.format("Problem getAllRelatedDealsOffersForMerchantId %s",
 					merchantId), ex);
 		}
+	}
+
+	@Override
+	public AcquireStatus getAcquireStatus(final AcquireStatusType type) throws ServiceException
+	{
+		// TODO Replace with a cache or 2nd level query cache
+		try
+		{
+			final Search search = new Search(AcquireStatusImpl.class);
+			search.addFilter(Filter.equal("status", type.toString()));
+
+			return (AcquireStatus) daoDispatcher.searchUnique(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getAcquireStatus %s", type), ex);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
+			throws ServiceException
+	{
+		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
+
+		if (dealAcq.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
+		{
+			throw new ServiceException("Cannot give an already redeemed deal " + dealAcquire);
+		}
+
+		try
+		{
+			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
+					.getAcquireStatus(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE));
+
+			dealAcq.setSharedByCusomer(dealAcquire.getCustomer());
+			dealAcq.setCustomer(toCustomer);
+			dealAcq.incrementShareCount();
+			daoDispatcher.save(dealAcq);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem giveDealToCustomer %s %s", dealAcquire,
+					toCustomer), ex);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void acceptDeal(final DealAcquire dealAcquire) throws ServiceException
+	{
+		// TODO apply state change logic. only accept deals in valid states to be
+		// accepted
+
+		if (dealAcquire.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
+		{
+			throw new ServiceException("Cannot acceptDeal an already redeemed deal " + dealAcquire);
+		}
+		try
+		{
+			final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
+
+			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
+					.getAcquireStatus(AcquireStatusType.ACCEPTED_CUSTOMER_SHARE));
+
+			daoDispatcher.save(dealAcq);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem acceptDeal %s %s", dealAcquire), ex);
+		}
+
+	}
+
+	@Override
+	/**
+	 * Current only supports rejecting deals given by customers (not merchants)
+	 */
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void rejectDeal(final DealAcquire dealAcquire) throws ServiceException
+	{
+		// TODO apply state change logic. only reject deals in valid states to be
+		// accepted
+
+		if (dealAcquire.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
+		{
+			throw new ServiceException("Cannot rejectDeal an already redeemed deal " + dealAcquire);
+		}
+
+		try
+		{
+			final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
+
+			// give it back to the original share
+			final Customer rejectedBy = dealAcquire.getCustomer();
+			dealAcq.setCustomer(dealAcquire.getSharedByCustomer());
+			dealAcq.setSharedByCusomer(rejectedBy);
+
+			daoDispatcher.save(dealAcquire);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem acceptDeal %s %s", dealAcquire), ex);
+		}
+
+	}
+
+	@Override
+	public void redeemDeal(final DealAcquire dealAcquire) throws ServiceException
+	{
+		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
+
+		if (dealAcq.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
+		{
+			throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquire);
+		}
+
+		try
+		{
+			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
+					.getAcquireStatus(AcquireStatusType.REDEEMED));
+
+			daoDispatcher.save(dealAcq);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem redeemDeal %s", ex);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId)
+			throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(DealAcquireHistoryImpl.class);
+			search.addFilter(Filter.equal("primaryKey.dealAcquire.id", dealAcquireId));
+
+			search.addSort(Sort.asc("primaryKey.updated"));
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealAcquireHistory %s", dealAcquireId),
+					ex);
+		}
+	}
+
+	@Override
+	public DealAcquire getDealAcquire(final UUID dealAcquireId) throws ServiceException
+	{
+		try
+		{
+			return daoDispatcher.find(DealAcquireImpl.class, dealAcquireId);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealAcquire %s", dealAcquireId), ex);
+		}
+
+	}
+
+	@Override
+	public void evict(Object obj) throws ServiceException
+	{
+		try
+		{
+			getSessionFactory().getCurrentSession().evict(obj);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem evicting %s", obj), ex);
+		}
+
 	}
 }

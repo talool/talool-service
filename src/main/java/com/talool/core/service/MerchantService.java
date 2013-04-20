@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.talool.core.AcquireStatus;
+import com.talool.core.AcquireStatusType;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
@@ -118,9 +120,13 @@ public interface MerchantService
 	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId)
 			throws ServiceException;
 
+	public DealAcquire getDealAcquire(final UUID dealAcquireId) throws ServiceException;
+
 	public List<Deal> getAllRelatedDealsForMerchantId(final UUID merchantId) throws ServiceException;
 
 	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final UUID merchantId)
 			throws ServiceException;
+
+	public AcquireStatus getAcquireStatus(final AcquireStatusType type) throws ServiceException;
 
 }
