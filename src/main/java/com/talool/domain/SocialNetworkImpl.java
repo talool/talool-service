@@ -7,8 +7,6 @@
  */
 package com.talool.domain;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,7 +32,6 @@ public class SocialNetworkImpl implements SocialNetwork
 	private static final long serialVersionUID = 3927081856250957166L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_social_network_seq")
 	@SequenceGenerator(name = "my_social_network_seq", sequenceName = "social_network_id_seq")
 	@Column(name = "social_network_id", unique = true, nullable = false)

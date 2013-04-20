@@ -2,8 +2,6 @@ package com.talool.domain;
 
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,18 +33,15 @@ public class FriendRequestImpl implements FriendRequest
 	private static final long serialVersionUID = -804410556508727956L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_friendr_seq")
 	@SequenceGenerator(name = "my_friendr_seq", sequenceName = "friend_request_friend_request_id_seq")
 	@Column(name = "friend_request_id", unique = true, nullable = false)
 	private Long id;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(targetEntity = DealImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;

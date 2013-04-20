@@ -3,8 +3,6 @@ package com.talool.domain;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -41,7 +39,6 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	{
 		private static final long serialVersionUID = -9082450751406248126L;
 
-		@Access(AccessType.FIELD)
 		@OneToOne(targetEntity = DealAcquireImpl.class, fetch = FetchType.LAZY)
 		@JoinColumn(name = "deal_acquire_id")
 		protected DealAcquire dealAcquire;
@@ -54,22 +51,18 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	@EmbeddedId
 	private final DealAcquireHistoryPK primaryKey;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AcquireStatusImpl.class)
 	@JoinColumn(name = "acquire_status_id")
 	private AcquireStatus status;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
 	@JoinColumn(name = "shared_by_merchant_id")
 	private Merchant sharedByMerchant;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "shared_by_customer_id")
 	private Customer sharedByCustomer;

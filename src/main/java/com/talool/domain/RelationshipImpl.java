@@ -2,8 +2,6 @@ package com.talool.domain;
 
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -41,18 +39,15 @@ public class RelationshipImpl implements Relationship
 	private static final long serialVersionUID = -8998925353726298712L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_rel_seq")
 	@SequenceGenerator(name = "my_rel_seq", sequenceName = "relationship_relationship_id_seq")
 	@Column(name = "relationship_id", unique = true, nullable = false)
 	private Long id;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "from_customer_id")
 	private Customer fromCustomer;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "to_customer_id")
 	private Customer toCustomer;

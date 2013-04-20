@@ -2,8 +2,6 @@ package com.talool.domain;
 
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -39,7 +37,6 @@ public class MerchantLocationImpl implements MerchantLocation
 	private static final long serialVersionUID = 3716227130006204917L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_loc_seq")
 	@SequenceGenerator(name = "my_loc_seq", sequenceName = "merchant_location_merchant_location_id_seq")
 	@Column(name = "merchant_location_id", unique = true, nullable = false)

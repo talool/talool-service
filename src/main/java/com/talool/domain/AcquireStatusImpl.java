@@ -2,8 +2,6 @@ package com.talool.domain;
 
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,7 +28,6 @@ public class AcquireStatusImpl implements AcquireStatus
 {
 	private static final long serialVersionUID = 3720511015708695704L;
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_aq_seq")
 	@SequenceGenerator(name = "my_aq_seq", sequenceName = "acquire_status_acquire_status_id_seq")
 	@Column(name = "acquire_status_id", unique = true, nullable = false)

@@ -3,8 +3,6 @@ package com.talool.domain;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -43,34 +41,28 @@ public class DealAcquireImpl implements DealAcquire
 	private static final long serialVersionUID = -4850285379175281009L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
 	@Type(type = "pg-uuid")
 	@Column(name = "deal_acquire_id", unique = true, nullable = false)
 	private UUID id;
 
-	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = DealImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AcquireStatusImpl.class)
 	@JoinColumn(name = "acquire_status_id")
 	private AcquireStatus status;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
 	@JoinColumn(name = "shared_by_merchant_id")
 	private Merchant sharedByMerchant;
 
-	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "shared_by_customer_id")
 	private Customer sharedByCustomer;

@@ -1,7 +1,5 @@
 package com.talool.domain;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +27,6 @@ public class TagImpl implements Tag
 	private static final long serialVersionUID = 2955686897079229757L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_tag_seq")
 	@SequenceGenerator(name = "my_tag_seq", sequenceName = "tag_tag_id_seq")
 	@Column(name = "tag_id", unique = true, nullable = false)

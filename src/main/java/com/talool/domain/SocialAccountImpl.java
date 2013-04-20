@@ -10,8 +10,6 @@ package com.talool.domain;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -94,7 +92,6 @@ public class SocialAccountImpl implements SocialAccount
 		private static final long serialVersionUID = 3294959164705341195L;
 
 		@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = SocialNetworkImpl.class)
-		@Access(AccessType.PROPERTY)
 		@JoinColumn(name = "social_network_id", nullable = false)
 		private SocialNetwork socialNetwork;
 

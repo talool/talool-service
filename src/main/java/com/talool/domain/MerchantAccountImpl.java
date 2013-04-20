@@ -2,8 +2,6 @@ package com.talool.domain;
 
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -39,13 +37,11 @@ public class MerchantAccountImpl implements MerchantAccount
 	private static final long serialVersionUID = -5479442982443424394L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_ma_seq")
 	@SequenceGenerator(name = "my_ma_seq", sequenceName = "merchant_account_merchant_account_id_seq")
 	@Column(name = "merchant_account_id", unique = true, nullable = false)
 	private Long id;
 
-	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;

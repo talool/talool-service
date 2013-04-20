@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -54,29 +52,24 @@ public class DealImpl implements Deal
 	private static final long serialVersionUID = -452436060657087167L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
 	@Type(type = "pg-uuid")
 	@Column(name = "deal_id", unique = true, nullable = false)
 	private UUID id;
 
-	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "updated_by_merchant_account_id")
 	private MerchantAccount updatedByMerchantAccount;
 
-	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "created_by_merchant_account_id")
 	private MerchantAccount createdByMerchantAccount;
 
-	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
-	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = DealOfferImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_offer_id")
 	private DealOffer dealOffer;

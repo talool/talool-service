@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -53,7 +51,6 @@ public class MerchantImpl implements Merchant
 	private static final long serialVersionUID = -4505114813841857043L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
 	@Type(type = "pg-uuid")

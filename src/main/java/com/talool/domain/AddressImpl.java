@@ -2,9 +2,8 @@ package com.talool.domain;
 
 import java.util.Date;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,43 +29,31 @@ public class AddressImpl implements Address
 	private static final long serialVersionUID = 958137187646742761L;
 
 	@Id
-	@Access(AccessType.FIELD)
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_address_seq")
 	@SequenceGenerator(name = "my_address_seq", sequenceName = "address_address_id_seq")
 	@Column(name = "address_id", unique = true, nullable = false)
 	private Long id;
 
-	@Access(AccessType.PROPERTY)
 	@Column(name = "address1", unique = false, nullable = true, length = 64)
 	private String address1;
 
-	@Access(AccessType.PROPERTY)
 	@Column(name = "address2", unique = false, nullable = true, length = 64)
 	private String address2;
 
-	@Access(AccessType.PROPERTY)
 	@Column(name = "city", unique = false, nullable = false, length = 64)
 	private String city;
 
-	@Access(AccessType.PROPERTY)
 	@Column(name = "state_province_county", unique = false, nullable = true, length = 64)
 	private String stateProvinceCounty;
 
-	@Access(AccessType.PROPERTY)
 	@Column(name = "zip", unique = false, nullable = true, length = 64)
 	private String zip;
 
-	@Access(AccessType.PROPERTY)
 	@Column(name = "country", unique = false, nullable = false, length = 4)
 	private String country;
 
-	@Access(AccessType.PROPERTY)
-	@Column(name = "create_dt", insertable = false, updatable = false)
-	private Date created;
-
-	@Access(AccessType.PROPERTY)
-	@Column(name = "update_dt", insertable = false, updatable = false)
-	private Date updated;
+	@Embedded
+	private CreatedUpdated createdUpdated;
 
 	@Override
 	public Long getId()
@@ -143,23 +130,13 @@ public class AddressImpl implements Address
 	@Override
 	public Date getUpdated()
 	{
-		return updated;
-	}
-
-	void setUpdated(final Date updated)
-	{
-		this.updated = updated;
-	}
-
-	void setCreated(final Date created)
-	{
-		this.created = updated;
+		return createdUpdated.getUpdated();
 	}
 
 	@Override
 	public Date getCreated()
 	{
-		return created;
+		return createdUpdated.getUpdated();
 	}
 
 	@Override

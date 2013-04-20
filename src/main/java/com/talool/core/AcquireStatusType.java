@@ -1,0 +1,11 @@
+package com.talool.core;
+
+/**
+ * 
+ * @author clintz
+ * 
+ */
+public enum AcquireStatusType
+{
+	PURCHASED, REDEEMED, REJECTED, ACCEPTED_MERCHANT_SHARE, ACCEPTED_CUSTOMER_SHARE, PENDING_ACCEPT_MERCHANT_SHARE, PENDING_ACCEPT_CUSTOMER_SHARE;
+}
