@@ -1,24 +1,23 @@
 package com.talool.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Immutable;
 
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
@@ -33,21 +32,27 @@ import com.talool.core.Merchant;
  */
 @Entity
 @Table(name = "deal_acquire_history", catalog = "public")
+@Immutable
 public class DealAcquireHistoryImpl implements DealAcquireHistory
 {
 	private static final long serialVersionUID = 7508266282237562791L;
 
-	@Id
-	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_dealaq_h_seq")
-	@SequenceGenerator(name = "my_dealaq_h_seq", sequenceName = "deal_acquire_history_deal_acquire_history_id_seq")
-	@Column(name = "deal_acquire_history_id", unique = true, nullable = false)
-	private Long id;
+	public static class DealAcquireHistoryPK implements Serializable
+	{
+		private static final long serialVersionUID = -9082450751406248126L;
 
-	@Access(AccessType.FIELD)
-	@OneToOne(targetEntity = DealAcquireImpl.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "deal_acquire_id")
-	private DealAcquire dealAcquire;
+		@Access(AccessType.FIELD)
+		@OneToOne(targetEntity = DealAcquireImpl.class, fetch = FetchType.LAZY)
+		@JoinColumn(name = "deal_acquire_id")
+		protected DealAcquire dealAcquire;
+
+		@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
+		protected Date updated;
+
+	}
+
+	@EmbeddedId
+	private final DealAcquireHistoryPK primaryKey;
 
 	@Access(AccessType.FIELD)
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AcquireStatusImpl.class)
@@ -72,19 +77,15 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	@Column(name = "share_cnt", unique = false, nullable = true)
 	private Integer shareCount;
 
-	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
-	private Date updated;
-
-	@Override
-	public Long getId()
+	public DealAcquireHistoryImpl()
 	{
-		return id;
+		this.primaryKey = new DealAcquireHistoryPK();
 	}
 
 	@Override
 	public Date getUpdated()
 	{
-		return updated;
+		return primaryKey.updated;
 	}
 
 	@Override
@@ -144,7 +145,7 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 
 		final DealAcquireHistoryImpl other = (DealAcquireHistoryImpl) obj;
 
-		if (getId() != other.getId())
+		if (getDealAcquire() != other.getDealAcquire())
 		{
 			return false;
 		}
@@ -168,7 +169,7 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	@Override
 	public DealAcquire getDealAcquire()
 	{
-		return dealAcquire;
+		return primaryKey.dealAcquire;
 	}
 
 }

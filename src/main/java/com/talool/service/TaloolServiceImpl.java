@@ -9,6 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -724,7 +725,7 @@ public class TaloolServiceImpl implements TaloolService
 							"select distinct t.* from tag as t, deal_tag as dt,deal_offer as dof, deal as d where t.tag_id=dt.tag_id and dof.deal_offer_id=d.deal_offer_id and d.deal_offer_id=:dealOfferId and d.deal_id=dt.deal_id")
 					.addEntity(TagImpl.class);
 
-			query.setParameter("dealOfferId", dealOfferId);
+			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
 
 			final List<Tag> tagList = (query.list());
 

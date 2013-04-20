@@ -8,7 +8,7 @@ import java.util.Date;
  * @author clintz
  * 
  */
-public interface DealAcquireHistory extends Identifiable, Serializable
+public interface DealAcquireHistory extends Serializable
 {
 	public DealAcquire getDealAcquire();
 

@@ -8,7 +8,7 @@ import java.util.Date;
  * @author clintz
  * 
  */
-public interface DealAcquire extends Identifiable, Serializable, TimeAware
+public interface DealAcquire extends IdentifiableUUID, Serializable, TimeAware
 {
 	public Deal getDeal();
 

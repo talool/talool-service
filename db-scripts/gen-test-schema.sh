@@ -20,7 +20,9 @@ echo "Dropping Database '$testDbName' ..."
 dropdb -U postgres -w $testDbName
 
 echo "Creating $testSchema from $taloolSchema..."
-sed -e "s/CREATE DATABASE talool/CREATE DATABASE talool-test/g;s/ALTER DATABASE talool/ALTER DATABASE talool-test/g;s/connect talool/connect $testDbName/" talool-schema.sql > $testSchema 
+sedStmt="s/CREATE DATABASE talool/CREATE DATABASE $testDbName/g;s/ALTER DATABASE talool/ALTER DATABASE $testDbName/g;s/connect talool/connect $testDbName/"
+
+sed -e "$sedStmt" talool-schema.sql > $testSchema 
 
 echo "Creating Database '$testDbName' ..."
 createdb -U postgres -w $testDbName

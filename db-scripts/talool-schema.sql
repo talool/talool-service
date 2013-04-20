@@ -54,6 +54,18 @@ BEGIN
 END;
 $$;
 
+CREATE FUNCTION deal_acquire_update() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO deal_acquire_history(deal_acquire_id,acquire_status_id,customer_id,
+     		    shared_by_merchant_id,shared_by_customer_id,share_cnt,update_dt) 
+       VALUES( OLD.deal_acquire_id,OLD.acquire_status_id,OLD.customer_id,
+               OLD.shared_by_merchant_id,OLD.shared_by_customer_id,OLD.share_cnt,OLD.update_dt);
+  return NEW;
+END;
+$$;
+    
 ALTER FUNCTION public.deal_offer_purchase() OWNER TO talool;
 
 SET default_tablespace = '';
@@ -498,7 +510,7 @@ CREATE UNIQUE INDEX acquire_status_status_idx ON acquire_status (status);
 
 
 CREATE TABLE deal_acquire (
-    deal_acquire_id bigint NOT NULL,   
+    deal_acquire_id UUID NOT NULL DEFAULT uuid_generate_v4(),   
     deal_id UUID NOT NULL,
     acquire_status_id smallint NOT NULL, 
     customer_id UUID NOT NULL,
@@ -515,16 +527,6 @@ CREATE TABLE deal_acquire (
 
 ALTER TABLE public.deal_acquire OWNER TO talool;
 
-CREATE SEQUENCE deal_acquire_deal_acquire_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-    
-ALTER TABLE public.deal_acquire_deal_acquire_id_seq OWNER TO talool;
-ALTER SEQUENCE deal_acquire_deal_acquire_id_seq OWNED BY deal_acquire.deal_acquire_id;
-ALTER TABLE ONLY deal_acquire ALTER COLUMN deal_acquire_id SET DEFAULT nextval('deal_acquire_deal_acquire_id_seq'::regclass);
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_DealDetail" FOREIGN KEY (deal_id) REFERENCES deal(deal_id);
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
@@ -536,29 +538,17 @@ CREATE INDEX deal_acquire_shared_by_customer_id_idx ON deal_acquire (shared_by_c
 CREATE INDEX deal_acquire_shared_by_merchant_id_idx ON deal_acquire (shared_by_merchant_id);
 
 CREATE TABLE deal_acquire_history (
-    deal_acquire_history_id bigint NOT NULL,  
-    deal_acquire_id bigint NOT NULL,
+    deal_acquire_id UUID NOT NULL,
     acquire_status_id smallint NOT NULL, 
     customer_id UUID NOT NULL,
     shared_by_merchant_id UUID,
     shared_by_customer_id UUID,
     share_cnt int NOT NULL DEFAULT 0,
     update_dt timestamp without time zone NOT NULL,
-    PRIMARY KEY(deal_acquire_history_id)
+    PRIMARY KEY(deal_acquire_id,update_dt)
 );
 
 ALTER TABLE public.deal_acquire_history OWNER TO talool;
-
-CREATE SEQUENCE deal_acquire_history_deal_acquire_history_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-    
-ALTER TABLE public.deal_acquire_history_deal_acquire_history_id_seq OWNER TO talool;
-ALTER SEQUENCE deal_acquire_history_deal_acquire_history_id_seq OWNED BY deal_acquire_history.deal_acquire_id;
-ALTER TABLE ONLY deal_acquire_history ALTER COLUMN deal_acquire_id SET DEFAULT nextval('deal_acquire_history_deal_acquire_history_id_seq'::regclass);
 
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Dealacquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
@@ -566,15 +556,15 @@ ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Shar
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_acquireStatus" FOREIGN KEY (acquire_status_id) REFERENCES acquire_status(acquire_status_id);
 
-
-
-
 CREATE TRIGGER update_merchant_update_dt BEFORE UPDATE ON merchant FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_customer_update_dt BEFORE UPDATE ON customer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_address_update_dt BEFORE UPDATE ON address FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+CREATE TRIGGER deal_update_update_dt BEFORE UPDATE ON deal FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+CREATE TRIGGER deal_offer_update_dt BEFORE UPDATE ON deal_offer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 
 CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();
+CREATE TRIGGER deal_acquire_update BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE deal_acquire_update();
 
 
 

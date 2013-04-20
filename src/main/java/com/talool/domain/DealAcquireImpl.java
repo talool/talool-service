@@ -1,6 +1,7 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -9,18 +10,18 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Target;
+import org.hibernate.annotations.Type;
 
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
@@ -42,10 +43,11 @@ public class DealAcquireImpl implements DealAcquire
 
 	@Id
 	@Access(AccessType.FIELD)
-	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_dealaq_seq")
-	@SequenceGenerator(name = "my_dealaq_seq", sequenceName = "deal_acquire_deal_acquire_id_seq")
+	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
+	@GeneratedValue(generator = "uuid_gen")
+	@Type(type = "pg-uuid")
 	@Column(name = "deal_acquire_id", unique = true, nullable = false)
-	private Long id;
+	private UUID id;
 
 	@Access(AccessType.FIELD)
 	@OneToOne(targetEntity = DealImpl.class, fetch = FetchType.LAZY)
@@ -86,7 +88,7 @@ public class DealAcquireImpl implements DealAcquire
 	private CreatedUpdated createdUpdated;
 
 	@Override
-	public Long getId()
+	public UUID getId()
 	{
 		return id;
 	}
