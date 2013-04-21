@@ -2,9 +2,11 @@ package com.talool.service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.Assert;
@@ -16,10 +18,12 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import com.talool.core.AccountType;
+import com.talool.core.AcquireStatus;
 import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
+import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.DealType;
@@ -48,6 +52,40 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceTest.class);
 
 	private DomainFactory domainFactory;
+
+	// I am using this because i dont want to clone components, i just want IDs
+	// to make it easier
+	protected class DealAcquireHistoryWrapper
+	{
+		protected UUID dealAcquireId;
+		protected AcquireStatus status;
+		protected UUID customerId;
+		protected UUID sharedbyMerchantId;
+		protected UUID sharedbyCustomerId;
+		protected Integer shareCount;
+		protected Date updated;
+
+		DealAcquireHistoryWrapper(DealAcquire dealAcquire)
+		{
+			this.dealAcquireId = dealAcquire.getId();;
+			this.status = dealAcquire.getAcquireStatus();
+			this.customerId = dealAcquire.getCustomer().getId();
+
+			if (dealAcquire.getSharedByMerchant() != null)
+			{
+				this.sharedbyMerchantId = dealAcquire.getSharedByMerchant().getId();
+			}
+
+			if (dealAcquire.getSharedByCustomer() != null)
+			{
+				this.sharedbyCustomerId = dealAcquire.getSharedByCustomer().getId();
+			}
+
+			this.shareCount = dealAcquire.getShareCount();
+			this.updated = dealAcquire.getUpdated();
+		}
+
+	}
 
 	@Before
 	public void setup()
@@ -94,81 +132,83 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			Assert.assertEquals(dealOffer.getId(), dealAcquire.getDeal().getDealOffer().getId());
 		}
 
-		// // update will trigger deal_acquire_history rows
-		// // evicting objects from session is needed because we are still under the
-		// // same Hibernate Session - if we dont daq will be the same object after
-		// // every get!
-		// List<DealAcquire> historyOfAcquires = new ArrayList<DealAcquire>();
-		//
-		// DealAcquire daq = dealAcquires.get(0);
-		//
-		// Customer originalCustomer = daq.getCustomer();
-		// Customer customerFriend = testCreateCustomer();
-		//
-		// // update #1 give to deal friend
-		// historyOfAcquires.add(daq);
-		// taloolService.evict(daq);
-		// daq = taloolService.getDealAcquire(daq.getId());
-		// taloolService.giveDeal(daq, customerFriend);
-		//
-		// // update #2 friend gives it back after accepting
-		// historyOfAcquires.add(daq);
-		// taloolService.evict(daq);
-		// daq = taloolService.getDealAcquire(daq.getId());
-		// taloolService.acceptDeal(daq);
-		//
-		// taloolService.evict(daq);
-		// daq = taloolService.getDealAcquire(daq.getId());
-		//
-		// List<DealAcquire> myAcquires = taloolService
-		// .getDealAcquiresByCustomerId(customerFriend.getId());
-		//
-		// Assert.assertEquals(1, myAcquires.size());
-		//
-		// Assert.assertEquals(new Integer(1), myAcquires.get(0).getShareCount());
-		//
-		// // test the history
-		//
-		// List<DealAcquireHistory> history =
-		// taloolService.getDealAcquireHistory(daq.getId());
-		// Assert.assertEquals(historyOfAcquires.size(), history.size());
-		//
-		// for (DealAcquire da : historyOfAcquires)
-		// {
-		// System.out.println(da.getUpdated());
-		// }
-		//
-		// System.out.println("----");
-		// for (DealAcquireHistory da : history)
-		// {
-		// System.out.println(da.getUpdated());
-		// }
-		//
-		// for (int i = 0; i < historyOfAcquires.size(); i++)
-		// {
-		//
-		// Assert.assertEquals(history.get(i).getUpdated(),
-		// historyOfAcquires.get(i).getUpdated());
-		//
-		// Assert.assertEquals(history.get(i).getCustomer(),
-		// historyOfAcquires.get(i).getCustomer());
-		//
-		// Assert.assertEquals(history.get(i).getShareCount(),
-		// historyOfAcquires.get(i).getShareCount());
-		//
-		// Assert.assertEquals(history.get(i).getSharedByCustomer(),
-		// historyOfAcquires.get(i)
-		// .getSharedByCustomer());
-		//
-		// Assert.assertEquals(history.get(i).getSharedByMerchant(),
-		// historyOfAcquires.get(i)
-		// .getSharedByMerchant());
-		//
-		// Assert.assertEquals(history.get(i).getAcquireStatus(),
-		// historyOfAcquires.get(i)
-		// .getAcquireStatus());
-		//
-		// }
+		// update will trigger deal_acquire_history rows
+		// evicting objects from session is needed because we are still under the
+		// same Hibernate Session - if we dont daq will be the same object after
+		// every get!
+		List<DealAcquireHistoryWrapper> historyOfAcquires = new ArrayList<DealAcquireHistoryWrapper>();
+
+		DealAcquire daq = dealAcquires.get(0);
+
+		Customer originalCustomer = daq.getCustomer();
+		Customer customerFriend = testCreateCustomer();
+
+		// update #1 give to deal friend
+		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
+		daq = taloolService.getDealAcquire(daq.getId());
+		taloolService.giveDeal(daq, customerFriend);
+		taloolService.refresh(daq);
+
+		// friend shouldnt have 1
+		List<DealAcquire> myAcquires = taloolService
+				.getDealAcquiresByCustomerId(customerFriend.getId());
+		Assert.assertEquals(1, myAcquires.size());
+
+		// original customer should have 1 less
+		myAcquires = taloolService.getDealAcquiresByCustomerId(originalCustomer.getId());
+		Assert.assertEquals(dealAcquires.size() - 1, myAcquires.size());
+
+		// update #2 friend accepts
+		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
+		daq = taloolService.getDealAcquire(daq.getId());
+		taloolService.acceptDeal(daq);
+		taloolService.refresh(daq);
+
+		// update #3 friend gives it back after accepting
+		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
+		daq = taloolService.getDealAcquire(daq.getId());
+		taloolService.giveDeal(daq, originalCustomer);
+		taloolService.refresh(daq);
+
+		Assert.assertEquals(new Integer(2), daq.getShareCount());
+
+		// test the history
+		List<DealAcquireHistory> history = taloolService.getDealAcquireHistory(daq.getId());
+
+		for (DealAcquireHistoryWrapper da : historyOfAcquires)
+		{
+			System.out.println(da.updated);
+		}
+
+		System.out.println("----");
+		for (DealAcquireHistory da : history)
+		{
+			System.out.println(da.getUpdated());
+		}
+
+		// test the persisted acquires with what should be
+		for (int i = 0; i < historyOfAcquires.size(); i++)
+		{
+			DealAcquireHistory realHistory = history.get(i);
+			DealAcquireHistoryWrapper expectedHistory = historyOfAcquires.get(i);
+
+			Assert.assertEquals(expectedHistory.updated, realHistory.getUpdated());
+
+			Assert.assertEquals(expectedHistory.customerId, realHistory.getCustomer().getId());
+
+			UUID sharedByCustId = realHistory.getSharedByCustomer() == null ? null : realHistory
+					.getSharedByCustomer().getId();
+
+			UUID sharedByMerchId = realHistory.getSharedByMerchant() == null ? null : realHistory
+					.getSharedByMerchant().getId();
+
+			Assert.assertEquals(expectedHistory.sharedbyCustomerId, sharedByCustId);
+
+			Assert.assertEquals(expectedHistory.sharedbyMerchantId, sharedByMerchId);
+
+			Assert.assertEquals(expectedHistory.sharedbyMerchantId, sharedByMerchId);
+
+		}
 
 	}
 
