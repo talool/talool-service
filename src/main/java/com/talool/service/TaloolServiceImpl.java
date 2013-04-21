@@ -39,6 +39,8 @@ import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantManagedLocation;
 import com.talool.core.Relationship;
+import com.talool.core.SearchOptions;
+import com.talool.core.SearchOptions.SortType;
 import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
@@ -68,6 +70,18 @@ import com.talool.domain.TagImpl;
 @Repository
 public class TaloolServiceImpl implements TaloolService
 {
+	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
+
+	private static final String GET_DEAL_ACQUIRES = "select dealAcquire from DealAcquireImpl dealAcquire, DealImpl d where d.merchant.id=:merchantId and dealAcquire.deal.id=d.id and dealAcquire.customer.id=:customerId";
+
+	private static final String GET_MERCHANT_ACQUIRES = "from MerchantImpl merchant, DealAcquireImpl da, DealImpl d where da.customer.id=:customerId and da.deal.id=d.merchant.id and d.merchant.id=m.id";
+
+	private DAODispatcher daoDispatcher;
+	private SessionFactory sessionFactory;
+
+	public TaloolServiceImpl()
+	{}
+
 	public SessionFactory getSessionFactory()
 	{
 		return sessionFactory;
@@ -77,14 +91,6 @@ public class TaloolServiceImpl implements TaloolService
 	{
 		this.sessionFactory = sessionFactory;
 	}
-
-	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
-
-	private DAODispatcher daoDispatcher;
-	private SessionFactory sessionFactory;
-
-	public TaloolServiceImpl()
-	{}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -343,7 +349,7 @@ public class TaloolServiceImpl implements TaloolService
 		return merchants;
 	}
 
-	private void removeElement(final UUID id, Class clazz) throws ServiceException
+	private void removeElement(final UUID id, Class<CustomerImpl> clazz) throws ServiceException
 	{
 		boolean deleted = false;
 		try
@@ -363,7 +369,7 @@ public class TaloolServiceImpl implements TaloolService
 		}
 	}
 
-	private void removeElement(final String id, Class clazz) throws ServiceException
+	private void removeElement(final String id, Class<MerchantImpl> clazz) throws ServiceException
 	{
 		boolean deleted = false;
 		try
@@ -479,7 +485,7 @@ public class TaloolServiceImpl implements TaloolService
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getDealsByCustomerId %d", accountId), ex);
+			throw new ServiceException(String.format("Problem getDealsByCustomerId %s", accountId), ex);
 		}
 
 	}
@@ -580,7 +586,7 @@ public class TaloolServiceImpl implements TaloolService
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem authenticateMerchantAccount %d %d",
+			throw new ServiceException(String.format("Problem authenticateMerchantAccount %s %s",
 					merchantId, email), ex);
 		}
 
@@ -797,7 +803,7 @@ public class TaloolServiceImpl implements TaloolService
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getFriends %d", id), ex);
+			throw new ServiceException(String.format("Problem getFriends %s", id), ex);
 		}
 	}
 
@@ -1303,5 +1309,104 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(String.format("Problem evicting %s", obj), ex);
 		}
 
+	}
+
+	static String getQueryWithOrder(final String firstLevelName, final String query,
+			final SearchOptions searchOpts)
+	{
+		if (searchOpts == null)
+		{
+			return query;
+		}
+
+		if (searchOpts.getSortProperty() == null)
+		{
+			return query;
+		}
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append(query);
+		sb.append(" order by ");
+
+		if (firstLevelName != null)
+		{
+			sb.append(firstLevelName).append(".");
+		}
+
+		sb.append(searchOpts.getSortProperty());
+
+		if (searchOpts.getSortType() == SortType.Asc)
+		{
+			sb.append(" ASC");
+		}
+		else
+		{
+			sb.append(" DESC");
+		}
+
+		return sb.toString();
+	}
+
+	static String decorateQuery(final String firstLevelName, final String query,
+			final SearchOptions searchOpts)
+	{
+		return searchOpts != null && searchOpts.getSortProperty() != null ? getQueryWithOrder(
+				firstLevelName, query, searchOpts) : query;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId,
+			final SearchOptions searchOpts) throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory.getCurrentSession().createQuery(
+					decorateQuery("dealAcquire", GET_DEAL_ACQUIRES, searchOpts));
+
+			query.setParameter("customerId", customerId);
+			query.setParameter("merchantId", merchantId);
+
+			if (searchOpts != null)
+			{
+				query.setMaxResults(searchOpts.getMaxResults());
+				query.setFirstResult(searchOpts.getMaxResults() * searchOpts.getPage());
+			}
+
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format(
+					"Problem getDealAcquires customerId %s merchantId %s", customerId, merchantId), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts)
+			throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory.getCurrentSession().createQuery(
+					decorateQuery("merchant", GET_MERCHANT_ACQUIRES, searchOpts));
+
+			query.setParameter("customerId", customerId);
+
+			if (searchOpts != null)
+			{
+				query.setMaxResults(searchOpts.getMaxResults());
+				query.setFirstResult(searchOpts.getMaxResults() * searchOpts.getPage());
+
+			}
+
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s",
+					customerId), ex);
+		}
 	}
 }

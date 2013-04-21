@@ -35,6 +35,8 @@ import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
 import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
+import com.talool.core.SearchOptions;
+import com.talool.core.SearchOptions.SortType;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 
@@ -120,8 +122,30 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			throws Exception
 	{
 
-		List<DealAcquire> dealAcquires = taloolService.getDealAcquiresByCustomerId(dealOfferPurchase
-				.getCustomer().getId());
+		List<DealAcquire> dealAcquires = null;
+
+		int totalPaginated = 0;
+
+		for (int page = 0; page < 3; page++)
+		{
+			SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(page)
+					.sortProperty("deal.title").sortType(SortType.Desc).build();
+
+			dealAcquires = taloolService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
+					dealOfferPurchase.getDealOffer().getMerchant().getId(), searchOpts);
+
+			for (final DealAcquire dacs : dealAcquires)
+			{
+				totalPaginated++;
+				LOG.info(dacs.getDeal().getTitle());
+			}
+
+		}
+
+		dealAcquires = taloolService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer()
+				.getId());
+
+		Assert.assertEquals(totalPaginated, dealAcquires.size());
 
 		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId());
 

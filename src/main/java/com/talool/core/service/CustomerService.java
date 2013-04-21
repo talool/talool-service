@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 import com.talool.core.Customer;
+import com.talool.core.DealAcquire;
+import com.talool.core.Merchant;
 import com.talool.core.Relationship;
+import com.talool.core.SearchOptions;
 
 /**
  * Customer Service
@@ -36,5 +39,16 @@ public interface CustomerService
 	public List<Relationship> getRelationshipsFrom(final UUID customerId) throws ServiceException;
 
 	public List<Relationship> getRelationshipsTo(final UUID customerId) throws ServiceException;
+
+	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId,
+			final SearchOptions searchOptions) throws ServiceException;
+
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOptions)
+			throws ServiceException;
+
+	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId)
+			throws ServiceException;
+
+	public DealAcquire getDealAcquire(final UUID dealAcquireId) throws ServiceException;
 
 }
