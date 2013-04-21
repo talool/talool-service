@@ -3,11 +3,15 @@ package com.talool.service;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,6 +43,9 @@ import com.talool.core.SearchOptions;
 import com.talool.core.SearchOptions.SortType;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
+import com.talool.utils.DealAcquireComparator;
+import com.talool.utils.DealAcquireComparator.ComparatorType;
+import com.talool.utils.MerchantComparator;
 
 /**
  * Talool Service integration test cases
@@ -118,36 +125,174 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	public void testDealAcquires(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer)
-			throws Exception
+	/**
+	 * Tests Search options on customer Deal Acquires (sorting & paginating)
+	 * 
+	 * @param dealOfferPurchase
+	 * @param dealOffer
+	 * @param expectedDealAcquires
+	 * @throws ServiceException
+	 */
+	public void testDealAquireSearchOptions(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer,
+			List<DealAcquire> expectedDealAcquires) throws ServiceException
 	{
-
 		List<DealAcquire> dealAcquires = null;
 
-		int totalPaginated = 0;
+		final int maxResults = 2;
 
-		for (int page = 0; page < 3; page++)
+		List<DealAcquire> allDealAcquires = new ArrayList<DealAcquire>();
+
+		for (int sortTypeIndex = 0; sortTypeIndex <= 1; sortTypeIndex++)
 		{
-			SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(page)
-					.sortProperty("deal.title").sortType(SortType.Desc).build();
+			int page = 0;
+			int totalPaginated = 0;
+			allDealAcquires.clear();
 
-			dealAcquires = taloolService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
-					dealOfferPurchase.getDealOffer().getMerchant().getId(), searchOpts);
+			SortType sortType = SortType.values()[sortTypeIndex];
 
-			for (final DealAcquire dacs : dealAcquires)
+			while (true)
 			{
-				totalPaginated++;
-				LOG.info(dacs.getDeal().getTitle());
+				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
+						.sortProperty("deal.title").sortType(sortType).build();
+
+				dealAcquires = taloolService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
+						dealOfferPurchase.getDealOffer().getMerchant().getId(), searchOpts);
+
+				if (CollectionUtils.isEmpty(dealAcquires))
+				{
+					break;
+				}
+
+				allDealAcquires.addAll(dealAcquires);
+
+				for (final DealAcquire dacs : dealAcquires)
+				{
+					totalPaginated++;
+					LOG.info(dacs.getDeal().getTitle());
+				}
+			}
+
+			Assert.assertEquals(totalPaginated, expectedDealAcquires.size());
+
+			Comparator<DealAcquire> comparator = null;
+
+			if (sortType == SortType.Asc)
+			{
+				comparator = new DealAcquireComparator(ComparatorType.DealTitle);
+			}
+			else
+			{
+				comparator = Collections.reverseOrder(new DealAcquireComparator(ComparatorType.DealTitle));
+
+			}
+
+			Collections.sort(expectedDealAcquires, comparator);
+
+			for (int i = 0; i < expectedDealAcquires.size(); i++)
+			{
+				Assert.assertEquals(expectedDealAcquires.get(i).getId(), allDealAcquires.get(i).getId());
 			}
 
 		}
 
+	}
+
+	/**
+	 * Tests Search options on Acquired Merchants (sorting & paginating)
+	 * 
+	 * @param dealOfferPurchase
+	 * @param dealOffer
+	 * @param expectedDealAcquires
+	 * @throws ServiceException
+	 */
+	public void testDealAquireMerchants(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer,
+			List<DealAcquire> expectedDealAcquires) throws ServiceException
+	{
+		List<Merchant> merchantsAcquired = null;
+
+		final int maxResults = 2;
+
+		List<Merchant> allMerchantAcquires = new ArrayList<Merchant>();
+		Set<Merchant> expectedMerchants = new HashSet<Merchant>();
+
+		for (DealAcquire _dac : expectedDealAcquires)
+		{
+			expectedMerchants.add(_dac.getDeal().getMerchant());
+		}
+
+		for (int sortTypeIndex = 0; sortTypeIndex <= 1; sortTypeIndex++)
+		{
+			int page = 0;
+			int totalPaginated = 0;
+			allMerchantAcquires.clear();
+
+			SortType sortType = SortType.values()[sortTypeIndex];
+
+			while (true)
+			{
+				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
+						.sortProperty("name").sortType(sortType).build();
+
+				merchantsAcquired = taloolService.getMerchantAcquires(dealOfferPurchase.getCustomer()
+						.getId(), searchOpts);
+
+				if (CollectionUtils.isEmpty(merchantsAcquired))
+				{
+					break;
+				}
+
+				allMerchantAcquires.addAll(merchantsAcquired);
+
+				for (final Merchant merch : merchantsAcquired)
+				{
+					totalPaginated++;
+					LOG.info(merch.getName());
+				}
+			}
+
+			Assert.assertEquals(totalPaginated, expectedMerchants.size());
+
+			Comparator<Merchant> comparator = null;
+
+			if (sortType == SortType.Asc)
+			{
+				comparator = new MerchantComparator(MerchantComparator.ComparatorType.Name);
+			}
+			else
+			{
+				comparator = Collections.reverseOrder(new MerchantComparator(
+						MerchantComparator.ComparatorType.Name));
+			}
+
+			List<Merchant> expectedMerchantList = new ArrayList<Merchant>(expectedMerchants);
+
+			Collections.sort(expectedMerchantList, comparator);
+
+			for (int i = 0; i < expectedMerchantList.size(); i++)
+			{
+				Assert
+						.assertEquals(expectedMerchantList.get(i).getId(), allMerchantAcquires.get(i).getId());
+			}
+
+		}
+
+	}
+
+	public void testDealAcquires(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer)
+			throws Exception
+	{
+		List<DealAcquire> dealAcquires = null;
+
 		dealAcquires = taloolService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer()
 				.getId());
 
-		Assert.assertEquals(totalPaginated, dealAcquires.size());
-
 		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId());
+
+		// test sort/pagination search options
+		testDealAquireSearchOptions(dealOfferPurchase, dealOffer, dealAcquires);
+
+		// test sort/pagination search options
+		testDealAquireMerchants(dealOfferPurchase, dealOffer, dealAcquires);
 
 		Assert.assertEquals(deals.size(), dealAcquires.size());
 

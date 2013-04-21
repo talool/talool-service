@@ -74,7 +74,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	private static final String GET_DEAL_ACQUIRES = "select dealAcquire from DealAcquireImpl dealAcquire, DealImpl d where d.merchant.id=:merchantId and dealAcquire.deal.id=d.id and dealAcquire.customer.id=:customerId";
 
-	private static final String GET_MERCHANT_ACQUIRES = "from MerchantImpl merchant, DealAcquireImpl da, DealImpl d where da.customer.id=:customerId and da.deal.id=d.merchant.id and d.merchant.id=m.id";
+	private static final String GET_MERCHANT_ACQUIRES = "select distinct merchant from MerchantImpl merchant, DealAcquireImpl da, DealImpl d where da.customer.id=:customerId and da.deal.id=d.id and d.merchant.id=merchant.id";
 
 	private DAODispatcher daoDispatcher;
 	private SessionFactory sessionFactory;
