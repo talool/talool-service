@@ -1177,7 +1177,8 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void acceptDeal(final DealAcquire dealAcquire) throws ServiceException
+	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException
 	{
 		// TODO apply state change logic. only accept deals in valid states to be
 		// accepted
@@ -1208,7 +1209,8 @@ public class TaloolServiceImpl implements TaloolService
 	 * Current only supports rejecting deals given by customers (not merchants)
 	 */
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void rejectDeal(final DealAcquire dealAcquire) throws ServiceException
+	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException
 	{
 		// TODO apply state change logic. only reject deals in valid states to be
 		// accepted
@@ -1216,6 +1218,12 @@ public class TaloolServiceImpl implements TaloolService
 		if (dealAcquire.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
 		{
 			throw new ServiceException("Cannot rejectDeal an already redeemed deal " + dealAcquire);
+		}
+
+		if (!dealAcquire.getCustomer().getId().equals(customerId))
+		{
+			throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
+					"Customer does not own deal");
 		}
 
 		try
@@ -1238,13 +1246,19 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public void redeemDeal(final DealAcquire dealAcquire) throws ServiceException
+	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException
 	{
 		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
 
 		if (dealAcq.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
 		{
 			throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquire);
+		}
+		if (!dealAcquire.getCustomer().getId().equals(customerId))
+		{
+			throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
+					"Customer does not own deal");
 		}
 
 		try

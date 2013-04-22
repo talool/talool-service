@@ -330,7 +330,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// update #2 friend accepts
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
 		daq = taloolService.getDealAcquire(daq.getId());
-		taloolService.acceptDeal(daq);
+		taloolService.acceptDeal(daq, originalCustomer.getId());
 		taloolService.refresh(daq);
 
 		// update #3 friend gives it back after accepting

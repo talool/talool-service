@@ -39,11 +39,14 @@ public interface TaloolService extends MerchantService, CustomerService
 	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
 			throws ServiceException;
 
-	public void acceptDeal(final DealAcquire dealAcquire) throws ServiceException;
+	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException;
 
-	public void rejectDeal(final DealAcquire dealAcquire) throws ServiceException;
+	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException;
 
-	public void redeemDeal(final DealAcquire dealAcquire) throws ServiceException;
+	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException;
 
 	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId)
 			throws ServiceException;
