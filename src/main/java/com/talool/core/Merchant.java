@@ -18,6 +18,18 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 
 	public MerchantLocation getPrimaryLocation();
 
+	public Set<MerchantLocation> getLocations();
+
+	/**
+	 * Temporary - returns Immutable Set . This simply adds primary to all managed
+	 * locations
+	 * 
+	 * TODO replace with a single call, drop primary location
+	 * 
+	 * @return
+	 */
+	public Set<MerchantLocation> getAllLocations();
+
 	public void setPrimaryLocation(MerchantLocation merchantLocation);
 
 	public Merchant getParent();

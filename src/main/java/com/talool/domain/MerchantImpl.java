@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -29,6 +30,8 @@ import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
@@ -64,7 +67,7 @@ public class MerchantImpl implements Merchant
 	@Column(name = "merchant_name", unique = false, nullable = false, length = 64)
 	private String name;
 
-	@OneToOne(targetEntity = MerchantLocationImpl.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(targetEntity = MerchantLocationImpl.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "primary_location_id")
 	private MerchantLocation primaryLocation;
 
@@ -75,6 +78,10 @@ public class MerchantImpl implements Merchant
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = MerchantAccountImpl.class)
 	@JoinColumn(name = "merchant_id")
 	private Set<MerchantAccount> merchantAccounts = new HashSet<MerchantAccount>();
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = MerchantLocationImpl.class)
+	@JoinTable(name = "merchant_managed_location", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "merchant_location_id", nullable = false, updatable = false) })
+	private Set<MerchantLocation> locations = new HashSet<MerchantLocation>();
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -233,4 +240,24 @@ public class MerchantImpl implements Merchant
 		this.tags = tags;
 	}
 
+	@Override
+	public Set<MerchantLocation> getLocations()
+	{
+		return this.locations;
+	}
+
+	@Override
+	public Set<MerchantLocation> getAllLocations()
+	{
+		final Builder<MerchantLocation> builder = ImmutableSet.builder();
+
+		builder.add(primaryLocation);
+
+		if (CollectionUtils.isNotEmpty(locations))
+		{
+			builder.addAll(locations);
+		}
+
+		return builder.build();
+	}
 }
