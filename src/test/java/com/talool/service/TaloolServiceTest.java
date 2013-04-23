@@ -40,7 +40,6 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.core.SearchOptions;
-import com.talool.core.SearchOptions.SortType;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.utils.DealAcquireComparator;
@@ -148,12 +147,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			int totalPaginated = 0;
 			allDealAcquires.clear();
 
-			SortType sortType = SortType.values()[sortTypeIndex];
+			boolean ascending = sortTypeIndex == 0 ? true : false;
 
 			while (true)
 			{
 				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
-						.sortProperty("deal.title").sortType(sortType).build();
+						.sortProperty("deal.title").ascending(ascending).build();
 
 				dealAcquires = taloolService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
 						dealOfferPurchase.getDealOffer().getMerchant().getId(), searchOpts);
@@ -176,7 +175,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 			Comparator<DealAcquire> comparator = null;
 
-			if (sortType == SortType.Asc)
+			if (ascending)
 			{
 				comparator = new DealAcquireComparator(ComparatorType.DealTitle);
 			}
@@ -226,12 +225,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			int totalPaginated = 0;
 			allMerchantAcquires.clear();
 
-			SortType sortType = SortType.values()[sortTypeIndex];
+			boolean ascending = sortTypeIndex == 0 ? true : false;
 
 			while (true)
 			{
 				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
-						.sortProperty("name").sortType(sortType).build();
+						.sortProperty("name").ascending(ascending).build();
 
 				merchantsAcquired = taloolService.getMerchantAcquires(dealOfferPurchase.getCustomer()
 						.getId(), searchOpts);
@@ -254,7 +253,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 			Comparator<Merchant> comparator = null;
 
-			if (sortType == SortType.Asc)
+			if (ascending)
 			{
 				comparator = new MerchantComparator(MerchantComparator.ComparatorType.Name);
 			}

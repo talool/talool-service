@@ -13,13 +13,7 @@ public class SearchOptions implements Serializable
 {
 	private static final long serialVersionUID = -7730917442100669680L;
 
-	public enum SortType
-	{
-		Asc, Desc
-	};
-
-	private SortType sortType;
-
+	private Boolean ascending = true;
 	private String sortProperty;
 	private int maxResults;
 	private int page;
@@ -29,24 +23,24 @@ public class SearchOptions implements Serializable
 		this.sortProperty = builder.sortProperty;
 		this.maxResults = builder.maxResults;
 		this.page = builder.page;
-		this.sortType = builder.sortType;
+		this.ascending = builder.ascending;
 	}
 
 	public static class Builder
 	{
 		public SearchOptions build()
 		{
-			Preconditions.checkArgument((sortProperty == null && sortType == null)
-					|| (sortProperty != null && sortType != null),
-					"Sort property and sortType work together. Both must be either null or not null");
+			Preconditions.checkArgument((sortProperty == null && ascending == null)
+					| (sortProperty != null && ascending != null),
+					"Sort property and ascending both must be set");
 
 			return new SearchOptions(this);
 
 		}
 
-		public Builder sortType(SortType sortType)
+		public Builder ascending(Boolean ascending)
 		{
-			this.sortType = sortType;
+			this.ascending = ascending;
 			return this;
 		}
 
@@ -68,16 +62,16 @@ public class SearchOptions implements Serializable
 			return this;
 		}
 
-		private SortType sortType;
+		private Boolean ascending = true;
 		private String sortProperty;
 		private int maxResults;
 		private int page;
 
 	}
 
-	public SortType getSortType()
+	public boolean isAscending()
 	{
-		return sortType;
+		return ascending;
 	}
 
 	public String getSortProperty()

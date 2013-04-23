@@ -40,7 +40,6 @@ import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantManagedLocation;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
-import com.talool.core.SearchOptions.SortType;
 import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
@@ -1349,7 +1348,7 @@ public class TaloolServiceImpl implements TaloolService
 
 		sb.append(searchOpts.getSortProperty());
 
-		if (searchOpts.getSortType() == SortType.Asc)
+		if (searchOpts.isAscending())
 		{
 			sb.append(" ASC");
 		}
