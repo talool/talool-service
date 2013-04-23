@@ -150,6 +150,11 @@ public class DealAcquireImpl implements DealAcquire
 		return sharedByCustomer;
 	}
 
+	public void setRedemptionDate(final Date date)
+	{
+		this.redemptionDate = date;
+	}
+
 	public void setSharedByCusomer(Customer customer)
 	{
 		this.sharedByCustomer = customer;

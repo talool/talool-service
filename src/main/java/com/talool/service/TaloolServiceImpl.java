@@ -1,5 +1,6 @@
 package com.talool.service;
 
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -1150,7 +1151,8 @@ public class TaloolServiceImpl implements TaloolService
 	{
 		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
 
-		if (dealAcq.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
+		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcq.getAcquireStatus()
+				.getStatus()))
 		{
 			throw new ServiceException("Cannot give an already redeemed deal " + dealAcquire);
 		}
@@ -1214,7 +1216,8 @@ public class TaloolServiceImpl implements TaloolService
 		// TODO apply state change logic. only reject deals in valid states to be
 		// accepted
 
-		if (dealAcquire.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
+		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcquire.getAcquireStatus()
+				.getStatus()))
 		{
 			throw new ServiceException("Cannot rejectDeal an already redeemed deal " + dealAcquire);
 		}
@@ -1245,12 +1248,14 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
 			throws ServiceException
 	{
 		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
 
-		if (dealAcq.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
+		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcq.getAcquireStatus()
+				.getStatus()))
 		{
 			throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquire);
 		}
@@ -1264,6 +1269,8 @@ public class TaloolServiceImpl implements TaloolService
 		{
 			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
 					.getAcquireStatus(AcquireStatusType.REDEEMED));
+
+			dealAcq.setRedemptionDate(Calendar.getInstance().getTime());
 
 			daoDispatcher.save(dealAcq);
 
