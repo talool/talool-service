@@ -21,7 +21,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -30,8 +29,6 @@ import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
@@ -246,18 +243,4 @@ public class MerchantImpl implements Merchant
 		return this.locations;
 	}
 
-	@Override
-	public Set<MerchantLocation> getAllLocations()
-	{
-		final Builder<MerchantLocation> builder = ImmutableSet.builder();
-
-		builder.add(primaryLocation);
-
-		if (CollectionUtils.isNotEmpty(locations))
-		{
-			builder.addAll(locations);
-		}
-
-		return builder.build();
-	}
 }

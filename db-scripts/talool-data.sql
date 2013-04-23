@@ -68,6 +68,10 @@ INSERT INTO merchant_location (email,website_url,logo_url,phone,address_id)
        
 INSERT INTO merchant (primary_location_id,merchant_name)
        VALUES ((select merchant_location_id from merchant_location where email='info@thekitchencafe.com'),'The Kitchen Boulder & [Upstairs]');
+       
+INSERT INTO merchant_managed_location (merchant_id,merchant_location_id)
+       VALUES ((select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+               (select merchant_location_id from merchant_location where email='info@thekitchencafe.com'));
 
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),'merle@thekitchencafe.com',(select md5('pass123')),'CFO',true);     
@@ -82,6 +86,11 @@ INSERT INTO merchant_location (email,website_url,logo_url,phone,address_id)
        
 INSERT INTO merchant (primary_location_id,merchant_name)
        VALUES ((select merchant_location_id from merchant_location where email='info@centrolatinkitchen.com'),'Centro Latin Kitchen');
+       
+       
+INSERT INTO merchant_managed_location (merchant_id,merchant_location_id)
+       VALUES ((select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),
+               (select merchant_location_id from merchant_location where email='info@centrolatinkitchen.com'));
 
 ---------Test Deal Offers & Deals -------------------------------   
 

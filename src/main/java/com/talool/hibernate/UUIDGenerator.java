@@ -20,6 +20,8 @@ import org.hibernate.id.IdentifierGenerator;
 public class UUIDGenerator implements IdentifierGenerator
 {
 	private static Logger LOG = Logger.getLogger(UUIDGenerator.class);
+	private static final String SELECT_UUID = "SELECT uuid_generate_v4() as uuid";
+	private static final String UUID_PARAM_NAME = "uuid";
 
 	public Serializable generate(final SessionImplementor session, final Object object)
 			throws HibernateException
@@ -32,17 +34,12 @@ public class UUIDGenerator implements IdentifierGenerator
 		final Connection connection = session.connection();
 		try
 		{
-			final PreparedStatement ps = connection.prepareStatement("SELECT uuid_generate_v4() as uuid");
+			final PreparedStatement ps = connection.prepareStatement(SELECT_UUID);
 
 			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			{
-				final UUID uuid = UUID.fromString(rs.getString("uuid"));
-				if (LOG.isDebugEnabled())
-				{
-					LOG.debug("Generated UUID: " + uuid);
-				}
-
+				final UUID uuid = UUID.fromString(rs.getString(UUID_PARAM_NAME));
 				return uuid;
 			}
 
