@@ -26,6 +26,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernatespatial.GeometryUserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,7 @@ import com.talool.service.ServiceFactory;
 @Entity
 @Table(name = "merchant", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
+@TypeDef(name = "geomType", typeClass = GeometryUserType.class)
 public class MerchantImpl implements Merchant
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantImpl.class);

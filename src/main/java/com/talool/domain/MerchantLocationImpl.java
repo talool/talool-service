@@ -18,11 +18,11 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.hibernate.annotations.Target;
+import org.hibernate.annotations.Type;
 
 import com.talool.core.Address;
-import com.talool.core.Location;
 import com.talool.core.MerchantLocation;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * 
@@ -61,9 +61,9 @@ public class MerchantLocationImpl implements MerchantLocation
 	@JoinColumn(name = "address_id")
 	private Address address;
 
-	@Embedded
-	@Target(LocationImpl.class)
-	private Location location;
+	@Type(type = "geomType")
+	@Column(name = "geom", nullable = true)
+	private com.vividsolutions.jts.geom.Point location;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -204,14 +204,15 @@ public class MerchantLocationImpl implements MerchantLocation
 	}
 
 	@Override
-	public Location getLocation()
+	public Point getLocation()
 	{
 		return location;
 	}
 
 	@Override
-	public void setLocation(Location location)
+	public void setLocation(Point location)
 	{
 		this.location = location;
 	}
+
 }

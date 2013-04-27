@@ -8,10 +8,13 @@ import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
+import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.StandardBasicTypes;
+import org.postgis.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.ImmutableMap;
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
@@ -32,9 +36,11 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DistanceEntity;
 import com.talool.core.FactoryManager;
 import com.talool.core.IdentifiableS;
 import com.talool.core.IdentifiableUUID;
+import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
@@ -59,6 +65,7 @@ import com.talool.domain.MerchantManagedLocationImpl;
 import com.talool.domain.RelationshipImpl;
 import com.talool.domain.SocialNetworkImpl;
 import com.talool.domain.TagImpl;
+import com.talool.utils.SpatialUtils;
 
 /**
  * Implementation of the TaloolService
@@ -71,6 +78,8 @@ import com.talool.domain.TagImpl;
 public class TaloolServiceImpl implements TaloolService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
+
+	public static final float MILES_TO_METERS = 1609.34f;
 
 	private static final String GET_DEAL_ACQUIRES = "select dealAcquire from DealAcquireImpl dealAcquire, DealImpl d where d.merchant.id=:merchantId and dealAcquire.deal.id=d.id and dealAcquire.customer.id=:customerId";
 
@@ -1428,5 +1437,58 @@ public class TaloolServiceImpl implements TaloolService
 			throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s",
 					customerId), ex);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DistanceEntity<Merchant>> getMerchantsWithin(final Location location,
+			final int maxMiles) throws ServiceException
+	{
+		List<DistanceEntity<Merchant>> distanceEntities = null;
+
+		final Point point = new Point(location.getLongitude(), location.getLatitude());
+		point.setSrid(4326);
+
+		final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
+				.put("point", point.toString())
+				.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
+
+		final String newSql = SQLHelper.getSQL(SQLHelper.MERCHANTS_WITHIN_METERS, params);
+
+		try
+		{
+			final SQLQuery query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
+			query.addEntity("entity", MerchantImpl.class);
+
+			query.setResultTransformer(new ResultTransformer()
+			{
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public Object transformTuple(final Object[] tuple, final String[] aliases)
+				{
+					return new DistanceEntity<Merchant>((Merchant) tuple[1], (Double) tuple[0]);
+				}
+
+				@SuppressWarnings("rawtypes")
+				@Override
+				public List transformList(List collection)
+				{
+					return collection;
+				}
+			});
+
+			distanceEntities = query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format(
+					"Problem getting merchants within lng/lat %s and maxMiles %d", location, maxMiles), ex);
+		}
+
+		return distanceEntities;
+
 	}
 }
