@@ -26,7 +26,7 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 	 * 
 	 * @return
 	 */
-	public Set<MerchantLocation> getLocations();
+	public List<MerchantLocation> getLocations();
 
 	public void setPrimaryLocation(MerchantLocation merchantLocation);
 

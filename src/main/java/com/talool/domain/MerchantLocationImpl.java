@@ -14,11 +14,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernatespatial.GeometryUserType;
 
 import com.talool.core.Address;
 import com.talool.core.MerchantLocation;
@@ -32,6 +35,7 @@ import com.vividsolutions.jts.geom.Point;
 @Entity
 @Table(name = "merchant_location", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
+@TypeDef(name = "geomType", typeClass = GeometryUserType.class)
 public class MerchantLocationImpl implements MerchantLocation
 {
 	private static final long serialVersionUID = 3716227130006204917L;
@@ -64,6 +68,9 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Type(type = "geomType")
 	@Column(name = "geom", nullable = true)
 	private com.vividsolutions.jts.geom.Point location;
+
+	@Transient
+	private Double distanceInMeters;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -213,6 +220,17 @@ public class MerchantLocationImpl implements MerchantLocation
 	public void setLocation(Point location)
 	{
 		this.location = location;
+	}
+
+	public void setDistanceInMeters(final Double meters)
+	{
+		distanceInMeters = meters;
+	}
+
+	@Override
+	public Double getDistanceInMeters()
+	{
+		return distanceInMeters;
 	}
 
 }

@@ -1,8 +1,11 @@
 package com.talool.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,7 +39,6 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
-import com.talool.core.DistanceEntity;
 import com.talool.core.FactoryManager;
 import com.talool.core.IdentifiableS;
 import com.talool.core.IdentifiableUUID;
@@ -52,6 +54,7 @@ import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.domain.AcquireStatusImpl;
+import com.talool.domain.AddressImpl;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireHistoryImpl;
 import com.talool.domain.DealAcquireImpl;
@@ -61,6 +64,7 @@ import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.MerchantAccountImpl;
 import com.talool.domain.MerchantIdentityImpl;
 import com.talool.domain.MerchantImpl;
+import com.talool.domain.MerchantLocationImpl;
 import com.talool.domain.MerchantManagedLocationImpl;
 import com.talool.domain.RelationshipImpl;
 import com.talool.domain.SocialNetworkImpl;
@@ -1439,12 +1443,11 @@ public class TaloolServiceImpl implements TaloolService
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<DistanceEntity<Merchant>> getMerchantsWithin(final Location location,
+	public List<Merchant> getMerchantsWithin(final Location location,
 			final int maxMiles) throws ServiceException
 	{
-		List<DistanceEntity<Merchant>> distanceEntities = null;
+		final List<Merchant> merchants = new ArrayList<Merchant>();
 
 		final Point point = new Point(location.getLongitude(), location.getLatitude());
 		point.setSrid(4326);
@@ -1457,29 +1460,57 @@ public class TaloolServiceImpl implements TaloolService
 
 		try
 		{
-			final SQLQuery query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+			final SQLQuery query =
+					getSessionFactory().getCurrentSession().createSQLQuery(newSql);
 			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
-			query.addEntity("entity", MerchantImpl.class);
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addEntity("merchant_location", MerchantLocationImpl.class);
+			query.addEntity("address", AddressImpl.class);
+
+			final Map<UUID, MerchantImpl> merchantMap = new HashMap<UUID, MerchantImpl>();
 
 			query.setResultTransformer(new ResultTransformer()
 			{
+
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				public Object transformTuple(final Object[] tuple, final String[] aliases)
+				public Object transformTuple(Object[] tuple, String[] aliases)
 				{
-					return new DistanceEntity<Merchant>((Merchant) tuple[1], (Double) tuple[0]);
+					final UUID uuid = (UUID) tuple[1];
+					final String name = (String) tuple[2];
+					final MerchantLocationImpl location = (MerchantLocationImpl) tuple[3];
+					location.setDistanceInMeters((Double) tuple[0]);
+					MerchantImpl merchant = merchantMap.get(uuid);
+
+					if (merchant == null)
+					{
+						merchant = new MerchantImpl();
+						merchant.setId(uuid);
+						merchant.setName(name);
+
+						merchant.getLocations().add(location);
+						merchantMap.put(uuid, merchant);
+						merchants.add(merchant);
+					}
+					else
+					{
+						merchant.getLocations().add(location);
+					}
+
+					return null;
 				}
 
 				@SuppressWarnings("rawtypes")
 				@Override
 				public List transformList(List collection)
 				{
-					return collection;
+					return merchants;
 				}
 			});
 
-			distanceEntities = query.list();
+			query.list();
 
 		}
 		catch (Exception ex)
@@ -1488,7 +1519,7 @@ public class TaloolServiceImpl implements TaloolService
 					"Problem getting merchants within lng/lat %s and maxMiles %d", location, maxMiles), ex);
 		}
 
-		return distanceEntities;
+		return merchants;
 
 	}
 }

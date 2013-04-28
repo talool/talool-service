@@ -34,4 +34,6 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public Point getLocation();
 
+	public Double getDistanceInMeters();
+
 }

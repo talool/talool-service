@@ -9,7 +9,6 @@ import com.talool.core.AcquireStatusType;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
-import com.talool.core.DistanceEntity;
 import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
@@ -125,7 +124,7 @@ public interface MerchantService
 
 	public AcquireStatus getAcquireStatus(final AcquireStatusType type) throws ServiceException;
 
-	public List<DistanceEntity<Merchant>> getMerchantsWithin(final Location location,
+	public List<Merchant> getMerchantsWithin(final Location location,
 			final int maxMiles) throws ServiceException;
 
 }
