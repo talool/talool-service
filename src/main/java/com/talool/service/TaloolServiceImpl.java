@@ -509,7 +509,7 @@ public class TaloolServiceImpl implements TaloolService
 		try
 		{
 			final Search search = new Search(TagImpl.class);
-			search.addFilterEqual("name", tagName);
+			search.addFilterEqual("name", cleanTagName(tagName));
 			return (Tag) daoDispatcher.searchUnique(search);
 		}
 		catch (Exception ex)
@@ -842,7 +842,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	private String cleanTagName(final String tagName)
 	{
-		return tagName.trim();
+		return tagName.trim().toLowerCase();
 	}
 
 	/**

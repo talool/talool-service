@@ -2,7 +2,7 @@ package com.talool.core;
 
 import java.io.Serializable;
 
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Geometry;
 
 public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 {
@@ -26,13 +26,13 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public void setPhone(String phone);
 
-	public void setLocation(Point location);
-
 	public Address getAddress();
 
 	public void setAddress(Address address);
 
-	public Point getLocation();
+	public Geometry getGeometry();
+
+	public void setGeometry(Geometry geometry);
 
 	public Double getDistanceInMeters();
 

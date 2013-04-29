@@ -1,0 +1,39 @@
+
+
+psql -d yourdatabase -f postgis.sql
+psql -d yourdatabase -f postgis_comments.sql
+psql -d yourdatabase -f spatial_ref_sys.sql
+
+Postgis stuff
+
+select merchant_id,St_astext(geom) from merchant;
+
+ALTER TABLE merchant ADD COLUMN geog geography(POINT,4326);
+
+UPDATE merchant SET geom = 'SRID=4326;POINT(32.7153 117.1564)' where merchant_id='da6dc45d-2d50-4a17-9adf-f3ceb9c7786a'
+
+ALTER TABLE merchant ALTER COLUMN geog geography(POINT,4326);
+
+select merchant_id,St_astext(geom) from merchant;
+
+SELECT ST_Distance( ST_GeographyFromText('POINT(104.9842 39.7392)'), ST_GeographyFromText('POINT(105.2700 40.0150)') ); -- Denver/Boulder
+
+-- every one Denver
+UPDATE merchant SET geom = 'SRID=4326;POINT(104.9842 39.7392)' where merchant_id='da6dc45d-2d50-4a17-9adf-f3ceb9c7786a'
+
+-- this one Boulder
+UPDATE merchant SET geom = 'SRID=4326;POINT(105.2700 40.0150)' where merchant_id='da6dc45d-2d50-4a17-9adf-f3ceb9c7786a'
+
+--  Make sure to use Sphere get the right answer
+SELECT ST_Distance_Sphere( ST_GeomFromText('POINT(104.9842 39.7392)'), ST_GeomFromText('POINT(105.2700 40.0150)') ); -- Denver/Boulder
+
+Answer: 39182.7457216715
+
+Chicago 
+UPDATE merchant SET geom = 'SRID=4326;POINT(87.6500 41.8500)' where merchant_id='da6dc45d-2d50-4a17-9adf-f3ceb9c7786a'
+
+Kansas City
+UPDATE merchant SET geom = 'SRID=4326;POINT(94.5783 39.0997)' where merchant_location_id=2;
+
+Littleton 
+39.6133° N, 105.0161

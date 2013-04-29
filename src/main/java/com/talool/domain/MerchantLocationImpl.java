@@ -25,7 +25,7 @@ import org.hibernatespatial.GeometryUserType;
 
 import com.talool.core.Address;
 import com.talool.core.MerchantLocation;
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -67,7 +67,7 @@ public class MerchantLocationImpl implements MerchantLocation
 
 	@Type(type = "geomType")
 	@Column(name = "geom", nullable = true)
-	private com.vividsolutions.jts.geom.Point location;
+	private com.vividsolutions.jts.geom.Geometry geometry;
 
 	@Transient
 	private Double distanceInMeters;
@@ -211,15 +211,15 @@ public class MerchantLocationImpl implements MerchantLocation
 	}
 
 	@Override
-	public Point getLocation()
+	public Geometry getGeometry()
 	{
-		return location;
+		return geometry;
 	}
 
 	@Override
-	public void setLocation(Point location)
+	public void setGeometry(Geometry geometry)
 	{
-		this.location = location;
+		this.geometry = geometry;
 	}
 
 	public void setDistanceInMeters(final Double meters)
