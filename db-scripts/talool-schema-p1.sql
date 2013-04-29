@@ -2,6 +2,9 @@
 
 \connect talool
 
+ALTER DATABASE spatial_ref_sys OWNER TO talool;
+ALTER VIEW geography_columns OWNER TO talool;
+ALTER VIEW geometry_columns OWNER TO talool;
 
 DROP INDEX merchant_location_longitude_idx;
 DROP INDEX merchant_location_latitude_idx;
