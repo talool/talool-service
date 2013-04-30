@@ -1522,4 +1522,16 @@ public class TaloolServiceImpl implements TaloolService
 		return merchants;
 
 	}
+
+	@Override
+	public void reattach(Object obj) throws ServiceException {
+		try
+		{
+			getSessionFactory().getCurrentSession().merge(obj);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem reattaching", e);
+		}
+	}
 }
