@@ -15,8 +15,8 @@ public class SearchOptions implements Serializable
 
 	private Boolean ascending = true;
 	private String sortProperty;
-	private int maxResults;
-	private int page;
+	private Integer maxResults;
+	private Integer page;
 
 	private SearchOptions(final Builder builder)
 	{
@@ -79,12 +79,12 @@ public class SearchOptions implements Serializable
 		return sortProperty;
 	}
 
-	public int getMaxResults()
+	public Integer getMaxResults()
 	{
 		return maxResults;
 	}
 
-	public int getPage()
+	public Integer getPage()
 	{
 		return page;
 	}

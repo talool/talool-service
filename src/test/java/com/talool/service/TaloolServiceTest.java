@@ -152,7 +152,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			while (true)
 			{
 				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
-						.sortProperty("deal.title").ascending(ascending).build();
+						.sortProperty("dealAcquire.deal.title").ascending(ascending).build();
 
 				dealAcquires = taloolService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
 						dealOfferPurchase.getDealOffer().getMerchant().getId(), searchOpts);
@@ -230,7 +230,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			while (true)
 			{
 				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
-						.sortProperty("name").ascending(ascending).build();
+						.sortProperty("merchant.name").ascending(ascending).build();
 
 				merchantsAcquired = taloolService.getMerchantAcquires(dealOfferPurchase.getCustomer()
 						.getId(), searchOpts);

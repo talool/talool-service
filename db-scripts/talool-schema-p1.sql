@@ -2,7 +2,7 @@
 
 \connect talool
 
-ALTER DATABASE spatial_ref_sys OWNER TO talool;
+ALTER TABLE spatial_ref_sys OWNER TO talool;
 ALTER VIEW geography_columns OWNER TO talool;
 ALTER VIEW geometry_columns OWNER TO talool;
 
