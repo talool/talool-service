@@ -12,12 +12,12 @@ SET client_min_messages = warning;
 -- Name: talool; Type: DATABASE; Schema: -; Owner: talool
 --
 
-CREATE DATABASE talooltest WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'C' LC_CTYPE = 'C';
+CREATE DATABASE talool WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'C' LC_CTYPE = 'C';
 
 
-ALTER DATABASE talooltest OWNER TO talool;
+ALTER DATABASE talool OWNER TO talool;
 
-\connect talooltest
+\connect talool
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';

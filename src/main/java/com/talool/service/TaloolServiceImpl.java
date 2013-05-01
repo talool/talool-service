@@ -69,6 +69,7 @@ import com.talool.domain.MerchantManagedLocationImpl;
 import com.talool.domain.RelationshipImpl;
 import com.talool.domain.SocialNetworkImpl;
 import com.talool.domain.TagImpl;
+import com.talool.service.QueryHelper.QueryType;
 import com.talool.utils.SpatialUtils;
 
 /**
@@ -84,10 +85,6 @@ public class TaloolServiceImpl implements TaloolService
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
 
 	public static final float MILES_TO_METERS = 1609.34f;
-
-	private static final String GET_DEAL_ACQUIRES = "select dealAcquire from DealAcquireImpl dealAcquire, DealImpl d where d.merchant.id=:merchantId and dealAcquire.deal.id=d.id and dealAcquire.customer.id=:customerId";
-
-	private static final String GET_MERCHANT_ACQUIRES = "select distinct merchant from MerchantImpl merchant, DealAcquireImpl da, DealImpl d where da.customer.id=:customerId and da.deal.id=d.id and d.merchant.id=merchant.id";
 
 	private DAODispatcher daoDispatcher;
 	private SessionFactory sessionFactory;
@@ -1380,13 +1377,6 @@ public class TaloolServiceImpl implements TaloolService
 		return sb.toString();
 	}
 
-	static String decorateQuery(final String firstLevelName, final String query,
-			final SearchOptions searchOpts)
-	{
-		return searchOpts != null && searchOpts.getSortProperty() != null ? getQueryWithOrder(
-				firstLevelName, query, searchOpts) : query;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId,
@@ -1394,17 +1384,13 @@ public class TaloolServiceImpl implements TaloolService
 	{
 		try
 		{
-			final Query query = sessionFactory.getCurrentSession().createQuery(
-					decorateQuery("dealAcquire", GET_DEAL_ACQUIRES, searchOpts));
+			final String newSql = QueryHelper.buildQuery(QueryType.GetDealAcquires, null, searchOpts,
+					true);
 
+			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setParameter("customerId", customerId);
 			query.setParameter("merchantId", merchantId);
-
-			if (searchOpts != null)
-			{
-				query.setMaxResults(searchOpts.getMaxResults());
-				query.setFirstResult(searchOpts.getMaxResults() * searchOpts.getPage());
-			}
+			QueryHelper.applyOffsetLimit(query, searchOpts);
 
 			return query.list();
 		}
@@ -1422,18 +1408,12 @@ public class TaloolServiceImpl implements TaloolService
 	{
 		try
 		{
-			final Query query = sessionFactory.getCurrentSession().createQuery(
-					decorateQuery("merchant", GET_MERCHANT_ACQUIRES, searchOpts));
+			final String newSql = QueryHelper.buildQuery(QueryType.GetMerchantAcquires, null, searchOpts,
+					true);
 
+			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setParameter("customerId", customerId);
-
-			if (searchOpts != null)
-			{
-				query.setMaxResults(searchOpts.getMaxResults());
-				query.setFirstResult(searchOpts.getMaxResults() * searchOpts.getPage());
-
-			}
-
+			QueryHelper.applyOffsetLimit(query, searchOpts);
 			return query.list();
 		}
 		catch (Exception ex)
@@ -1445,7 +1425,7 @@ public class TaloolServiceImpl implements TaloolService
 
 	@Override
 	public List<Merchant> getMerchantsWithin(final Location location,
-			final int maxMiles) throws ServiceException
+			final int maxMiles, SearchOptions searchOpts) throws ServiceException
 	{
 		final List<Merchant> merchants = new ArrayList<Merchant>();
 
@@ -1456,7 +1436,8 @@ public class TaloolServiceImpl implements TaloolService
 				.put("point", point.toString())
 				.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
 
-		final String newSql = SQLHelper.getSQL(SQLHelper.MERCHANTS_WITHIN_METERS, params);
+		final String newSql = QueryHelper.buildQuery(QueryType.MerchantsWithinMeters, params,
+				searchOpts);
 
 		try
 		{
@@ -1464,7 +1445,7 @@ public class TaloolServiceImpl implements TaloolService
 					getSessionFactory().getCurrentSession().createSQLQuery(newSql);
 			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
-			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("name", StandardBasicTypes.STRING);
 			query.addEntity("merchant_location", MerchantLocationImpl.class);
 			query.addEntity("address", AddressImpl.class);
 

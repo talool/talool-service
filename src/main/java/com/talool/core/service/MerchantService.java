@@ -14,6 +14,7 @@ import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantManagedLocation;
+import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 
 /**
@@ -125,6 +126,6 @@ public interface MerchantService
 	public AcquireStatus getAcquireStatus(final AcquireStatusType type) throws ServiceException;
 
 	public List<Merchant> getMerchantsWithin(final Location location,
-			final int maxMiles) throws ServiceException;
+			final int maxMiles, final SearchOptions searchOptions) throws ServiceException;
 
 }

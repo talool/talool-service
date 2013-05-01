@@ -11,9 +11,15 @@
 #
 ##################################################################
 
+if [ $# -ne 2 ]
+then
+  echo "Usage: `basename $0` schema.sql data.sql"
+  exit $E_BADARGS
+fi
+
 testSchema=$(dirname $0)/test-schema.sql
-taloolSchema=$(dirname $0)/talool-schema.sql
-taloolData=$(dirname $0)/talool-data.sql
+taloolSchema=$(dirname $0)/$1
+taloolData=$(dirname $0)/$2
 testDbName="talooltest"
 
 echo "Dropping Database '$testDbName' ..."
@@ -22,7 +28,7 @@ dropdb -U postgres -w $testDbName
 echo "Creating $testSchema from $taloolSchema..."
 sedStmt="s/CREATE DATABASE talool/CREATE DATABASE $testDbName/g;s/ALTER DATABASE talool/ALTER DATABASE $testDbName/g;s/connect talool/connect $testDbName/"
 
-sed -e "$sedStmt" talool-schema.sql > $testSchema 
+sed -e "$sedStmt" $taloolSchema > $testSchema 
 
 echo "Creating Database '$testDbName' ..."
 createdb -U postgres -w $testDbName

@@ -11,8 +11,8 @@
 #
 ##################################################################
 
-taloolSchema=$(dirname $0)/talool-schema.sql
-taloolData=$(dirname $0)/talool-data.sql
+taloolSchema=$(dirname $0)/$1
+taloolData=$(dirname $0)/$2
 testDbName="talool"
 
 echo "Dropping Database '$testDbName' ..."
