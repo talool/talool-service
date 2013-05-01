@@ -272,7 +272,6 @@ CREATE INDEX merchant_name_idx ON merchant (merchant_name);
 CREATE TABLE merchant_location (
     merchant_location_id bigint NOT NULL,
     merchant_id UUID NOT NULL,
-    is_primary bool NOT NULL DEFAULT false,
     geom geometry(POINT,4326),
     merchant_location_name character varying(64),
     email character varying(128) NOT NULL,

@@ -610,9 +610,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		mel.setEmail("billyjohnson" + now + "@gmail.com");
 		mel.setLogoUrl("http://merch.logos.com/logo.png");
 		mel.setLocationName("Merch" + now * 2);
-
-		merchant.setPrimaryLocation(mel);
-
+		merchant.addLocation(mel);
 		taloolService.save(merchant);
 		taloolService.refresh(merchant);
 
