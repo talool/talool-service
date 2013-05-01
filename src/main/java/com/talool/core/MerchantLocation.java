@@ -40,8 +40,4 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public Double getDistanceInMeters();
 
-	public boolean isPrimary();
-
-	public void setIsPrimary(boolean isPrimary);
-
 }

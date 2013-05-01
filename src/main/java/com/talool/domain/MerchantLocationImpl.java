@@ -67,9 +67,6 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "phone", unique = true, nullable = true, length = 48)
 	private String phone;
 
-	@Column(name = "is_primary", nullable = true)
-	private boolean isPrimary;
-
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = AddressImpl.class)
 	@JoinColumn(name = "address_id")
 	private Address address;
@@ -255,17 +252,4 @@ public class MerchantLocationImpl implements MerchantLocation
 	{
 		this.merchant = merchant;
 	}
-
-	@Override
-	public boolean isPrimary()
-	{
-		return isPrimary;
-	}
-
-	@Override
-	public void setIsPrimary(boolean isPrimary)
-	{
-		this.isPrimary = isPrimary;
-	}
-
 }

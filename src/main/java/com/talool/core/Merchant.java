@@ -28,8 +28,6 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 	 */
 	public List<MerchantLocation> getLocations();
 
-	public void setPrimaryLocation(MerchantLocation merchantLocation);
-
 	public Merchant getParent();
 
 	public Set<MerchantAccount> getMerchantAccounts();
@@ -45,6 +43,8 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 	public void addTag(Tag tag);
 
 	public void addTags(List<Tag> tag);
+
+	public void addLocation(MerchantLocation mloc);
 
 	/**
 	 * Get number of merchant accounts (without loading all objects to count them)
