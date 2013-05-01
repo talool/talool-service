@@ -13,7 +13,7 @@ import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
-import com.talool.core.MerchantManagedLocation;
+import com.talool.core.MerchantLocation;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 
@@ -104,13 +104,13 @@ public interface MerchantService
 	public List<MerchantAccount> getAccountsForMerchant(final UUID merchantId)
 			throws ServiceException;
 
-	public List<MerchantManagedLocation> getLocationsForMerchant(final UUID merchantId)
+	public List<MerchantLocation> getLocationsForMerchant(final UUID merchantId)
 			throws ServiceException;
 
-	public MerchantManagedLocation getMerchantLocationById(final Long merchantManagedLocationId)
+	public MerchantLocation getMerchantLocationById(final Long merchantManagedLocationId)
 			throws ServiceException;
 
-	public void save(final MerchantManagedLocation merchantManagedLocation) throws ServiceException;
+	public void save(final MerchantLocation merchantLocation) throws ServiceException;
 
 	public MerchantAccount getMerchantAccountById(final Long merchantAccountId)
 			throws ServiceException;

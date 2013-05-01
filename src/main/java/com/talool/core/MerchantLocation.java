@@ -6,6 +6,10 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 {
+	public Merchant getMerchant();
+
+	public void setMerchant(final Merchant merchant);
+
 	public String getLocationName();
 
 	public void setLocationName(String name);
@@ -35,5 +39,9 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 	public void setGeometry(Geometry geometry);
 
 	public Double getDistanceInMeters();
+
+	public boolean isPrimary();
+
+	public void setIsPrimary(boolean isPrimary);
 
 }

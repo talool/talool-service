@@ -26,8 +26,6 @@ public interface DomainFactory
 
 	public MerchantLocation newMerchantLocation();
 
-	public MerchantManagedLocation newMerchantManagedLocation(Merchant merchant);
-
 	public MerchantAccount newMerchantAccount(Merchant merchant);
 
 	public Customer newCustomer();

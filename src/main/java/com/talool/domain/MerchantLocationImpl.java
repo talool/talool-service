@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernatespatial.GeometryUserType;
 
 import com.talool.core.Address;
+import com.talool.core.Merchant;
 import com.talool.core.MerchantLocation;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -46,6 +48,10 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "merchant_location_id", unique = true, nullable = false)
 	private Long id;
 
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
+	@JoinColumn(name = "merchant_id")
+	private Merchant merchant;
+
 	@Column(name = "merchant_location_name", unique = false, nullable = true, length = 64)
 	private String locationName;
 
@@ -60,6 +66,9 @@ public class MerchantLocationImpl implements MerchantLocation
 
 	@Column(name = "phone", unique = true, nullable = true, length = 48)
 	private String phone;
+
+	@Column(name = "is_primary", nullable = true)
+	private boolean isPrimary;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = AddressImpl.class)
 	@JoinColumn(name = "address_id")
@@ -188,14 +197,16 @@ public class MerchantLocationImpl implements MerchantLocation
 			return false;
 		}
 
-		return new EqualsBuilder().append(getLocationName(), other.getLocationName())
+		return new EqualsBuilder().append(getMerchant(), other.getMerchant())
+				.append(getLocationName(), other.getLocationName())
 				.append(getAddress(), other.getAddress()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getLocationName()).append(getAddress()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getMerchant()).append(getLocationName())
+				.append(getAddress()).hashCode();
 	}
 
 	@Override
@@ -231,6 +242,30 @@ public class MerchantLocationImpl implements MerchantLocation
 	public Double getDistanceInMeters()
 	{
 		return distanceInMeters;
+	}
+
+	@Override
+	public Merchant getMerchant()
+	{
+		return merchant;
+	}
+
+	@Override
+	public void setMerchant(Merchant merchant)
+	{
+		this.merchant = merchant;
+	}
+
+	@Override
+	public boolean isPrimary()
+	{
+		return isPrimary;
+	}
+
+	@Override
+	public void setIsPrimary(boolean isPrimary)
+	{
+		this.isPrimary = isPrimary;
 	}
 
 }

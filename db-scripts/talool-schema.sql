@@ -12,6 +12,10 @@ ALTER DATABASE talool OWNER TO talool;
 
 \connect talool
 
+ALTER TABLE spatial_ref_sys OWNER TO talool;
+ALTER VIEW geography_columns OWNER TO talool;
+ALTER VIEW geometry_columns OWNER TO talool;
+
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
@@ -250,20 +254,36 @@ ALTER TABLE public.social_network_id_seq OWNER TO talool;
 ALTER SEQUENCE social_network_id_seq OWNED BY social_network.social_network_id;
 ALTER TABLE ONLY social_network ALTER COLUMN social_network_id SET DEFAULT nextval('social_network_id_seq'::regclass);
 
+CREATE TABLE merchant (
+	merchant_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    merchant_parent_id UUID,
+    merchant_name character varying(64) NOT NULL,
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    update_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY (merchant_id),
+    UNIQUE (merchant_name)
+);
+
+ALTER TABLE public.merchant OWNER TO talool;
+
+ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (merchant_parent_id) REFERENCES merchant(merchant_id);
+CREATE INDEX merchant_name_idx ON merchant (merchant_name);
+
 CREATE TABLE merchant_location (
     merchant_location_id bigint NOT NULL,
+    merchant_id UUID NOT NULL,
+    is_primary bool NOT NULL DEFAULT false,
+    geom geometry(POINT,4326),
     merchant_location_name character varying(64),
     email character varying(128) NOT NULL,
     website_url character varying(128),
     logo_url character varying(64) NOT NULL,
     phone character varying(48),
-    latitude double precision,
-    longitude double precision,
     address_id bigint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY (merchant_location_id),
-    UNIQUE (merchant_location_name,address_id)
+    UNIQUE (merchant_id,address_id)
 );
 
 ALTER TABLE public.merchant_location OWNER TO talool;
@@ -280,26 +300,10 @@ ALTER SEQUENCE merchant_location_merchant_location_id_seq OWNED BY merchant_loca
 ALTER TABLE ONLY merchant_location ALTER COLUMN merchant_location_id SET DEFAULT nextval('merchant_location_merchant_location_id_seq'::regclass);
 
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Address" FOREIGN KEY (address_id) REFERENCES address(address_id);
+ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 CREATE INDEX merchant_location_name_idx ON merchant_location (merchant_location_name);
-CREATE INDEX merchant_location_latitude_idx ON merchant_location (latitude);
-CREATE INDEX merchant_location_longitude_idx ON merchant_location (longitude);
-
-CREATE TABLE merchant (
-	merchant_id UUID NOT NULL DEFAULT uuid_generate_v4(),
-    merchant_parent_id UUID,
-    primary_location_id bigint NOT NULL,
-    merchant_name character varying(64) NOT NULL,
-    create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY (merchant_id),
-    UNIQUE (merchant_name,primary_location_id)
-);
-
-ALTER TABLE public.merchant OWNER TO talool;
-
-ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (merchant_parent_id) REFERENCES merchant(merchant_id);
-ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_MechantLocation" FOREIGN KEY (primary_location_id) REFERENCES merchant_location(merchant_location_id);
-CREATE INDEX merchant_name_idx ON merchant (merchant_name);
+CREATE INDEX merchant_location_merchant_idx ON merchant_location (merchant_id);
+CREATE INDEX merchant_location_geom_idx ON merchant_location USING GIST (geom);
 
 CREATE TABLE property_type (
     property_type_id smallint NOT NULL,
@@ -331,29 +335,6 @@ CREATE TABLE merchant_request (
    update_dt timestamp without time zone NOT NULL,
    PRIMARY KEY(merchant_request_id)
 );
-
-
-CREATE SEQUENCE merchant_managed_location_merchant_managed_location_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-    
-CREATE TABLE merchant_managed_location (
-    merchant_managed_location_id bigint NOT NULL,
-    merchant_id UUID NOT NULL,
-    merchant_location_id bigint NOT NULL,
-    create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY (merchant_managed_location_id)
-);
-
-ALTER TABLE public.merchant_managed_location OWNER TO talool;
-ALTER TABLE public.merchant_managed_location_merchant_managed_location_id_seq OWNER TO talool;
-ALTER SEQUENCE merchant_managed_location_merchant_managed_location_id_seq OWNED BY merchant_managed_location.merchant_managed_location_id;
-ALTER TABLE ONLY merchant_managed_location ALTER COLUMN merchant_managed_location_id SET DEFAULT nextval('merchant_managed_location_merchant_managed_location_id_seq'::regclass);
-ALTER TABLE ONLY merchant_managed_location ADD CONSTRAINT "FK_MerchantManagedLocation_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
-ALTER TABLE ONLY merchant_managed_location ADD CONSTRAINT "FK_MerchantManagedLocation_MerchantLocation" FOREIGN KEY (merchant_location_id) REFERENCES merchant_location(merchant_location_id);
 
 CREATE TABLE merchant_account (
  	merchant_account_id bigint NOT NULL,

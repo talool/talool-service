@@ -602,7 +602,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Location location = domainFactory.newLocation(-10.564142, -74.047852);
 
 		MerchantLocation mel = domainFactory.newMerchantLocation();
-
+		// mel.setMerchant(merchant);
 		mel.setAddress(address);
 
 		mel.setPhone("781-818-1212");

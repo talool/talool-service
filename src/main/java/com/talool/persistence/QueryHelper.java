@@ -18,14 +18,9 @@ public final class QueryHelper
 {
 	public static final String MERCHANTS_WITHIN_METERS =
 			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*, addr.*,ST_Distance( mloc.geom,'${point}',true) "
-					+
-					"as distanceInMeters FROM public.merchant as merchant, public.merchant_managed_location as mmloc, "
-					+
-					"public.merchant_location as mloc, public.address as addr "
-					+
-					"WHERE merchant.merchant_id=mmloc.merchant_id AND mmloc.merchant_location_id=mloc.merchant_location_id "
-					+
-					"AND ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) and addr.address_id=mloc.address_id";
+					+ "as distanceInMeters FROM public.merchant as merchant, public.merchant_location as mloc, public.address as addr "
+					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) and mloc.address_id=addr.address_id "
+					+ "and mloc.merchant_id=merchant.merchant_id";
 
 	public static final String GET_DEAL_ACQUIRES =
 			"select dealAcquire from DealAcquireImpl dealAcquire, " +

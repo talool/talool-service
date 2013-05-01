@@ -31,13 +31,13 @@ INSERT INTO customer(email, password, first_name, last_name, sex_t)
 -------------- Talool Merchant/Address/Accounts ------------------
 INSERT INTO address (address1,address2,city,state_province_county,zip,country)
        VALUES ('1267 Lafayette St.','Unit 504','Denver','CO','80218','US');
-   		
-INSERT INTO merchant_location (email,website_url,logo_url,phone,address_id)
-        VALUES( 'team@talool.com','http://www.talool.com','','720-446-6075',(select max(address_id) from address));
-       
-INSERT INTO merchant (primary_location_id,merchant_name)
-       VALUES ((select merchant_location_id from merchant_location where email='team@talool.com'),'Talool');
+   	
+INSERT INTO merchant (merchant_name) VALUES ('Talool');
 
+INSERT INTO merchant_location (merchant_id,is_primary,email,website_url,logo_url,phone,address_id)
+        VALUES( (select merchant_id from merchant where merchant_name='Talool'),true,
+                'team@talool.com','http://www.talool.com','','720-446-6075',(select max(address_id) from address));
+          
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='Talool'),'doug@talool.com',(select md5('pass123')),'CEO',true);     
        
@@ -47,13 +47,13 @@ INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_c
 --------------- --PaybackBook Merchant/Address/Accounts ----------------
 INSERT INTO address (address1,address2,city,state_province_county,zip,country)
        VALUES ('6715 NE 63rd St.','PO Box 195','Vancouver','WA','98661','US');
-   		
-INSERT INTO merchant_location (email,website_url,logo_url,phone,address_id)
-        VALUES( 'paybackbook@aol.com','http://www.paybackbook.com','','1.360.699.1252',
-          (select address_id from address where address1='6715 NE 63rd St.'));
-       
-INSERT INTO merchant (primary_location_id,merchant_name)
-       VALUES ((select merchant_location_id from merchant_location where email='paybackbook@aol.com'),'Payback Book');
+
+INSERT INTO merchant (merchant_name) VALUES ('Payback Book');
+
+INSERT INTO merchant_location (merchant_id,is_primary,email,website_url,logo_url,phone,address_id)
+        VALUES(  (select merchant_id from merchant where merchant_name='Payback Book'),true,
+          		  'paybackbook@aol.com','http://www.paybackbook.com','','1.360.699.1252',
+          		  (select address_id from address where address1='6715 NE 63rd St.'));
 
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='Payback Book'),'paybackbook@aol.com',(select md5('pass123')),'Owner',true);     
@@ -61,37 +61,29 @@ INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_c
 ---------------------The Kitche Merchant/Address/Accounts ----------------
 INSERT INTO address (address1,city,state_province_county,zip,country)
        VALUES ('1039 Pearl St','Boulder','CO','80302','US');
+
+INSERT INTO merchant (merchant_name) VALUES ('The Kitchen');
+
+INSERT INTO merchant_location (merchant_id,is_primary,email,website_url,logo_url,phone,address_id)
+        VALUES(  (select merchant_id from merchant where merchant_name='The Kitchen'),true,
+			      'info@thekitchencafe.com','http://thekitchencommunity.com','','303.544.5973',
+       	 		  (select address_id from address where address1='1039 Pearl St'));
       
-INSERT INTO merchant_location (email,website_url,logo_url,phone,address_id)
-        VALUES( 'info@thekitchencafe.com','http://thekitchencommunity.com','','303.544.5973',
-        (select address_id from address where address1='1039 Pearl St'));
-       
-INSERT INTO merchant (primary_location_id,merchant_name)
-       VALUES ((select merchant_location_id from merchant_location where email='info@thekitchencafe.com'),'The Kitchen Boulder & [Upstairs]');
-       
-INSERT INTO merchant_managed_location (merchant_id,merchant_location_id)
-       VALUES ((select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
-               (select merchant_location_id from merchant_location where email='info@thekitchencafe.com'));
 
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
-       VALUES ((select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),'merle@thekitchencafe.com',(select md5('pass123')),'CFO',true);     
+       VALUES ((select merchant_id from merchant where merchant_name='The Kitchen'),'merle@thekitchencafe.com',(select md5('pass123')),'CFO',true);     
 
 --------------------- Centro Merchant/Address/Accounts ----------------
 INSERT INTO address (address1,city,state_province_county,zip,country)
        VALUES ('950 Pearl St','Boulder','CO','80302','US');
-      
-INSERT INTO merchant_location (email,website_url,logo_url,phone,address_id)
-        VALUES( 'info@centrolatinkitchen.com','http://www.centrolatinkitchen.com','','303.442.7771',
-        (select address_id from address where address1='950 Pearl St'));
-       
-INSERT INTO merchant (primary_location_id,merchant_name)
-       VALUES ((select merchant_location_id from merchant_location where email='info@centrolatinkitchen.com'),'Centro Latin Kitchen');
-       
-       
-INSERT INTO merchant_managed_location (merchant_id,merchant_location_id)
-       VALUES ((select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),
-               (select merchant_location_id from merchant_location where email='info@centrolatinkitchen.com'));
 
+INSERT INTO merchant (merchant_name) VALUES ('Centro Latin Kitchen');
+             
+INSERT INTO merchant_location (merchant_id,is_primary,email,website_url,logo_url,phone,address_id)
+        VALUES( (select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),true,
+        		'info@centrolatinkitchen.com','http://www.centrolatinkitchen.com','','303.442.7771',
+        		(select address_id from address where address1='950 Pearl St'));
+       
 ---------Test Deal Offers & Deals -------------------------------   
 
 INSERT INTO deal_offer( merchant_id, created_by_merchant_account_id,updated_by_merchant_account_id, 
@@ -103,7 +95,7 @@ INSERT INTO deal_offer( merchant_id, created_by_merchant_account_id,updated_by_m
                 
 INSERT INTO deal_offer( merchant_id, created_by_merchant_account_id,updated_by_merchant_account_id, 
                         deal_type,title,summary,code,price,is_active )
-        VALUES( (select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+        VALUES( (select merchant_id from merchant where merchant_name='The Kitchen'),
                 (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                 (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                 'FREE_BOOK','The Kitchen Test Book #1','The Kitchen Test Book #1','kitchen-code12345','0.00',true);
@@ -127,7 +119,7 @@ INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updat
 INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updated_by_merchant_account_id,
                   title, summary, details, code, expires, is_active)
        VALUES( (select deal_offer_id from deal_offer where title='Payback Book Test Book #1'),
-               (select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+               (select merchant_id from merchant where merchant_name='The Kitchen'),
                (select merchant_account_id from merchant_account where email='paybackbook@aol.com'),
                (select merchant_account_id from merchant_account where email='paybackbook@aol.com'),
                'Free Wine Tasting', 'Free Wine Tasting', 'Free Wine Tasting','kitchen-asdas','2015/11/20',true);
@@ -135,7 +127,7 @@ INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updat
 INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updated_by_merchant_account_id,
                   title, summary, details, code, expires, is_active)
        VALUES( (select deal_offer_id from deal_offer where title='Payback Book Test Book #1'),
-               (select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+               (select merchant_id from merchant where merchant_name='The Kitchen'),
                (select merchant_account_id from merchant_account where email='paybackbook@aol.com'),
                (select merchant_account_id from merchant_account where email='paybackbook@aol.com'),
                '2 for 1 Lunch', '2 for 1 Lunch', '2 for 1 Lunch','kitchen-bdhdf','2015/11/20',true);    
@@ -144,7 +136,7 @@ INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updat
 INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updated_by_merchant_account_id,
                   title, summary, details, code, expires, is_active)
        VALUES( (select deal_offer_id from deal_offer where title='The Kitchen Test Book #1'),
-               (select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+               (select merchant_id from merchant where merchant_name='The Kitchen'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                'Free Garlic Fries', 'Free Garlic Fries with purchase of lunch or dinner', 'Free Garlic Fries with purchase of lunch or dinner',
@@ -153,7 +145,7 @@ INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updat
 INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updated_by_merchant_account_id,
                   title, summary, details, code, expires, is_active)
        VALUES( (select deal_offer_id from deal_offer where title='The Kitchen Test Book #1'),
-               (select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+               (select merchant_id from merchant where merchant_name='The Kitchen'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                '1/2 Off Wine', '1/2 Off Wine', '1/2 Off Wine',
@@ -162,7 +154,7 @@ INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updat
 INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updated_by_merchant_account_id,
                   title, summary, details, code, expires, is_active)
        VALUES( (select deal_offer_id from deal_offer where title='The Kitchen Test Book #1'),
-               (select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+               (select merchant_id from merchant where merchant_name='The Kitchen'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                'Free Drinks at Community Event','Free Drinks at Community Event', 'Free Drinks at Community Event',
@@ -171,7 +163,7 @@ INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updat
 INSERT INTO deal (deal_offer_id,merchant_id,created_by_merchant_account_id,updated_by_merchant_account_id,
                   title, summary, details, code, expires, is_active)
        VALUES( (select deal_offer_id from deal_offer where title='The Kitchen Test Book #1'),
-               (select merchant_id from merchant where merchant_name='The Kitchen Boulder & [Upstairs]'),
+               (select merchant_id from merchant where merchant_name='The Kitchen'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                (select merchant_account_id from merchant_account where email='merle@thekitchencafe.com'),
                'Buy 1 Get 1 Free Lunch', 'Buy 1 Get 1 Free Lunch', 'Buy 1 Get 1 Free Lunch (M-F only)',

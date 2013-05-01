@@ -10,23 +10,32 @@
 #    localhost:5432:postgres:postgres:XXXXXX
 #
 ##################################################################
+set -e
+
+if [ $# -ne 3 ]
+then
+  echo "Usage: `basename $0` schema.sql data.sql /Library/PostgreSQL/9.2/share/postgresql/contrib/postgis/" 
+  exit -1
+fi
 
 taloolSchema=$(dirname $0)/$1
 taloolData=$(dirname $0)/$2
-testDbName="talool"
+#postGisDir=/Library/PostgreSQL/9.2/share/postgresql/contrib/postgis/
+postGisDir=$3
+dbName="talool"
 
-echo "Dropping Database '$testDbName' ..."
-dropdb -U postgres -w $testDbName
+echo "Dropping Database '$dbName' ..."
+dropdb -U postgres -w $dbName
 
-if [ $? -eq 1 ]; then
-  exit
-fi
+echo "Creating Database '$dbName' ..."
+createdb -U postgres -w $dbName
 
-echo "Creating Database '$testDbName' ..."
-createdb -U postgres -w $testDbName
+echo "Installing PostGIS '$dbName' ..."
+psql -U postgres -d $dbName -f $postGisDir/postgis.sql
+psql -U postgres -d $dbName -f $postGisDir/spatial_ref_sys.sql
+ 
+echo "Importing $dbName schema..."
+psql -U postgres -w $dbName < $taloolSchema
 
-echo "Importing $testDbName schema..."
-psql -U postgres -w $testDbName < $taloolSchema
-
-echo "Importing $taloolData into Database '$testDbName' ..."
-psql -U postgres -w $testDbName < $taloolData
+echo "Importing $taloolData into Database '$dbName' ..."
+psql -U postgres -w $dbName < $taloolData

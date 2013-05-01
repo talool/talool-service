@@ -11,16 +11,17 @@
 #
 ##################################################################
 
-if [ $# -ne 2 ]
+if [ $# -ne 3 ]
 then
-  echo "Usage: `basename $0` schema.sql data.sql"
-  exit $E_BADARGS
+  echo "Usage: `basename $0` schema.sql data.sql /Library/PostgreSQL/9.2/share/postgresql/contrib/postgis/"
+  exit -1
 fi
 
 testSchema=$(dirname $0)/test-schema.sql
 taloolSchema=$(dirname $0)/$1
 taloolData=$(dirname $0)/$2
 testDbName="talooltest"
+postGisDir=$3
 
 echo "Dropping Database '$testDbName' ..."
 dropdb -U postgres -w $testDbName
@@ -32,6 +33,11 @@ sed -e "$sedStmt" $taloolSchema > $testSchema
 
 echo "Creating Database '$testDbName' ..."
 createdb -U postgres -w $testDbName
+
+echo "Installing PostGIS '$dbName' ..."
+psql -U postgres -d $testDbName -f $postGisDir/postgis.sql
+
+psql -U postgres -d $testDbName -f $postGisDir/spatial_ref_sys.sql
 
 echo "Importing $testDbName schema..."
 psql -U postgres -w $testDbName < $testSchema
