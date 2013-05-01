@@ -48,6 +48,7 @@
 		<property name="packagesToScan">
 			<list>
 				<value>com.talool.domain</value>
+			    <value>com.talool.persistence</value>
 			</list>
 		</property>
 

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
@@ -69,7 +70,8 @@ import com.talool.domain.MerchantManagedLocationImpl;
 import com.talool.domain.RelationshipImpl;
 import com.talool.domain.SocialNetworkImpl;
 import com.talool.domain.TagImpl;
-import com.talool.service.QueryHelper.QueryType;
+import com.talool.persistence.QueryHelper;
+import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.utils.SpatialUtils;
 
 /**
@@ -1505,14 +1507,29 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
-	public void reattach(Object obj) throws ServiceException {
+	public void reattach(final Object obj) throws ServiceException
+	{
+		try
+		{
+			getSessionFactory().getCurrentSession().buildLockRequest(LockOptions.NONE);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem reattaching", e);
+		}
+	}
+
+	@Override
+	public void merge(final Object obj) throws ServiceException
+	{
 		try
 		{
 			getSessionFactory().getCurrentSession().merge(obj);
 		}
 		catch (Exception e)
 		{
-			throw new ServiceException("There was a problem reattaching", e);
+			throw new ServiceException("There was a problem merging", e);
 		}
+
 	}
 }

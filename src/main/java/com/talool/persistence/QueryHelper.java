@@ -1,4 +1,4 @@
-package com.talool.service;
+package com.talool.persistence;
 
 import java.util.Map;
 

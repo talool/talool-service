@@ -50,7 +50,9 @@ public interface TaloolService extends MerchantService, CustomerService
 
 	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId)
 			throws ServiceException;
-	
-	public void reattach(Object obj) throws ServiceException;
+
+	public void reattach(final Object obj) throws ServiceException;
+
+	public void merge(final Object obj) throws ServiceException;
 
 }
