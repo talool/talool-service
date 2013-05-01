@@ -1,7 +1,11 @@
 package com.talool.domain;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.LazyInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +26,8 @@ import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.core.SocialAccount;
 import com.talool.core.Tag;
+import com.talool.core.service.ServiceException;
+import com.talool.core.service.TaloolService;
 
 /**
  * Default Factory for all domain objects
@@ -135,10 +141,59 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public Deal newDeal(final MerchantAccount createdByMerchantAccount)
+	public Deal newDeal(final MerchantAccount createdByMerchantAccount, final boolean setDefaults)
 	{
 		final Deal deal = new DealImpl(createdByMerchantAccount);
 		deal.setUpdatedByMerchantAccount(createdByMerchantAccount);
+		
+		if (setDefaults)
+		{
+			deal.setMerchant(createdByMerchantAccount.getMerchant());
+			
+			TaloolService taloolService = FactoryManager.get().getServiceFactory().getTaloolService();
+			
+			/*
+			 * Grab a DealOffer from the logged in Merchant and
+			 * use it's expiration date as the default for the Deal
+			 */
+			try {
+				List<DealOffer> offers = taloolService.getDealOffersByMerchantId(createdByMerchantAccount.getMerchant().getId());
+				if (CollectionUtils.isNotEmpty(offers)) {
+					// TODO New Deals should default to the most recently updated DealOffer
+					DealOffer dealOffer = offers.get(0);
+					deal.setDealOffer(dealOffer);
+					deal.setExpires(dealOffer.getExpires());
+				}
+				
+			}
+			catch (ServiceException se)
+			{
+				LOG.error("Failed to get offers for logged in merchant", se);
+			}
+			
+			/*
+			 * Pass the Merchant's tags to the Deal by default
+			 * TODO should use "reattach" rather than "refresh"
+			 */ 
+			try {
+				Merchant merchant = createdByMerchantAccount.getMerchant();
+				taloolService.refresh(merchant);
+				Set<Tag> tags = merchant.getTags();
+				if (CollectionUtils.isNotEmpty(tags)) {
+					deal.setTags(tags);
+				}
+			}
+			catch (ServiceException se)
+			{
+				LOG.error("Failed to reattach the merchant when getting tags", se);
+			}
+			catch (Exception e)
+			{
+				LOG.error("Failed to get tags for logged in merchant", e);
+			}
+			
+		}
+		
 		return deal;
 	}
 
