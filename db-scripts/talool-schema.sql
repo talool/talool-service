@@ -209,7 +209,35 @@ ALTER TABLE public.tag OWNER TO talool;
 ALTER TABLE public.tag_tag_id_seq OWNER TO talool;
 ALTER SEQUENCE tag_tag_id_seq OWNED BY tag.tag_id;
 ALTER TABLE ONLY tag ALTER COLUMN tag_id SET DEFAULT nextval('tag_tag_id_seq'::regclass);
-CREATE UNIQUE INDEX tag_name_idx ON tag (name);
+CREATE UNIQUE INDEX tag_name_lower_idx ON tag (lower(name));
+
+CREATE TABLE category (
+    category_id smallint NOT NULL,
+    name character varying(32) NOT NULL,
+    PRIMARY KEY (category_id)
+);
+
+CREATE SEQUENCE category_category_id_seq 
+ 	START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    CACHE 1;
+
+ALTER TABLE public.category OWNER TO talool;
+ALTER TABLE public.category_category_id_seq OWNER TO talool;
+ALTER SEQUENCE category_category_id_seq OWNED BY category.category_id;
+ALTER TABLE ONLY category ALTER COLUMN category_id SET DEFAULT nextval('category_category_id_seq'::regclass);
+CREATE UNIQUE INDEX category_name_lower_idx ON category (lower(name));
+
+CREATE TABLE category_tag (
+    category_id smallint NOT NULL,
+    tag_id smallint NOT NULL,
+    PRIMARY KEY (category_id,tag_id)
+);
+
+ALTER TABLE public.category_tag OWNER TO talool;
+ALTER TABLE ONLY category_tag ADD CONSTRAINT "FK_CategoryTag_Category" FOREIGN KEY (category_id) REFERENCES category(category_id);
+ALTER TABLE ONLY category_tag ADD CONSTRAINT "FK_CategoryTag_Tag" FOREIGN KEY (tag_id) REFERENCES tag(tag_id);
 
 CREATE SEQUENCE social_network_id_seq 
  	START WITH 1
@@ -547,6 +575,28 @@ CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FO
 CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();
 CREATE TRIGGER deal_acquire_update BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE deal_acquire_update();
 
+CREATE FUNCTION add_category_tag(text,text) RETURNS VOID
+LANGUAGE plpgsql
+AS $$
+DECLARE
+	cat_id smallint;
+	tg_id smallint;
+	cat_tg_id smallint;
+BEGIN
+  SELECT category_id INTO cat_id FROM category WHERE name = $1;
+  IF NOT FOUND THEN
+      INSERT INTO category(name) VALUES($1);
+      SELECT category_id INTO cat_id FROM category WHERE name = $1;
+  END IF;
+  
+  SELECT tag_id INTO tg_id FROM tag WHERE name = $2;
+  IF NOT FOUND THEN
+      INSERT INTO tag(name) VALUES($2);
+      SELECT tag_id INTO tg_id FROM tag WHERE name = $2;
+  END IF;
 
+  INSERT INTO category_tag(category_id,tag_id) VALUES(cat_id,tg_id);
+END;
+$$
 
 

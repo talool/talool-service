@@ -34,6 +34,8 @@ import com.googlecode.genericdao.search.Sort;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
 import com.talool.core.AcquireStatusType;
+import com.talool.core.Category;
+import com.talool.core.CategoryTag;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
@@ -56,6 +58,8 @@ import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.domain.AcquireStatusImpl;
 import com.talool.domain.AddressImpl;
+import com.talool.domain.CategoryImpl;
+import com.talool.domain.CategoryTagImpl;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireHistoryImpl;
 import com.talool.domain.DealAcquireImpl;
@@ -507,7 +511,7 @@ public class TaloolServiceImpl implements TaloolService
 		try
 		{
 			final Search search = new Search(TagImpl.class);
-			search.addFilterEqual("name", cleanTagName(tagName));
+			search.addFilterEqual("name", tagName);
 			return (Tag) daoDispatcher.searchUnique(search);
 		}
 		catch (Exception ex)
@@ -1531,4 +1535,101 @@ public class TaloolServiceImpl implements TaloolService
 		}
 
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Category> getAllCategories() throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(CategoryImpl.class);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(
+					String.format("Problem getAllCategories"), ex);
+		}
+	}
+
+	@Transactional(propagation = Propagation.NESTED)
+	protected void persistObject(Object obj) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(obj);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem saving object" + obj, e);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final Tag tag) throws ServiceException
+	{
+		persistObject(tag);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final Category category) throws ServiceException
+	{
+		persistObject(category);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public CategoryTag createCategoryTag(final String categoryName, final String tagName)
+			throws ServiceException
+	{
+		CategoryTag categoryTag;
+
+		try
+		{
+			Category category = getCategory(categoryName);
+			Tag tag = getTag(tagName);
+			if (category == null)
+			{
+				category = new CategoryImpl();
+				category.setName(categoryName);
+			}
+			if (tag == null)
+			{
+				tag = new TagImpl();
+				tag.setName(tagName);
+			}
+
+			categoryTag = new CategoryTagImpl(category, tag);
+
+			daoDispatcher.save(category);
+			daoDispatcher.save(tag);
+			daoDispatcher.save(categoryTag);
+
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(String.format(
+					"There was a problem saving category %s tageName %s", categoryName, tagName), e);
+		}
+
+		return categoryTag;
+	}
+
+	@Override
+	public Category getCategory(final String categoryName) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(CategoryImpl.class);
+			search.addFilterEqual("name", categoryName);
+			return (Category) daoDispatcher.searchUnique(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getCategory %s", categoryName), ex);
+		}
+	}
+
 }

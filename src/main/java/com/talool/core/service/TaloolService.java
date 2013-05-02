@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.talool.core.AccountType;
+import com.talool.core.Category;
+import com.talool.core.CategoryTag;
 import com.talool.core.Customer;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
@@ -31,6 +33,17 @@ public interface TaloolService extends MerchantService, CustomerService
 	public void addTags(List<Tag> tags) throws ServiceException;
 
 	public Set<Tag> getOrCreateTags(String... tags) throws ServiceException;
+
+	public List<Category> getAllCategories() throws ServiceException;
+
+	public Category getCategory(final String categoryName) throws ServiceException;
+
+	public void save(final Category category) throws ServiceException;
+
+	public void save(final Tag category) throws ServiceException;
+
+	public CategoryTag createCategoryTag(final String categoryName, final String tagName)
+			throws ServiceException;
 
 	public void refresh(Object obj) throws ServiceException;
 

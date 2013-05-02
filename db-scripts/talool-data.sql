@@ -188,4 +188,37 @@ INSERT INTO deal_offer_purchase (deal_offer_id,customer_id)
         VALUES ( (select deal_offer_id from deal_offer where title='Payback Book Test Book #1'),  
                  (select customer_id from customer where email='douglasmccuen@gmail.com')); 
 
+-- categories
 
+select add_category_tag('Food','Breakfast');
+select add_category_tag('Food','Lunch');
+select add_category_tag('Food','Dinner');
+select add_category_tag('Food','Burgers');
+select add_category_tag('Food','Coffee');
+select add_category_tag('Food','Bagels');
+select add_category_tag('Food','Pizza');
+select add_category_tag('Food','Pasta');
+select add_category_tag('Food','Burritos');
+select add_category_tag('Food','Cafe');
+select add_category_tag('Food','Fish');
+select add_category_tag('Food','Seafood');
+select add_category_tag('Food','Sushi');
+select add_category_tag('Food','Fish');
+
+select add_category_tag('Shopping Services','Antique Shop');
+select add_category_tag('Shopping Services','Arts & Crafts Store');
+select add_category_tag('Shopping Services','Bike Shop');
+select add_category_tag('Shopping Services','Board Shop');
+select add_category_tag('Shopping Services','Bookstore');
+select add_category_tag('Shopping Services','Bridal Shop');
+select add_category_tag('Shopping Services','Salon');
+select add_category_tag('Shopping Services','Dry Cleaning');
+
+select add_category_tag('Nightlife','Sports Bar');
+select add_category_tag('Nightlife','Dance Club');
+select add_category_tag('Nightlife','Live Music');
+
+              
+
+-- select * from category c, tag as t, tag as cat_t  where c.category_tag_id=cat_t.tag_id and c.tag_id=t.tag_id order by c.category_tag_id;           
+               

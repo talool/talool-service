@@ -3,6 +3,7 @@ package com.talool.service;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -99,6 +100,25 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void setup()
 	{
 		domainFactory = FactoryManager.get().getDomainFactory();
+	}
+
+	@Test
+	public void testCategories() throws ServiceException
+	{
+		Long now = Calendar.getInstance().getTime().getTime();
+		taloolService.createCategoryTag("Food" + now, "Pizza" + now);
+		taloolService.createCategoryTag("Food" + now, "Burgers" + now);
+		taloolService.createCategoryTag("Food" + now, "Sandwiches" + now);
+		taloolService.createCategoryTag("Food" + now, "Chinese" + now);
+		taloolService.createCategoryTag("Nightlife" + now, "Clubs" + now);
+		taloolService.createCategoryTag("Nightlife" + now, "Bars" + now);
+		taloolService.createCategoryTag("Nightlife" + now, "Late Night Eats" + now);
+		taloolService.createCategoryTag("Nightlife" + now, "Comedy" + now);
+
+		Assert.assertNotNull(taloolService.getCategory("Food" + now));
+
+		Assert.assertNotNull(taloolService.getCategory("Nightlife" + now));
+
 	}
 
 	@Test
