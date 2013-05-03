@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,9 +23,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
+import com.talool.cache.TagCache;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
 import com.talool.core.Address;
+import com.talool.core.Category;
+import com.talool.core.CategoryTag;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
@@ -61,6 +65,17 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceTest.class);
 
 	private DomainFactory domainFactory;
+
+	private class TagNameComparator implements Comparator<Tag>
+	{
+
+		@Override
+		public int compare(Tag o1, Tag o2)
+		{
+			return o1.getName().compareTo(o2.getName());
+		}
+
+	}
 
 	// I am using this because i dont want to clone components, i just want IDs
 	// to make it easier
@@ -103,21 +118,85 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	}
 
 	@Test
-	public void testCategories() throws ServiceException
+	public void testCategories() throws ServiceException, InterruptedException
 	{
 		Long now = Calendar.getInstance().getTime().getTime();
-		taloolService.createCategoryTag("Food" + now, "Pizza" + now);
-		taloolService.createCategoryTag("Food" + now, "Burgers" + now);
-		taloolService.createCategoryTag("Food" + now, "Sandwiches" + now);
-		taloolService.createCategoryTag("Food" + now, "Chinese" + now);
-		taloolService.createCategoryTag("Nightlife" + now, "Clubs" + now);
-		taloolService.createCategoryTag("Nightlife" + now, "Bars" + now);
-		taloolService.createCategoryTag("Nightlife" + now, "Late Night Eats" + now);
-		taloolService.createCategoryTag("Nightlife" + now, "Comedy" + now);
+		final String foodCat = "Food" + now;
+		final String nightLifeCat = "Nightlife" + now;
 
-		Assert.assertNotNull(taloolService.getCategory("Food" + now));
+		List<Tag> foodList = new ArrayList<Tag>();
+		List<Tag> nightLifeList = new ArrayList<Tag>();
 
-		Assert.assertNotNull(taloolService.getCategory("Nightlife" + now));
+		CategoryTag catTag = taloolService.createCategoryTag(foodCat, "Pizza" + now);
+		foodList.add(catTag.getCategoryTag());
+
+		catTag = taloolService.createCategoryTag(foodCat, "Burgers" + now);
+		foodList.add(catTag.getCategoryTag());
+
+		catTag = taloolService.createCategoryTag(foodCat, "Sandwiches" + now);
+		foodList.add(catTag.getCategoryTag());
+
+		catTag = taloolService.createCategoryTag(foodCat, "Chinese" + now);
+		foodList.add(catTag.getCategoryTag());
+
+		catTag = taloolService.createCategoryTag(nightLifeCat, "Clubs" + now);
+		nightLifeList.add(catTag.getCategoryTag());
+
+		catTag = taloolService.createCategoryTag(nightLifeCat, "Bars" + now);
+		nightLifeList.add(catTag.getCategoryTag());
+
+		catTag = taloolService.createCategoryTag(nightLifeCat, "Late Night Eats" + now);
+		nightLifeList.add(catTag.getCategoryTag());
+
+		catTag = taloolService.createCategoryTag(nightLifeCat, "Comedy" + now);
+		nightLifeList.add(catTag.getCategoryTag());
+
+		Category foodCatResult = taloolService.getCategory(foodCat);
+		Category nightlifeCatResult = taloolService.getCategory(nightLifeCat);
+
+		Assert.assertNotNull(foodCatResult);
+		Assert.assertNotNull(nightlifeCatResult);
+
+		final Map<Category, List<Tag>> catTagMap = taloolService.getCategoryTags();
+
+		Collections.sort(foodList, new TagNameComparator());
+		List<Tag> foodResultList = catTagMap.get(foodCatResult);
+		Collections.sort(foodResultList, new TagNameComparator());
+
+		for (int i = 0; i < foodResultList.size(); i++)
+		{
+			Assert.assertEquals(foodResultList.get(0).getName(), foodList.get(0).getName());
+		}
+
+		Collections.sort(nightLifeList, new TagNameComparator());
+		List<Tag> nightLifeResultList = catTagMap.get(nightlifeCatResult);
+		Collections.sort(nightLifeResultList, new TagNameComparator());
+
+		for (int i = 0; i < nightLifeList.size(); i++)
+		{
+			Assert.assertEquals(nightLifeResultList.get(0).getName(), nightLifeList.get(0).getName());
+		}
+
+		TagCache.createInstance(60);
+
+		// give it time to load
+		Thread.sleep(1000l);
+
+		foodResultList = TagCache.get().getTagsByCategoryName(foodCat);
+		Collections.sort(foodResultList, new TagNameComparator());
+
+		for (int i = 0; i < foodResultList.size(); i++)
+		{
+			Assert.assertEquals(foodResultList.get(0).getName(), foodList.get(0).getName());
+		}
+
+		nightLifeResultList = TagCache.get().getTagsByCategoryName(nightLifeCat);
+		Collections.sort(nightLifeResultList, new TagNameComparator());
+
+		for (int i = 0; i < nightLifeList.size(); i++)
+		{
+			Assert.assertEquals(nightLifeResultList.get(0).getName(), nightLifeList.get(0).getName());
+		}
 
 	}
 

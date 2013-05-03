@@ -1632,4 +1632,62 @@ public class TaloolServiceImpl implements TaloolService
 		}
 	}
 
+	@Override
+	public Map<Category, List<Tag>> getCategoryTags() throws ServiceException
+	{
+		final Map<Category, List<Tag>> catTagMap = new HashMap<Category, List<Tag>>();
+
+		try
+		{
+			final Query query = getSessionFactory()
+					.getCurrentSession()
+					.createQuery("from CategoryTagImpl")
+					.setResultTransformer(new ResultTransformer()
+					{
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						public Object transformTuple(final Object[] tuple, final String[] aliases)
+						{
+							final CategoryTag catTag = (CategoryTagImpl) tuple[0];
+							final Category cat = catTag.getCategory();
+							final Tag tag = catTag.getCategoryTag();
+
+							List<Tag> tagList = catTagMap.get(cat);
+							if (tagList == null)
+							{
+								tagList = new ArrayList<Tag>();
+							}
+							tagList.add(tag);
+							LOG.info("Putting: " + cat.getName());
+
+							catTagMap.put(cat, tagList);
+
+							return null;
+						}
+
+						@SuppressWarnings("rawtypes")
+						@Override
+						public List transformList(List collection)
+						{
+							// nothing to return, we built our map
+							return collection;
+						}
+					});
+
+			query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCategoryTags", ex);
+		}
+
+		for (Category entry : catTagMap.keySet())
+		{
+			LOG.info("service: " + entry.getName());
+		}
+
+		return catTagMap;
+	}
 }

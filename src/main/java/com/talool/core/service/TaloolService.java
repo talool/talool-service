@@ -1,6 +1,7 @@
 package com.talool.core.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,6 +38,8 @@ public interface TaloolService extends MerchantService, CustomerService
 	public List<Category> getAllCategories() throws ServiceException;
 
 	public Category getCategory(final String categoryName) throws ServiceException;
+
+	public Map<Category, List<Tag>> getCategoryTags() throws ServiceException;
 
 	public void save(final Category category) throws ServiceException;
 

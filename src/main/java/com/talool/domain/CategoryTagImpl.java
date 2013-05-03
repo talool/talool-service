@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.Tag;
@@ -94,6 +96,12 @@ public class CategoryTagImpl implements CategoryTag
 	public void setCategory(Category category)
 	{
 		this.primaryKey.category = category;
+	}
+
+	@Override
+	public String toString()
+	{
+		return ReflectionToStringBuilder.toString(this);
 	}
 
 }
