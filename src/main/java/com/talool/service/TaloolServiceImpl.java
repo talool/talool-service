@@ -1523,6 +1523,7 @@ public class TaloolServiceImpl implements TaloolService
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void merge(final Object obj) throws ServiceException
 	{
 		try

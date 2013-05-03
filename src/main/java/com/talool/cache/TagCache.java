@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.talool.core.Category;
 import com.talool.core.Tag;
 import com.talool.service.ServiceFactory;
@@ -27,6 +28,7 @@ public final class TagCache
 
 	private volatile Map<Category, List<Tag>> categoryTagMap = new HashMap<Category, List<Tag>>();
 	private volatile Map<String, Category> categoryNameMap = new HashMap<String, Category>();
+	private volatile Map<String, Category> tagNameCategoryMap = new HashMap<String, Category>();
 	private volatile List<Category> categories = new ArrayList<Category>();
 
 	private long cacheRefreshIntervalInMillis = 0;
@@ -51,6 +53,8 @@ public final class TagCache
 
 				final Map<String, Category> _categoryNameMap = new HashMap<String, Category>();
 
+				final Map<String, Category> _tagNameCategoryMap = new HashMap<String, Category>();
+
 				int totalTags = 0;
 
 				if (MapUtils.isNotEmpty(_categoryTagMap))
@@ -59,7 +63,13 @@ public final class TagCache
 					for (final Category cat : _categoryTagMap.keySet())
 					{
 						totalTags += _categoryTagMap.get(cat).size();
-						_categoryNameMap.put(cat.getName(), cat);
+						_categoryNameMap.put(normalizeName(cat.getName()), cat);
+
+						for (final Tag tag : _categoryTagMap.get(cat))
+						{
+							_tagNameCategoryMap.put(normalizeName(tag.getName()), cat);
+						}
+
 					}
 				}
 
@@ -67,6 +77,8 @@ public final class TagCache
 				categoryTagMap = _categoryTagMap;
 				categoryNameMap = _categoryNameMap;
 				categories = ImmutableList.<Category> builder().addAll(_categoryTagMap.keySet()).build();
+				tagNameCategoryMap = ImmutableMap.<String, Category> builder().putAll(_tagNameCategoryMap)
+						.build();
 
 				LOG.info(String.format("Refrehed %d categories and %d total tags", categoryTagMap.keySet()
 						.size(), totalTags));
@@ -88,16 +100,29 @@ public final class TagCache
 		}
 	}
 
+	private static String normalizeName(String tagName)
+	{
+		if (tagName == null)
+		{
+			return null;
+		}
+		return tagName.toLowerCase();
+	}
+
 	public List<Tag> getTagsByCategoryName(final String categoryName)
 	{
-		final Category category = categoryNameMap.get(categoryName);
+		final Category category = categoryNameMap.get(normalizeName(categoryName));
 		if (category == null)
 		{
 			return null;
 		}
 
 		return categoryTagMap.get(category);
+	}
 
+	public Category getCategoryByTagName(final String tagName)
+	{
+		return tagNameCategoryMap.get(normalizeName(tagName));
 	}
 
 	public List<Category> getCategories()
