@@ -24,7 +24,6 @@ public final class TagCache
 {
 	private static final Logger LOG = LoggerFactory.getLogger(TagCache.class);
 	private static TagCache instance;
-	private static final long DEFAULT_REFRESH_INTERVAL = 60000;
 
 	private volatile Map<Category, List<Tag>> categoryTagMap = new HashMap<Category, List<Tag>>();
 	private volatile Map<String, Category> categoryNameMap = new HashMap<String, Category>();
@@ -45,59 +44,65 @@ public final class TagCache
 		@Override
 		public void run()
 		{
-			try
+			while (true)
 			{
-
-				final Map<Category, List<Tag>> _categoryTagMap = ServiceFactory.get().getTaloolService()
-						.getCategoryTags();
-
-				final Map<String, Category> _categoryNameMap = new HashMap<String, Category>();
-
-				final Map<String, Category> _tagNameCategoryMap = new HashMap<String, Category>();
-
-				int totalTags = 0;
-
-				if (MapUtils.isNotEmpty(_categoryTagMap))
+				try
 				{
 
-					for (final Category cat : _categoryTagMap.keySet())
+					final Map<Category, List<Tag>> _categoryTagMap = ServiceFactory.get().getTaloolService()
+							.getCategoryTags();
+
+					final Map<String, Category> _categoryNameMap = new HashMap<String, Category>();
+
+					final Map<String, Category> _tagNameCategoryMap = new HashMap<String, Category>();
+
+					int totalTags = 0;
+
+					if (MapUtils.isNotEmpty(_categoryTagMap))
 					{
-						totalTags += _categoryTagMap.get(cat).size();
-						_categoryNameMap.put(normalizeName(cat.getName()), cat);
 
-						for (final Tag tag : _categoryTagMap.get(cat))
+						for (final Category cat : _categoryTagMap.keySet())
 						{
-							_tagNameCategoryMap.put(normalizeName(tag.getName()), cat);
-						}
+							totalTags += _categoryTagMap.get(cat).size();
+							_categoryNameMap.put(normalizeName(cat.getName()), cat);
 
+							for (final Tag tag : _categoryTagMap.get(cat))
+							{
+								_tagNameCategoryMap.put(normalizeName(tag.getName()), cat);
+							}
+
+						}
 					}
+
+					// set new maps
+					categoryTagMap = _categoryTagMap;
+					categoryNameMap = _categoryNameMap;
+					categories = ImmutableList.<Category> builder().addAll(_categoryTagMap.keySet()).build();
+					tagNameCategoryMap = ImmutableMap.<String, Category> builder()
+							.putAll(_tagNameCategoryMap)
+							.build();
+
+					LOG.info(String.format("Refreshed %d categories and %d total tags", categoryTagMap
+							.keySet()
+							.size(), totalTags));
+
+				}
+				catch (Exception e)
+				{
+					LOG.error("Problem refreshing categoryTagMap", e);
 				}
 
-				// set new maps
-				categoryTagMap = _categoryTagMap;
-				categoryNameMap = _categoryNameMap;
-				categories = ImmutableList.<Category> builder().addAll(_categoryTagMap.keySet()).build();
-				tagNameCategoryMap = ImmutableMap.<String, Category> builder().putAll(_tagNameCategoryMap)
-						.build();
-
-				LOG.info(String.format("Refrehed %d categories and %d total tags", categoryTagMap.keySet()
-						.size(), totalTags));
-
-			}
-			catch (Exception e)
-			{
-				LOG.error("Problem refreshing categoryTagMap", e);
-			}
-
-			try
-			{
-				Thread.sleep(cacheRefreshIntervalInMillis);
-			}
-			catch (InterruptedException e)
-			{
-				LOG.error("Thread interuppted: " + e.getLocalizedMessage(), e);
+				try
+				{
+					Thread.sleep(cacheRefreshIntervalInMillis);
+				}
+				catch (InterruptedException e)
+				{
+					LOG.error("Thread interuppted: " + e.getLocalizedMessage(), e);
+				}
 			}
 		}
+
 	}
 
 	private static String normalizeName(String tagName)

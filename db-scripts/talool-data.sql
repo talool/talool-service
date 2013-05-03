@@ -204,6 +204,24 @@ select add_category_tag('Food','Fish');
 select add_category_tag('Food','Seafood');
 select add_category_tag('Food','Sushi');
 select add_category_tag('Food','Fish');
+select add_category_tag('Food','Gluten-free');
+select add_category_tag('Food','Ice Cream');
+select add_category_tag('Food','Yogurt');
+select add_category_tag('Food','Juice Bar');
+select add_category_tag('Food','Gelato');
+select add_category_tag('Food','Salad');
+select add_category_tag('Food','Ramen / Noodel House');
+select add_category_tag('Food','Steakhouse');
+select add_category_tag('Food','Taco');
+select add_category_tag('Food','Tapas');
+select add_category_tag('Food','Tea');
+select add_category_tag('Food','Vegetarian / Vegan');
+select add_category_tag('Food','Wings');
+select add_category_tag('Food','Wine');
+select add_category_tag('Food','Cocktails');
+select add_category_tag('Food','Brewery');
+
+
 
 select add_category_tag('Shopping Services','Antique Shop');
 select add_category_tag('Shopping Services','Arts & Crafts Store');
@@ -214,9 +232,26 @@ select add_category_tag('Shopping Services','Bridal Shop');
 select add_category_tag('Shopping Services','Salon');
 select add_category_tag('Shopping Services','Dry Cleaning');
 
+select add_category_tag('Fun','Arcade');
+select add_category_tag('Fun','Games');
+select add_category_tag('Fun','Amusement Center');
+select add_category_tag('Fun','Kids / Children');
+select add_category_tag('Fun','Pets');
+select add_category_tag('Fun','Dogs');
+select add_category_tag('Fun','Cats');
+select add_category_tag('Fun','Golf');
+
+select add_category_tag('Nightlife','Bar');
+select add_category_tag('Nightlife','Beer');
+select add_category_tag('Nightlife','Cocktails');
 select add_category_tag('Nightlife','Sports Bar');
 select add_category_tag('Nightlife','Dance Club');
 select add_category_tag('Nightlife','Live Music');
+select add_category_tag('Nightlife','Nightclub');
+select add_category_tag('Nightlife','Pub');
+select add_category_tag('Nightlife','Sake');
+select add_category_tag('Nightlife','Speakeasy');
+select add_category_tag('Nightlife','Dancing');
 
               
 
