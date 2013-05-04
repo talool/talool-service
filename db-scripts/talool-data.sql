@@ -200,7 +200,6 @@ select add_category_tag('Food','Pizza');
 select add_category_tag('Food','Pasta');
 select add_category_tag('Food','Burritos');
 select add_category_tag('Food','Cafe');
-select add_category_tag('Food','Fish');
 select add_category_tag('Food','Seafood');
 select add_category_tag('Food','Sushi');
 select add_category_tag('Food','Fish');

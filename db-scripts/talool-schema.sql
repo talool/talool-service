@@ -297,6 +297,21 @@ ALTER TABLE public.merchant OWNER TO talool;
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (merchant_parent_id) REFERENCES merchant(merchant_id);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
 
+CREATE TYPE media_type AS ENUM ('IMAGE','VIDEO','AUDIO', 'TEXT');
+
+CREATE TABLE merchant_media (
+    merchant_media_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL,
+	media_type media_type NOT NULL,
+    media_url character varying(128) NOT NULL,
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY (merchant_media_id),
+    UNIQUE (merchant_id,media_url)
+);
+
+ALTER TABLE public.merchant_media OWNER TO talool;
+ALTER TABLE ONLY merchant_media ADD CONSTRAINT "FK_MerchantMedia_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+
 CREATE TABLE merchant_location (
     merchant_location_id bigint NOT NULL,
     merchant_id UUID NOT NULL,

@@ -40,4 +40,7 @@ public interface DomainFactory
 			final RelationshipStatus status);
 
 	public MerchantIdentity newMerchantIdentity(final UUID id, final String name);
+
+	public MerchantMedia newMedia(final UUID merchantId, final String mediaUrl,
+			final MediaType mediaType);
 }

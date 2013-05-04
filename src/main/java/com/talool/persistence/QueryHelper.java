@@ -16,6 +16,9 @@ import com.talool.core.SearchOptions;
  */
 public final class QueryHelper
 {
+	private static final ImmutableMap<String, String> EMPTY_IMMUTABLE_PROPS = ImmutableMap
+			.<String, String> of();
+
 	public static final String MERCHANTS_WITHIN_METERS =
 			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*, addr.*,ST_Distance( mloc.geom,'${point}',true) "
 					+ "as distanceInMeters FROM public.merchant as merchant, public.merchant_location as mloc, public.address as addr "
@@ -32,6 +35,9 @@ public final class QueryHelper
 					+
 					"DealImpl d where da.customer.id=:customerId and da.deal.id=d.id and d.merchant.id=merchant.id";
 
+	private static final String GET_MERCHANT_MEDIAS =
+			"from MerchantMediaImpl as merchantMedia where merchantMedia.merchantId=:merchantId";
+
 	public enum QueryType
 	{
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
@@ -39,9 +45,11 @@ public final class QueryHelper
 						.put("merchant.name", "name")
 						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 
-		GetDealAcquires(GET_DEAL_ACQUIRES, ImmutableMap.<String, String> of()),
+		GetDealAcquires(GET_DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 
-		GetMerchantAcquires(GET_MERCHANT_ACQUIRES, ImmutableMap.<String, String> of());
+		GetMerchantAcquires(GET_MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
+
+		GetMerchantMedias(GET_MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS);
 
 		private String query;
 		private ImmutableMap<String, String> propertyColumnMap;

@@ -50,6 +50,7 @@ import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
+import com.talool.core.MerchantMedia;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
 import com.talool.core.SocialNetwork;
@@ -1690,5 +1691,46 @@ public class TaloolServiceImpl implements TaloolService
 		}
 
 		return catTagMap;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantMedia> getMerchantMedias(final UUID merchantId,
+			final SearchOptions searchOpts) throws ServiceException
+	{
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.GetMerchantMedias, null, searchOpts,
+					true);
+
+			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
+			query.setParameter("merchantId", merchantId);
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format(
+					"Problem getMerchantMedias merchantId %s", merchantId, merchantId), ex);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(merchantMedia);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format(
+					"Problem saving merchantMedia for merchantId '%s' mediaUrl '%s' ",
+					merchantMedia.getMerchantId(),
+					merchantMedia.getMediaUrl(), ex));
+		}
+
 	}
 }

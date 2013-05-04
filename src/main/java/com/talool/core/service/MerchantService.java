@@ -14,6 +14,7 @@ import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
+import com.talool.core.MerchantMedia;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 
@@ -94,26 +95,21 @@ public interface MerchantService
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
 			throws ServiceException;
 
-	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId)
-			throws ServiceException;
+	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId) throws ServiceException;
 
 	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException;
 
 	public Set<Tag> getDealOfferTags(final UUID dealOfferId) throws ServiceException;
 
-	public List<MerchantAccount> getAccountsForMerchant(final UUID merchantId)
-			throws ServiceException;
+	public List<MerchantAccount> getAccountsForMerchant(final UUID merchantId) throws ServiceException;
 
-	public List<MerchantLocation> getLocationsForMerchant(final UUID merchantId)
-			throws ServiceException;
+	public List<MerchantLocation> getLocationsForMerchant(final UUID merchantId) throws ServiceException;
 
-	public MerchantLocation getMerchantLocationById(final Long merchantManagedLocationId)
-			throws ServiceException;
+	public MerchantLocation getMerchantLocationById(final Long merchantManagedLocationId) throws ServiceException;
 
 	public void save(final MerchantLocation merchantLocation) throws ServiceException;
 
-	public MerchantAccount getMerchantAccountById(final Long merchantAccountId)
-			throws ServiceException;
+	public MerchantAccount getMerchantAccountById(final Long merchantAccountId) throws ServiceException;
 
 	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
 			throws ServiceException;
@@ -125,7 +121,12 @@ public interface MerchantService
 
 	public AcquireStatus getAcquireStatus(final AcquireStatusType type) throws ServiceException;
 
-	public List<Merchant> getMerchantsWithin(final Location location,
-			final int maxMiles, final SearchOptions searchOptions) throws ServiceException;
+	public List<Merchant> getMerchantsWithin(final Location location, final int maxMiles, final SearchOptions searchOptions)
+			throws ServiceException;
+
+	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final SearchOptions searchOptions)
+			throws ServiceException;
+
+	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException;
 
 }

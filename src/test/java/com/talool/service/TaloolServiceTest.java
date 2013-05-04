@@ -39,9 +39,11 @@ import com.talool.core.DealType;
 import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
+import com.talool.core.MediaType;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
+import com.talool.core.MerchantMedia;
 import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.core.SearchOptions;
@@ -115,6 +117,49 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void setup()
 	{
 		domainFactory = FactoryManager.get().getDomainFactory();
+	}
+
+	@Test
+	public void testMedia() throws ServiceException, InterruptedException
+	{
+		Long now = Calendar.getInstance().getTime().getTime();
+		List<String> mediaUrls = new ArrayList<String>();
+
+		mediaUrls.add("http://static.talool.com/1.png");
+		mediaUrls.add("http://static.talool.com/2.png");
+		mediaUrls.add("http://static.talool.com/3.png");
+		mediaUrls.add("http://static.talool.com/4.png");
+		mediaUrls.add("http://static.talool.com/5.png");
+
+		Merchant merchant = domainFactory.newMerchant();
+		merchant.setName("Merch-media" + now);
+
+		taloolService.save(merchant);
+
+		taloolService.refresh(merchant);
+
+		for (String url : mediaUrls)
+		{
+			MerchantMedia merchantMedia = domainFactory.newMedia(merchant.getId(), url, MediaType.IMAGE);
+
+			taloolService.saveMerchantMedia(merchantMedia);
+
+			taloolService.refresh(merchantMedia);
+		}
+
+		SearchOptions searchOptions = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("merchantMedia.mediaUrl")
+				.ascending(true).build();
+
+		int i = 0;
+		List<MerchantMedia> medias = taloolService.getMerchantMedias(merchant.getId(), searchOptions);
+
+		for (final MerchantMedia media : medias)
+		{
+			Assert.assertNotNull(media.getCreated());
+			Assert.assertEquals(MediaType.IMAGE, media.getMediaType());
+
+			Assert.assertEquals(mediaUrls.get(i++), media.getMediaUrl());
+		}
 	}
 
 	@Test
@@ -669,24 +714,24 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		// tags for fun
 
-		Tag mexicanTag = taloolService.getTag("mexican");
+		Tag mexicanTag = taloolService.getTag("Mexican");
 		if (mexicanTag == null)
 		{
-			mexicanTag = domainFactory.newTag("mexican");
+			mexicanTag = domainFactory.newTag("Mexican");
 		}
 		merchant.addTag(mexicanTag);
 
-		Tag tapasTag = taloolService.getTag("tapas");
+		Tag tapasTag = taloolService.getTag("Tapas");
 		if (tapasTag == null)
 		{
-			tapasTag = domainFactory.newTag("tapas");
+			tapasTag = domainFactory.newTag("Tapas");
 		}
 		merchant.addTag(tapasTag);
 
-		Tag cubanTag = taloolService.getTag("cuban");
+		Tag cubanTag = taloolService.getTag("Cuban");
 		if (cubanTag == null)
 		{
-			cubanTag = domainFactory.newTag("cuban");
+			cubanTag = domainFactory.newTag("Cuban");
 		}
 		merchant.addTag(cubanTag);
 

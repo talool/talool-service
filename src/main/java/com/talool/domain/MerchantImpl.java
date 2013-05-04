@@ -244,5 +244,4 @@ public class MerchantImpl implements Merchant
 		mloc.setMerchant(this);
 		this.locations.add(mloc);
 	}
-
 }

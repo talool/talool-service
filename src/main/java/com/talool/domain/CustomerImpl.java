@@ -21,9 +21,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +30,9 @@ import com.talool.core.Customer;
 import com.talool.core.Sex;
 import com.talool.core.SocialAccount;
 import com.talool.core.SocialNetwork;
-import com.talool.persistence.GenericEnumUserType;
 
 @Entity
 @Table(name = "customer", catalog = "public")
-@TypeDef(name = "sexType", typeClass = GenericEnumUserType.class, parameters = {
-		@Parameter(name = "enumClass", value = "com.talool.core.Sex"),
-		@Parameter(name = "identifierMethod", value = "getLetter"),
-		@Parameter(name = "valueOfMethod", value = "valueByLetter") })
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class CustomerImpl implements Customer
 {
@@ -55,7 +48,6 @@ public class CustomerImpl implements Customer
 	private UUID id;
 
 	@Type(type = "sexType")
-	// @Column(name = "sex_t", columnDefinition = "sex_type")
 	@Column(name = "sex_t", nullable = true, columnDefinition = "sex_type")
 	private Sex sex;
 

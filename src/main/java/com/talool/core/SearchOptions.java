@@ -38,24 +38,48 @@ public class SearchOptions implements Serializable
 
 		}
 
+		/**
+		 * Set ascending
+		 * 
+		 * @param ascending
+		 * @return
+		 */
 		public Builder ascending(Boolean ascending)
 		{
 			this.ascending = ascending;
 			return this;
 		}
 
+		/**
+		 * Set sort property
+		 * 
+		 * @param sortProperty
+		 * @return
+		 */
 		public Builder sortProperty(String sortProperty)
 		{
 			this.sortProperty = sortProperty;
 			return this;
 		}
 
+		/**
+		 * Set max results (also see page)
+		 * 
+		 * @param maxResults
+		 * @return
+		 */
 		public Builder maxResults(int maxResults)
 		{
 			this.maxResults = maxResults;
 			return this;
 		}
 
+		/**
+		 * Set page (zero based paging)
+		 * 
+		 * @param page
+		 * @return
+		 */
 		public Builder page(int page)
 		{
 			this.page = page;
