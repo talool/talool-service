@@ -140,7 +140,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		for (String url : mediaUrls)
 		{
-			MerchantMedia merchantMedia = domainFactory.newMedia(merchant.getId(), url, MediaType.IMAGE);
+			MerchantMedia merchantMedia = domainFactory.newMedia(merchant.getId(), url, MediaType.DEAL_IMAGE);
 
 			taloolService.saveMerchantMedia(merchantMedia);
 
@@ -156,7 +156,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		for (final MerchantMedia media : medias)
 		{
 			Assert.assertNotNull(media.getCreated());
-			Assert.assertEquals(MediaType.IMAGE, media.getMediaType());
+			Assert.assertEquals(MediaType.DEAL_IMAGE, media.getMediaType());
 
 			Assert.assertEquals(mediaUrls.get(i++), media.getMediaUrl());
 		}
