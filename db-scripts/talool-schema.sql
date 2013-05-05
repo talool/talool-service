@@ -321,7 +321,7 @@ CREATE TABLE merchant_location (
     merchant_location_name character varying(64),
     email character varying(128) NOT NULL,
     website_url character varying(128),
-    logo_url character varying(64) NOT NULL,
+    merchant_media character varying(64) NOT NULL,
     phone character varying(48),
     address_id bigint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
