@@ -150,8 +150,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		SearchOptions searchOptions = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("merchantMedia.mediaUrl")
 				.ascending(true).build();
 
+		MediaType[] mediaTypes = MediaType.values(); // all
+
 		int i = 0;
-		List<MerchantMedia> medias = taloolService.getMerchantMedias(merchant.getId(), searchOptions);
+		List<MerchantMedia> medias = taloolService.getMerchantMedias(merchant.getId(), mediaTypes, searchOptions);
+
+		Assert.assertEquals(5, medias.size());
 
 		for (final MerchantMedia media : medias)
 		{

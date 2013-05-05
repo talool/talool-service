@@ -46,6 +46,7 @@ import com.talool.core.FactoryManager;
 import com.talool.core.IdentifiableS;
 import com.talool.core.IdentifiableUUID;
 import com.talool.core.Location;
+import com.talool.core.MediaType;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
@@ -1696,7 +1697,7 @@ public class TaloolServiceImpl implements TaloolService
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<MerchantMedia> getMerchantMedias(final UUID merchantId,
-			final SearchOptions searchOpts) throws ServiceException
+			final MediaType[] mediaTypes, final SearchOptions searchOpts) throws ServiceException
 	{
 		try
 		{
@@ -1705,8 +1706,8 @@ public class TaloolServiceImpl implements TaloolService
 
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setParameter("merchantId", merchantId);
+			query.setParameterList("mediaTypes", mediaTypes);
 			QueryHelper.applyOffsetLimit(query, searchOpts);
-
 			return query.list();
 		}
 		catch (Exception ex)
