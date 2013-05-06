@@ -63,7 +63,9 @@ final class DomainFactoryImpl implements DomainFactory
 	@Override
 	public Address newAddress()
 	{
-		return new AddressImpl();
+		Address address = new AddressImpl();
+		address.setCountry("US");
+		return address;
 	}
 
 	@Override

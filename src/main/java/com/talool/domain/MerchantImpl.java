@@ -21,6 +21,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -51,6 +52,9 @@ public class MerchantImpl implements Merchant
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantImpl.class);
 	private static final long serialVersionUID = -4505114813841857043L;
+	
+	@Transient
+	private MerchantLocation currentLocation;
 
 	@Id
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
@@ -243,5 +247,20 @@ public class MerchantImpl implements Merchant
 	{
 		mloc.setMerchant(this);
 		this.locations.add(mloc);
+	}
+	
+	public MerchantLocation getCurrentLocation()
+	{
+		if (currentLocation == null)
+		{
+			return getPrimaryLocation();
+		}
+
+		return currentLocation;
+	}
+	
+	public void setCurrentLocation(MerchantLocation loc)
+	{
+		currentLocation = loc;
 	}
 }
