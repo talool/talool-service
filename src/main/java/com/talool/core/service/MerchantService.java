@@ -10,6 +10,7 @@ import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Location;
+import com.talool.core.MediaType;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
@@ -124,7 +125,8 @@ public interface MerchantService
 	public List<Merchant> getMerchantsWithin(final Location location, final int maxMiles, final SearchOptions searchOptions)
 			throws ServiceException;
 
-	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final SearchOptions searchOptions)
+	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final MediaType[] mediaTypes,
+			final SearchOptions searchOptions)
 			throws ServiceException;
 
 	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException;

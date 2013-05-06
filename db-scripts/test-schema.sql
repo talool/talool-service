@@ -297,7 +297,7 @@ ALTER TABLE public.merchant OWNER TO talool;
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (merchant_parent_id) REFERENCES merchant(merchant_id);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
 
-CREATE TYPE media_type AS ENUM ('IMAGE','VIDEO');
+CREATE TYPE media_type AS ENUM ('DEAL_IMAGE','MERCHANT_IMAGE', 'MERCHANT_LOGO', 'DEAL_OFFER_LOGO');
 
 CREATE TABLE merchant_media (
     merchant_media_id UUID NOT NULL DEFAULT uuid_generate_v4(),
@@ -311,6 +311,8 @@ CREATE TABLE merchant_media (
 
 ALTER TABLE public.merchant_media OWNER TO talool;
 ALTER TABLE ONLY merchant_media ADD CONSTRAINT "FK_MerchantMedia_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+CREATE INDEX merchant_media_merchant_media_type_idx ON merchant_media (merchant_id,media_type);
+
 
 CREATE TABLE merchant_location (
     merchant_location_id bigint NOT NULL,

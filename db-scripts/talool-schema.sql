@@ -311,6 +311,8 @@ CREATE TABLE merchant_media (
 
 ALTER TABLE public.merchant_media OWNER TO talool;
 ALTER TABLE ONLY merchant_media ADD CONSTRAINT "FK_MerchantMedia_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+CREATE INDEX merchant_media_merchant_media_type_idx ON merchant_media (merchant_id,media_type);
+
 
 CREATE TABLE merchant_location (
     merchant_location_id bigint NOT NULL,

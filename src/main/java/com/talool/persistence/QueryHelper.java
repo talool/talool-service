@@ -36,7 +36,7 @@ public final class QueryHelper
 					"DealImpl d where da.customer.id=:customerId and da.deal.id=d.id and d.merchant.id=merchant.id";
 
 	private static final String GET_MERCHANT_MEDIAS =
-			"from MerchantMediaImpl as merchantMedia where merchantMedia.merchantId=:merchantId";
+			"from MerchantMediaImpl as merchantMedia where merchantMedia.merchantId=:merchantId and merchantMedia.mediaType in (:mediaTypes)";
 
 	public enum QueryType
 	{
