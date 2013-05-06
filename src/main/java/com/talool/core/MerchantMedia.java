@@ -16,6 +16,8 @@ public interface MerchantMedia extends IdentifiableUUID, Serializable
 	public void setMerchantId(final UUID merchantId);
 
 	public String getMediaUrl();
+	
+	public String getMediaName();
 
 	public void setMediaUrl(final String mediaUrl);
 

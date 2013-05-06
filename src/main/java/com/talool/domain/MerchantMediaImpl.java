@@ -134,4 +134,17 @@ public class MerchantMediaImpl implements MerchantMedia
 		this.mediaType = mediaType;
 	}
 
+	@Override
+	public String getMediaName() {
+		if (mediaUrl == null){
+			return null;
+		}
+		else
+		{
+			// currently, our media urls have the filename as a param.
+			int slashIndex = mediaUrl.lastIndexOf('=');
+			return mediaUrl.substring(slashIndex + 1);
+		}
+	}
+
 }
