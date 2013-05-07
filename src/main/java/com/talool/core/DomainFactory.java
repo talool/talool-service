@@ -22,7 +22,7 @@ public interface DomainFactory
 
 	public Deal newDeal(final DealOffer dealOffer);
 
-	public Deal newDeal(final MerchantAccount createdByMerchantAccount, final boolean setDefaults);
+	public Deal newDeal(final UUID merchantId, final MerchantAccount createdByMerchantAccount, final boolean setDefaults);
 
 	public MerchantLocation newMerchantLocation();
 

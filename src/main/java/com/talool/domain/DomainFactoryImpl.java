@@ -144,7 +144,7 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public Deal newDeal(final MerchantAccount createdByMerchantAccount, final boolean setDefaults)
+	public Deal newDeal(UUID merchantId, final MerchantAccount createdByMerchantAccount, final boolean setDefaults)
 	{
 		final Deal deal = new DealImpl(createdByMerchantAccount);
 		deal.setUpdatedByMerchantAccount(createdByMerchantAccount);
@@ -184,7 +184,13 @@ final class DomainFactoryImpl implements DomainFactory
 			 */
 			try
 			{
-				Merchant merchant = createdByMerchantAccount.getMerchant();
+				Merchant merchant;
+				if (merchantId == null) 
+				{
+					merchant = createdByMerchantAccount.getMerchant();
+				} else {
+					merchant = taloolService.getMerchantById(merchantId);
+				}
 				taloolService.refresh(merchant);
 				Set<Tag> tags = merchant.getTags();
 				if (CollectionUtils.isNotEmpty(tags))
