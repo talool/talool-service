@@ -27,6 +27,7 @@ import org.hibernatespatial.GeometryUserType;
 import com.talool.core.Address;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantLocation;
+import com.talool.core.MerchantMedia;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -61,9 +62,6 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "website_url", unique = false, nullable = true, length = 128)
 	private String websiteUrl;
 
-	@Column(name = "logo_url", unique = false, nullable = true, length = 64)
-	private String logoUrl;
-
 	@Column(name = "phone", unique = true, nullable = true, length = 48)
 	private String phone;
 
@@ -74,6 +72,10 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Type(type = "geomType")
 	@Column(name = "geom", nullable = true)
 	private com.vividsolutions.jts.geom.Geometry geometry;
+
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@JoinColumn(name = "logo_url_id")
+	private MerchantMedia logo;
 
 	@Transient
 	private Double distanceInMeters;
@@ -116,15 +118,15 @@ public class MerchantLocationImpl implements MerchantLocation
 	}
 
 	@Override
-	public String getLogoUrl()
+	public MerchantMedia getLogo()
 	{
-		return logoUrl;
+		return logo;
 	}
 
 	@Override
-	public void setLogoUrl(String logoUrl)
+	public void setLogo(MerchantMedia logo)
 	{
-		this.logoUrl = logoUrl;
+		this.logo = logo;
 	}
 
 	@Override

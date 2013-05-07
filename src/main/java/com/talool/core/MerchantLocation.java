@@ -22,9 +22,9 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public void setWebsiteUrl(String websiteUrl);
 
-	public String getLogoUrl();
+	public MerchantMedia getLogo();
 
-	public void setLogoUrl(String logoUrl);
+	public void setLogo(MerchantMedia logo);
 
 	public String getPhone();
 

@@ -756,11 +756,15 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		mel.setPhone("781-818-1212");
 		mel.setWebsiteUrl("http://merch1.com" + now);
 		mel.setEmail("billyjohnson" + now + "@gmail.com");
-		mel.setLogoUrl("http://merch.logos.com/logo.png");
+
 		mel.setLocationName("Merch" + now * 2);
 		merchant.addLocation(mel);
 		taloolService.save(merchant);
 		taloolService.refresh(merchant);
+
+		MerchantMedia logo = domainFactory.newMedia(merchant.getId(), "http://some/image.com", MediaType.MERCHANT_LOGO);
+
+		mel.setLogo(logo);
 
 		List<Merchant> resultMerchs = taloolService.getMerchantByName("Merch" + now);
 		Merchant resultMerch = resultMerchs.get(0);
@@ -772,8 +776,9 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				.getEmail());
 		Assert.assertEquals(merchant.getPrimaryLocation().getLocationName(), resultMerch
 				.getPrimaryLocation().getLocationName());
-		Assert.assertEquals(merchant.getPrimaryLocation().getLogoUrl(), resultMerch
-				.getPrimaryLocation().getLogoUrl());
+
+		Assert.assertEquals(merchant.getPrimaryLocation().getLogo(), resultMerch
+				.getPrimaryLocation().getLogo());
 		Assert.assertEquals(merchant.getPrimaryLocation().getPhone(), resultMerch.getPrimaryLocation()
 				.getPhone());
 		Assert.assertEquals(merchant.getPrimaryLocation().getWebsiteUrl(), resultMerch

@@ -34,9 +34,9 @@ INSERT INTO address (address1,address2,city,state_province_county,zip,country)
    	
 INSERT INTO merchant (merchant_name) VALUES ('Talool');
 
-INSERT INTO merchant_location (merchant_id,email,website_url,logo_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
         VALUES( (select merchant_id from merchant where merchant_name='Talool'),
-                'team@talool.com','http://www.talool.com','','720-446-6075',(select max(address_id) from address));
+                'team@talool.com','http://www.talool.com','720-446-6075',(select max(address_id) from address));
           
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='Talool'),'doug@talool.com',(select md5('pass123')),'CEO',true);     
@@ -50,9 +50,9 @@ INSERT INTO address (address1,address2,city,state_province_county,zip,country)
 
 INSERT INTO merchant (merchant_name) VALUES ('Payback Book');
 
-INSERT INTO merchant_location (merchant_id,email,website_url,logo_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
         VALUES(  (select merchant_id from merchant where merchant_name='Payback Book'),
-          		  'paybackbook@aol.com','http://www.paybackbook.com','','1.360.699.1252',
+          		  'paybackbook@aol.com','http://www.paybackbook.com','1.360.699.1252',
           		  (select address_id from address where address1='6715 NE 63rd St.'));
 
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
@@ -64,9 +64,9 @@ INSERT INTO address (address1,city,state_province_county,zip,country)
 
 INSERT INTO merchant (merchant_name) VALUES ('The Kitchen');
 
-INSERT INTO merchant_location (merchant_id,email,website_url,logo_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
         VALUES(  (select merchant_id from merchant where merchant_name='The Kitchen'),
-			      'info@thekitchencafe.com','http://thekitchencommunity.com','','303.544.5973',
+			      'info@thekitchencafe.com','http://thekitchencommunity.com','303.544.5973',
        	 		  (select address_id from address where address1='1039 Pearl St'));
       
 
@@ -79,9 +79,9 @@ INSERT INTO address (address1,city,state_province_county,zip,country)
 
 INSERT INTO merchant (merchant_name) VALUES ('Centro Latin Kitchen');
              
-INSERT INTO merchant_location (merchant_id,email,website_url,logo_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
         VALUES( (select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),
-        		'info@centrolatinkitchen.com','http://www.centrolatinkitchen.com','','303.442.7771',
+        		'info@centrolatinkitchen.com','http://www.centrolatinkitchen.com','303.442.7771',
         		(select address_id from address where address1='950 Pearl St'));
        
 ---------Test Deal Offers & Deals -------------------------------   
