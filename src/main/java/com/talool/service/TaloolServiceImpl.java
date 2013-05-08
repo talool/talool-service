@@ -835,9 +835,7 @@ public class TaloolServiceImpl implements TaloolService
 		{
 			final Search search = new Search(DealOfferImpl.class);
 			search.addSort(Sort.desc("createdUpdated.updated"));
-			// TODO return only deals they can see . For now we must return all Deal
-			// Offers available
-			// search.addFilterEqual("merchant.id", merchantId);
+			search.addFilterEqual("merchant.id", merchantId);
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -1136,7 +1134,7 @@ public class TaloolServiceImpl implements TaloolService
 			final Search search = new Search(DealOfferImpl.class);
 			// TODO read permissions or other to get only deal offers visible to
 			// merchantId
-			// search.addFilterEqual("merchant.id", merchantId);
+			search.addFilterEqual("merchant.id", merchantId);
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -1689,7 +1687,7 @@ public class TaloolServiceImpl implements TaloolService
 
 		for (Category entry : catTagMap.keySet())
 		{
-			LOG.info("service: " + entry.getName());
+			// LOG.info("service: " + entry.getName());
 		}
 
 		return catTagMap;
