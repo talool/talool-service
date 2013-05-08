@@ -82,9 +82,6 @@ public final class TagCache
 							.putAll(_tagNameCategoryMap)
 							.build();
 
-					LOG.info(String.format("Refreshed %d categories and %d total tags", categoryTagMap
-							.keySet()
-							.size(), totalTags));
 
 				}
 				catch (Exception e)
