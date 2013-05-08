@@ -24,6 +24,10 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public MerchantMedia getLogo();
 
+	public MerchantMedia getMerchantImage();
+
+	public void setMerchantImage(MerchantMedia merchantImage);
+
 	public void setLogo(MerchantMedia logo);
 
 	public String getPhone();

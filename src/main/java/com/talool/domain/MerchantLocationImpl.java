@@ -73,9 +73,13 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "geom", nullable = true)
 	private com.vividsolutions.jts.geom.Geometry geometry;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@JoinColumn(name = "logo_url_id")
 	private MerchantMedia logo;
+
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@JoinColumn(name = "merchant_image_id")
+	private MerchantMedia merchantImage;
 
 	@Transient
 	private Double distanceInMeters;
@@ -253,5 +257,17 @@ public class MerchantLocationImpl implements MerchantLocation
 	public void setMerchant(Merchant merchant)
 	{
 		this.merchant = merchant;
+	}
+
+	@Override
+	public MerchantMedia getMerchantImage()
+	{
+		return merchantImage;
+	}
+
+	@Override
+	public void setMerchantImage(MerchantMedia merchantImage)
+	{
+		this.merchantImage = merchantImage;
 	}
 }

@@ -63,7 +63,7 @@ public class DealImpl implements Deal
 	@JoinColumn(name = "created_by_merchant_account_id")
 	private MerchantAccount createdByMerchantAccount;
 
-	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = MerchantImpl.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
@@ -89,7 +89,7 @@ public class DealImpl implements Deal
 	@Column(name = "expires", unique = false, nullable = true)
 	private Date expires;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, targetEntity = TagImpl.class)
 	@JoinTable(name = "deal_tag", joinColumns = { @JoinColumn(name = "deal_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
 	private Set<Tag> tags = new HashSet<Tag>();
 

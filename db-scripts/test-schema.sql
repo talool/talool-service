@@ -322,6 +322,7 @@ CREATE TABLE merchant_location (
     email character varying(128) NOT NULL,
     website_url character varying(128),
     logo_url_id UUID,
+    merchant_image_id UUID,
     phone character varying(48),
     address_id bigint NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
@@ -346,10 +347,11 @@ ALTER TABLE ONLY merchant_location ALTER COLUMN merchant_location_id SET DEFAULT
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Address" FOREIGN KEY (address_id) REFERENCES address(address_id);
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Logo" FOREIGN KEY (logo_url_id) REFERENCES merchant_media(merchant_media_id);
+ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_MerchantImage" FOREIGN KEY (merchant_image_id) REFERENCES merchant_media(merchant_media_id);
+
 CREATE INDEX merchant_location_name_idx ON merchant_location (merchant_location_name);
 CREATE INDEX merchant_location_merchant_idx ON merchant_location (merchant_id);
 CREATE INDEX merchant_location_geom_idx ON merchant_location USING GIST (geom);
-CREATE INDEX merchant_location_logo_url_id_idx ON merchant_location (logo_url_id);
 
 CREATE TABLE property_type (
     property_type_id smallint NOT NULL,

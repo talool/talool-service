@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.hibernate.Session;
+
 import com.talool.core.AccountType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
@@ -70,5 +72,11 @@ public interface TaloolService extends MerchantService, CustomerService
 	public void reattach(final Object obj) throws ServiceException;
 
 	public void merge(final Object obj) throws ServiceException;
+
+	public Session getCurrentSession() throws ServiceException;
+
+	public void initialize(Object obj) throws ServiceException;
+
+	public void isInitialized(Object obj) throws ServiceException;
 
 }

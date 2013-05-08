@@ -10,9 +10,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -1516,7 +1519,7 @@ public class TaloolServiceImpl implements TaloolService
 	{
 		try
 		{
-			getSessionFactory().getCurrentSession().buildLockRequest(LockOptions.NONE);
+			getSessionFactory().getCurrentSession().buildLockRequest(LockOptions.NONE).lock(obj);
 		}
 		catch (Exception e)
 		{
@@ -1536,7 +1539,6 @@ public class TaloolServiceImpl implements TaloolService
 		{
 			throw new ServiceException("There was a problem merging", e);
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1662,7 +1664,6 @@ public class TaloolServiceImpl implements TaloolService
 								tagList = new ArrayList<Tag>();
 							}
 							tagList.add(tag);
-							LOG.info("Putting: " + cat.getName());
 
 							catTagMap.put(cat, tagList);
 
@@ -1733,5 +1734,37 @@ public class TaloolServiceImpl implements TaloolService
 					merchantMedia.getMediaUrl(), ex));
 		}
 
+	}
+
+	@Override
+	public Session getCurrentSession()
+	{
+		return sessionFactory.getCurrentSession();
+	}
+
+	@Override
+	public void initialize(final Object obj) throws ServiceException
+	{
+		try
+		{
+			Hibernate.initialize(obj);
+		}
+		catch (HibernateException he)
+		{
+			throw new ServiceException(he.getLocalizedMessage(), he);
+		}
+	}
+
+	@Override
+	public void isInitialized(final Object obj) throws ServiceException
+	{
+		try
+		{
+			Hibernate.isInitialized(obj);
+		}
+		catch (HibernateException he)
+		{
+			throw new ServiceException(he.getLocalizedMessage(), he);
+		}
 	}
 }

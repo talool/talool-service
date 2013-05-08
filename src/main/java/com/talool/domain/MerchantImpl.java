@@ -52,7 +52,7 @@ public class MerchantImpl implements Merchant
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantImpl.class);
 	private static final long serialVersionUID = -4505114813841857043L;
-	
+
 	@Transient
 	private MerchantLocation currentLocation;
 
@@ -72,7 +72,7 @@ public class MerchantImpl implements Merchant
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
-	private Set<Tag> tags = new HashSet<Tag>();
+	private Set<Tag> tags;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = MerchantAccountImpl.class)
 	@JoinColumn(name = "merchant_id")
@@ -248,7 +248,7 @@ public class MerchantImpl implements Merchant
 		mloc.setMerchant(this);
 		this.locations.add(mloc);
 	}
-	
+
 	public MerchantLocation getCurrentLocation()
 	{
 		if (currentLocation == null)
@@ -258,7 +258,7 @@ public class MerchantImpl implements Merchant
 
 		return currentLocation;
 	}
-	
+
 	public void setCurrentLocation(MerchantLocation loc)
 	{
 		currentLocation = loc;
