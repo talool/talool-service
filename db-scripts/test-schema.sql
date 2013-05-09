@@ -48,12 +48,13 @@ CREATE FUNCTION deal_offer_purchase() RETURNS trigger
     AS $$
 DECLARE
   rec deal%rowtype;
+  acq_id smallint;
 BEGIN
+  SELECT acquire_status_id INTO acq_id FROM acquire_status where status='PURCHASED';
   FOR rec IN SELECT * FROM deal WHERE deal_offer_id = NEW.deal_offer_id
   LOOP
-    INSERT INTO deal_acquire(deal_id,acquire_status_id,customer_id) 
-       VALUES( rec.deal_id,(select acquire_status_id from acquire_status where status='PURCHASED'),NEW.customer_id);
-  end loop;
+    INSERT INTO deal_acquire(deal_id,acquire_status_id,customer_id) VALUES( rec.deal_id,acq_id,NEW.customer_id );
+  END LOOP;
   return NEW;
 END;
 $$;

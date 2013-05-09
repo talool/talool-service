@@ -55,16 +55,13 @@
 		<property name="hibernateProperties">
 			<props>
 
-
 		<prop key="hibernate.dialect">org.hibernatespatial.postgis.PostgisDialect</prop>
 					
 				<prop key="hibernate.jdbc.use_get_generated_keys">
 					false
 				</prop>
-				<!--  
 				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory
 				</prop>
-				-->
 				<prop key="hibernate.format_sql">${hibernate.format.sql}</prop>
 				<prop key="hibernate.show_sql">${hibernate.show.sql}</prop>
 				<!-- -->

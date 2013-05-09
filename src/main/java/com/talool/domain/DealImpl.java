@@ -89,7 +89,7 @@ public class DealImpl implements Deal
 	@Column(name = "expires", unique = false, nullable = true)
 	private Date expires;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, targetEntity = TagImpl.class)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "deal_tag", joinColumns = { @JoinColumn(name = "deal_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
 	private Set<Tag> tags = new HashSet<Tag>();
 

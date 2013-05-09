@@ -166,7 +166,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		}
 	}
 
-	@Test
 	public void testCategories() throws ServiceException, InterruptedException
 	{
 		Long now = Calendar.getInstance().getTime().getTime();
@@ -257,6 +256,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		cleanTest();
 
 		testRelationship();
+
+		testCategories();
+
+		testMedia();
 
 		Customer customer = testCreateCustomer();
 
@@ -718,24 +721,24 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		// tags for fun
 
-		Tag mexicanTag = taloolService.getTag("Mexican");
+		Tag mexicanTag = taloolService.getTag("Mexican" + now);
 		if (mexicanTag == null)
 		{
-			mexicanTag = domainFactory.newTag("Mexican");
+			mexicanTag = domainFactory.newTag("Mexican" + now);
 		}
 		merchant.addTag(mexicanTag);
 
-		Tag tapasTag = taloolService.getTag("Tapas");
+		Tag tapasTag = taloolService.getTag("Tapas" + now);
 		if (tapasTag == null)
 		{
-			tapasTag = domainFactory.newTag("Tapas");
+			tapasTag = domainFactory.newTag("Tapas" + now);
 		}
 		merchant.addTag(tapasTag);
 
-		Tag cubanTag = taloolService.getTag("Cuban");
+		Tag cubanTag = taloolService.getTag("Cuban" + now);
 		if (cubanTag == null)
 		{
-			cubanTag = domainFactory.newTag("Cuban");
+			cubanTag = domainFactory.newTag("Cuban" + now);
 		}
 		merchant.addTag(cubanTag);
 
@@ -762,7 +765,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		taloolService.save(merchant);
 		taloolService.refresh(merchant);
 
-		MerchantMedia logo = domainFactory.newMedia(merchant.getId(), "http://some/image.com", MediaType.MERCHANT_LOGO);
+		MerchantMedia logo = domainFactory.newMedia(merchant.getId(),
+				"http://some/image.com", MediaType.MERCHANT_LOGO);
 
 		mel.setLogo(logo);
 
