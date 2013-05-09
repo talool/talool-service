@@ -20,6 +20,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernatespatial.GeometryUserType;
@@ -65,7 +67,7 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "phone", unique = true, nullable = true, length = 48)
 	private String phone;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = AddressImpl.class)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = AddressImpl.class)
 	@JoinColumn(name = "address_id")
 	private Address address;
 
@@ -74,10 +76,12 @@ public class MerchantLocationImpl implements MerchantLocation
 	private com.vividsolutions.jts.geom.Geometry geometry;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
 	@JoinColumn(name = "logo_url_id")
 	private MerchantMedia logo;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
 	@JoinColumn(name = "merchant_image_id")
 	private MerchantMedia merchantImage;
 
