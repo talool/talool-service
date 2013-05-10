@@ -71,7 +71,13 @@ final class DomainFactoryImpl implements DomainFactory
 	@Override
 	public Merchant newMerchant()
 	{
-		return new MerchantImpl();
+		Merchant merchant = new MerchantImpl();
+		
+		MerchantLocation location = newMerchantLocation();
+		location.setAddress(newAddress());
+		merchant.addLocation(location);
+		
+		return merchant;
 	}
 
 	@Override
