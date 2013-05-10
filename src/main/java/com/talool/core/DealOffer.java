@@ -45,9 +45,9 @@ public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
 
 	public String getCode();
 
-	public void setImageUrl(String imageUrl);
+	public void setImage(MerchantMedia imageUrl);
 
-	public String getImageUrl();
+	public MerchantMedia getImage();
 
 	public void setExpires(Date expires);
 

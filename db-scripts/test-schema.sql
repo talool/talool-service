@@ -423,7 +423,7 @@ CREATE TABLE deal_offer (
     title character varying(256) NOT NULL,
     summary character varying(256),
     code character varying(128), 
-    image_url character varying(128), 
+    image_id UUID, 
     expires timestamp without time zone,
     price numeric(10,2) NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
@@ -437,6 +437,8 @@ ALTER TABLE public.deal_offer OWNER TO talool;
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_CreatedMerchantAccount" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_UpdatedMerchantAccount" FOREIGN KEY (updated_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Image" FOREIGN KEY (image_id) REFERENCES merchant_media(image_id);
+
 
 CREATE INDEX deal_offer_created_by_merchant_account_id_idx ON deal_offer (created_by_merchant_account_id);
 CREATE INDEX deal_offer_updated_by_merchant_account_id_idx ON deal_offer (updated_by_merchant_account_id);
@@ -467,12 +469,12 @@ CREATE TABLE deal (
     merchant_id UUID NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
     updated_by_merchant_account_id bigint NOT NULL,
-    deal_illndex int,
+    deal_index int,
     title character varying(256) NOT NULL,
     summary character varying(256) NOT NULL,
     details character varying(256) NOT NULL,
     code character varying(128), 
-    image_url character varying(128), 
+    image_id UUID, 
     expires timestamp without time zone,
     is_active boolean DEFAULT true NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
@@ -486,6 +488,7 @@ ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_DealOffer" FOREIGN KEY (deal_offer
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_CreatedByMerchant" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_UpdatedByMerchant" FOREIGN KEY (updated_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
+ALTER TABLE ONLY deal ADD CONSTRAINT "FK_Deal_Image" FOREIGN KEY (image_id) REFERENCES merchant_media(merchant_media_id);
 
 CREATE INDEX deal_created_by_merchant_account_id_idx ON deal (created_by_merchant_account_id);
 CREATE INDEX deal_updated_by_merchant_account_id_idx ON deal (updated_by_merchant_account_id);

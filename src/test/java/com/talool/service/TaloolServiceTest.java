@@ -49,6 +49,7 @@ import com.talool.core.RelationshipStatus;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
+import com.talool.domain.MerchantMediaImpl;
 import com.talool.utils.DealAcquireComparator;
 import com.talool.utils.DealAcquireComparator.ComparatorType;
 import com.talool.utils.MerchantComparator;
@@ -577,8 +578,13 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		dealOffer.setCode("code123");
 		dealOffer.setTitle("PaybackBook #1");
 		dealOffer.setDealType(DealType.PAID_BOOK);
-		dealOffer
-				.setImageUrl("http://cdn.dzone.com/static/images/vaannila/hibernate/hibernateManyToOnePic1.gif");
+
+		MerchantMedia media = new MerchantMediaImpl();
+		media.setMediaType(MediaType.DEAL_OFFER_LOGO);
+		media.setMediaUrl("http://cdn.dzone.com/static/images/vaannila/hibernate/hibernateManyToOnePic1.gif");
+		media.setMerchantId(dealOffer.getMerchant().getId());
+		dealOffer.setImage(media);
+
 		dealOffer.setPrice(20.00f);
 		dealOffer.setSummary("Payback Book Boulder, CO");
 		dealOffer.setExpires(DateUtils.addYears(new Date(), 1));
@@ -590,7 +596,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		Assert.assertEquals(dealOffer.getCode(), dealOfferResult.getCode());
 		Assert.assertEquals(dealOffer.getTitle(), dealOfferResult.getTitle());
-		Assert.assertEquals(dealOffer.getImageUrl(), dealOfferResult.getImageUrl());
+		Assert.assertEquals(dealOffer.getImage(), dealOfferResult.getImage());
 		Assert.assertEquals(dealOffer.getSummary(), dealOfferResult.getSummary());
 		Assert.assertEquals(dealOffer.getCreatedByMerchantAccount().getId(), dealOfferResult
 				.getCreatedByMerchantAccount().getId());
@@ -638,7 +644,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	private void assertDeal(final Deal expectedDeal, final Deal actualDeal)
 	{
 		Assert.assertEquals(expectedDeal.getCode(), actualDeal.getCode());
-		Assert.assertEquals(expectedDeal.getImageUrl(), actualDeal.getImageUrl());
+		Assert.assertEquals(expectedDeal.getImage(), actualDeal.getImage());
 		Assert.assertEquals(expectedDeal.getSummary(), actualDeal.getSummary());
 		Assert.assertEquals(expectedDeal.getTitle(), actualDeal.getTitle());
 		Assert.assertEquals(expectedDeal.getDealOffer(), actualDeal.getDealOffer());
@@ -700,7 +706,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		deal.setExpires(new Date());
 		deal.setSummary("Summary-" + now);
 		deal.setTitle("Title-" + now);
-		deal.setImageUrl("http://www.ImageUrl-" + now + ".com");
+
+		MerchantMedia media = new MerchantMediaImpl();
+		media.setMediaType(MediaType.DEAL_IMAGE);
+		media.setMediaUrl("http://deal.image.url" + now);
+		media.setMerchantId(deal.getMerchant().getId());
+		deal.setImage(media);
 
 		return deal;
 	}

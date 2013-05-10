@@ -16,11 +16,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantMedia;
 import com.talool.core.Tag;
 
 /**
@@ -74,8 +78,10 @@ public class DealImpl implements Deal
 	@Column(name = "title", unique = false, nullable = true, length = 256)
 	private String title;
 
-	@Column(name = "image_url", unique = false, nullable = true, length = 128)
-	private String imageUrl;
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinColumn(name = "image_id")
+	private MerchantMedia image;
 
 	@Column(name = "summary", unique = false, nullable = true, length = 256)
 	private String summary;
@@ -255,15 +261,15 @@ public class DealImpl implements Deal
 	}
 
 	@Override
-	public void setImageUrl(String imageUrl)
+	public void setImage(MerchantMedia image)
 	{
-		this.imageUrl = imageUrl;
+		this.image = image;
 	}
 
 	@Override
-	public String getImageUrl()
+	public MerchantMedia getImage()
 	{
-		return imageUrl;
+		return image;
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.talool.domain;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -10,12 +11,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -25,6 +29,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealType;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantMedia;
 import com.talool.persistence.GenericEnumUserType;
 
 /**
@@ -62,8 +67,10 @@ public class DealOfferImpl implements DealOffer
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
-	@Column(name = "image_url", unique = false, nullable = true, length = 128)
-	private String imageUrl;
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinColumn(name = "image_id")
+	private MerchantMedia image;
 
 	@Column(name = "summary", unique = false, nullable = true, length = 256)
 	private String summary;
@@ -203,15 +210,15 @@ public class DealOfferImpl implements DealOffer
 	}
 
 	@Override
-	public void setImageUrl(String imageUrl)
+	public void setImage(final MerchantMedia image)
 	{
-		this.imageUrl = imageUrl;
+		this.image = image;
 	}
 
 	@Override
-	public String getImageUrl()
+	public MerchantMedia getImage()
 	{
-		return imageUrl;
+		return image;
 	}
 
 	@Override
