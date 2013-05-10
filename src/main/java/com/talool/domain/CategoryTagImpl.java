@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
@@ -33,10 +35,12 @@ public class CategoryTagImpl implements CategoryTag
 		private static final long serialVersionUID = 5154400944254037286L;
 
 		@ManyToOne(fetch = FetchType.EAGER, targetEntity = TagImpl.class)
+		@Fetch(FetchMode.JOIN)
 		@JoinColumn(name = "tag_id")
 		private Tag categoryTag;
 
 		@ManyToOne(fetch = FetchType.EAGER, targetEntity = CategoryImpl.class)
+		@Fetch(FetchMode.JOIN)
 		@JoinColumn(name = "category_id")
 		private Category category;
 

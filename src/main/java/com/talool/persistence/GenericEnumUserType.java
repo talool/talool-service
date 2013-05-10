@@ -18,12 +18,14 @@ import org.hibernate.usertype.UserType;
 public class GenericEnumUserType implements UserType, ParameterizedType
 {
 
+	@SuppressWarnings("rawtypes")
 	private Class<? extends Enum> enumClass;
 	private Class<?> identifierType;
 	private Method identifierMethod;
 	private Method valueOfMethod;
 	private static final String defaultIdentifierMethodName = "name";
 	private static final String defaultValueOfMethodName = "valueOf";
+	@SuppressWarnings("rawtypes")
 	private AbstractSingleColumnStandardBasicType type;
 	private int[] sqlTypes;
 

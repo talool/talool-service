@@ -15,7 +15,13 @@ import org.hibernate.annotations.TypeDefs;
 				query = "select distinct d from DealImpl d " +
 						"where d.merchant.id=:merchantId OR " +
 						"d.dealOffer.createdByMerchantAccount.merchant.id=:merchantId " +
-						"OR d.dealOffer.merchant.id=:merchantId order by d.createdUpdated.created desc") })
+						"OR d.dealOffer.merchant.id=:merchantId order by d.createdUpdated.created desc"),
+
+		@NamedQuery(
+				name = "allCategoryTags",
+				query = "select ct.primaryKey.category, ct.primaryKey.categoryTag from CategoryTagImpl as ct"),
+
+})
 @TypeDefs({
 		@TypeDef(name = "sexType", typeClass = GenericEnumUserType.class, parameters = {
 				@Parameter(name = "enumClass", value = "com.talool.core.Sex"),

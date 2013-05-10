@@ -1642,9 +1642,7 @@ public class TaloolServiceImpl implements TaloolService
 
 		try
 		{
-			final Query query = getSessionFactory()
-					.getCurrentSession()
-					.createQuery("from CategoryTagImpl")
+			final Query query = getSessionFactory().getCurrentSession().getNamedQuery("allCategoryTags")
 					.setResultTransformer(new ResultTransformer()
 					{
 						private static final long serialVersionUID = 1L;
@@ -1652,9 +1650,8 @@ public class TaloolServiceImpl implements TaloolService
 						@Override
 						public Object transformTuple(final Object[] tuple, final String[] aliases)
 						{
-							final CategoryTag catTag = (CategoryTagImpl) tuple[0];
-							final Category cat = catTag.getCategory();
-							final Tag tag = catTag.getCategoryTag();
+							final Category cat = (Category) tuple[0];
+							final Tag tag = (Tag) tuple[1];
 
 							List<Tag> tagList = catTagMap.get(cat);
 							if (tagList == null)
@@ -1683,11 +1680,6 @@ public class TaloolServiceImpl implements TaloolService
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem getCategoryTags", ex);
-		}
-
-		for (Category entry : catTagMap.keySet())
-		{
-			// LOG.info("service: " + entry.getName());
 		}
 
 		return catTagMap;
