@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.talool.core.Customer;
+import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
@@ -32,6 +34,15 @@ public interface CustomerService
 
 	public List<Customer> getCustomers() throws ServiceException;
 
+	/**
+	 * Gets Merchants associated with a customer (via paid deal books or free)
+	 * 
+	 * @param customerId
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Merchant> getMerchantsByCustomerId(final Long customerId) throws ServiceException;
+
 	public List<Customer> getFriends(final UUID id) throws ServiceException;
 
 	public void save(final Relationship relationship) throws ServiceException;
@@ -43,6 +54,11 @@ public interface CustomerService
 	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId,
 			final SearchOptions searchOptions) throws ServiceException;
 
+	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
+			throws ServiceException;
+
+	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;
+
 	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOptions)
 			throws ServiceException;
 
@@ -50,5 +66,9 @@ public interface CustomerService
 			throws ServiceException;
 
 	public DealAcquire getDealAcquire(final UUID dealAcquireId) throws ServiceException;
+
+	public void addFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException;
+
+	public void removeFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException;
 
 }

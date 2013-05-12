@@ -120,7 +120,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		domainFactory = FactoryManager.get().getDomainFactory();
 	}
 
-	@Test
 	public void testMedia() throws ServiceException, InterruptedException
 	{
 		Long now = Calendar.getInstance().getTime().getTime();
@@ -132,7 +131,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		mediaUrls.add("http://static.talool.com/4.png");
 		mediaUrls.add("http://static.talool.com/5.png");
 
-		Merchant merchant = domainFactory.newMerchant();
+		Merchant merchant = domainFactory.newMerchant(true);
 		merchant.setName("Merch-media" + now);
 
 		taloolService.save(merchant);
@@ -256,11 +255,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// this is an integration test hacked together via JUnit, so no big deal!
 		cleanTest();
 
-		testRelationship();
-
 		testCategories();
 
 		testMedia();
+
+		testRelationship();
 
 		Customer customer = testCreateCustomer();
 
@@ -306,7 +305,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
 						.sortProperty("dealAcquire.deal.title").ascending(ascending).build();
 
-				dealAcquires = taloolService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
+				dealAcquires = customerService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
 						dealOfferPurchase.getDealOffer().getMerchant().getId(), searchOpts);
 
 				if (CollectionUtils.isEmpty(dealAcquires))
@@ -384,7 +383,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
 						.sortProperty("merchant.name").ascending(ascending).build();
 
-				merchantsAcquired = taloolService.getMerchantAcquires(dealOfferPurchase.getCustomer()
+				merchantsAcquired = customerService.getMerchantAcquires(dealOfferPurchase.getCustomer()
 						.getId(), searchOpts);
 
 				if (CollectionUtils.isEmpty(merchantsAcquired))
@@ -434,7 +433,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	{
 		List<DealAcquire> dealAcquires = null;
 
-		dealAcquires = taloolService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer()
+		dealAcquires = customerService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer()
 				.getId());
 
 		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId());
@@ -465,28 +464,28 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		// update #1 give to deal friend
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
-		daq = taloolService.getDealAcquire(daq.getId());
+		daq = customerService.getDealAcquire(daq.getId());
 		taloolService.giveDeal(daq, customerFriend);
 		taloolService.refresh(daq);
 
 		// friend shouldnt have 1
-		List<DealAcquire> myAcquires = taloolService
+		List<DealAcquire> myAcquires = customerService
 				.getDealAcquiresByCustomerId(customerFriend.getId());
 		Assert.assertEquals(1, myAcquires.size());
 
 		// original customer should have 1 less
-		myAcquires = taloolService.getDealAcquiresByCustomerId(originalCustomer.getId());
+		myAcquires = customerService.getDealAcquiresByCustomerId(originalCustomer.getId());
 		Assert.assertEquals(dealAcquires.size() - 1, myAcquires.size());
 
 		// update #2 friend accepts
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
-		daq = taloolService.getDealAcquire(daq.getId());
+		daq = customerService.getDealAcquire(daq.getId());
 		taloolService.acceptDeal(daq, originalCustomer.getId());
 		taloolService.refresh(daq);
 
 		// update #3 friend gives it back after accepting
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
-		daq = taloolService.getDealAcquire(daq.getId());
+		daq = customerService.getDealAcquire(daq.getId());
 		taloolService.giveDeal(daq, originalCustomer);
 		taloolService.refresh(daq);
 
@@ -537,14 +536,14 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Customer fromCustomer = testCreateCustomer();
 		Customer toCustomer = testCreateCustomer();
 
-		taloolService.save(domainFactory.newRelationship(fromCustomer, toCustomer,
+		customerService.save(domainFactory.newRelationship(fromCustomer, toCustomer,
 				RelationshipStatus.FRIEND));
 
-		List<Relationship> rels = taloolService.getRelationshipsFrom(fromCustomer.getId());
+		List<Relationship> rels = customerService.getRelationshipsFrom(fromCustomer.getId());
 		Assert.assertEquals(1, rels.size());
 		Assert.assertEquals(rels.get(0).getToCustomer(), toCustomer);
 
-		rels = taloolService.getRelationshipsTo(toCustomer.getId());
+		rels = customerService.getRelationshipsTo(toCustomer.getId());
 		Assert.assertEquals(1, rels.size());
 		Assert.assertEquals(rels.get(0).getFromCustomer(), fromCustomer);
 
@@ -559,7 +558,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		taloolService.save(dealOfferPurchase);
 		taloolService.refresh(dealOfferPurchase);
 
-		List<DealOfferPurchase> dealOfferPurchaseResult = taloolService
+		List<DealOfferPurchase> dealOfferPurchaseResult = customerService
 				.getDealOfferPurchasesByCustomerId(customer.getId());
 
 		Assert.assertEquals(1, dealOfferPurchaseResult.size());
@@ -718,7 +717,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	public void cleanTest() throws ServiceException
 	{
-		final Customer customer = taloolService.getCustomerByEmail("christopher.justin-1000@gmail.com");
+		final Customer customer = customerService.getCustomerByEmail("christopher.justin-1000@gmail.com");
 
 		System.out.println(customer);
 	}
@@ -727,7 +726,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	{
 		Long now = System.currentTimeMillis();
 
-		Merchant merchant = domainFactory.newMerchant();
+		Merchant merchant = domainFactory.newMerchant(true);
 		merchant.setName("Merch" + now);
 
 		// tags for fun
@@ -835,10 +834,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Customer cust = createCustomer();
 
 		// create account
-		taloolService.createAccount(cust, "pass123");
+		customerService.createAccount(cust, "pass123");
 
 		// authenticate
-		Customer cust2 = taloolService.authenticateCustomer(cust.getEmail(), "pass123");
+		Customer cust2 = customerService.authenticateCustomer(cust.getEmail(), "pass123");
 
 		Assert.assertNotNull(cust2.getId());
 

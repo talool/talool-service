@@ -17,6 +17,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.talool.core.FactoryManager;
+import com.talool.core.service.CustomerService;
 import com.talool.core.service.TaloolService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,6 +36,9 @@ public abstract class HibernateFunctionalTestBase extends AbstractJUnit4SpringCo
 
 	@Autowired
 	protected TaloolService taloolService;
+
+	@Autowired
+	protected CustomerService customerService;
 
 	@Before
 	public void setUp()
@@ -59,8 +63,13 @@ public abstract class HibernateFunctionalTestBase extends AbstractJUnit4SpringCo
 		Session sess = holder.getSession();
 
 		sess.flush();
+
+		// SessionFactoryUtils.closeSession(sess);
+
+		// sessionFactory.close();
+
 		TransactionSynchronizationManager.unbindResource(sessionFactory);
-		// SessionFactoryUtils.closeSession( sess );
+
 	}
 
 }

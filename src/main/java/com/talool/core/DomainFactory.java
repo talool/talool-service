@@ -16,6 +16,8 @@ public interface DomainFactory
 
 	public Merchant newMerchant();
 
+	public Merchant newMerchant(boolean topLevelOnly);
+
 	public DealOffer newDealOffer(final Merchant merchant, final MerchantAccount createdByMerchant);
 
 	public DealOfferPurchase newDealOfferPurchase(final Customer customer, final DealOffer dealOffer);

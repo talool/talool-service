@@ -2,6 +2,7 @@
 --  USED AS A SEED ONLY FOR DEVELOPMENT. 
 --  THE BELOW IS FRAGILE, PAY SPECIAL ATTENTION TO THE SEEDs
 --------------------------------------------------------------
+\set ON_ERROR_STOP on;
 
 -- insert socials
 INSERT INTO social_network(name, website, api_url)

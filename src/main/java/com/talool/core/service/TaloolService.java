@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.hibernate.Session;
-
 import com.talool.core.AccountType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
@@ -15,15 +13,14 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
+import com.talool.service.HibernateService;
 
 /**
  * 
  * @author clintz
  */
-public interface TaloolService extends MerchantService, CustomerService
+public interface TaloolService extends MerchantService, HibernateService
 {
-	public void evict(Object obj) throws ServiceException;
-
 	public SocialNetwork getSocialNetwork(final String name) throws ServiceException;
 
 	public boolean emailExists(final AccountType accountType, final String email)
@@ -50,8 +47,6 @@ public interface TaloolService extends MerchantService, CustomerService
 	public CategoryTag createCategoryTag(final String categoryName, final String tagName)
 			throws ServiceException;
 
-	public void refresh(Object obj) throws ServiceException;
-
 	public Long sizeOfCollection(final Object collection) throws ServiceException;
 
 	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
@@ -68,15 +63,5 @@ public interface TaloolService extends MerchantService, CustomerService
 
 	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId)
 			throws ServiceException;
-
-	public void reattach(final Object obj) throws ServiceException;
-
-	public void merge(final Object obj) throws ServiceException;
-
-	public Session getCurrentSession() throws ServiceException;
-
-	public void initialize(Object obj) throws ServiceException;
-
-	public void isInitialized(Object obj) throws ServiceException;
 
 }

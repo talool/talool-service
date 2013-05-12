@@ -33,6 +33,11 @@
 		<property name="daoDispatcher" ref="daoDispatcher" />
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
+	
+	<bean id="customerServiceImpl" class="com.talool.service.CustomerServiceImpl">
+		<property name="daoDispatcher" ref="daoDispatcher" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
 
 	<!-- a PlatformTransactionManager is still required <bean id="transactionManager" 
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager" <property 
@@ -65,18 +70,15 @@
 				<prop key="hibernate.format_sql">${hibernate.format.sql}</prop>
 				<prop key="hibernate.show_sql">${hibernate.show.sql}</prop>
 				<!-- -->
-				<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
+			
 
 				<prop key="hibernate.generate_statistics">true</prop>
 				<prop key="hibernate.cache.use_structured_entries">true</prop>
-				<prop key="hibernate.cache.use_second_level_cache">true</prop>
-				<prop key="hibernate.cache.use_query_cache">true</prop>
-
-				<!-- <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory 
-					</prop> -->
-
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.use_query_cache">false</prop>
+				<prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</prop>
+				<prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.EhCacheProvider"</prop>
 				<prop key="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</prop>
-
 			</props>
 		</property>
 

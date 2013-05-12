@@ -5,8 +5,9 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
-
 CREATE DATABASE talooltest WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US' LC_CTYPE = 'en_US';
+
+\set ON_ERROR_STOP on;
 
 ALTER DATABASE talooltest OWNER TO talool;
 
@@ -298,6 +299,28 @@ ALTER TABLE public.merchant OWNER TO talool;
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (merchant_parent_id) REFERENCES merchant(merchant_id);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
 
+CREATE TABLE favorite_merchant (
+	favorite_merchant_id bigint NOT NULL,
+	customer_id UUID NOT NULL,
+    merchant_id UUID NOT NULL,
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY (favorite_merchant_id),
+    UNIQUE (customer_id,merchant_id)
+);
+
+ALTER TABLE public.favorite_merchant OWNER TO talool;
+
+CREATE SEQUENCE favorite_merchant_favorite_merchant_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE public.favorite_merchant_favorite_merchant_id_seq OWNER TO talool;
+ALTER SEQUENCE favorite_merchant_favorite_merchant_id_seq OWNED BY favorite_merchant.favorite_merchant_id;
+ALTER TABLE ONLY favorite_merchant ALTER COLUMN favorite_merchant_id SET DEFAULT nextval('favorite_merchant_favorite_merchant_id_seq'::regclass);
+
 CREATE TYPE media_type AS ENUM ('DEAL_IMAGE','MERCHANT_IMAGE', 'MERCHANT_LOGO', 'DEAL_OFFER_LOGO');
 
 CREATE TABLE merchant_media (
@@ -341,7 +364,7 @@ CREATE SEQUENCE merchant_location_merchant_location_id_seq
     NO MAXVALUE
     CACHE 1;
 
-ALTER TABLE public. merchant_location_merchant_location_id_seq OWNER TO talool;
+ALTER TABLE public.merchant_location_merchant_location_id_seq OWNER TO talool;
 ALTER SEQUENCE merchant_location_merchant_location_id_seq OWNED BY merchant_location.merchant_location_id;
 ALTER TABLE ONLY merchant_location ALTER COLUMN merchant_location_id SET DEFAULT nextval('merchant_location_merchant_location_id_seq'::regclass);
 
@@ -437,7 +460,7 @@ ALTER TABLE public.deal_offer OWNER TO talool;
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_CreatedMerchantAccount" FOREIGN KEY (created_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_UpdatedMerchantAccount" FOREIGN KEY (updated_by_merchant_account_id) REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
-ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Image" FOREIGN KEY (image_id) REFERENCES merchant_media(image_id);
+ALTER TABLE ONLY deal_offer ADD CONSTRAINT "FK_Deal_Image" FOREIGN KEY (image_id) REFERENCES merchant_media(merchant_media_id);
 
 
 CREATE INDEX deal_offer_created_by_merchant_account_id_idx ON deal_offer (created_by_merchant_account_id);

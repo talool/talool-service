@@ -1,5 +1,6 @@
 package com.talool.service;
 
+import com.talool.core.service.CustomerService;
 import com.talool.core.service.TaloolService;
 
 /**
@@ -12,6 +13,7 @@ public final class ServiceFactory
 {
 	private static ServiceFactory instance;
 	private TaloolService taloolService;
+	private CustomerService customerService;
 
 	private ServiceFactory()
 	{}
@@ -21,12 +23,14 @@ public final class ServiceFactory
 		return instance;
 	}
 
-	public static synchronized ServiceFactory createInstance(final TaloolService taloolService)
+	public static synchronized ServiceFactory createInstance(final TaloolService taloolService,
+			final CustomerService customerService)
 	{
 		if (instance == null)
 		{
 			instance = new ServiceFactory();
 			instance.taloolService = taloolService;
+			instance.customerService = customerService;
 		}
 
 		return instance;
@@ -35,6 +39,11 @@ public final class ServiceFactory
 	public TaloolService getTaloolService()
 	{
 		return taloolService;
+	}
+
+	public CustomerService getCustomerService()
+	{
+		return customerService;
 	}
 
 }

@@ -18,7 +18,7 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>file:/etc/talool/website.properties</value>
+				<value>classpath:service.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -29,7 +29,8 @@
  
 	<bean id="serviceFactory" class="com.talool.service.ServiceFactory" factory-method="createInstance">
 		<constructor-arg ref="taloolServiceImpl"/>
-		</bean>
+	    <constructor-arg ref="customerServiceImpl"/>
+	</bean>
 		
 				
 	<bean id="domainFactory" class="com.talool.domain.DomainFactoryImpl"/>

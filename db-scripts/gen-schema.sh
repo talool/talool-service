@@ -25,10 +25,10 @@ postGisDir=$3
 dbName="talool"
 
 echo "Dropping Database '$dbName' ..."
-dropdb -U postgres -w $dbName
+dropdb --if-exists -U postgres -w $dbName
 
-echo "Creating Database '$dbName' ..."
-createdb -U postgres -w $dbName
+#echo "Creating Database '$dbName' ..."
+createdb -T template0 -E UTF8 -U postgres -w $dbName
 
 echo "Installing PostGIS '$dbName' ..."
 psql -U postgres -d $dbName -f $postGisDir/postgis.sql

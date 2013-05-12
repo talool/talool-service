@@ -71,13 +71,7 @@ final class DomainFactoryImpl implements DomainFactory
 	@Override
 	public Merchant newMerchant()
 	{
-		Merchant merchant = new MerchantImpl();
-		
-		MerchantLocation location = newMerchantLocation();
-		location.setAddress(newAddress());
-		merchant.addLocation(location);
-		
-		return merchant;
+		return newMerchant(false);
 	}
 
 	@Override
@@ -191,10 +185,12 @@ final class DomainFactoryImpl implements DomainFactory
 			try
 			{
 				Merchant merchant;
-				if (merchantId == null) 
+				if (merchantId == null)
 				{
 					merchant = createdByMerchantAccount.getMerchant();
-				} else {
+				}
+				else
+				{
 					merchant = taloolService.getMerchantById(merchantId);
 				}
 				taloolService.refresh(merchant);
@@ -233,5 +229,20 @@ final class DomainFactoryImpl implements DomainFactory
 		media.setMerchantId(merchantId);
 		media.setMediaType(mediaType);
 		return media;
+	}
+
+	@Override
+	public Merchant newMerchant(boolean topLevelOnly)
+	{
+		Merchant merchant = new MerchantImpl();
+
+		if (!topLevelOnly)
+		{
+			MerchantLocation location = newMerchantLocation();
+			location.setAddress(newAddress());
+			merchant.addLocation(location);
+		}
+		return merchant;
+
 	}
 }

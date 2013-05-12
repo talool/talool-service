@@ -27,6 +27,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
@@ -48,6 +50,7 @@ import com.talool.service.ServiceFactory;
 @Entity
 @Table(name = "merchant", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
+@Cache(region = "Merchant", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MerchantImpl implements Merchant
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantImpl.class);
@@ -72,14 +75,17 @@ public class MerchantImpl implements Merchant
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<Tag> tags = new HashSet<Tag>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = MerchantAccountImpl.class)
 	@JoinColumn(name = "merchant_id")
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<MerchantAccount> merchantAccounts = new HashSet<MerchantAccount>();
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "merchant", targetEntity = MerchantLocationImpl.class)
 	@OrderBy("createdUpdated.created")
+	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private List<MerchantLocation> locations = new ArrayList<MerchantLocation>();
 
 	@Embedded

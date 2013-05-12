@@ -56,15 +56,6 @@ public interface MerchantService
 	public List<Deal> getMerchantDeals(final UUID merchantId, final Boolean isActive)
 			throws ServiceException;
 
-	/**
-	 * Gets Merchants associated with a customer (via paid deal books or free)
-	 * 
-	 * @param customerId
-	 * @return
-	 * @throws ServiceException
-	 */
-	public List<Merchant> getMerchantsByCustomerId(final Long customerId) throws ServiceException;
-
 	public List<Merchant> getMerchants() throws ServiceException;
 
 	/**
@@ -75,8 +66,6 @@ public interface MerchantService
 	 * @throws ServiceException
 	 */
 	public List<Deal> getDealsByMerchantId(final UUID merchantId) throws ServiceException;
-
-	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;
 
 	// DealOffer stuff
 	public void save(final DealOffer dealOffer) throws ServiceException;
@@ -92,9 +81,6 @@ public interface MerchantService
 	public Deal getDeal(final UUID dealId) throws ServiceException;
 
 	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId) throws ServiceException;
-
-	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
-			throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId) throws ServiceException;
 
