@@ -10,6 +10,7 @@ import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
+import com.talool.service.HibernateService;
 
 /**
  * Customer Service
@@ -17,11 +18,11 @@ import com.talool.core.SearchOptions;
  * @author clintz
  * 
  */
-public interface CustomerService
+public interface CustomerService extends HibernateService
 {
 	public void createAccount(final Customer customer, final String password) throws ServiceException;
 
-	public void deleteCustomer(final UUID id) throws ServiceException;
+	public void removeCustomer(final UUID id) throws ServiceException;
 
 	public Customer authenticateCustomer(final String email, final String password)
 			throws ServiceException;
@@ -70,5 +71,7 @@ public interface CustomerService
 	public void addFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException;
 
 	public void removeFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException;
+
+	public List<Merchant> getFavoriteMerchants(final UUID customerId, final SearchOptions searchOpts) throws ServiceException;
 
 }

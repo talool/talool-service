@@ -18,6 +18,7 @@ import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
@@ -27,6 +28,7 @@ import com.talool.core.service.ServiceException;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
+import com.talool.domain.FavoriteMerchantImpl;
 import com.talool.domain.RelationshipImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
@@ -78,7 +80,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public void deleteCustomer(UUID id) throws ServiceException
+	public void removeCustomer(UUID id) throws ServiceException
 	{
 		// TODO Auto-generated method stub
 
@@ -110,7 +112,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			daoDispatcher.save((CustomerImpl) customer);
+			daoDispatcher.save(customer);
 		}
 		catch (Exception e)
 		{
@@ -391,16 +393,70 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public void addFavoriteMerchant(UUID customerId, UUID merchantId) throws ServiceException
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void addFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException
 	{
-		// TODO Auto-generated method stub
+		final FavoriteMerchant favMerchant = new FavoriteMerchantImpl(customerId, merchantId);
+
+		try
+		{
+			daoDispatcher.save(favMerchant);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(String.format("There was a problem adding favorite merchant: customerId %s merchantId %s",
+					customerId, merchantId));
+		}
 
 	}
 
 	@Override
-	public void removeFavoriteMerchant(UUID customerId, UUID merchantId) throws ServiceException
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void removeFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException
 	{
-		// TODO Auto-generated method stub
+		try
+		{
+			final Search search = new Search().addFilterEqual("customerId", customerId).addFilterEqual("merchantId", merchantId);
+			final FavoriteMerchant favMerchant = (FavoriteMerchant) daoDispatcher.searchUnique(search);
+			if (favMerchant != null)
+			{
+				daoDispatcher.remove(favMerchant);
+			}
+			else
+			{
+				LOG.warn(String.format("Ignoring remove of favorite merchant (not found) customerId %s merchantId %s", customerId,
+						merchantId));
+			}
+
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(String.format("There was a problem removing favorite merchant: customerId %s merchantId %s",
+					customerId, merchantId));
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getFavoriteMerchants(final UUID customerId, final SearchOptions searchOpts) throws ServiceException
+	{
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.GetFavoriteMerchants, null, searchOpts,
+					true);
+
+			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
+			query.setParameter("customerId", customerId);
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+
+			return query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getting favorite merchant for customerId " + customerId, ex);
+		}
 
 	}
 

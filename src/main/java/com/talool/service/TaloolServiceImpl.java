@@ -964,42 +964,6 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 	}
 
-	static String getQueryWithOrder(final String firstLevelName, final String query,
-			final SearchOptions searchOpts)
-	{
-		if (searchOpts == null)
-		{
-			return query;
-		}
-
-		if (searchOpts.getSortProperty() == null)
-		{
-			return query;
-		}
-
-		final StringBuilder sb = new StringBuilder();
-		sb.append(query);
-		sb.append(" order by ");
-
-		if (firstLevelName != null)
-		{
-			sb.append(firstLevelName).append(".");
-		}
-
-		sb.append(searchOpts.getSortProperty());
-
-		if (searchOpts.isAscending())
-		{
-			sb.append(" ASC");
-		}
-		else
-		{
-			sb.append(" DESC");
-		}
-
-		return sb.toString();
-	}
-
 	@Override
 	public List<Merchant> getMerchantsWithin(final Location location,
 			final int maxMiles, SearchOptions searchOpts) throws ServiceException

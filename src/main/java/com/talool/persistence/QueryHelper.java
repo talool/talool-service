@@ -38,6 +38,8 @@ public final class QueryHelper
 	private static final String GET_MERCHANT_MEDIAS =
 			"from MerchantMediaImpl as merchantMedia where merchantMedia.merchantId=:merchantId and merchantMedia.mediaType in (:mediaTypes)";
 
+	private static final String GET_FAVORITE_MERCHANTS = "select merchant from MerchantImpl as merchant, FavoriteMerchantImpl as f where f.customerId=:customerId and f.merchantId=merchant.id";
+
 	public enum QueryType
 	{
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
@@ -49,7 +51,11 @@ public final class QueryHelper
 
 		GetMerchantAcquires(GET_MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 
-		GetMerchantMedias(GET_MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS);
+		GetMerchantMedias(GET_MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS),
+
+		GetFavoriteMerchants(GET_FAVORITE_MERCHANTS, ImmutableMap.<String, String> builder()
+				.put("merchant.created", "merchant.createdUpdated.created").
+				put("merchant.updated", "merchant.createdUpdated.updated").build());
 
 		private String query;
 		private ImmutableMap<String, String> propertyColumnMap;

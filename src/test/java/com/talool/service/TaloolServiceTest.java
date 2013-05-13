@@ -120,6 +120,35 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		domainFactory = FactoryManager.get().getDomainFactory();
 	}
 
+	@Test
+	public void testCustomerIntegration() throws Exception
+	{
+		// yes if this were a "unit" test, these would not be dependent.
+		// this is an integration test hacked together via JUnit, so no big deal!
+		cleanTest();
+
+		testCategories();
+
+		testMedia();
+
+		testRelationship();
+
+		Customer customer = testCreateCustomer();
+
+		Merchant testMerchant = testCreateMerchant();
+
+		MerchantAccount testMerchantAccount = testMerchantAccount(testMerchant);
+
+		final DealOffer dealOffer = testDealOffers(testMerchant, testMerchantAccount, customer);
+
+		final DealOfferPurchase dealOfferPurchase = testDealOfferPurchase(customer, dealOffer);
+
+		testDealAcquires(dealOfferPurchase, dealOffer);
+
+		testFavoriteMerchants();
+
+	}
+
 	public void testMedia() throws ServiceException, InterruptedException
 	{
 		Long now = Calendar.getInstance().getTime().getTime();
@@ -164,6 +193,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 			Assert.assertEquals(mediaUrls.get(i++), media.getMediaUrl());
 		}
+
 	}
 
 	public void testCategories() throws ServiceException, InterruptedException
@@ -245,33 +275,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		{
 			Assert.assertEquals(nightLifeResultList.get(0).getName(), nightLifeList.get(0).getName());
 		}
-
-	}
-
-	@Test
-	public void testCustomerIntegration() throws Exception
-	{
-		// yes if this were a "unit" test, these would not be dependent.
-		// this is an integration test hacked together via JUnit, so no big deal!
-		cleanTest();
-
-		testCategories();
-
-		testMedia();
-
-		testRelationship();
-
-		Customer customer = testCreateCustomer();
-
-		Merchant testMerchant = testCreateMerchant();
-
-		MerchantAccount testMerchantAccount = testMerchantAccount(testMerchant);
-
-		final DealOffer dealOffer = testDealOffers(testMerchant, testMerchantAccount, customer);
-
-		final DealOfferPurchase dealOfferPurchase = testDealOfferPurchase(customer, dealOffer);
-
-		testDealAcquires(dealOfferPurchase, dealOffer);
 
 	}
 
@@ -717,9 +720,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	public void cleanTest() throws ServiceException
 	{
-		final Customer customer = customerService.getCustomerByEmail("christopher.justin-1000@gmail.com");
 
-		System.out.println(customer);
 	}
 
 	public Merchant testCreateMerchant() throws ServiceException
@@ -826,6 +827,41 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		cust.setBirthDate(new Date());
 
 		return cust;
+
+	}
+
+	public void testFavoriteMerchants() throws ServiceException
+	{
+		int numMerchants = 5;
+
+		Customer customer = createCustomer();
+		List<Merchant> merchants = new ArrayList<Merchant>();
+
+		customerService.createAccount(customer, "pass123");
+		customerService.refresh(customer);
+
+		for (int i = 0; i < numMerchants; i++)
+		{
+			Merchant merchant = domainFactory.newMerchant(true);
+			merchant.setName("MerchFav" + i + System.currentTimeMillis());
+			taloolService.save(merchant);
+			taloolService.refresh(merchant);
+			merchants.add(merchant);
+
+			customerService.addFavoriteMerchant(customer.getId(), merchant.getId());
+		}
+
+		SearchOptions searchOptions = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("merchant.created")
+				.ascending(true).build();
+
+		List<Merchant> favMerchants = customerService.getFavoriteMerchants(customer.getId(), searchOptions);
+
+		Assert.assertEquals(numMerchants, favMerchants.size());
+
+		for (int i = 0; i < numMerchants; i++)
+		{
+			Assert.assertEquals(merchants.get(i).getName(), favMerchants.get(i).getName());
+		}
 
 	}
 

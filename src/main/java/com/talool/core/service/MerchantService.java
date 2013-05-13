@@ -18,6 +18,7 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
+import com.talool.service.HibernateService;
 
 /**
  * r Merchant Service
@@ -25,7 +26,7 @@ import com.talool.core.Tag;
  * @author clintz
  * 
  */
-public interface MerchantService
+public interface MerchantService extends HibernateService
 {
 	public void save(final MerchantAccount merchantAccount) throws ServiceException;
 
