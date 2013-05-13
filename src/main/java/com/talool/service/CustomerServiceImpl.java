@@ -416,7 +416,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			final Search search = new Search().addFilterEqual("customerId", customerId).addFilterEqual("merchantId", merchantId);
+			final Search search = new Search(FavoriteMerchantImpl.class).addFilterEqual("customerId", customerId).addFilterEqual(
+					"merchantId", merchantId);
 			final FavoriteMerchant favMerchant = (FavoriteMerchant) daoDispatcher.searchUnique(search);
 			if (favMerchant != null)
 			{

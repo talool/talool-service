@@ -861,7 +861,14 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		for (int i = 0; i < numMerchants; i++)
 		{
 			Assert.assertEquals(merchants.get(i).getName(), favMerchants.get(i).getName());
+
+			customerService.removeFavoriteMerchant(customer.getId(), merchants.get(i).getId());
 		}
+
+		// should have no favorite merchants
+		favMerchants = customerService.getFavoriteMerchants(customer.getId(), searchOptions);
+
+		Assert.assertEquals(0, favMerchants.size());
 
 	}
 

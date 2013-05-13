@@ -189,26 +189,6 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		return merchants;
 	}
 
-	private void removeElement(final UUID id, Class<CustomerImpl> clazz) throws ServiceException
-	{
-		boolean deleted = false;
-		try
-		{
-			deleted = daoDispatcher.removeById(clazz, id);
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem removing ID '%d' for domain %s", id,
-					clazz.getSimpleName()), ex);
-		}
-
-		if (!deleted)
-		{
-			throw new ServiceException((String.format("Element ID '%d' not found for domain %s", id,
-					clazz.getSimpleName())));
-		}
-	}
-
 	private void removeElement(final String id, Class<MerchantImpl> clazz) throws ServiceException
 	{
 		boolean deleted = false;
