@@ -51,10 +51,11 @@ INSERT INTO address (address1,address2,city,state_province_county,zip,country)
 
 INSERT INTO merchant (merchant_name) VALUES ('Payback Book');
 
-INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES(  (select merchant_id from merchant where merchant_name='Payback Book'),
           		  'paybackbook@aol.com','http://www.paybackbook.com','1.360.699.1252',
-          		  (select address_id from address where address1='6715 NE 63rd St.'));
+          		  (select address_id from address where address1='6715 NE 63rd St.'),
+          		  ST_GeomFromText('POINT(-122.602628 45.667817)', 4326));
 
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='Payback Book'),'paybackbook@aol.com',(select md5('pass123')),'Owner',true);     
@@ -65,10 +66,11 @@ INSERT INTO address (address1,city,state_province_county,zip,country)
 
 INSERT INTO merchant (merchant_name) VALUES ('The Kitchen');
 
-INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES(  (select merchant_id from merchant where merchant_name='The Kitchen'),
 			      'info@thekitchencafe.com','http://thekitchencommunity.com','303.544.5973',
-       	 		  (select address_id from address where address1='1039 Pearl St'));
+       	 		  (select address_id from address where address1='1039 Pearl St'),
+       	 		  ST_GeomFromText('POINT(-105.281686 40.017663)', 4326));
       
 
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
@@ -80,10 +82,11 @@ INSERT INTO address (address1,city,state_province_county,zip,country)
 
 INSERT INTO merchant (merchant_name) VALUES ('Centro Latin Kitchen');
              
-INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES( (select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),
         		'info@centrolatinkitchen.com','http://www.centrolatinkitchen.com','303.442.7771',
-        		(select address_id from address where address1='950 Pearl St'));
+        		(select address_id from address where address1='950 Pearl St'),
+        		ST_GeomFromText('POINT(-105.2841748 40.0169992)', 4326));
        
 ---------Test Deal Offers & Deals -------------------------------   
 
