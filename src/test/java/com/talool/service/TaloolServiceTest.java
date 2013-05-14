@@ -147,6 +147,26 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		testFavoriteMerchants();
 
+		testMerchantsWithin();
+
+	}
+
+	public void testMerchantsWithin() throws ServiceException, InterruptedException
+	{
+
+		// The kitchen Boulder location
+		Location location = domainFactory.newLocation(-105.281686, 40.017663);
+		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("merchant.name").ascending(true)
+				.build();
+
+		List<Merchant> merchants = taloolService.getMerchantsWithin(location, 2, searchOpts);
+
+		Assert.assertEquals(2, merchants.size());
+
+		Assert.assertEquals("Centro Latin Kitchen", merchants.get(0).getName());
+
+		Assert.assertEquals("The Kitchen", merchants.get(1).getName());
+
 	}
 
 	public void testMedia() throws ServiceException, InterruptedException
