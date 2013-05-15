@@ -22,6 +22,8 @@ public interface CustomerService extends HibernateService
 {
 	public void createAccount(final Customer customer, final String password) throws ServiceException;
 
+	public void createDealOfferPurchase(final UUID customerId, final UUID dealOfferId) throws ServiceException;
+
 	public void removeCustomer(final UUID id) throws ServiceException;
 
 	public Customer authenticateCustomer(final String email, final String password)
@@ -56,6 +58,18 @@ public interface CustomerService extends HibernateService
 			final SearchOptions searchOptions) throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
+			throws ServiceException;
+
+	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
+			throws ServiceException;
+
+	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException;
+
+	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId)
+			throws ServiceException;
+
+	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
 			throws ServiceException;
 
 	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;

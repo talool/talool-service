@@ -1,7 +1,6 @@
 package com.talool.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,9 +34,7 @@ import com.talool.core.AcquireStatus;
 import com.talool.core.AcquireStatusType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
-import com.talool.core.Customer;
 import com.talool.core.Deal;
-import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
@@ -60,7 +57,6 @@ import com.talool.domain.CategoryImpl;
 import com.talool.domain.CategoryTagImpl;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireHistoryImpl;
-import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealImpl;
 import com.talool.domain.DealOfferImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
@@ -782,144 +778,6 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		catch (Exception ex)
 		{
 			throw new ServiceException(String.format("Problem getAcquireStatus %s", type), ex);
-		}
-
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
-			throws ServiceException
-	{
-		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
-
-		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcq.getAcquireStatus()
-				.getStatus()))
-		{
-			throw new ServiceException("Cannot give an already redeemed deal " + dealAcquire);
-		}
-
-		try
-		{
-			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
-					.getAcquireStatus(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE));
-
-			dealAcq.setSharedByCusomer(dealAcquire.getCustomer());
-			dealAcq.setCustomer(toCustomer);
-			dealAcq.incrementShareCount();
-			daoDispatcher.save(dealAcq);
-
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem giveDealToCustomer %s %s", dealAcquire,
-					toCustomer), ex);
-		}
-
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException
-	{
-		// TODO apply state change logic. only accept deals in valid states to be
-		// accepted
-
-		if (dealAcquire.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
-		{
-			throw new ServiceException("Cannot acceptDeal an already redeemed deal " + dealAcquire);
-		}
-		try
-		{
-			final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
-
-			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
-					.getAcquireStatus(AcquireStatusType.ACCEPTED_CUSTOMER_SHARE));
-
-			daoDispatcher.save(dealAcq);
-
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem acceptDeal %s %s", dealAcquire), ex);
-		}
-
-	}
-
-	@Override
-	/**
-	 * Current only supports rejecting deals given by customers (not merchants)
-	 */
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException
-	{
-		// TODO apply state change logic. only reject deals in valid states to be
-		// accepted
-
-		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcquire.getAcquireStatus()
-				.getStatus()))
-		{
-			throw new ServiceException("Cannot rejectDeal an already redeemed deal " + dealAcquire);
-		}
-
-		if (!dealAcquire.getCustomer().getId().equals(customerId))
-		{
-			throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
-					"Customer does not own deal");
-		}
-
-		try
-		{
-			final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
-
-			// give it back to the original share
-			final Customer rejectedBy = dealAcquire.getCustomer();
-			dealAcq.setCustomer(dealAcquire.getSharedByCustomer());
-			dealAcq.setSharedByCusomer(rejectedBy);
-
-			daoDispatcher.save(dealAcquire);
-
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem acceptDeal %s %s", dealAcquire), ex);
-		}
-
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException
-	{
-		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
-
-		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcq.getAcquireStatus()
-				.getStatus()))
-		{
-			throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquire);
-		}
-		if (!dealAcquire.getCustomer().getId().equals(customerId))
-		{
-			throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
-					"Customer does not own deal");
-		}
-
-		try
-		{
-			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
-					.getAcquireStatus(AcquireStatusType.REDEEMED));
-
-			dealAcq.setRedemptionDate(Calendar.getInstance().getTime());
-
-			daoDispatcher.save(dealAcq);
-
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException("Problem redeemDeal %s", ex);
 		}
 
 	}

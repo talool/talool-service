@@ -488,7 +488,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// update #1 give to deal friend
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
 		daq = customerService.getDealAcquire(daq.getId());
-		taloolService.giveDeal(daq, customerFriend);
+		customerService.giveDeal(daq, customerFriend);
 		taloolService.refresh(daq);
 
 		// friend shouldnt have 1
@@ -503,13 +503,13 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// update #2 friend accepts
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
 		daq = customerService.getDealAcquire(daq.getId());
-		taloolService.acceptDeal(daq, originalCustomer.getId());
+		customerService.acceptDeal(daq, originalCustomer.getId());
 		taloolService.refresh(daq);
 
 		// update #3 friend gives it back after accepting
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
 		daq = customerService.getDealAcquire(daq.getId());
-		taloolService.giveDeal(daq, originalCustomer);
+		customerService.giveDeal(daq, originalCustomer);
 		taloolService.refresh(daq);
 
 		Assert.assertEquals(new Integer(2), daq.getShareCount());

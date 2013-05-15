@@ -8,8 +8,6 @@ import java.util.UUID;
 import com.talool.core.AccountType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
-import com.talool.core.Customer;
-import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
@@ -48,18 +46,6 @@ public interface TaloolService extends MerchantService, HibernateService
 			throws ServiceException;
 
 	public Long sizeOfCollection(final Object collection) throws ServiceException;
-
-	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
-			throws ServiceException;
-
-	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException;
-
-	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException;
-
-	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException;
 
 	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId)
 			throws ServiceException;
