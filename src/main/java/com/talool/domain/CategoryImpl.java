@@ -31,7 +31,7 @@ public class CategoryImpl implements Category
 	@Column(name = "category_id", unique = true, nullable = false)
 	private Integer id;
 
-	@Column(name = "name", unique = true, nullable = false, length = 32)
+	@Column(name = "category_name", unique = true, nullable = false, length = 32)
 	private String name;
 
 	@Override

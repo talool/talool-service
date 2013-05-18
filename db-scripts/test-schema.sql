@@ -215,7 +215,7 @@ CREATE UNIQUE INDEX tag_name_lower_idx ON tag (lower(name));
 
 CREATE TABLE category (
     category_id smallint NOT NULL,
-    name character varying(32) NOT NULL,
+    category_name character varying(32) NOT NULL,
     PRIMARY KEY (category_id)
 );
 
@@ -229,7 +229,7 @@ ALTER TABLE public.category OWNER TO talool;
 ALTER TABLE public.category_category_id_seq OWNER TO talool;
 ALTER SEQUENCE category_category_id_seq OWNED BY category.category_id;
 ALTER TABLE ONLY category ALTER COLUMN category_id SET DEFAULT nextval('category_category_id_seq'::regclass);
-CREATE UNIQUE INDEX category_name_lower_idx ON category (lower(name));
+CREATE UNIQUE INDEX category_name_lower_idx ON category (lower(category_name));
 
 CREATE TABLE category_tag (
     category_id smallint NOT NULL,
@@ -634,10 +634,10 @@ DECLARE
 	tg_id smallint;
 	cat_tg_id smallint;
 BEGIN
-  SELECT category_id INTO cat_id FROM category WHERE name = $1;
+  SELECT category_id INTO cat_id FROM category WHERE category_name = $1;
   IF NOT FOUND THEN
-      INSERT INTO category(name) VALUES($1);
-      SELECT category_id INTO cat_id FROM category WHERE name = $1;
+      INSERT INTO category(category_name) VALUES($1);
+      SELECT category_id INTO cat_id FROM category WHERE category_name = $1;
   END IF;
   
   SELECT tag_id INTO tg_id FROM tag WHERE name = $2;

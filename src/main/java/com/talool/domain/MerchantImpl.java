@@ -71,7 +71,7 @@ public class MerchantImpl implements Merchant
 	@JoinColumn(name = "merchant_parent_id")
 	private Merchant parent;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CategoryImpl.class)
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CategoryImpl.class)
 	@JoinColumn(name = "category_id")
 	private Category category;
 

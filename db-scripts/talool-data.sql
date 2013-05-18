@@ -128,7 +128,7 @@ INSERT INTO address (address1,city,state_province_county,zip,country)
        VALUES ('1039 Pearl St','Boulder','CO','80302','US');
 
 INSERT INTO merchant (merchant_name,category_id) 
-       VALUES ('The Kitchen', (select category_id from category where name='Food'));
+       VALUES ('The Kitchen', (select category_id from category where category_name='Food'));
 
 INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES(  (select merchant_id from merchant where merchant_name='The Kitchen'),
@@ -145,7 +145,7 @@ INSERT INTO address (address1,city,state_province_county,zip,country)
        VALUES ('950 Pearl St','Boulder','CO','80302','US');
 
 INSERT INTO merchant (merchant_name,category_id) 
-       VALUES ('Centro Latin Kitchen',(select category_id from category where name='Food'));
+       VALUES ('Centro Latin Kitchen',(select category_id from category where category_name='Food'));
              
 INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES( (select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),

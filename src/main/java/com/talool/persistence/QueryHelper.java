@@ -20,10 +20,10 @@ public final class QueryHelper
 			.<String, String> of();
 
 	public static final String MERCHANTS_WITHIN_METERS =
-			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*, addr.*,ST_Distance( mloc.geom,'${point}',true) "
-					+ "as distanceInMeters FROM public.merchant as merchant, public.merchant_location as mloc, public.address as addr "
+			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*,cat.*, addr.*,ST_Distance( mloc.geom,'${point}',true) "
+					+ "as distanceInMeters FROM public.merchant as merchant, public.category as cat, public.merchant_location as mloc, public.address as addr "
 					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) and mloc.address_id=addr.address_id "
-					+ "and mloc.merchant_id=merchant.merchant_id";
+					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id";
 
 	public static final String DEAL_ACQUIRES =
 			"select dealAcquire from DealAcquireImpl dealAcquire, " +

@@ -164,8 +164,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(2, merchants.size());
 
 		Assert.assertEquals("Centro Latin Kitchen", merchants.get(0).getName());
+		Assert.assertNotNull(merchants.get(0).getCategory());
 
 		Assert.assertEquals("The Kitchen", merchants.get(1).getName());
+		Assert.assertNotNull(merchants.get(1).getCategory());
 
 	}
 

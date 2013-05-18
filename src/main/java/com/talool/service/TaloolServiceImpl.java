@@ -827,6 +827,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("name", StandardBasicTypes.STRING);
 			query.addEntity("merchant_location", MerchantLocationImpl.class);
 			query.addEntity("address", AddressImpl.class);
+			query.addEntity("category", CategoryImpl.class);
 
 			final Map<UUID, MerchantImpl> merchantMap = new HashMap<UUID, MerchantImpl>();
 
@@ -841,6 +842,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					final UUID uuid = (UUID) tuple[1];
 					final String name = (String) tuple[2];
 					final MerchantLocationImpl location = (MerchantLocationImpl) tuple[3];
+					final Category category = (Category) tuple[5];
 					location.setDistanceInMeters((Double) tuple[0]);
 					MerchantImpl merchant = merchantMap.get(uuid);
 
@@ -849,6 +851,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 						merchant = new MerchantImpl();
 						merchant.setId(uuid);
 						merchant.setName(name);
+						merchant.setCategory(category);
 
 						merchant.getLocations().add(location);
 						merchantMap.put(uuid, merchant);
