@@ -288,6 +288,7 @@ CREATE TABLE merchant (
 	merchant_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     merchant_parent_id UUID,
     merchant_name character varying(64) NOT NULL,
+    category_id bigint,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY (merchant_id),
@@ -297,7 +298,9 @@ CREATE TABLE merchant (
 ALTER TABLE public.merchant OWNER TO talool;
 
 ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Merchant" FOREIGN KEY (merchant_parent_id) REFERENCES merchant(merchant_id);
+ALTER TABLE ONLY merchant ADD CONSTRAINT "FK_Merchant_Category" FOREIGN KEY (category_id) REFERENCES category(category_id);
 CREATE INDEX merchant_name_idx ON merchant (merchant_name);
+CREATE INDEX merchant_category_id_idx ON merchant (category_id);
 
 CREATE TABLE favorite_merchant (
 	favorite_merchant_id bigint NOT NULL,

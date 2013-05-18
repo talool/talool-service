@@ -34,6 +34,7 @@ import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.talool.core.Category;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
@@ -69,6 +70,10 @@ public class MerchantImpl implements Merchant
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
 	@JoinColumn(name = "merchant_parent_id")
 	private Merchant parent;
+
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CategoryImpl.class)
+	@JoinColumn(name = "category_id")
+	private Category category;
 
 	@Column(name = "merchant_name", unique = false, nullable = false, length = 64)
 	private String name;
@@ -265,8 +270,20 @@ public class MerchantImpl implements Merchant
 		return currentLocation;
 	}
 
-	public void setCurrentLocation(MerchantLocation loc)
+	public void setCurrentLocation(final MerchantLocation loc)
 	{
 		currentLocation = loc;
+	}
+
+	@Override
+	public Category getCategory()
+	{
+		return category;
+	}
+
+	@Override
+	public void setCategory(final Category category)
+	{
+		this.category = category;
 	}
 }

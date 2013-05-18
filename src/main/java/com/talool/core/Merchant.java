@@ -17,8 +17,9 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 	public void setName(String name);
 
 	public MerchantLocation getPrimaryLocation();
-	
+
 	public MerchantLocation getCurrentLocation();
+
 	public void setCurrentLocation(MerchantLocation location);
 
 	/**
@@ -57,5 +58,9 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 	 * @return
 	 */
 	public Long getNumberOfMerchantAccounts();
+
+	public Category getCategory();
+
+	public void setCategory(final Category category);
 
 }

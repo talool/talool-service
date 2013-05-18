@@ -77,6 +77,9 @@ public interface CustomerService extends HibernateService
 	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOptions)
 			throws ServiceException;
 
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final Integer categoryId, final SearchOptions searchOptions)
+			throws ServiceException;
+
 	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId)
 			throws ServiceException;
 

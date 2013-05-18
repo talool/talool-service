@@ -15,6 +15,69 @@ INSERT INTO social_network(name, website, api_url)
 
     VALUES ( 'Pinterest', 'http://www.pinterest.com', 'https://api.pinterest.com');
 
+-- categories
+
+select add_category_tag('Food','Breakfast');
+select add_category_tag('Food','Lunch');
+select add_category_tag('Food','Dinner');
+select add_category_tag('Food','Burgers');
+select add_category_tag('Food','Coffee');
+select add_category_tag('Food','Bagels');
+select add_category_tag('Food','Pizza');
+select add_category_tag('Food','Pasta');
+select add_category_tag('Food','Burritos');
+select add_category_tag('Food','Cafe');
+select add_category_tag('Food','Seafood');
+select add_category_tag('Food','Sushi');
+select add_category_tag('Food','Fish');
+select add_category_tag('Food','Gluten-free');
+select add_category_tag('Food','Ice Cream');
+select add_category_tag('Food','Yogurt');
+select add_category_tag('Food','Juice Bar');
+select add_category_tag('Food','Gelato');
+select add_category_tag('Food','Salad');
+select add_category_tag('Food','Ramen / Noodel House');
+select add_category_tag('Food','Steakhouse');
+select add_category_tag('Food','Taco');
+select add_category_tag('Food','Tapas');
+select add_category_tag('Food','Tea');
+select add_category_tag('Food','Vegetarian / Vegan');
+select add_category_tag('Food','Wings');
+select add_category_tag('Food','Wine');
+select add_category_tag('Food','Cocktails');
+select add_category_tag('Food','Brewery');
+
+select add_category_tag('Shopping Services','Antique Shop');
+select add_category_tag('Shopping Services','Arts & Crafts Store');
+select add_category_tag('Shopping Services','Bike Shop');
+select add_category_tag('Shopping Services','Board Shop');
+select add_category_tag('Shopping Services','Bookstore');
+select add_category_tag('Shopping Services','Bridal Shop');
+select add_category_tag('Shopping Services','Salon');
+select add_category_tag('Shopping Services','Dry Cleaning');
+
+select add_category_tag('Fun','Arcade');
+select add_category_tag('Fun','Games');
+select add_category_tag('Fun','Amusement Center');
+select add_category_tag('Fun','Kids / Children');
+select add_category_tag('Fun','Pets');
+select add_category_tag('Fun','Dogs');
+select add_category_tag('Fun','Cats');
+select add_category_tag('Fun','Golf');
+
+select add_category_tag('Nightlife','Bar');
+select add_category_tag('Nightlife','Beer');
+select add_category_tag('Nightlife','Cocktails');
+select add_category_tag('Nightlife','Sports Bar');
+select add_category_tag('Nightlife','Dance Club');
+select add_category_tag('Nightlife','Live Music');
+select add_category_tag('Nightlife','Nightclub');
+select add_category_tag('Nightlife','Pub');
+select add_category_tag('Nightlife','Sake');
+select add_category_tag('Nightlife','Speakeasy');
+select add_category_tag('Nightlife','Dancing');
+
+
 INSERT INTO acquire_status(status) VALUES ('PURCHASED');
 INSERT INTO acquire_status(status) VALUES ('REDEEMED');
 INSERT INTO acquire_status(status) VALUES ('REJECTED_CUSTOMER_SHARE');
@@ -64,7 +127,8 @@ INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_c
 INSERT INTO address (address1,city,state_province_county,zip,country)
        VALUES ('1039 Pearl St','Boulder','CO','80302','US');
 
-INSERT INTO merchant (merchant_name) VALUES ('The Kitchen');
+INSERT INTO merchant (merchant_name,category_id) 
+       VALUES ('The Kitchen', (select category_id from category where name='Food'));
 
 INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES(  (select merchant_id from merchant where merchant_name='The Kitchen'),
@@ -80,7 +144,8 @@ INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_c
 INSERT INTO address (address1,city,state_province_county,zip,country)
        VALUES ('950 Pearl St','Boulder','CO','80302','US');
 
-INSERT INTO merchant (merchant_name) VALUES ('Centro Latin Kitchen');
+INSERT INTO merchant (merchant_name,category_id) 
+       VALUES ('Centro Latin Kitchen',(select category_id from category where name='Food'));
              
 INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES( (select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),
@@ -191,71 +256,6 @@ INSERT INTO deal_offer_purchase (deal_offer_id,customer_id)
 INSERT INTO deal_offer_purchase (deal_offer_id,customer_id)         
         VALUES ( (select deal_offer_id from deal_offer where title='Payback Book Test Book #1'),  
                  (select customer_id from customer where email='douglasmccuen@gmail.com')); 
-
--- categories
-
-select add_category_tag('Food','Breakfast');
-select add_category_tag('Food','Lunch');
-select add_category_tag('Food','Dinner');
-select add_category_tag('Food','Burgers');
-select add_category_tag('Food','Coffee');
-select add_category_tag('Food','Bagels');
-select add_category_tag('Food','Pizza');
-select add_category_tag('Food','Pasta');
-select add_category_tag('Food','Burritos');
-select add_category_tag('Food','Cafe');
-select add_category_tag('Food','Seafood');
-select add_category_tag('Food','Sushi');
-select add_category_tag('Food','Fish');
-select add_category_tag('Food','Gluten-free');
-select add_category_tag('Food','Ice Cream');
-select add_category_tag('Food','Yogurt');
-select add_category_tag('Food','Juice Bar');
-select add_category_tag('Food','Gelato');
-select add_category_tag('Food','Salad');
-select add_category_tag('Food','Ramen / Noodel House');
-select add_category_tag('Food','Steakhouse');
-select add_category_tag('Food','Taco');
-select add_category_tag('Food','Tapas');
-select add_category_tag('Food','Tea');
-select add_category_tag('Food','Vegetarian / Vegan');
-select add_category_tag('Food','Wings');
-select add_category_tag('Food','Wine');
-select add_category_tag('Food','Cocktails');
-select add_category_tag('Food','Brewery');
-
-
-
-select add_category_tag('Shopping Services','Antique Shop');
-select add_category_tag('Shopping Services','Arts & Crafts Store');
-select add_category_tag('Shopping Services','Bike Shop');
-select add_category_tag('Shopping Services','Board Shop');
-select add_category_tag('Shopping Services','Bookstore');
-select add_category_tag('Shopping Services','Bridal Shop');
-select add_category_tag('Shopping Services','Salon');
-select add_category_tag('Shopping Services','Dry Cleaning');
-
-select add_category_tag('Fun','Arcade');
-select add_category_tag('Fun','Games');
-select add_category_tag('Fun','Amusement Center');
-select add_category_tag('Fun','Kids / Children');
-select add_category_tag('Fun','Pets');
-select add_category_tag('Fun','Dogs');
-select add_category_tag('Fun','Cats');
-select add_category_tag('Fun','Golf');
-
-select add_category_tag('Nightlife','Bar');
-select add_category_tag('Nightlife','Beer');
-select add_category_tag('Nightlife','Cocktails');
-select add_category_tag('Nightlife','Sports Bar');
-select add_category_tag('Nightlife','Dance Club');
-select add_category_tag('Nightlife','Live Music');
-select add_category_tag('Nightlife','Nightclub');
-select add_category_tag('Nightlife','Pub');
-select add_category_tag('Nightlife','Sake');
-select add_category_tag('Nightlife','Speakeasy');
-select add_category_tag('Nightlife','Dancing');
-
               
 
 -- select * from category c, tag as t, tag as cat_t  where c.category_tag_id=cat_t.tag_id and c.tag_id=t.tag_id order by c.category_tag_id;           

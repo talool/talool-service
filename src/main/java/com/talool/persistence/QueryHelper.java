@@ -25,20 +25,23 @@ public final class QueryHelper
 					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) and mloc.address_id=addr.address_id "
 					+ "and mloc.merchant_id=merchant.merchant_id";
 
-	public static final String GET_DEAL_ACQUIRES =
+	public static final String DEAL_ACQUIRES =
 			"select dealAcquire from DealAcquireImpl dealAcquire, " +
 					"DealImpl d where d.merchant.id=:merchantId " +
 					"and dealAcquire.deal.id=d.id and dealAcquire.customer.id=:customerId";
 
-	private static final String GET_MERCHANT_ACQUIRES =
-			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da,"
-					+
+	private static final String MERCHANT_ACQUIRES =
+			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da," +
 					"DealImpl d where da.customer.id=:customerId and da.deal.id=d.id and d.merchant.id=merchant.id";
 
-	private static final String GET_MERCHANT_MEDIAS =
+	private static final String MERCHANT_ACQUIRES_BY_CAT_ID =
+			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da,DealImpl d"
+					+ " where da.customer.id=:customerId and da.deal.id=d.id and d.merchant.id=merchant.id and merchant.category.id=:categoryId";
+
+	private static final String MERCHANT_MEDIAS =
 			"from MerchantMediaImpl as merchantMedia where merchantMedia.merchantId=:merchantId and merchantMedia.mediaType in (:mediaTypes)";
 
-	private static final String GET_FAVORITE_MERCHANTS = "select merchant from MerchantImpl as merchant, FavoriteMerchantImpl as f where f.customerId=:customerId and f.merchantId=merchant.id";
+	private static final String FAVORITE_MERCHANTS = "select merchant from MerchantImpl as merchant, FavoriteMerchantImpl as f where f.customerId=:customerId and f.merchantId=merchant.id";
 
 	public enum QueryType
 	{
@@ -47,15 +50,17 @@ public final class QueryHelper
 						.put("merchant.name", "name")
 						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 
-		GetDealAcquires(GET_DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
+		DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 
-		GetMerchantAcquires(GET_MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
+		MerchantAcquires(MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 
-		GetMerchantMedias(GET_MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS),
+		GetMerchantMedias(MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS),
 
-		GetFavoriteMerchants(GET_FAVORITE_MERCHANTS, ImmutableMap.<String, String> builder()
+		FavoriteMerchants(FAVORITE_MERCHANTS, ImmutableMap.<String, String> builder()
 				.put("merchant.created", "merchant.createdUpdated.created").
-				put("merchant.updated", "merchant.createdUpdated.updated").build());
+				put("merchant.updated", "merchant.createdUpdated.updated").build()),
+
+		MerchantAcquiresByCatId(MERCHANT_ACQUIRES_BY_CAT_ID, EMPTY_IMMUTABLE_PROPS);
 
 		private String query;
 		private ImmutableMap<String, String> propertyColumnMap;

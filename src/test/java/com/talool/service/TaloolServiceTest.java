@@ -589,6 +589,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(dealOffer.getTitle(), dealOfferPurchaseResult.get(0).getDealOffer()
 				.getTitle());
 
+		Category cat = dealOffer.getMerchant().getCategory();
+		List<Merchant> merchants = customerService.getMerchantAcquires(customer.getId(), cat.getId(), null);
+
+		Assert.assertEquals(1, merchants.size());
+
 		return dealOfferPurchase;
 	}
 
@@ -750,6 +755,9 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Merchant merchant = domainFactory.newMerchant(true);
 		merchant.setName("Merch" + now);
 
+		Category category = TagCache.get().getCategories().get(0);
+		merchant.setCategory(category);
+
 		// tags for fun
 
 		Tag mexicanTag = taloolService.getTag("Mexican" + now);
@@ -827,6 +835,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertTrue(resultMerch.getTags().contains(mexicanTag));
 		Assert.assertTrue(resultMerch.getTags().contains(tapasTag));
 		Assert.assertTrue(resultMerch.getTags().contains(cubanTag));
+
+		Assert.assertEquals(category, resultMerch.getCategory());
 
 		return merchant;
 	}

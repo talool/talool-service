@@ -391,7 +391,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.GetDealAcquires, null, searchOpts,
+			final String newSql = QueryHelper.buildQuery(QueryType.DealAcquires, null, searchOpts,
 					true);
 
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
@@ -415,7 +415,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.GetMerchantAcquires, null, searchOpts,
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquires, null, searchOpts,
 					true);
 
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
@@ -586,7 +586,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.GetFavoriteMerchants, null, searchOpts,
+			final String newSql = QueryHelper.buildQuery(QueryType.FavoriteMerchants, null, searchOpts,
 					true);
 
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
@@ -624,4 +624,28 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final Integer categoryId, final SearchOptions searchOpts)
+			throws ServiceException
+	{
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquiresByCatId, null, searchOpts,
+					true);
+
+			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
+			query.setParameter("customerId", customerId);
+			query.setParameter("categoryId", categoryId);
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s categoryId %s", customerId,
+					categoryId, ex));
+		}
+	}
+
 }
