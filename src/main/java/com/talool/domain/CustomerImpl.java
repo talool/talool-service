@@ -12,24 +12,24 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
 import com.talool.core.Sex;
-import com.talool.core.SocialAccount;
-import com.talool.core.SocialNetwork;
+import com.talool.core.social.CustomerSocialAccount;
+import com.talool.core.social.SocialNetwork;
+import com.talool.domain.social.CustomerSocialAccountImpl;
 
 @Entity
 @Table(name = "customer", catalog = "public")
@@ -66,16 +66,10 @@ public class CustomerImpl implements Customer
 	@Column(name = "password", unique = false, nullable = false, length = 64)
 	private String password;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SocialAccountImpl.class, mappedBy = "primaryKey.userId")
-	/*
-	 * TODO - sucks - cant get a formula to work. Replace WHERE clause with
-	 * something dynamic that reads the enum to prevent any future bug (WHERE has
-	 * to be constant!)
-	 */
-	@Where(clause = "account_t='CUS'")
-	@MapKey(name = "primaryKey.socialNetwork")
-	@Transient
-	private final Map<SocialNetwork, SocialAccount> socialAccounts = new HashMap<SocialNetwork, SocialAccount>();
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = CustomerSocialAccountImpl.class, orphanRemoval = true)
+	@MapKey(name = "socialNetwork")
+	@JoinColumn(name = "customer_id")
+	private final Map<SocialNetwork, CustomerSocialAccount> socialAccounts = new HashMap<SocialNetwork, CustomerSocialAccount>();
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -213,15 +207,22 @@ public class CustomerImpl implements Customer
 	}
 
 	@Override
-	public Map<SocialNetwork, SocialAccount> getSocialAccounts()
+	public Map<SocialNetwork, CustomerSocialAccount> getSocialAccounts()
 	{
 		return socialAccounts;
 	}
 
 	@Override
-	public void addSocialAccount(final SocialAccount socialAccount)
+	public void addSocialAccount(final CustomerSocialAccount socialAccount)
 	{
 		socialAccounts.put(socialAccount.getSocialNetwork(), socialAccount);
+	}
+
+	@Override
+	public void removeSocialAccount(final CustomerSocialAccount socialAccount)
+	{
+		socialAccounts.remove(socialAccount.getSocialNetwork());
+
 	}
 
 }

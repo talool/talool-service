@@ -4,6 +4,14 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import com.talool.core.social.CustomerSocialAccount;
+import com.talool.core.social.SocialNetwork;
+
+/**
+ * 
+ * @author clintz
+ * 
+ */
 public interface Customer extends IdentifiableUUID, Serializable, TimeAware
 {
 	public String getFirstName();
@@ -30,8 +38,10 @@ public interface Customer extends IdentifiableUUID, Serializable, TimeAware
 
 	public void setBirthDate(Date birthDate);
 
-	public Map<SocialNetwork, SocialAccount> getSocialAccounts();
+	public Map<SocialNetwork, CustomerSocialAccount> getSocialAccounts();
 
-	public void addSocialAccount(SocialAccount socialAccount);
+	public void addSocialAccount(CustomerSocialAccount socialAccount);
+
+	public void removeSocialAccount(CustomerSocialAccount socialAccount);
 
 }

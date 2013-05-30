@@ -19,7 +19,6 @@
 
 
 	<tx:annotation-driven order="1" />
-	<!--  <aop:aspectj-autoproxy />-->
 
 	<bean id="generalDAOImpl" class="com.googlecode.genericdao.dao.hibernate.GeneralDAOImpl">
 		<property name="sessionFactory" ref="sessionFactory" />

@@ -10,6 +10,9 @@ import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
+import com.talool.core.gift.GiftRequest;
+import com.talool.core.social.CustomerSocialAccount;
+import com.talool.core.social.SocialNetwork;
 import com.talool.service.HibernateService;
 
 /**
@@ -60,9 +63,6 @@ public interface CustomerService extends HibernateService
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
 			throws ServiceException;
 
-	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
-			throws ServiceException;
-
 	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
 			throws ServiceException;
 
@@ -89,6 +89,29 @@ public interface CustomerService extends HibernateService
 
 	public void removeFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException;
 
+	public void remove(CustomerSocialAccount cas) throws ServiceException;
+
+	/**
+	 * Removes the socialAccount for the given customerId and SocialNetwork.
+	 * 
+	 * @param customerId
+	 * @param socialNetwork
+	 * @throws ServiceException
+	 */
+	public void removeSocialAccount(final UUID customerId, final SocialNetwork socialNetwork) throws ServiceException;
+
 	public List<Merchant> getFavoriteMerchants(final UUID customerId, final SearchOptions searchOpts) throws ServiceException;
+
+	// Gift stuff
+
+	public void createGiftRequest(final GiftRequest giftRequest) throws ServiceException;
+
+	public GiftRequest getGiftRequest(final UUID giftRequestId) throws ServiceException;
+
+	public void acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException;
+
+	public void rejectGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException;
+
+	public void save(final CustomerSocialAccount socialAccount) throws ServiceException;
 
 }

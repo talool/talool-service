@@ -32,7 +32,6 @@ import com.talool.core.CategoryTag;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
-import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.DealType;
@@ -48,8 +47,12 @@ import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
+import com.talool.core.gift.FaceBookGiftRequest;
 import com.talool.core.service.ServiceException;
+import com.talool.core.social.CustomerSocialAccount;
+import com.talool.core.social.SocialNetwork;
 import com.talool.domain.MerchantMediaImpl;
+import com.talool.domain.gift.FacebookGiftRequestImpl;
 import com.talool.utils.DealAcquireComparator;
 import com.talool.utils.DealAcquireComparator.ComparatorType;
 import com.talool.utils.MerchantComparator;
@@ -148,6 +151,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		testFavoriteMerchants();
 
 		testMerchantsWithin();
+
+		testGiftRequest();
 
 	}
 
@@ -490,68 +495,123 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// update #1 give to deal friend
 		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
 		daq = customerService.getDealAcquire(daq.getId());
-		customerService.giveDeal(daq, customerFriend);
-		taloolService.refresh(daq);
 
-		// friend shouldnt have 1
-		List<DealAcquire> myAcquires = customerService
-				.getDealAcquiresByCustomerId(customerFriend.getId());
-		Assert.assertEquals(1, myAcquires.size());
+		// EmailGiftRequestImpl giftRequest = new EmailGiftRequestImpl();
+		// giftRequest.setCustomerId(originalCustomer.getId());
+		// giftRequest.setDealAcquireId(daq.getId());
+		// giftRequest.setToEmail(System.currentTimeMillis() + "@gmail.com");
+		//
+		// customerService.giftRequest(giftRequest);
+		// taloolService.refresh(daq);
+		//
+		// // friend shouldnt have 1
+		// List<DealAcquire> myAcquires = customerService
+		// .getDealAcquiresByCustomerId(customerFriend.getId());
+		// Assert.assertEquals(1, myAcquires.size());
+		//
+		// // original customer should have 1 less
+		// myAcquires =
+		// customerService.getDealAcquiresByCustomerId(originalCustomer.getId());
+		// Assert.assertEquals(dealAcquires.size() - 1, myAcquires.size());
+		//
+		// // update #2 friend accepts
+		// historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
+		// daq = customerService.getDealAcquire(daq.getId());
+		// customerService.acceptDeal(daq, originalCustomer.getId());
+		// taloolService.refresh(daq);
+		//
+		// // update #3 friend gives it back after accepting
+		// historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
+		// daq = customerService.getDealAcquire(daq.getId());
+		//
+		// EmailGiftRequestImpl giftRequest2 = new EmailGiftRequestImpl();
+		// giftRequest2.setCustomerId(originalCustomer.getId());
+		// giftRequest2.setDealAcquireId(daq.getId());
+		//
+		// customerService.giftRequest(giftRequest);
+		//
+		// taloolService.refresh(daq);
+		//
+		// Assert.assertEquals(new Integer(2), daq.getShareCount());
+		//
+		// // test the history
+		// List<DealAcquireHistory> history =
+		// taloolService.getDealAcquireHistory(daq.getId());
+		//
+		// for (DealAcquireHistoryWrapper da : historyOfAcquires)
+		// {
+		// System.out.println(da.updated);
+		// }
+		//
+		// System.out.println("----");
+		// for (DealAcquireHistory da : history)
+		// {
+		// System.out.println(da.getUpdated());
+		// }
+		//
+		// // test the persisted acquires with what should be
+		// for (int i = 0; i < historyOfAcquires.size(); i++)
+		// {
+		// DealAcquireHistory realHistory = history.get(i);
+		// DealAcquireHistoryWrapper expectedHistory = historyOfAcquires.get(i);
+		//
+		// Assert.assertEquals(expectedHistory.updated, realHistory.getUpdated());
+		//
+		// Assert.assertEquals(expectedHistory.customerId,
+		// realHistory.getCustomer().getId());
+		//
+		// UUID sharedByCustId = realHistory.getSharedByCustomer() == null ? null :
+		// realHistory
+		// .getSharedByCustomer().getId();
+		//
+		// UUID sharedByMerchId = realHistory.getSharedByMerchant() == null ? null :
+		// realHistory
+		// .getSharedByMerchant().getId();
+		//
+		// Assert.assertEquals(expectedHistory.sharedbyCustomerId, sharedByCustId);
+		//
+		// Assert.assertEquals(expectedHistory.sharedbyMerchantId, sharedByMerchId);
+		//
+		// Assert.assertEquals(expectedHistory.sharedbyMerchantId, sharedByMerchId);
+		//
+		// }
 
-		// original customer should have 1 less
-		myAcquires = customerService.getDealAcquiresByCustomerId(originalCustomer.getId());
-		Assert.assertEquals(dealAcquires.size() - 1, myAcquires.size());
+	}
 
-		// update #2 friend accepts
-		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
-		daq = customerService.getDealAcquire(daq.getId());
-		customerService.acceptDeal(daq, originalCustomer.getId());
-		taloolService.refresh(daq);
+	public void testGiftRequest() throws ServiceException
+	{
+		Long now = System.currentTimeMillis();
 
-		// update #3 friend gives it back after accepting
-		historyOfAcquires.add(new DealAcquireHistoryWrapper(daq));
-		daq = customerService.getDealAcquire(daq.getId());
-		customerService.giveDeal(daq, originalCustomer);
-		taloolService.refresh(daq);
+		Customer customer = createCustomer();
+		CustomerSocialAccount socAcnt = domainFactory.newCustomerSocialAccount(SocialNetwork.NetworkName.Facebook.toString());
+		socAcnt.setLoginId("fbloginId" + System.currentTimeMillis());
 
-		Assert.assertEquals(new Integer(2), daq.getShareCount());
+		customer.addSocialAccount(socAcnt);
 
-		// test the history
-		List<DealAcquireHistory> history = taloolService.getDealAcquireHistory(daq.getId());
+		customerService.save(customer);
+		customerService.refresh(customer);
 
-		for (DealAcquireHistoryWrapper da : historyOfAcquires)
+		DealOfferPurchase dealOfferPurc = domainFactory.newDealOfferPurchase(customer, taloolService.getDealOffers().get(0));
+		taloolService.save(dealOfferPurc);
+
+		List<DealAcquire> dacs = customerService.getDealAcquiresByCustomerId(customer.getId());
+
+		FaceBookGiftRequest giftRequest = new FacebookGiftRequestImpl();
+		giftRequest.setDealAcquireId(dacs.get(0).getId());
+		giftRequest.setCustomerId(customer.getId());
+		giftRequest.setToFacebookId("fbId" + now);
+		giftRequest.setToName("Firstname lastname" + now);
+
+		customerService.createGiftRequest(giftRequest);
+
+		// try to gift again, should get an exception
+		try
 		{
-			System.out.println(da.updated);
+			customerService.createGiftRequest(giftRequest);
 		}
-
-		System.out.println("----");
-		for (DealAcquireHistory da : history)
+		catch (ServiceException ex)
 		{
-			System.out.println(da.getUpdated());
-		}
-
-		// test the persisted acquires with what should be
-		for (int i = 0; i < historyOfAcquires.size(); i++)
-		{
-			DealAcquireHistory realHistory = history.get(i);
-			DealAcquireHistoryWrapper expectedHistory = historyOfAcquires.get(i);
-
-			Assert.assertEquals(expectedHistory.updated, realHistory.getUpdated());
-
-			Assert.assertEquals(expectedHistory.customerId, realHistory.getCustomer().getId());
-
-			UUID sharedByCustId = realHistory.getSharedByCustomer() == null ? null : realHistory
-					.getSharedByCustomer().getId();
-
-			UUID sharedByMerchId = realHistory.getSharedByMerchant() == null ? null : realHistory
-					.getSharedByMerchant().getId();
-
-			Assert.assertEquals(expectedHistory.sharedbyCustomerId, sharedByCustId);
-
-			Assert.assertEquals(expectedHistory.sharedbyMerchantId, sharedByMerchId);
-
-			Assert.assertEquals(expectedHistory.sharedbyMerchantId, sharedByMerchId);
-
+			Assert.assertEquals(ServiceException.Type.GIFTING_NOT_ALLOWED, ex.getType());
 		}
 
 	}

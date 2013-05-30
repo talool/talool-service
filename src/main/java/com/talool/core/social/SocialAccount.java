@@ -5,36 +5,26 @@
  * software is only allowed at the direction of Comcast Corporation. All allowed
  * modifications must be provided to Comcast Corporation.
  */
-package com.talool.core;
+package com.talool.core.social;
 
 import java.io.Serializable;
+import java.util.Date;
+
+import com.talool.core.Identifiable;
 
 /**
  * @author clintz
  * 
  */
-public interface SocialAccount extends TimeAware, Serializable
+public interface SocialAccount extends Identifiable, Serializable
 {
 	public SocialNetwork getSocialNetwork();
 
 	public void setSocialNetwork(SocialNetwork socialNetwork);
 
-	/**
-	 * gets merchant or customer Id (based on AccountType)
-	 */
-	public String getUserId();
-
-	/**
-	 * sets merchant or customer Id (based on AccountType)
-	 */
-	public void setUserId(String userId);
-
 	public String getLoginId();
 
 	public void setLoginId(String loginId);
 
-	public AccountType getAccountType();
-
-	public void setAccountType(AccountType accountType);
-
+	public Date getCreated();
 }

@@ -27,13 +27,18 @@ import com.talool.core.IdentifiableUUID;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
+import com.talool.core.gift.GiftRequest;
 import com.talool.core.service.CustomerService;
 import com.talool.core.service.ServiceException;
+import com.talool.core.service.ServiceException.Type;
+import com.talool.core.social.CustomerSocialAccount;
+import com.talool.core.social.SocialNetwork;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.FavoriteMerchantImpl;
 import com.talool.domain.RelationshipImpl;
+import com.talool.domain.gift.GiftRequestImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 
@@ -111,7 +116,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
+	@Transactional(propagation = Propagation.NESTED)
 	public void save(final Customer customer) throws ServiceException
 	{
 		try
@@ -124,7 +129,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error(err, e);
 			throw new ServiceException(err, e);
 		}
-
 	}
 
 	@Override
@@ -212,38 +216,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			throw new ServiceException(String.format("Problem getFriends %s", id), ex);
 		}
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void giveDeal(final DealAcquire dealAcquire, final Customer toCustomer)
-			throws ServiceException
-	{
-		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
-
-		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcq.getAcquireStatus()
-				.getStatus()))
-		{
-			throw new ServiceException("Cannot give an already redeemed deal " + dealAcquire);
-		}
-
-		try
-		{
-			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
-					.getAcquireStatus(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE));
-
-			dealAcq.setSharedByCusomer(dealAcquire.getCustomer());
-			dealAcq.setCustomer(toCustomer);
-			dealAcq.incrementShareCount();
-			daoDispatcher.save(dealAcq);
-
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem giveDealToCustomer %s %s", dealAcquire,
-					toCustomer), ex);
-		}
-
 	}
 
 	@Override
@@ -648,4 +620,125 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void createGiftRequest(final GiftRequest giftRequest) throws ServiceException
+	{
+		final DealAcquireImpl dac = (DealAcquireImpl) getCurrentSession().load(DealAcquireImpl.class, giftRequest.getDealAcquireId());
+
+		final AcquireStatusType currentAcquireStatus = AcquireStatusType.valueOf(dac.getAcquireStatus()
+				.getStatus());
+
+		if (currentAcquireStatus == AcquireStatusType.REDEEMED)
+		{
+			throw new ServiceException(Type.DEAL_ALREADY_REDEEMED, "dealAcquireId: " + dac.getId());
+		}
+
+		// Can only redeem a deal that is in a valid state!
+		if (currentAcquireStatus != AcquireStatusType.ACCEPTED_CUSTOMER_SHARE &&
+				currentAcquireStatus != AcquireStatusType.ACCEPTED_MERCHANT_SHARE &&
+				currentAcquireStatus != AcquireStatusType.PURCHASED)
+		{
+			throw new ServiceException(Type.GIFTING_NOT_ALLOWED,
+					String.format("acquireStatus %s for dealAcquireId %s", currentAcquireStatus, dac.getId()));
+		}
+
+		if (dac.getCustomer().getId() != giftRequest.getCustomerId())
+		{
+			throw new ServiceException(Type.CUSTOMER_DOES_NOT_OWN_DEAL, "gifteeId: " + giftRequest.getCustomerId()
+					+ ", owningCustimerId: " + dac.getCustomer().getId());
+		}
+
+		try
+		{
+			dac.setAcquireStatus(ServiceFactory.get().getTaloolService()
+					.getAcquireStatus(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE));
+
+			daoDispatcher.save(dac);
+
+			daoDispatcher.save(giftRequest);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem in giftRequest", ex);
+		}
+	}
+
+	@Override
+	public GiftRequest getGiftRequest(final UUID giftRequestId) throws ServiceException
+	{
+		try
+		{
+			return daoDispatcher.find(GiftRequestImpl.class, giftRequestId);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getGiftRequest %s", giftRequestId), ex);
+		}
+	}
+
+	@Override
+	public void acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void rejectGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void remove(CustomerSocialAccount cas) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.remove(cas);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem in removing CustomerSocialAccount", ex);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void removeSocialAccount(final UUID customerId, final SocialNetwork socialNetwork) throws ServiceException
+	{
+		try
+		{
+			final Query query = getCurrentSession().createQuery(
+					"delete from CustomerSocialAccountImpl where customer.id=:customerId and socialNetwork.id=:socialNetworkId");
+			query.setParameter("customerId", customerId);
+			query.setParameter("socialNetworkId", socialNetwork.getId());
+			query.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem in removing SocialAccount %s for customerId %s", socialNetwork.getName(),
+					customerId.toString()), ex);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final CustomerSocialAccount socialAccount) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(socialAccount);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem saving CustomerSocialAccount", ex);
+		}
+
+	}
 }

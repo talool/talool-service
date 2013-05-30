@@ -14,29 +14,18 @@
 
 	<tx:annotation-driven order="1" />
 
-	<import resource="./taloolCommon.xml" />
-  	<import resource="./taloolMailService.xml" />
-    <import resource="./dataSource.xml" />
-	<import resource="./taloolHibernateContext.xml" />
-
-
-	<bean id="serviceFactory" class="com.talool.service.ServiceFactory" factory-method="createInstance">
-		<constructor-arg ref="taloolServiceImpl"/>
-		<constructor-arg ref="customerServiceImpl"/>
-   </bean>
-   
-   <bean id="tagCache" class="com.talool.cache.TagCache" factory-method="createInstance">
-		<constructor-arg value="${tag.cache.refresh.in.secs}"/>
-   </bean>
-   
-				
-	<bean id="domainFactory" class="com.talool.domain.DomainFactoryImpl"/>
-	
-	<bean id="factoryManager" class="com.talool.core.FactoryManager" factory-method="createInstance">
-	    <constructor-arg ref="serviceFactory"/>
-	    <constructor-arg ref="domainFactory"/>
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:/etc/talool/service.properties</value>
+			</list>
+		</property>
 	</bean>
 	
-
-
+	<bean id="serviceConfig" class="com.talool.service.ServiceConfig"
+		factory-method="createInstance">
+		<constructor-arg value="/etc/talool/service.properties" />
+	</bean>
+	
 </beans>

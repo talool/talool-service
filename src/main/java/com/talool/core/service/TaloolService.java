@@ -9,8 +9,8 @@ import com.talool.core.AccountType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.DealAcquireHistory;
-import com.talool.core.SocialNetwork;
 import com.talool.core.Tag;
+import com.talool.core.social.SocialNetwork;
 import com.talool.service.HibernateService;
 
 /**

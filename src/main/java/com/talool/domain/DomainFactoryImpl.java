@@ -8,7 +8,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.talool.core.AccountType;
 import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
@@ -25,10 +24,14 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
-import com.talool.core.SocialAccount;
 import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
+import com.talool.core.social.CustomerSocialAccount;
+import com.talool.core.social.MerchantSocialAccount;
+import com.talool.core.social.SocialNetwork;
+import com.talool.domain.social.CustomerSocialAccountImpl;
+import com.talool.domain.social.MerchantSocialAccountImpl;
 
 /**
  * Default Factory for all domain objects
@@ -44,20 +47,43 @@ final class DomainFactoryImpl implements DomainFactory
 	{}
 
 	@Override
-	public SocialAccount newSocialAccount(final String socialNetworkName,
-			final AccountType accountType)
+	public CustomerSocialAccount newCustomerSocialAccount(final String socialNetworkName)
 	{
+		CustomerSocialAccount sac = null;
 		try
 		{
-			return new SocialAccountImpl(FactoryManager.get().getServiceFactory().getTaloolService()
-					.getSocialNetwork(socialNetworkName), accountType);
+			SocialNetwork snet = FactoryManager.get().getServiceFactory().getTaloolService()
+					.getSocialNetwork(socialNetworkName);
+
+			sac = new CustomerSocialAccountImpl();
+			sac.setSocialNetwork(snet);
 		}
 		catch (Exception e)
 		{
 			LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
 		}
 
-		return new SocialAccountImpl();
+		return sac;
+	}
+
+	@Override
+	public MerchantSocialAccount newMerchantSocialAccount(final String socialNetworkName)
+	{
+		MerchantSocialAccount sac = null;
+		try
+		{
+			SocialNetwork snet = FactoryManager.get().getServiceFactory().getTaloolService()
+					.getSocialNetwork(socialNetworkName);
+
+			sac = new MerchantSocialAccountImpl();
+			sac.setSocialNetwork(snet);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
+		}
+
+		return sac;
 	}
 
 	@Override

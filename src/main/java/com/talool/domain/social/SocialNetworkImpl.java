@@ -5,7 +5,7 @@
  * software is only allowed at the direction of Comcast Corporation. All allowed
  * modifications must be provided to Comcast Corporation.
  */
-package com.talool.domain;
+package com.talool.domain.social;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +19,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
-import com.talool.core.SocialNetwork;
+import com.talool.core.social.SocialNetwork;
 
 /**
  * @author clintz
@@ -78,11 +78,6 @@ public class SocialNetworkImpl implements SocialNetwork
 
 		final SocialNetworkImpl other = (SocialNetworkImpl) obj;
 
-		if (getId() != other.getId())
-		{
-			return false;
-		}
-
 		return new EqualsBuilder().append(getName(), other.getName()).isEquals();
 	}
 
@@ -114,7 +109,7 @@ public class SocialNetworkImpl implements SocialNetwork
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getName()).hashCode();
+		return new HashCodeBuilder(17, 37).append(name).hashCode();
 	}
 
 	@Override

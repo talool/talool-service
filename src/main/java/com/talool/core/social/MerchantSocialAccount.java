@@ -5,20 +5,16 @@
  * software is only allowed at the direction of Comcast Corporation. All allowed
  * modifications must be provided to Comcast Corporation.
  */
-package com.talool.core;
+package com.talool.core.social;
 
-import java.io.Serializable;
+import java.util.UUID;
+
 
 /**
  * @author clintz
  * 
  */
-public interface SocialNetwork extends Identifiable, Serializable
+public interface MerchantSocialAccount extends SocialAccount
 {
-	public String getName();
-
-	public String getWebsite();
-
-	public String getApiUrl();
-
+	public UUID getMerchantId();
 }

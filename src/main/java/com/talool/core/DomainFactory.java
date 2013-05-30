@@ -2,6 +2,9 @@ package com.talool.core;
 
 import java.util.UUID;
 
+import com.talool.core.social.CustomerSocialAccount;
+import com.talool.core.social.MerchantSocialAccount;
+
 /**
  * 
  * @author clintz
@@ -9,8 +12,9 @@ import java.util.UUID;
  */
 public interface DomainFactory
 {
-	public SocialAccount newSocialAccount(final String socialNetworkName,
-			final AccountType accountType);
+	public CustomerSocialAccount newCustomerSocialAccount(final String socialNetworkName);
+
+	public MerchantSocialAccount newMerchantSocialAccount(final String socialNetworkName);
 
 	public Address newAddress();
 

@@ -12,9 +12,13 @@ public class ServiceException extends Exception
 
 	public static enum Type
 	{
-		UNKNOWN(0, "Unknown"), EMAIL_ALREADY_TAKEN(1000, "Email already taken"), INVALID_USERNAME_OR_PASSWORD(
-				1001, "Invalid username or password"), CUSTOMER_DOES_NOT_OWN_DEAL(1002,
-				"Customer does not own deal");
+		UNKNOWN(0, "Unknown"),
+		EMAIL_ALREADY_TAKEN(1000, "Email already taken"),
+		INVALID_USERNAME_OR_PASSWORD(1001, "Invalid username or password"),
+		CUSTOMER_DOES_NOT_OWN_DEAL(1002, "Customer does not own deal"),
+		DEAL_ALREADY_REDEEMED(1003, "Deal already redeemed"),
+		GIFTING_NOT_ALLOWED(1004, "Cannot gift deal due to acquire status"),
+		MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found");
 
 		private final int code;
 		private final String message;
@@ -86,6 +90,24 @@ public class ServiceException extends Exception
 	public Type getType()
 	{
 		return type;
+	}
+
+	@Override
+	public String getMessage()
+	{
+		StringBuilder sb = new StringBuilder();
+
+		if (type != null)
+		{
+			sb.append(type.getMessage());
+			if (super.getMessage() != null)
+			{
+				sb.append(": ").append(super.getMessage());
+			}
+			return sb.toString();
+		}
+
+		return super.getMessage();
 	}
 
 }

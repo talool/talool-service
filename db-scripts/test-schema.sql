@@ -251,8 +251,6 @@ CREATE SEQUENCE social_network_id_seq
 REVOKE ALL ON SEQUENCE social_network_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE social_network_id_seq FROM talool;
 GRANT ALL ON SEQUENCE social_network_id_seq TO talool;
-   
-CREATE TYPE account_type AS ENUM ('MER', 'CUS');
 
 CREATE TABLE social_network (
     social_network_id bigint NOT NULL,
@@ -266,19 +264,6 @@ ALTER TABLE public.social_network OWNER TO talool;
 
 CREATE UNIQUE INDEX social_network_idx ON social_network (name);
 
-CREATE TABLE social_account (
-    user_id character varying(32) NOT NULL,
-    account_t account_type NOT NULL,
-    social_network_id bigint NOT NULL,
-    login_id character varying(32) NOT NULL,
-    create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY (user_id,account_t,social_network_id)
-);
-
-ALTER TABLE public.social_account OWNER TO talool;
-ALTER TABLE ONLY social_account ADD CONSTRAINT "FK_CustomerSocialAccount_SocialNetwork" FOREIGN KEY (social_network_id) REFERENCES social_network(social_network_id);
-CREATE UNIQUE INDEX social_user_id_account_idx ON social_account (user_id,account_t);
 
 ALTER TABLE public.social_network_id_seq OWNER TO talool;
 ALTER SEQUENCE social_network_id_seq OWNED BY social_network.social_network_id;
@@ -615,16 +600,70 @@ ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Shar
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_acquireStatus" FOREIGN KEY (acquire_status_id) REFERENCES acquire_status(acquire_status_id);
 
+CREATE TABLE gift_request (
+    gift_request_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    request_type char(1) NOT NULL,
+    customer_id UUID NOT NULL,
+    deal_acquire_id UUID NOT NULL,
+    to_facebook_id character varying(32),
+    to_facebook_name character varying(32),
+    to_email character varying(128),
+    accepted_by_facebook_id character varying(32),
+    accepted_by_email character varying(128),
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    update_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY(gift_request_id)
+);
+
+ALTER TABLE public.gift_request OWNER TO talool;
+ALTER TABLE ONLY gift_request ADD CONSTRAINT "FK_GiftRequest_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY gift_request ADD CONSTRAINT "FK_GiftRequest_DealAcquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
+
+
+CREATE TABLE customer_social_account (
+	customer_social_account_id bigserial NOT NULL,
+    customer_id UUID NOT NULL,
+    social_network_id bigint NOT NULL,
+    login_id character varying(32) NOT NULL,
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY (customer_social_account_id),
+    UNIQUE ( customer_id, social_network_id )
+);
+
+CREATE TABLE merchant_social_account (
+	merchant_social_account_id bigserial NOT NULL,
+    merchant_id UUID,
+    social_network_id bigint NOT NULL,
+    login_id character varying(32) NOT NULL,
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY (merchant_social_account_id)
+);
+
+
+ALTER TABLE public.customer_social_account OWNER TO talool;
+ALTER TABLE ONLY customer_social_account ADD CONSTRAINT "FK_CustomerSocialAccount_SocialNetwork" FOREIGN KEY (social_network_id) REFERENCES social_network(social_network_id);
+ALTER TABLE ONLY customer_social_account ADD CONSTRAINT "FK_CustomerSocialAccount_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+CREATE INDEX customer_social_account_customer_id_idx ON customer_social_account (customer_id);
+CREATE INDEX customer_social_account_sn_id_idx ON customer_social_account (social_network_id);
+
+ALTER TABLE public.merchant_social_account OWNER TO talool;
+ALTER TABLE ONLY merchant_social_account ADD CONSTRAINT "FK_MerchantSocialAccount_SocialNetwork" FOREIGN KEY (social_network_id) REFERENCES social_network(social_network_id);
+ALTER TABLE ONLY merchant_social_account ADD CONSTRAINT "FK_MerchantSocialAccount_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
+CREATE INDEX merchant_social_account_merchant_id_idx ON merchant_social_account (merchant_id);
+CREATE INDEX merchant_social_account_sn_id_idx ON merchant_social_account (social_network_id);
+
+
 CREATE TRIGGER update_merchant_update_dt BEFORE UPDATE ON merchant FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_customer_update_dt BEFORE UPDATE ON customer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_address_update_dt BEFORE UPDATE ON address FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_update_update_dt BEFORE UPDATE ON deal FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_offer_update_dt BEFORE UPDATE ON deal_offer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_acquire_update_dt BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
-CREATE TRIGGER update_socal_account_update_dt BEFORE UPDATE ON social_account FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+CREATE TRIGGER gift_request_update_dt BEFORE UPDATE ON gift_request FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 
 CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();
 CREATE TRIGGER deal_acquire_update BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE deal_acquire_update();
+
 
 CREATE FUNCTION add_category_tag(text,text) RETURNS VOID
 LANGUAGE plpgsql
