@@ -585,7 +585,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Customer customer = createCustomer();
 		CustomerSocialAccount socAcnt = domainFactory.newCustomerSocialAccount(SocialNetwork.NetworkName.Facebook.toString());
 		socAcnt.setLoginId("fbloginId" + System.currentTimeMillis());
-
+		socAcnt.setCustomer(customer);
 		customer.addSocialAccount(socAcnt);
 
 		customerService.save(customer);
@@ -596,11 +596,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		List<DealAcquire> dacs = customerService.getDealAcquiresByCustomerId(customer.getId());
 
+		DealAcquire giftedDealAcquire = dacs.get(0);
 		FaceBookGiftRequest giftRequest = new FacebookGiftRequestImpl();
-		giftRequest.setDealAcquireId(dacs.get(0).getId());
+		giftRequest.setDealAcquireId(giftedDealAcquire.getId());
 		giftRequest.setCustomerId(customer.getId());
 		giftRequest.setToFacebookId("fbId" + now);
-		giftRequest.setToName("Firstname lastname" + now);
+		giftRequest.setReceipientName("Firstname lastname" + now);
 
 		customerService.createGiftRequest(giftRequest);
 
@@ -612,6 +613,16 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		catch (ServiceException ex)
 		{
 			Assert.assertEquals(ServiceException.Type.GIFTING_NOT_ALLOWED, ex.getType());
+		}
+
+		List<DealAcquire> dealAcquires = customerService.getGiftedDealAcquires(customer.getId());
+
+		Assert.assertEquals(1, dealAcquires.size());
+		Assert.assertEquals(giftedDealAcquire, dealAcquires.get(0));
+
+		for (DealAcquire dac : dealAcquires)
+		{
+			System.out.println(dac);
 		}
 
 	}

@@ -50,6 +50,9 @@ public abstract class GiftRequestImpl implements GiftRequest
 	@Column(name = "deal_acquire_id", unique = true, nullable = false)
 	private UUID dealAcquireId;
 
+	@Column(name = "receipient_name", length = 32)
+	private String receipientName;
+
 	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
 	private Date updated;
 
@@ -96,6 +99,18 @@ public abstract class GiftRequestImpl implements GiftRequest
 	public void setDealAcquireId(final UUID dealAcquireId)
 	{
 		this.dealAcquireId = dealAcquireId;
+	}
+
+	@Override
+	public String getReceipientName()
+	{
+		return receipientName;
+	}
+
+	@Override
+	public void setReceipientName(final String receipientName)
+	{
+		this.receipientName = receipientName;
 	}
 
 	@Override

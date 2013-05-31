@@ -606,10 +606,10 @@ CREATE TABLE gift_request (
     customer_id UUID NOT NULL,
     deal_acquire_id UUID NOT NULL,
     to_facebook_id character varying(32),
-    to_facebook_name character varying(32),
+    receipient_name character varying(32),
     to_email character varying(128),
-    accepted_by_facebook_id character varying(32),
-    accepted_by_email character varying(128),
+    original_to_facebook_id character varying(32),
+    original_to_email character varying(128),
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY(gift_request_id)
@@ -618,7 +618,10 @@ CREATE TABLE gift_request (
 ALTER TABLE public.gift_request OWNER TO talool;
 ALTER TABLE ONLY gift_request ADD CONSTRAINT "FK_GiftRequest_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY gift_request ADD CONSTRAINT "FK_GiftRequest_DealAcquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
-
+CREATE INDEX gift_request_customer_id_idx ON gift_request (customer_id);
+CREATE INDEX gift_request_deal_acquire_id_idx ON gift_request (deal_acquire_id);
+CREATE INDEX gift_request_to_facebook_id_idx ON gift_request (to_facebook_id);
+CREATE INDEX gift_request_to_email_idx ON gift_request (to_email);
 
 CREATE TABLE customer_social_account (
 	customer_social_account_id bigserial NOT NULL,

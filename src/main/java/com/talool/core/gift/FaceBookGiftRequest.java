@@ -12,12 +12,8 @@ public interface FaceBookGiftRequest extends GiftRequest
 
 	public void setToFacebookId(final String toFacebookId);
 
-	public String getToName();
+	public String getOriginalToFacebookId();
 
-	public void setToName(final String toName);
-
-	public String getAcceptedByFacebookId();
-
-	public void setAcceptedByFacebookId(final String acceptedByFacebookId);
+	public void setOriginalToFacebookId(final String originalToFacebookId);
 
 }

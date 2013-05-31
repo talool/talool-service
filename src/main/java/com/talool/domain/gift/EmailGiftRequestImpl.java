@@ -22,8 +22,8 @@ public class EmailGiftRequestImpl extends GiftRequestImpl implements EmailGiftRe
 {
 	private static final long serialVersionUID = -6197930806091256725L;
 
-	@Column(name = "accepted_by_email", length = 128)
-	private String acceptedByEmail;
+	@Column(name = "original_to_email", length = 128)
+	private String originalToEmail;
 
 	@Column(name = "to_email", length = 128)
 	private String toEmail;
@@ -41,15 +41,15 @@ public class EmailGiftRequestImpl extends GiftRequestImpl implements EmailGiftRe
 	}
 
 	@Override
-	public String getAcceptedByEmail()
+	public String getOriginalToEmail()
 	{
-		return acceptedByEmail;
+		return originalToEmail;
 	}
 
 	@Override
-	public void setAcceptedByEmail(final String acceptedByEmail)
+	public void setOriginalToEmail(final String originalToEmail)
 	{
-		this.acceptedByEmail = acceptedByEmail;
+		this.originalToEmail = originalToEmail;
 	}
 
 	@Override
@@ -73,13 +73,13 @@ public class EmailGiftRequestImpl extends GiftRequestImpl implements EmailGiftRe
 		final EmailGiftRequestImpl other = (EmailGiftRequestImpl) obj;
 
 		return super.equals(obj) && new EqualsBuilder().append(getToEmail(), other.getToEmail())
-				.append(getAcceptedByEmail(), other.getAcceptedByEmail()).isEquals();
+				.append(getOriginalToEmail(), other.getOriginalToEmail()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getToEmail()).append(getAcceptedByEmail()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getToEmail()).append(getOriginalToEmail()).hashCode();
 	}
 
 }

@@ -12,8 +12,8 @@ public interface EmailGiftRequest extends GiftRequest
 
 	public void setToEmail(final String toEmail);
 
-	public String getAcceptedByEmail();
+	public String getOriginalToEmail();
 
-	public void setAcceptedByEmail(final String acceptedByEmail);
+	public void setOriginalToEmail(final String originalToEmail);
 
 }

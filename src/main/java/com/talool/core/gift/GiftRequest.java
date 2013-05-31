@@ -21,4 +21,8 @@ public interface GiftRequest extends IdentifiableUUID, Serializable, TimeAware
 	public UUID getDealAcquireId();
 
 	public void setDealAcquireId(final UUID dealAcquireId);
+
+	public String getReceipientName();
+
+	public void setReceipientName(final String rceipientName);
 }

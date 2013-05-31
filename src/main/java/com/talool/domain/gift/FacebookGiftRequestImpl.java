@@ -25,11 +25,8 @@ public class FacebookGiftRequestImpl extends GiftRequestImpl implements FaceBook
 	@Column(name = "to_facebook_id", length = 32)
 	private String toFacebookId;
 
-	@Column(name = "to_facebook_name", length = 32)
-	private String toName;
-
-	@Column(name = "accepted_by_facebook_id", length = 32)
-	private String acceptedByFacebookId;
+	@Column(name = "original_to_facebook_id", length = 32)
+	private String originalToFacebookId;
 
 	@Override
 	public String getToFacebookId()
@@ -44,27 +41,15 @@ public class FacebookGiftRequestImpl extends GiftRequestImpl implements FaceBook
 	}
 
 	@Override
-	public String getToName()
+	public String getOriginalToFacebookId()
 	{
-		return toName;
+		return originalToFacebookId;
 	}
 
 	@Override
-	public void setToName(final String toName)
+	public void setOriginalToFacebookId(final String originalToFacebookId)
 	{
-		this.toName = toName;
-	}
-
-	@Override
-	public String getAcceptedByFacebookId()
-	{
-		return acceptedByFacebookId;
-	}
-
-	@Override
-	public void setAcceptedByFacebookId(final String acceptedByFacebookId)
-	{
-		this.acceptedByFacebookId = acceptedByFacebookId;
+		this.originalToFacebookId = originalToFacebookId;
 
 	}
 
@@ -89,14 +74,14 @@ public class FacebookGiftRequestImpl extends GiftRequestImpl implements FaceBook
 		final FacebookGiftRequestImpl other = (FacebookGiftRequestImpl) obj;
 
 		return super.equals(obj) && new EqualsBuilder().append(getToFacebookId(), other.getToFacebookId())
-				.append(getToName(), other.getToName()).append(getAcceptedByFacebookId(), other.getAcceptedByFacebookId()).isEquals();
+				.append(getOriginalToFacebookId(), other.getOriginalToFacebookId()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getToFacebookId()).append(getToName()).
-				append(getAcceptedByFacebookId()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getToFacebookId()).
+				append(getOriginalToFacebookId()).hashCode();
 	}
 
 }

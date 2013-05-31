@@ -713,8 +713,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			final Query query = getCurrentSession().createQuery(
-					"delete from CustomerSocialAccountImpl where customer.id=:customerId and socialNetwork.id=:socialNetworkId");
+			final Query query = getCurrentSession().getNamedQuery("deleteCustomerSocialAccount");
 			query.setParameter("customerId", customerId);
 			query.setParameter("socialNetworkId", socialNetwork.getId());
 			query.executeUpdate();
@@ -739,6 +738,28 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			throw new ServiceException("Problem saving CustomerSocialAccount", ex);
 		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquire> getGiftedDealAcquires(final UUID customerId) throws ServiceException
+	{
+		List<DealAcquire> dealAcquires = null;
+
+		try
+		{
+			final Query sqlQuery = (Query) getCurrentSession().getNamedQuery("giftedDealAcquires");
+			sqlQuery.setParameter("customerId", customerId, PostgresUUIDType.INSTANCE);
+			dealAcquires = sqlQuery.list();
+
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem getGiftedDealAcquires", e);
+		}
+
+		return dealAcquires;
 
 	}
 }
