@@ -608,6 +608,7 @@ CREATE TABLE gift_request (
     to_facebook_id character varying(32),
     receipient_name character varying(32),
     to_email character varying(128),
+    is_accepted boolean DEFAULT false NOT NULL,
     original_to_facebook_id character varying(32),
     original_to_email character varying(128),
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
