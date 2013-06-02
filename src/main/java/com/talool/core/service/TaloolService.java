@@ -19,7 +19,7 @@ import com.talool.service.HibernateService;
  */
 public interface TaloolService extends MerchantService, HibernateService
 {
-	public SocialNetwork getSocialNetwork(final String name) throws ServiceException;
+	public SocialNetwork getSocialNetwork(final SocialNetwork.NetworkName name) throws ServiceException;
 
 	public boolean emailExists(final AccountType accountType, final String email)
 			throws ServiceException;

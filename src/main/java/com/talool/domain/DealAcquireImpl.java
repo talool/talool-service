@@ -26,7 +26,6 @@ import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.Location;
-import com.talool.core.Merchant;
 
 /**
  * 
@@ -47,7 +46,7 @@ public class DealAcquireImpl implements DealAcquire
 	@Column(name = "deal_acquire_id", unique = true, nullable = false)
 	private UUID id;
 
-	@OneToOne(targetEntity = DealImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = DealImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
 
@@ -55,13 +54,9 @@ public class DealAcquireImpl implements DealAcquire
 	@JoinColumn(name = "acquire_status_id")
 	private AcquireStatus status;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
-
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
-	@JoinColumn(name = "shared_by_merchant_id")
-	private Merchant sharedByMerchant;
 
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "shared_by_customer_id")
@@ -115,6 +110,7 @@ public class DealAcquireImpl implements DealAcquire
 		return status;
 	}
 
+	@Override
 	public void setAcquireStatus(AcquireStatus acquireStatus)
 	{
 		this.status = acquireStatus;
@@ -130,18 +126,6 @@ public class DealAcquireImpl implements DealAcquire
 	public void setCustomer(Customer customer)
 	{
 		this.customer = customer;
-	}
-
-	@Override
-	public Merchant getSharedByMerchant()
-	{
-		return sharedByMerchant;
-	}
-
-	public void setSharedByMerchant(Merchant merchant)
-	{
-		this.setSharedByMerchant(merchant);
-
 	}
 
 	@Override
@@ -235,6 +219,12 @@ public class DealAcquireImpl implements DealAcquire
 	{
 		shareCount += 1;
 		return shareCount;
+	}
+
+	@Override
+	public void setSharedByCustomer(final Customer customer)
+	{
+		this.customer = customer;
 	}
 
 }

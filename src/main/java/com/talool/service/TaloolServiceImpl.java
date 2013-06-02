@@ -87,19 +87,19 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	{}
 
 	@Override
-	public SocialNetwork getSocialNetwork(final String name) throws ServiceException
+	public SocialNetwork getSocialNetwork(final SocialNetwork.NetworkName name) throws ServiceException
 	{
 		SocialNetwork snet;
 		try
 		{
 			final Search search = new Search(SocialNetworkImpl.class);
-			search.addFilterEqual("name", name);
+			search.addFilterEqual("name", name.toString());
 			snet = (SocialNetwork) daoDispatcher.searchUnique(search);
 
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem getSocialNetwork  " + name, ex);
+			throw new ServiceException("Problem getSocialNetwork  " + name.toString(), ex);
 		}
 
 		return snet;

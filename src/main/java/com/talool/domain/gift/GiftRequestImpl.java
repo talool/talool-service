@@ -53,6 +53,9 @@ public abstract class GiftRequestImpl implements GiftRequest
 	@Column(name = "receipient_name", length = 32)
 	private String receipientName;
 
+	@Column(name = "is_accepted")
+	private boolean isAccepted;
+
 	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
 	private Date updated;
 
@@ -141,6 +144,18 @@ public abstract class GiftRequestImpl implements GiftRequest
 	public int hashCode()
 	{
 		return new HashCodeBuilder(17, 37).append(getCustomerId()).append(getDealAcquireId()).hashCode();
+	}
+
+	@Override
+	public boolean isAccepted()
+	{
+		return isAccepted;
+	}
+
+	@Override
+	public void setIsAccepted(final boolean isAccepted)
+	{
+		this.isAccepted = isAccepted;
 	}
 
 }

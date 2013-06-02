@@ -25,4 +25,8 @@ public interface GiftRequest extends IdentifiableUUID, Serializable, TimeAware
 	public String getReceipientName();
 
 	public void setReceipientName(final String rceipientName);
+
+	public boolean isAccepted();
+
+	public void setIsAccepted(final boolean isAccepted);
 }

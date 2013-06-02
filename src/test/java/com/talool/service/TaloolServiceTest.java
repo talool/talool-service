@@ -26,6 +26,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import com.talool.cache.TagCache;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
+import com.talool.core.AcquireStatusType;
 import com.talool.core.Address;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
@@ -47,11 +48,13 @@ import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
+import com.talool.core.gift.EmailGiftRequest;
 import com.talool.core.gift.FaceBookGiftRequest;
 import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.MerchantMediaImpl;
+import com.talool.domain.gift.EmailGiftRequestImpl;
 import com.talool.domain.gift.FacebookGiftRequestImpl;
 import com.talool.utils.DealAcquireComparator;
 import com.talool.utils.DealAcquireComparator.ComparatorType;
@@ -100,11 +103,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			this.dealAcquireId = dealAcquire.getId();;
 			this.status = dealAcquire.getAcquireStatus();
 			this.customerId = dealAcquire.getCustomer().getId();
-
-			if (dealAcquire.getSharedByMerchant() != null)
-			{
-				this.sharedbyMerchantId = dealAcquire.getSharedByMerchant().getId();
-			}
 
 			if (dealAcquire.getSharedByCustomer() != null)
 			{
@@ -581,28 +579,40 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void testGiftRequest() throws ServiceException
 	{
 		Long now = System.currentTimeMillis();
+		String receivingFacebookId = "fbloginId" + System.currentTimeMillis();
+		String receivingName = "Firstname lastname" + now;
 
-		Customer customer = createCustomer();
+		Customer givingCustomer = createCustomer();
+		givingCustomer.setEmail("billy@facebook" + System.currentTimeMillis() + ".com");
+
+		Customer receivingCustomer = createCustomer();
+
 		CustomerSocialAccount socAcnt = domainFactory.newCustomerSocialAccount(SocialNetwork.NetworkName.Facebook.toString());
-		socAcnt.setLoginId("fbloginId" + System.currentTimeMillis());
-		socAcnt.setCustomer(customer);
-		customer.addSocialAccount(socAcnt);
+		socAcnt.setLoginId(receivingFacebookId);
+		socAcnt.setCustomer(receivingCustomer);
+		receivingCustomer.addSocialAccount(socAcnt);
 
-		customerService.save(customer);
-		customerService.refresh(customer);
+		customerService.save(givingCustomer);
+		customerService.refresh(givingCustomer);
 
-		DealOfferPurchase dealOfferPurc = domainFactory.newDealOfferPurchase(customer, taloolService.getDealOffers().get(0));
+		customerService.save(receivingCustomer);
+		customerService.refresh(receivingCustomer);
+
+		DealOfferPurchase dealOfferPurc = domainFactory.newDealOfferPurchase(givingCustomer, taloolService.getDealOffers().get(0));
 		taloolService.save(dealOfferPurc);
 
-		List<DealAcquire> dacs = customerService.getDealAcquiresByCustomerId(customer.getId());
+		List<DealAcquire> dacs = customerService.getDealAcquiresByCustomerId(givingCustomer.getId());
 
-		DealAcquire giftedDealAcquire = dacs.get(0);
+		DealAcquire giftedDealAcquireViaFacebook = dacs.get(0);
+		DealAcquire giftedDealAcquireViaEmail = dacs.get(1);
+
 		FaceBookGiftRequest giftRequest = new FacebookGiftRequestImpl();
-		giftRequest.setDealAcquireId(giftedDealAcquire.getId());
-		giftRequest.setCustomerId(customer.getId());
-		giftRequest.setToFacebookId("fbId" + now);
-		giftRequest.setReceipientName("Firstname lastname" + now);
+		giftRequest.setDealAcquireId(giftedDealAcquireViaFacebook.getId());
+		giftRequest.setCustomerId(givingCustomer.getId());
+		giftRequest.setToFacebookId(receivingFacebookId);
+		giftRequest.setReceipientName(receivingName);
 
+		// give gift to facebookId
 		customerService.createGiftRequest(giftRequest);
 
 		// try to gift again, should get an exception
@@ -615,15 +625,29 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			Assert.assertEquals(ServiceException.Type.GIFTING_NOT_ALLOWED, ex.getType());
 		}
 
-		List<DealAcquire> dealAcquires = customerService.getGiftedDealAcquires(customer.getId());
+		EmailGiftRequest eGiftRequest = new EmailGiftRequestImpl();
+		eGiftRequest.setDealAcquireId(dacs.get(1).getId());
+		eGiftRequest.setCustomerId(givingCustomer.getId());
+		eGiftRequest.setToEmail(receivingCustomer.getEmail());
+		eGiftRequest.setReceipientName(receivingName);
 
-		Assert.assertEquals(1, dealAcquires.size());
-		Assert.assertEquals(giftedDealAcquire, dealAcquires.get(0));
+		// give 2nd to email
+		customerService.createGiftRequest(eGiftRequest);
 
-		for (DealAcquire dac : dealAcquires)
-		{
-			System.out.println(dac);
-		}
+		List<DealAcquire> dealAcquires = customerService.getGiftedDealAcquires(receivingCustomer.getId());
+
+		Assert.assertEquals(2, dealAcquires.size());
+
+		Assert.assertEquals(giftedDealAcquireViaFacebook, dealAcquires.get(0));
+		Assert.assertEquals(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE.toString(),
+				giftedDealAcquireViaFacebook.getAcquireStatus().getStatus());
+
+		Assert.assertEquals(giftedDealAcquireViaEmail, dealAcquires.get(1));
+		Assert.assertEquals(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE.toString(),
+				giftedDealAcquireViaEmail.getAcquireStatus().getStatus());
+
+		// lets accept the gifts!
+		// customerService.acceptGift(giftRequestId, receipientCustomerId)
 
 	}
 

@@ -59,7 +59,7 @@ public class DealImpl implements Deal
 	@Column(name = "deal_id", unique = true, nullable = false)
 	private UUID id;
 
-	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.EAGER)
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "updated_by_merchant_account_id")
 	private MerchantAccount updatedByMerchantAccount;
 

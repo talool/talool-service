@@ -14,13 +14,15 @@ public interface DealAcquire extends IdentifiableUUID, Serializable, TimeAware
 
 	public AcquireStatus getAcquireStatus();
 
+	public void setAcquireStatus(AcquireStatus status);
+
 	public Customer getCustomer();
 
 	public void setCustomer(Customer customer);
 
-	public Merchant getSharedByMerchant();
-
 	public Customer getSharedByCustomer();
+
+	public void setSharedByCustomer(Customer customer);
 
 	public Integer getShareCount();
 

@@ -53,7 +53,7 @@ final class DomainFactoryImpl implements DomainFactory
 		try
 		{
 			SocialNetwork snet = FactoryManager.get().getServiceFactory().getTaloolService()
-					.getSocialNetwork(socialNetworkName);
+					.getSocialNetwork(SocialNetwork.NetworkName.valueOf(socialNetworkName));
 
 			sac = new CustomerSocialAccountImpl();
 			sac.setSocialNetwork(snet);
@@ -73,7 +73,7 @@ final class DomainFactoryImpl implements DomainFactory
 		try
 		{
 			SocialNetwork snet = FactoryManager.get().getServiceFactory().getTaloolService()
-					.getSocialNetwork(socialNetworkName);
+					.getSocialNetwork(SocialNetwork.NetworkName.valueOf(socialNetworkName));
 
 			sac = new MerchantSocialAccountImpl();
 			sac.setSocialNetwork(snet);
