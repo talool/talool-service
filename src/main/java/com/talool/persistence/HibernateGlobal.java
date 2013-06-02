@@ -2,15 +2,12 @@ package com.talool.persistence;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
-
-import com.talool.domain.DealAcquireImpl;
 
 @MappedSuperclass
 @NamedQueries({
@@ -29,19 +26,26 @@ import com.talool.domain.DealAcquireImpl;
 				name = "deleteCustomerSocialAccount",
 				query = "delete from CustomerSocialAccountImpl where customer.id=:customerId and socialNetwork.id=:socialNetworkId"),
 
+		/*
+		 * giftedDealAcquires is a great example of force fetching eagerly in HQL on
+		 * entities we know we need to pull in. Avoids many select statements from
+		 * lazy objects. Remember, FetchMode.LAZY/EAGER is for Criteria API
+		 */
+		@NamedQuery(
+				name = "giftedDealAcquires",
+				query = "from DealAcquireImpl as dac left join fetch dac.customer left join fetch dac.deal left join fetch dac.deal.image "
+						+
+						"where dac.id in " +
+						"(select gr.dealAcquireId from GiftRequestImpl as gr, CustomerImpl as cust," +
+						"CustomerSocialAccountImpl as csa " +
+						"where gr.customerId=:customerId OR " +
+						"(cust.id=:customerId AND gr.toEmail=cust.email) OR " +
+						"(csa.customer.id=:customerId AND gr.toFacebookId=csa.loginId) " +
+						"order by gr.created asc)")
+
 })
 @NamedNativeQueries({
-		@NamedNativeQuery(
-				resultClass = DealAcquireImpl.class,
-				name = "giftedDealAcquires",
-				query = "select dac.* from deal_acquire as dac " +
-						"where (deal_acquire_id) in " +
-						"(select gr.deal_acquire_id from gift_request as gr, customer as cust," +
-						"customer_social_account as csa " +
-						"where gr.customer_id=:customerId OR " +
-						"(cust.customer_id=:customerId AND gr.to_email=cust.email) OR " +
-						"(csa.customer_id=:customerId AND gr.to_facebook_id=csa.login_id) " +
-						"order by gr.create_dt asc)")
+
 })
 @TypeDefs({
 		@TypeDef(name = "sexType", typeClass = GenericEnumUserType.class, parameters = {
