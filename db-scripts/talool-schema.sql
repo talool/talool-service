@@ -468,7 +468,7 @@ CREATE TABLE deal (
     deal_index int,
     title character varying(256) NOT NULL,
     summary character varying(256) NOT NULL,
-    details character varying(256) NOT NULL,
+    details character varying(256),
     code character varying(128), 
     image_id UUID, 
     expires timestamp without time zone,
