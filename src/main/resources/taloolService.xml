@@ -15,7 +15,7 @@
 	<tx:annotation-driven order="1" />
 
 	<import resource="./taloolCommon.xml" />
-  	<import resource="./taloolMailService.xml" />
+  	<!-- import resource="./taloolMailService.xml" /-->
     <import resource="./dataSource.xml" />
 	<import resource="./taloolHibernateContext.xml" />
 
