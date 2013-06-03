@@ -33,8 +33,8 @@ import org.hibernate.annotations.TypeDefs;
 		@NamedQuery(
 				name = "getGifts",
 				query =
-				"select gr from GiftRequestImpl as gr, CustomerImpl as cust " +
-						"CustomerSocialAccountImpl as csa " +
+				"select gr from GiftRequestImpl as gr, CustomerImpl as cust,CustomerSocialAccountImpl as csa "
+						+
 						"left join fetch gr.fromCustomer left join fetch gr.dealAcquire as da left join fetch da.deal as d " +
 						"left join fetch d.merchant left join fetch d.image " +
 						"where gr.requestStatus in (:requestStatus) AND " +
