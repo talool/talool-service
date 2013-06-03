@@ -1,9 +1,11 @@
 package com.talool.core.gift;
 
 import java.io.Serializable;
-import java.util.UUID;
 
+import com.talool.core.Customer;
+import com.talool.core.DealAcquire;
 import com.talool.core.IdentifiableUUID;
+import com.talool.core.RequestStatus;
 import com.talool.core.TimeAware;
 
 /**
@@ -14,19 +16,20 @@ import com.talool.core.TimeAware;
  */
 public interface GiftRequest extends IdentifiableUUID, Serializable, TimeAware
 {
-	public UUID getCustomerId();
+	public Customer getFromCustomer();
 
-	public void setCustomerId(final UUID customerId);
+	public void setFromCustomer(final Customer fromCustomer);
 
-	public UUID getDealAcquireId();
+	public DealAcquire getDealAcquire();
 
-	public void setDealAcquireId(final UUID dealAcquireId);
+	public void setDealAcquire(final DealAcquire dealAcquire);
 
 	public String getReceipientName();
 
 	public void setReceipientName(final String rceipientName);
 
-	public boolean isAccepted();
+	public RequestStatus getRequestStatus();
 
-	public void setIsAccepted(final boolean isAccepted);
+	public void setRequestStatus(final RequestStatus requestStatus);
+
 }

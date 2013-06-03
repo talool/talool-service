@@ -8,10 +8,13 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -19,7 +22,12 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
+import com.talool.core.Customer;
+import com.talool.core.DealAcquire;
+import com.talool.core.RequestStatus;
 import com.talool.core.gift.GiftRequest;
+import com.talool.domain.CustomerImpl;
+import com.talool.domain.DealAcquireImpl;
 
 /**
  * 
@@ -42,19 +50,20 @@ public abstract class GiftRequestImpl implements GiftRequest
 	@Column(name = "gift_request_id", unique = true, nullable = false)
 	private UUID id;
 
-	@Type(type = "pg-uuid")
-	@Column(name = "customer_id", unique = true, nullable = false)
-	private UUID customerId;
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class)
+	@JoinColumn(name = "from_customer_id")
+	private Customer fromCustomer;
 
-	@Type(type = "pg-uuid")
-	@Column(name = "deal_acquire_id", unique = true, nullable = false)
-	private UUID dealAcquireId;
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = DealAcquireImpl.class)
+	@JoinColumn(name = "deal_acquire_id")
+	private DealAcquire dealAcquire;
+
+	@Type(type = "requestStatus")
+	@Column(name = "request_status", nullable = false, columnDefinition = "request_status")
+	private RequestStatus requestStatus = RequestStatus.PENDING;
 
 	@Column(name = "receipient_name", length = 32)
 	private String receipientName;
-
-	@Column(name = "is_accepted")
-	private boolean isAccepted;
 
 	@Column(name = "update_dt", unique = false, insertable = false, updatable = false)
 	private Date updated;
@@ -81,27 +90,27 @@ public abstract class GiftRequestImpl implements GiftRequest
 	}
 
 	@Override
-	public UUID getCustomerId()
+	public Customer getFromCustomer()
 	{
-		return customerId;
+		return fromCustomer;
 	}
 
 	@Override
-	public void setCustomerId(UUID customerId)
+	public void setFromCustomer(final Customer fromCustomer)
 	{
-		this.customerId = customerId;
+		this.fromCustomer = fromCustomer;
 	}
 
 	@Override
-	public UUID getDealAcquireId()
+	public DealAcquire getDealAcquire()
 	{
-		return dealAcquireId;
+		return dealAcquire;
 	}
 
 	@Override
-	public void setDealAcquireId(final UUID dealAcquireId)
+	public void setDealAcquire(final DealAcquire dealAcquire)
 	{
-		this.dealAcquireId = dealAcquireId;
+		this.dealAcquire = dealAcquire;
 	}
 
 	@Override
@@ -114,6 +123,19 @@ public abstract class GiftRequestImpl implements GiftRequest
 	public void setReceipientName(final String receipientName)
 	{
 		this.receipientName = receipientName;
+	}
+
+	@Override
+	public RequestStatus getRequestStatus()
+	{
+		return requestStatus;
+	}
+
+	@Override
+	public void setRequestStatus(final RequestStatus requestStatus)
+	{
+		this.requestStatus = requestStatus;
+
 	}
 
 	@Override
@@ -136,26 +158,14 @@ public abstract class GiftRequestImpl implements GiftRequest
 
 		final GiftRequestImpl other = (GiftRequestImpl) obj;
 
-		return super.equals(obj) && new EqualsBuilder().append(getCustomerId(), other.getCustomerId())
-				.append(getDealAcquireId(), other.getDealAcquireId()).isEquals();
+		return super.equals(obj) && new EqualsBuilder().append(getFromCustomer(), other.getFromCustomer())
+				.append(getDealAcquire(), other.getDealAcquire()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getCustomerId()).append(getDealAcquireId()).hashCode();
-	}
-
-	@Override
-	public boolean isAccepted()
-	{
-		return isAccepted;
-	}
-
-	@Override
-	public void setIsAccepted(final boolean isAccepted)
-	{
-		this.isAccepted = isAccepted;
+		return new HashCodeBuilder(17, 37).append(getFromCustomer()).append(getDealAcquire()).hashCode();
 	}
 
 }

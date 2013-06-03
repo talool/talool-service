@@ -1,7 +1,6 @@
 package com.talool.persistence;
 
 import javax.persistence.MappedSuperclass;
-import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
@@ -32,20 +31,18 @@ import org.hibernate.annotations.TypeDefs;
 		 * lazy objects. Remember, FetchMode.LAZY/EAGER is for Criteria API
 		 */
 		@NamedQuery(
-				name = "giftedDealAcquires",
-				query = "from DealAcquireImpl as dac left join fetch dac.customer left join fetch dac.deal left join fetch dac.deal.image "
+				name = "getGifts",
+				query =
+				"select gr from GiftRequestImpl as gr, CustomerImpl as cust,CustomerSocialAccountImpl as csa "
 						+
-						"where dac.id in " +
-						"(select gr.dealAcquireId from GiftRequestImpl as gr, CustomerImpl as cust," +
-						"CustomerSocialAccountImpl as csa " +
-						"where gr.customerId=:customerId OR " +
-						"(cust.id=:customerId AND gr.toEmail=cust.email) OR " +
-						"(csa.customer.id=:customerId AND gr.toFacebookId=csa.loginId) " +
-						"order by gr.created asc)")
-
-})
-@NamedNativeQueries({
-
+						"left join fetch gr.fromCustomer left join fetch gr.dealAcquire as da left join fetch da.deal as d " +
+						"left join fetch d.merchant left join fetch d.image " +
+						"where gr.requestStatus in (:requestStatus) AND " +
+						"(csa.customer.id=:customerId AND (gr.toFacebookId=csa.loginId OR gr.toCustomer.id=:customerId) " +
+						" and cust.id=:customerId) OR " +
+						"(cust.id=:customerId AND cust.email=gr.toEmail AND csa.customer.id=cust.id) " +
+						"order by gr.created asc)"
+		),
 })
 @TypeDefs({
 		@TypeDef(name = "sexType", typeClass = GenericEnumUserType.class, parameters = {
@@ -55,6 +52,9 @@ import org.hibernate.annotations.TypeDefs;
 
 		@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters =
 		{ @Parameter(name = "enumClass", value = "com.talool.core.DealType") }),
+
+		@TypeDef(name = "requestStatus", typeClass = GenericEnumUserType.class, parameters =
+		{ @Parameter(name = "enumClass", value = "com.talool.core.RequestStatus") }),
 
 		@TypeDef(name = "mediaType", typeClass = GenericEnumUserType.class, parameters =
 		{ @Parameter(name = "enumClass", value = "com.talool.core.MediaType") })

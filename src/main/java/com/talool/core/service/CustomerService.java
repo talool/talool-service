@@ -9,6 +9,7 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
+import com.talool.core.RequestStatus;
 import com.talool.core.SearchOptions;
 import com.talool.core.gift.GiftRequest;
 import com.talool.core.social.CustomerSocialAccount;
@@ -63,14 +64,11 @@ public interface CustomerService extends HibernateService
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
 			throws ServiceException;
 
-	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException;
+	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
 
-	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException;
+	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
 
-	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException;
+	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
 
 	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;
 
@@ -80,8 +78,7 @@ public interface CustomerService extends HibernateService
 	public List<Merchant> getMerchantAcquires(final UUID customerId, final Integer categoryId, final SearchOptions searchOptions)
 			throws ServiceException;
 
-	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId)
-			throws ServiceException;
+	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId) throws ServiceException;
 
 	public DealAcquire getDealAcquire(final UUID dealAcquireId) throws ServiceException;
 
@@ -108,7 +105,7 @@ public interface CustomerService extends HibernateService
 
 	public GiftRequest getGiftRequest(final UUID giftRequestId) throws ServiceException;
 
-	public List<DealAcquire> getGiftedDealAcquires(final UUID customerId) throws ServiceException;
+	public List<GiftRequest> getGifts(final UUID customerId, final RequestStatus[] requestStatus) throws ServiceException;
 
 	public void acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException;
 
