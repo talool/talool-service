@@ -11,6 +11,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.talool.core.Category;
 
@@ -21,6 +23,7 @@ import com.talool.core.Category;
  */
 @Entity
 @Table(name = "category", catalog = "public")
+@Cache(region = "Category", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CategoryImpl implements Category
 {
 	private static final long serialVersionUID = 2955686897079229757L;
