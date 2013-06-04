@@ -711,7 +711,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		Assert.assertTrue(emailPass && facebookPass && taloolPass);
 
-		// lets accept the gifts!
+		// lets accept 1 gift
 		customerService.acceptGift(gifts.get(0).getId(), receivingCustomer.getId());
 
 		// verify the dealAcquire
@@ -723,6 +723,23 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		// verify Gift request is in right state
 		Assert.assertEquals(RequestStatus.ACCEPTED, customerService.getGiftRequest(gifts.get(0).getId()).getRequestStatus());
+
+		// lets reject the other gift
+		customerService.rejectGift(gifts.get(1).getId(), receivingCustomer.getId());
+
+		// verify the dealAcquire
+		dealAcquires = customerService.getDealAcquiresByCustomerId(receivingCustomer.getId());
+		// still just 1 acquire
+		Assert.assertEquals(1, dealAcquires.size());
+
+		// validate the dealAcquire we rejected was set properly and belongs to the
+		// giving customer
+		DealAcquire dac = customerService.getDealAcquire(gifts.get(1).getDealAcquire().getId());
+		Assert.assertEquals(AcquireStatusType.REJECTED_CUSTOMER_SHARE.toString(), dac.getAcquireStatus().getStatus());
+		Assert.assertEquals(givingCustomer, dac.getCustomer());
+
+		// verify Gift request is in right state
+		Assert.assertEquals(RequestStatus.REJECTED, customerService.getGiftRequest(gifts.get(1).getId()).getRequestStatus());
 
 	}
 
