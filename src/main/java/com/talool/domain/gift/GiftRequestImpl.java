@@ -39,6 +39,7 @@ import com.talool.domain.DealAcquireImpl;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "request_type", discriminatorType = DiscriminatorType.CHAR, length = 1)
 @DiscriminatorValue("G")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public abstract class GiftRequestImpl implements GiftRequest
 {
 	private static final long serialVersionUID = -5248037524436980144L;

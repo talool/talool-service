@@ -712,8 +712,17 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertTrue(emailPass && facebookPass && taloolPass);
 
 		// lets accept the gifts!
+		customerService.acceptGift(gifts.get(0).getId(), receivingCustomer.getId());
 
-		// customerService.acceptGift(giftRequestId, receipientCustomerId)
+		// verify the dealAcquire
+		List<DealAcquire> dealAcquires = customerService.getDealAcquiresByCustomerId(receivingCustomer.getId());
+		Assert.assertEquals(1, dealAcquires.size());
+		Assert.assertEquals(gifts.get(0).getDealAcquire().getId(), dealAcquires.get(0).getId());
+		Assert.assertEquals(dealAcquires.get(0).getSharedByCustomer(), givingCustomer);
+		Assert.assertEquals(dealAcquires.get(0).getAcquireStatus().getStatus(), AcquireStatusType.ACCEPTED_CUSTOMER_SHARE.toString());
+
+		// verify Gift request is in right state
+		Assert.assertEquals(RequestStatus.ACCEPTED, customerService.getGiftRequest(gifts.get(0).getId()).getRequestStatus());
 
 	}
 

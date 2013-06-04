@@ -281,7 +281,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			// give it back to the original share
 			final Customer rejectedBy = dealAcquire.getCustomer();
 			dealAcq.setCustomer(dealAcquire.getSharedByCustomer());
-			dealAcq.setSharedByCusomer(rejectedBy);
+			dealAcq.setSharedByCustomer(rejectedBy);
 
 			daoDispatcher.save(dealAcquire);
 

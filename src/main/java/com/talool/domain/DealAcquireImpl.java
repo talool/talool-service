@@ -3,6 +3,7 @@ package com.talool.domain;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -58,7 +59,7 @@ public class DealAcquireImpl implements DealAcquire
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "shared_by_customer_id")
 	private Customer sharedByCustomer;
 
@@ -137,12 +138,6 @@ public class DealAcquireImpl implements DealAcquire
 	public void setRedemptionDate(final Date date)
 	{
 		this.redemptionDate = date;
-	}
-
-	public void setSharedByCusomer(Customer customer)
-	{
-		this.sharedByCustomer = customer;
-
 	}
 
 	@Override
@@ -224,7 +219,7 @@ public class DealAcquireImpl implements DealAcquire
 	@Override
 	public void setSharedByCustomer(final Customer customer)
 	{
-		this.customer = customer;
+		this.sharedByCustomer = customer;
 	}
 
 }
