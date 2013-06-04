@@ -51,9 +51,9 @@ public class DealAcquireImpl implements DealAcquire
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AcquireStatusImpl.class)
-	@JoinColumn(name = "acquire_status_id")
-	private AcquireStatus status;
+	@Type(type = "acquireStatus")
+	@Column(name = "acquire_status", nullable = false, columnDefinition = "acquire_status", updatable = false)
+	private AcquireStatus acquireStatus;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "customer_id")
@@ -108,13 +108,13 @@ public class DealAcquireImpl implements DealAcquire
 	@Override
 	public AcquireStatus getAcquireStatus()
 	{
-		return status;
+		return acquireStatus;
 	}
 
 	@Override
-	public void setAcquireStatus(AcquireStatus acquireStatus)
+	public void setAcquireStatus(final AcquireStatus acquireStatus)
 	{
-		this.status = acquireStatus;
+		this.acquireStatus = acquireStatus;
 	}
 
 	@Override

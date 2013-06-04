@@ -56,6 +56,9 @@ import org.hibernate.annotations.TypeDefs;
 		@TypeDef(name = "requestStatus", typeClass = GenericEnumUserType.class, parameters =
 		{ @Parameter(name = "enumClass", value = "com.talool.core.RequestStatus") }),
 
+		@TypeDef(name = "acquireStatus", typeClass = GenericEnumUserType.class, parameters =
+		{ @Parameter(name = "enumClass", value = "com.talool.core.AcquireStatus") }),
+
 		@TypeDef(name = "mediaType", typeClass = GenericEnumUserType.class, parameters =
 		{ @Parameter(name = "enumClass", value = "com.talool.core.MediaType") })
 

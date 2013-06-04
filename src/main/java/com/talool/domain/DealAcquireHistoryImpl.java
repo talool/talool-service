@@ -16,6 +16,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.Type;
 
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
@@ -51,9 +52,9 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	@EmbeddedId
 	private final DealAcquireHistoryPK primaryKey;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = AcquireStatusImpl.class)
-	@JoinColumn(name = "acquire_status_id")
-	private AcquireStatus status;
+	@Type(type = "acquireStatus")
+	@Column(name = "acquire_status", nullable = false, columnDefinition = "acquire_status", updatable = false)
+	private AcquireStatus acquireStatus;
 
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "customer_id")
@@ -84,7 +85,7 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	@Override
 	public AcquireStatus getAcquireStatus()
 	{
-		return status;
+		return acquireStatus;
 	}
 
 	@Override

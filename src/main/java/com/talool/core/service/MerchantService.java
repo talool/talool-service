@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.talool.core.AcquireStatus;
-import com.talool.core.AcquireStatusType;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
@@ -106,8 +104,6 @@ public interface MerchantService extends HibernateService
 
 	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final UUID merchantId)
 			throws ServiceException;
-
-	public AcquireStatus getAcquireStatus(final AcquireStatusType type) throws ServiceException;
 
 	public List<Merchant> getMerchantsWithin(final Location location, final int maxMiles, final SearchOptions searchOptions)
 			throws ServiceException;

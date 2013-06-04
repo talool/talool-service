@@ -1,20 +1,11 @@
 package com.talool.core;
 
-import java.io.Serializable;
-import java.util.Date;
-
 /**
- * Acquire Status Interface
  * 
  * @author clintz
  * 
  */
-public interface AcquireStatus extends Serializable
+public enum AcquireStatus
 {
-	public Integer getId();
-
-	public String getStatus();
-
-	public Date getCreated();
-
+	PURCHASED, REDEEMED, REJECTED_CUSTOMER_SHARE, REJECTED_MERCHANT_SHARE, ACCEPTED_MERCHANT_SHARE, ACCEPTED_CUSTOMER_SHARE, PENDING_ACCEPT_MERCHANT_SHARE, PENDING_ACCEPT_CUSTOMER_SHARE;
 }

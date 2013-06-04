@@ -64,10 +64,6 @@ public interface CustomerService extends HibernateService
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
 			throws ServiceException;
 
-	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
-
-	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
-
 	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
 
 	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;

@@ -26,7 +26,6 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import com.talool.cache.TagCache;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
-import com.talool.core.AcquireStatusType;
 import com.talool.core.Address;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
@@ -679,8 +678,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			{
 				Assert.assertEquals(giftedDealAcquireViaEmail, gr.getDealAcquire());
 
-				Assert.assertEquals(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE.toString(),
-						gr.getDealAcquire().getAcquireStatus().getStatus());
+				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
+						gr.getDealAcquire().getAcquireStatus());
 
 				Assert.assertEquals(receivingCustomer.getEmail(), ((EmailGiftRequest) gr).getToEmail());
 
@@ -690,8 +689,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			else if (gr instanceof FaceBookGiftRequest)
 			{
 				Assert.assertEquals(giftedDealAcquireViaFacebook, gr.getDealAcquire());
-				Assert.assertEquals(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE.toString(),
-						gr.getDealAcquire().getAcquireStatus().getStatus());
+				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
+						gr.getDealAcquire().getAcquireStatus());
 
 				facebookPass = true;
 
@@ -699,8 +698,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			else if (gr instanceof TaloolGiftRequest)
 			{
 				Assert.assertEquals(giftedDealAcquireViaTalool, gr.getDealAcquire());
-				Assert.assertEquals(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE.toString(),
-						gr.getDealAcquire().getAcquireStatus().getStatus());
+				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
+						gr.getDealAcquire().getAcquireStatus());
 
 				Assert.assertEquals(receivingCustomer, ((TaloolGiftRequest) gr).getToCustomer());
 
@@ -719,7 +718,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(1, dealAcquires.size());
 		Assert.assertEquals(gifts.get(0).getDealAcquire().getId(), dealAcquires.get(0).getId());
 		Assert.assertEquals(dealAcquires.get(0).getSharedByCustomer(), givingCustomer);
-		Assert.assertEquals(dealAcquires.get(0).getAcquireStatus().getStatus(), AcquireStatusType.ACCEPTED_CUSTOMER_SHARE.toString());
+		Assert.assertEquals(dealAcquires.get(0).getAcquireStatus(),
+				AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
 
 		// verify Gift request is in right state
 		Assert.assertEquals(RequestStatus.ACCEPTED, customerService.getGiftRequest(gifts.get(0).getId()).getRequestStatus());
@@ -735,7 +735,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// validate the dealAcquire we rejected was set properly and belongs to the
 		// giving customer
 		DealAcquire dac = customerService.getDealAcquire(gifts.get(1).getDealAcquire().getId());
-		Assert.assertEquals(AcquireStatusType.REJECTED_CUSTOMER_SHARE.toString(), dac.getAcquireStatus().getStatus());
+		Assert.assertEquals(AcquireStatus.REJECTED_CUSTOMER_SHARE, dac.getAcquireStatus());
 		Assert.assertEquals(givingCustomer, dac.getCustomer());
 
 		// verify Gift request is in right state

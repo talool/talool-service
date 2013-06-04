@@ -30,8 +30,6 @@ import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.Sort;
 import com.talool.core.AccountType;
-import com.talool.core.AcquireStatus;
-import com.talool.core.AcquireStatusType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.Deal;
@@ -51,7 +49,6 @@ import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.core.social.SocialNetwork;
-import com.talool.domain.AcquireStatusImpl;
 import com.talool.domain.AddressImpl;
 import com.talool.domain.CategoryImpl;
 import com.talool.domain.CategoryTagImpl;
@@ -762,24 +759,6 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throw new ServiceException(String.format("Problem getAllRelatedDealsOffersForMerchantId %s",
 					merchantId), ex);
 		}
-	}
-
-	@Override
-	public AcquireStatus getAcquireStatus(final AcquireStatusType type) throws ServiceException
-	{
-		// TODO Replace with a cache or 2nd level query cache
-		try
-		{
-			final Search search = new Search(AcquireStatusImpl.class);
-			search.addFilter(Filter.equal("status", type.toString()));
-
-			return (AcquireStatus) daoDispatcher.searchUnique(search);
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem getAcquireStatus %s", type), ex);
-		}
-
 	}
 
 	@SuppressWarnings("unchecked")

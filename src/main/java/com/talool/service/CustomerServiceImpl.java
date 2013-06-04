@@ -18,7 +18,6 @@ import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
-import com.talool.core.AcquireStatusType;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
@@ -231,84 +230,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void acceptDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException
-	{
-		// TODO apply state change logic. only accept deals in valid states to be
-		// accepted
-
-		if (dealAcquire.getAcquireStatus().getStatus().equals(AcquireStatusType.REDEEMED))
-		{
-			throw new ServiceException("Cannot acceptDeal an already redeemed deal " + dealAcquire);
-		}
-		try
-		{
-			final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
-
-			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
-					.getAcquireStatus(AcquireStatusType.ACCEPTED_CUSTOMER_SHARE));
-
-			daoDispatcher.save(dealAcq);
-
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem acceptDeal %s %s", dealAcquire), ex);
-		}
-
-	}
-
-	@Override
-	/**
-	 * Current only supports rejecting deals given by customers (not merchants)
-	 */
-	@Transactional(propagation = Propagation.REQUIRED)
-	public void rejectDeal(final DealAcquire dealAcquire, final UUID customerId)
-			throws ServiceException
-	{
-		// TODO apply state change logic. only reject deals in valid states to be
-		// accepted
-
-		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcquire.getAcquireStatus()
-				.getStatus()))
-		{
-			throw new ServiceException("Cannot rejectDeal an already redeemed deal " + dealAcquire);
-		}
-
-		if (!dealAcquire.getCustomer().getId().equals(customerId))
-		{
-			throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
-					"Customer does not own deal");
-		}
-
-		try
-		{
-			final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
-
-			// give it back to the original share
-			final Customer rejectedBy = dealAcquire.getCustomer();
-			dealAcq.setCustomer(dealAcquire.getSharedByCustomer());
-			dealAcq.setSharedByCustomer(rejectedBy);
-
-			daoDispatcher.save(dealAcquire);
-
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException(String.format("Problem acceptDeal %s %s", dealAcquire), ex);
-		}
-
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
 	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
 			throws ServiceException
 	{
 		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
 
-		if (AcquireStatusType.REDEEMED == AcquireStatusType.valueOf(dealAcq.getAcquireStatus()
-				.getStatus()))
+		if (AcquireStatus.REDEEMED == dealAcq.getAcquireStatus())
 		{
 			throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquire);
 		}
@@ -320,8 +247,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			dealAcq.setAcquireStatus(ServiceFactory.get().getTaloolService()
-					.getAcquireStatus(AcquireStatusType.REDEEMED));
+			dealAcq.setAcquireStatus(AcquireStatus.REDEEMED);
 
 			dealAcq.setRedemptionDate(Calendar.getInstance().getTime());
 
@@ -638,18 +564,17 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		final DealAcquireImpl dac = (DealAcquireImpl) getCurrentSession().load(DealAcquireImpl.class,
 				giftRequest.getDealAcquire().getId());
 
-		final AcquireStatusType currentAcquireStatus = AcquireStatusType.valueOf(dac.getAcquireStatus()
-				.getStatus());
+		final AcquireStatus currentAcquireStatus = dac.getAcquireStatus();
 
-		if (currentAcquireStatus == AcquireStatusType.REDEEMED)
+		if (currentAcquireStatus == AcquireStatus.REDEEMED)
 		{
 			throw new ServiceException(Type.DEAL_ALREADY_REDEEMED, "dealAcquireId: " + dac.getId());
 		}
 
 		// Can only redeem a deal that is in a valid state!
-		if (currentAcquireStatus != AcquireStatusType.ACCEPTED_CUSTOMER_SHARE &&
-				currentAcquireStatus != AcquireStatusType.ACCEPTED_MERCHANT_SHARE &&
-				currentAcquireStatus != AcquireStatusType.PURCHASED)
+		if (currentAcquireStatus != AcquireStatus.ACCEPTED_CUSTOMER_SHARE &&
+				currentAcquireStatus != AcquireStatus.ACCEPTED_MERCHANT_SHARE &&
+				currentAcquireStatus != AcquireStatus.PURCHASED)
 		{
 			throw new ServiceException(Type.GIFTING_NOT_ALLOWED,
 					String.format("acquireStatus %s for dealAcquireId %s", currentAcquireStatus, dac.getId()));
@@ -663,8 +588,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			dac.setAcquireStatus(ServiceFactory.get().getTaloolService()
-					.getAcquireStatus(AcquireStatusType.PENDING_ACCEPT_CUSTOMER_SHARE));
+			dac.setAcquireStatus(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE);
 
 			daoDispatcher.save(dac);
 
@@ -753,10 +677,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		final DealAcquire dac = giftOwnership.giftRequest.getDealAcquire();
 
-		final AcquireStatus status = ServiceFactory.get().getTaloolService()
-				.getAcquireStatus(AcquireStatusType.ACCEPTED_CUSTOMER_SHARE);
-
-		dac.setAcquireStatus(status);
+		dac.setAcquireStatus(AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
 		dac.setSharedByCustomer(dac.getCustomer());
 		dac.setCustomer(giftOwnership.receivingCustomer);
 
@@ -777,10 +698,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		final DealAcquire dac = giftOwnership.giftRequest.getDealAcquire();
 
-		final AcquireStatus status = ServiceFactory.get().getTaloolService()
-				.getAcquireStatus(AcquireStatusType.REJECTED_CUSTOMER_SHARE);
-
-		dac.setAcquireStatus(status);
+		dac.setAcquireStatus(AcquireStatus.REJECTED_CUSTOMER_SHARE);
 
 		// update deal acquire
 		daoDispatcher.save(dac);

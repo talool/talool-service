@@ -77,16 +77,6 @@ select add_category_tag('Nightlife','Sake');
 select add_category_tag('Nightlife','Speakeasy');
 select add_category_tag('Nightlife','Dancing');
 
-
-INSERT INTO acquire_status(status) VALUES ('PURCHASED');
-INSERT INTO acquire_status(status) VALUES ('REDEEMED');
-INSERT INTO acquire_status(status) VALUES ('REJECTED_CUSTOMER_SHARE');
-INSERT INTO acquire_status(status) VALUES ('REJECTED_MERCHANT_SHARE');
-INSERT INTO acquire_status(status) VALUES ('ACCEPTED_MERCHANT_SHARE');
-INSERT INTO acquire_status(status) VALUES ('ACCEPTED_CUSTOMER_SHARE');
-INSERT INTO acquire_status(status) VALUES ('PENDING_ACCEPT_MERCHANT_SHARE');
-INSERT INTO acquire_status(status) VALUES ('PENDING_ACCEPT_CUSTOMER_SHARE');
-
 INSERT INTO customer(email, password, first_name, last_name, sex_t)
        VALUES ('christopher.justin@gmail.com', (select md5('pass123')), 'Chris', 'Lintz', 'M');
 
