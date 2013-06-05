@@ -61,6 +61,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
+	private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
+
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void createAccount(final Customer customer, final String password) throws ServiceException
@@ -812,10 +814,21 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	public void giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
 			throws ServiceException
 	{
+
 		final EmailGift giftRequest = new EmailGiftImpl();
 		giftRequest.setToEmail(email);
 		giftRequest.setReceipientName(receipientName);
 		createGift(owningCustomerId, dealAcquireId, giftRequest);
+
+		if (!email.contains(IGNORE_TEST_EMAIL_DOMAIN))
+		{
+			if (LOG.isDebugEnabled())
+			{
+				LOG.info("Sending gift email to " + email);
+			}
+			ServiceFactory.get().getEmailService().sendGiftEmail(giftRequest);
+		}
+
 	}
 
 	@Override

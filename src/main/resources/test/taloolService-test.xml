@@ -22,7 +22,8 @@
 			</list>
 		</property>
 	</bean>
-	
+	<import resource="../taloolCommon.xml" />
+  	<import resource="../taloolMailService.xml"/>
 	<import resource="./dataSource-test.xml" />
 	<import resource="../taloolHibernateContext.xml" />
 
@@ -30,6 +31,7 @@
 	<bean id="serviceFactory" class="com.talool.service.ServiceFactory" factory-method="createInstance">
 		<constructor-arg ref="taloolServiceImpl"/>
 	    <constructor-arg ref="customerServiceImpl"/>
+	    <constructor-arg ref="emailServiceImpl"/>
 	</bean>
 		
 				

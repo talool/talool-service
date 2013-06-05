@@ -23,6 +23,9 @@ public class ServiceConfig extends PropertiesConfiguration
 	private static final String TEMPLATE_DIR = "template.dir";
 	private static final String REGISTRATION_TEMPLATE = "registration.template";
 	private static final String REGISTRATION_SUBJ = "registration.subject";
+	private static final String GIFT_TEMPLATE = "gift.template";
+	private static final String GIFT_SUBJECT = "gift.subject";
+	private static final String GIFT_LINK = "gift.link";
 
 	private ServiceConfig(String file) throws ConfigurationException
 	{
@@ -82,6 +85,21 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getRegistrationSubj()
 	{
 		return getString(REGISTRATION_SUBJ);
+	}
+
+	public String getGiftTemplate()
+	{
+		return getString(GIFT_TEMPLATE);
+	}
+
+	public String getGiftLink()
+	{
+		return getString(GIFT_LINK);
+	}
+
+	public String getGiftSubj()
+	{
+		return getString(GIFT_SUBJECT);
 	}
 
 	public static synchronized ServiceConfig createInstance(final String propertyFile)

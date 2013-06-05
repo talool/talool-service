@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
+import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.ServiceException.Type;
@@ -131,6 +132,33 @@ public class EmailServiceImpl implements EmailService
 		Customer customer = new CustomerImpl();
 		customer.setEmail("christopher.justin@gmail.com");
 		emailService.sendCustomerRegistrationEmail(customer);
+
+	}
+
+	@Override
+	public void sendGiftEmail(final EmailGift gift) throws ServiceException
+	{
+		try
+		{
+			sendEmail(ServiceConfig.get().getGiftSubj(), gift.getToEmail(), ServiceConfig.get().getMailFrom(),
+					FreemarkerUtil.get().renderGiftEmail(gift));
+
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug("Gift email successfully sent to " + gift.getToEmail());
+			}
+
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			throw new ServiceException(e.getLocalizedMessage(), e);
+		}
+		catch (TemplateException e)
+		{
+			e.printStackTrace();
+			throw new ServiceException(Type.MAIL_TEMPLATE_NOT_FOUND, e);
+		}
 
 	}
 

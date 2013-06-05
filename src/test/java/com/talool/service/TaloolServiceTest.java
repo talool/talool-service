@@ -73,6 +73,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 {
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceTest.class);
 
+	private static final String TALOOL_IGNORED_TEST_DOMAIN = "test.talool.com";
+
 	private DomainFactory domainFactory;
 
 	private class TagNameComparator implements Comparator<Tag>
@@ -598,10 +600,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		String receivingFacebookId = "fbloginId" + System.currentTimeMillis();
 		String receivingName = "Firstname lastname" + now;
 
-		Customer givingCustomer = createCustomer();
-		givingCustomer.setEmail("billy@facebook" + System.currentTimeMillis() + ".com");
+		Customer givingCustomer = createCustomer("gmail.com");
+		givingCustomer.setEmail("billy@" + TALOOL_IGNORED_TEST_DOMAIN + System.currentTimeMillis() + 1001 + ".com");
 
-		Customer receivingCustomer = createCustomer();
+		Customer receivingCustomer = createCustomer(TALOOL_IGNORED_TEST_DOMAIN);
 
 		CustomerSocialAccount socAcnt = domainFactory.newCustomerSocialAccount(SocialNetwork.NetworkName.Facebook.toString());
 		socAcnt.setLoginId(receivingFacebookId);
@@ -622,6 +624,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		DealAcquire giftedDealAcquireViaFacebook = dacs.get(0);
 		DealAcquire giftedDealAcquireViaEmail = dacs.get(1);
 		DealAcquire giftedDealAcquireViaTalool = dacs.get(2);
+		DealAcquire finalDealAcquireTest = dacs.get(3);
 
 		// give gift to facebookId
 		customerService
@@ -639,11 +642,16 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		}
 
 		// give 2nd via email
-		customerService.giftToEmail(givingCustomer.getId(), giftedDealAcquireViaEmail.getId(), receivingCustomer.getEmail(),
+		customerService.giftToEmail(givingCustomer.getId(),
+				giftedDealAcquireViaEmail.getId(), receivingCustomer.getEmail(),
 				receivingName);
 
 		// give 3rd to Talool
 		customerService.giftToTalool(givingCustomer.getId(), giftedDealAcquireViaTalool.getId(), receivingCustomer.getId());
+
+		// send one to chris!
+		customerService.giftToEmail(givingCustomer.getId(), finalDealAcquireTest.getId(), "doug@talool.com",
+				"Doug Mccuen");
 
 		List<Gift> gifts = customerService.getGifts(receivingCustomer.getId(),
 				new GiftStatus[] { GiftStatus.PENDING });
@@ -1012,12 +1020,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		return merchant;
 	}
 
-	private Customer createCustomer()
+	private Customer createCustomer(final String emailDomain)
 	{
 		Long now = System.currentTimeMillis();
-		String firstName = "firstName";
-		String lastName = "lastName";
-		String email = firstName + lastName + now + "@gmail.com";
+		String firstName = "Billy";
+		String lastName = "TheKid";
+		String email = firstName + lastName + now + "@" + emailDomain;
 
 		Customer cust = domainFactory.newCustomer();
 
@@ -1035,7 +1043,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	{
 		int numMerchants = 5;
 
-		Customer customer = createCustomer();
+		Customer customer = createCustomer(TALOOL_IGNORED_TEST_DOMAIN);
 		List<Merchant> merchants = new ArrayList<Merchant>();
 
 		customerService.createAccount(customer, "pass123");
@@ -1075,7 +1083,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	public Customer testCreateCustomer() throws Exception
 	{
-		Customer cust = createCustomer();
+		Customer cust = createCustomer(TALOOL_IGNORED_TEST_DOMAIN);
 
 		// create account
 		customerService.createAccount(cust, "pass123");
