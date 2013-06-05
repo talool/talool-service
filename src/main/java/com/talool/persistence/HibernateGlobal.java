@@ -32,16 +32,16 @@ import org.hibernate.annotations.TypeDefs;
 		 */
 		@NamedQuery(
 				name = "getGifts",
-				query =
-				"select gr from GiftImpl as gr, CustomerImpl as cust," +
-						"CustomerSocialAccountImpl as csa " +
-						"left join fetch gr.fromCustomer left join fetch gr.dealAcquire as da left join fetch da.deal as d " +
+				query = "select gift from GiftImpl as gift left join fetch gift.fromCustomer " +
+						"left join fetch gift.dealAcquire as da left join fetch da.deal as d " +
 						"left join fetch d.image left join fetch d.merchant as m left join fetch m.locations " +
-						"where gr.giftStatus in (:giftStatus) AND " +
-						"(csa.customer.id=:customerId AND (gr.toFacebookId=csa.loginId OR gr.toCustomer.id=:customerId) " +
-						" and cust.id=:customerId) OR " +
-						"(cust.id=:customerId AND cust.email=gr.toEmail AND csa.customer.id=cust.id) " +
-						"order by gr.created asc)"
+						"where gift.giftStatus in (:giftStatus) AND (gift.toCustomer.id=:customerId OR " +
+						"gift.id in ( " +
+						" select g.id from GiftImpl as g,CustomerSocialAccountImpl as cs " +
+						" where cs.customer.id=:customerId and g.toFacebookId=cs.loginId) " +
+						"OR gift.id in ( " +
+						"   select g.id from GiftImpl as g,CustomerImpl as c " +
+						"   where c.id=:customerId and c.email=g.toEmail))"
 		),
 })
 @TypeDefs({
