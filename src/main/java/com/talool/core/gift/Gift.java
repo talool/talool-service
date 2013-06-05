@@ -5,7 +5,6 @@ import java.io.Serializable;
 import com.talool.core.Customer;
 import com.talool.core.DealAcquire;
 import com.talool.core.IdentifiableUUID;
-import com.talool.core.RequestStatus;
 import com.talool.core.TimeAware;
 
 /**
@@ -14,7 +13,7 @@ import com.talool.core.TimeAware;
  * @author clintz
  * 
  */
-public interface GiftRequest extends IdentifiableUUID, Serializable, TimeAware
+public interface Gift extends IdentifiableUUID, Serializable, TimeAware
 {
 	public Customer getFromCustomer();
 
@@ -28,8 +27,8 @@ public interface GiftRequest extends IdentifiableUUID, Serializable, TimeAware
 
 	public void setReceipientName(final String rceipientName);
 
-	public RequestStatus getRequestStatus();
+	public GiftStatus getGiftStatus();
 
-	public void setRequestStatus(final RequestStatus requestStatus);
+	public void setGiftStatus(final GiftStatus giftStatus);
 
 }

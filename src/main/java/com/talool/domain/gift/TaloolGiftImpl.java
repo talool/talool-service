@@ -11,7 +11,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.talool.core.Customer;
-import com.talool.core.gift.TaloolGiftRequest;
+import com.talool.core.gift.TaloolGift;
 import com.talool.domain.CustomerImpl;
 
 /**
@@ -20,9 +20,9 @@ import com.talool.domain.CustomerImpl;
  * 
  */
 @Entity
-@Table(name = "gift_request")
+@Table(name = "gift")
 @DiscriminatorValue("T")
-public class TaloolGiftRequestImpl extends GiftRequestImpl implements TaloolGiftRequest
+public class TaloolGiftImpl extends GiftImpl implements TaloolGift
 {
 	private static final long serialVersionUID = -6197930806091256725L;
 
@@ -55,12 +55,12 @@ public class TaloolGiftRequestImpl extends GiftRequestImpl implements TaloolGift
 			return false;
 		}
 
-		if (!(obj instanceof TaloolGiftRequestImpl))
+		if (!(obj instanceof TaloolGiftImpl))
 		{
 			return false;
 		}
 
-		final TaloolGiftRequestImpl other = (TaloolGiftRequestImpl) obj;
+		final TaloolGiftImpl other = (TaloolGiftImpl) obj;
 
 		return super.equals(obj) && new EqualsBuilder().append(getToCustomer(), other.getToCustomer()).isEquals();
 	}

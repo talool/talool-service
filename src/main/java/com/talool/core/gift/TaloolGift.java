@@ -8,7 +8,7 @@ import com.talool.core.Customer;
  * @author clintz
  * 
  */
-public interface TaloolGiftRequest extends GiftRequest
+public interface TaloolGift extends Gift
 {
 	public Customer getToCustomer();
 

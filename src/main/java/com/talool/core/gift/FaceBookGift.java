@@ -6,7 +6,7 @@ package com.talool.core.gift;
  * @author clintz
  * 
  */
-public interface FaceBookGiftRequest extends GiftRequest
+public interface FaceBookGift extends Gift
 {
 	public String getToFacebookId();
 

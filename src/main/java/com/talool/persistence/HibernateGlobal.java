@@ -33,11 +33,11 @@ import org.hibernate.annotations.TypeDefs;
 		@NamedQuery(
 				name = "getGifts",
 				query =
-				"select gr from GiftRequestImpl as gr, CustomerImpl as cust,CustomerSocialAccountImpl as csa "
-						+
+				"select gr from GiftImpl as gr, CustomerImpl as cust," +
+						"CustomerSocialAccountImpl as csa " +
 						"left join fetch gr.fromCustomer left join fetch gr.dealAcquire as da left join fetch da.deal as d " +
-						"left join fetch d.merchant left join fetch d.image " +
-						"where gr.requestStatus in (:requestStatus) AND " +
+						"left join fetch d.image left join fetch d.merchant as m left join fetch m.locations " +
+						"where gr.giftStatus in (:giftStatus) AND " +
 						"(csa.customer.id=:customerId AND (gr.toFacebookId=csa.loginId OR gr.toCustomer.id=:customerId) " +
 						" and cust.id=:customerId) OR " +
 						"(cust.id=:customerId AND cust.email=gr.toEmail AND csa.customer.id=cust.id) " +
@@ -53,8 +53,8 @@ import org.hibernate.annotations.TypeDefs;
 		@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters =
 		{ @Parameter(name = "enumClass", value = "com.talool.core.DealType") }),
 
-		@TypeDef(name = "requestStatus", typeClass = GenericEnumUserType.class, parameters =
-		{ @Parameter(name = "enumClass", value = "com.talool.core.RequestStatus") }),
+		@TypeDef(name = "giftStatus", typeClass = GenericEnumUserType.class, parameters =
+		{ @Parameter(name = "enumClass", value = "com.talool.core.gift.GiftStatus") }),
 
 		@TypeDef(name = "acquireStatus", typeClass = GenericEnumUserType.class, parameters =
 		{ @Parameter(name = "enumClass", value = "com.talool.core.AcquireStatus") }),

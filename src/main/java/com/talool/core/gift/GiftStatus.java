@@ -1,11 +1,11 @@
-package com.talool.core;
+package com.talool.core.gift;
 
 /**
  * 
  * @author clintz
  * 
  */
-public enum RequestStatus
+public enum GiftStatus
 {
 	PENDING, ACCEPTED, REJECTED;
 }

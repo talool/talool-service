@@ -24,8 +24,8 @@ import org.hibernate.annotations.Type;
 
 import com.talool.core.Customer;
 import com.talool.core.DealAcquire;
-import com.talool.core.RequestStatus;
-import com.talool.core.gift.GiftRequest;
+import com.talool.core.gift.Gift;
+import com.talool.core.gift.GiftStatus;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 
@@ -35,12 +35,12 @@ import com.talool.domain.DealAcquireImpl;
  * 
  */
 @Entity
-@Table(name = "gift_request")
+@Table(name = "gift")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "request_type", discriminatorType = DiscriminatorType.CHAR, length = 1)
 @DiscriminatorValue("G")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
-public abstract class GiftRequestImpl implements GiftRequest
+public abstract class GiftImpl implements Gift
 {
 	private static final long serialVersionUID = -5248037524436980144L;
 
@@ -48,7 +48,7 @@ public abstract class GiftRequestImpl implements GiftRequest
 	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
 	@GeneratedValue(generator = "uuid_gen")
 	@Type(type = "pg-uuid")
-	@Column(name = "gift_request_id", unique = true, nullable = false)
+	@Column(name = "gift_id", unique = true, nullable = false)
 	private UUID id;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class)
@@ -59,9 +59,9 @@ public abstract class GiftRequestImpl implements GiftRequest
 	@JoinColumn(name = "deal_acquire_id")
 	private DealAcquire dealAcquire;
 
-	@Type(type = "requestStatus")
-	@Column(name = "request_status", nullable = false, columnDefinition = "request_status")
-	private RequestStatus requestStatus = RequestStatus.PENDING;
+	@Type(type = "giftStatus")
+	@Column(name = "gift_status", nullable = false, columnDefinition = "gift_status")
+	private GiftStatus giftStatus = GiftStatus.PENDING;
 
 	@Column(name = "receipient_name", length = 32)
 	private String receipientName;
@@ -127,15 +127,15 @@ public abstract class GiftRequestImpl implements GiftRequest
 	}
 
 	@Override
-	public RequestStatus getRequestStatus()
+	public GiftStatus getGiftStatus()
 	{
-		return requestStatus;
+		return giftStatus;
 	}
 
 	@Override
-	public void setRequestStatus(final RequestStatus requestStatus)
+	public void setGiftStatus(final GiftStatus giftStatus)
 	{
-		this.requestStatus = requestStatus;
+		this.giftStatus = giftStatus;
 
 	}
 
@@ -152,21 +152,22 @@ public abstract class GiftRequestImpl implements GiftRequest
 			return false;
 		}
 
-		if (!(obj instanceof GiftRequestImpl))
+		if (!(obj instanceof GiftImpl))
 		{
 			return false;
 		}
 
-		final GiftRequestImpl other = (GiftRequestImpl) obj;
+		final GiftImpl other = (GiftImpl) obj;
 
 		return super.equals(obj) && new EqualsBuilder().append(getFromCustomer(), other.getFromCustomer())
-				.append(getDealAcquire(), other.getDealAcquire()).isEquals();
+				.append(getDealAcquire(), other.getDealAcquire()).append(getGiftStatus(), other.getGiftStatus()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getFromCustomer()).append(getDealAcquire()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getFromCustomer()).append(getDealAcquire()).append(getGiftStatus()).
+				hashCode();
 	}
 
 }

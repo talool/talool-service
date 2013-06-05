@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.talool.core.gift.EmailGiftRequest;
+import com.talool.core.gift.EmailGift;
 
 /**
  * 
@@ -16,9 +16,9 @@ import com.talool.core.gift.EmailGiftRequest;
  * 
  */
 @Entity
-@Table(name = "gift_request")
+@Table(name = "gift")
 @DiscriminatorValue("E")
-public class EmailGiftRequestImpl extends GiftRequestImpl implements EmailGiftRequest
+public class EmailGiftImpl extends GiftImpl implements EmailGift
 {
 	private static final long serialVersionUID = -6197930806091256725L;
 
@@ -65,12 +65,12 @@ public class EmailGiftRequestImpl extends GiftRequestImpl implements EmailGiftRe
 			return false;
 		}
 
-		if (!(obj instanceof EmailGiftRequestImpl))
+		if (!(obj instanceof EmailGiftImpl))
 		{
 			return false;
 		}
 
-		final EmailGiftRequestImpl other = (EmailGiftRequestImpl) obj;
+		final EmailGiftImpl other = (EmailGiftImpl) obj;
 
 		return super.equals(obj) && new EqualsBuilder().append(getToEmail(), other.getToEmail())
 				.append(getOriginalToEmail(), other.getOriginalToEmail()).isEquals();

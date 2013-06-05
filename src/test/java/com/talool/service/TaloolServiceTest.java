@@ -45,20 +45,17 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
-import com.talool.core.RequestStatus;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
-import com.talool.core.gift.EmailGiftRequest;
-import com.talool.core.gift.FaceBookGiftRequest;
-import com.talool.core.gift.GiftRequest;
-import com.talool.core.gift.TaloolGiftRequest;
+import com.talool.core.gift.EmailGift;
+import com.talool.core.gift.FaceBookGift;
+import com.talool.core.gift.Gift;
+import com.talool.core.gift.GiftStatus;
+import com.talool.core.gift.TaloolGift;
 import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.MerchantMediaImpl;
-import com.talool.domain.gift.EmailGiftRequestImpl;
-import com.talool.domain.gift.FacebookGiftRequestImpl;
-import com.talool.domain.gift.TaloolGiftRequestImpl;
 import com.talool.utils.DealAcquireComparator;
 import com.talool.utils.DealAcquireComparator.ComparatorType;
 import com.talool.utils.MerchantComparator;
@@ -583,10 +580,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	public void testGetGiftsForCustomer() throws ServiceException
 	{
-		List<GiftRequest> gifts = customerService.getGifts(UUID.fromString("d5959550-2fee-4612-9daf-9d6df2347f62"),
-				new RequestStatus[] { RequestStatus.PENDING });
+		List<Gift> gifts = customerService.getGifts(UUID.fromString("d5959550-2fee-4612-9daf-9d6df2347f62"),
+				new GiftStatus[] { GiftStatus.PENDING });
 
-		for (GiftRequest gr : gifts)
+		for (Gift gr : gifts)
 		{
 			System.out.println(gr.getDealAcquire());
 			System.out.println(gr.getFromCustomer());
@@ -626,45 +623,30 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		DealAcquire giftedDealAcquireViaEmail = dacs.get(1);
 		DealAcquire giftedDealAcquireViaTalool = dacs.get(2);
 
-		FaceBookGiftRequest giftRequest = new FacebookGiftRequestImpl();
-		giftRequest.setDealAcquire(giftedDealAcquireViaFacebook);
-		giftRequest.setFromCustomer(givingCustomer);
-		giftRequest.setToFacebookId(receivingFacebookId);
-		giftRequest.setReceipientName(receivingName);
-
 		// give gift to facebookId
-		customerService.createGiftRequest(giftRequest);
+		customerService
+				.giftToFacebook(givingCustomer.getId(), giftedDealAcquireViaFacebook.getId(), receivingFacebookId, receivingName);
 
 		// try to gift again, should get an exception
 		try
 		{
-			customerService.createGiftRequest(giftRequest);
+			customerService.giftToFacebook(givingCustomer.getId(), giftedDealAcquireViaFacebook.getId(), receivingFacebookId,
+					receivingName);
 		}
 		catch (ServiceException ex)
 		{
 			Assert.assertEquals(ServiceException.Type.GIFTING_NOT_ALLOWED, ex.getType());
 		}
 
-		EmailGiftRequest eGiftRequest = new EmailGiftRequestImpl();
-		eGiftRequest.setDealAcquire(giftedDealAcquireViaEmail);
-		eGiftRequest.setFromCustomer(givingCustomer);
-		eGiftRequest.setToEmail(receivingCustomer.getEmail());
-		eGiftRequest.setReceipientName(receivingName);
-
 		// give 2nd via email
-		customerService.createGiftRequest(eGiftRequest);
+		customerService.giftToEmail(givingCustomer.getId(), giftedDealAcquireViaEmail.getId(), receivingCustomer.getEmail(),
+				receivingName);
 
 		// give 3rd to Talool
-		TaloolGiftRequest taloolGiftRequest = new TaloolGiftRequestImpl();
-		taloolGiftRequest.setDealAcquire(giftedDealAcquireViaTalool);
-		taloolGiftRequest.setFromCustomer(givingCustomer);
-		taloolGiftRequest.setToCustomer(receivingCustomer);
-		taloolGiftRequest.setReceipientName(receivingName);
+		customerService.giftToTalool(givingCustomer.getId(), giftedDealAcquireViaTalool.getId(), receivingCustomer.getId());
 
-		customerService.createGiftRequest(taloolGiftRequest);
-
-		List<GiftRequest> gifts = customerService.getGifts(receivingCustomer.getId(),
-				new RequestStatus[] { RequestStatus.PENDING });
+		List<Gift> gifts = customerService.getGifts(receivingCustomer.getId(),
+				new GiftStatus[] { GiftStatus.PENDING });
 
 		Assert.assertEquals(3, gifts.size());
 
@@ -672,21 +654,21 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		boolean facebookPass = false;
 		boolean taloolPass = false;
 
-		for (GiftRequest gr : gifts)
+		for (Gift gr : gifts)
 		{
-			if (gr instanceof EmailGiftRequest)
+			if (gr instanceof EmailGift)
 			{
 				Assert.assertEquals(giftedDealAcquireViaEmail, gr.getDealAcquire());
 
 				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
 						gr.getDealAcquire().getAcquireStatus());
 
-				Assert.assertEquals(receivingCustomer.getEmail(), ((EmailGiftRequest) gr).getToEmail());
+				Assert.assertEquals(receivingCustomer.getEmail(), ((EmailGift) gr).getToEmail());
 
 				emailPass = true;
 
 			}
-			else if (gr instanceof FaceBookGiftRequest)
+			else if (gr instanceof FaceBookGift)
 			{
 				Assert.assertEquals(giftedDealAcquireViaFacebook, gr.getDealAcquire());
 				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
@@ -695,13 +677,13 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				facebookPass = true;
 
 			}
-			else if (gr instanceof TaloolGiftRequest)
+			else if (gr instanceof TaloolGift)
 			{
 				Assert.assertEquals(giftedDealAcquireViaTalool, gr.getDealAcquire());
 				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
 						gr.getDealAcquire().getAcquireStatus());
 
-				Assert.assertEquals(receivingCustomer, ((TaloolGiftRequest) gr).getToCustomer());
+				Assert.assertEquals(receivingCustomer, ((TaloolGift) gr).getToCustomer());
 
 				taloolPass = true;
 			}
@@ -722,7 +704,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
 
 		// verify Gift request is in right state
-		Assert.assertEquals(RequestStatus.ACCEPTED, customerService.getGiftRequest(gifts.get(0).getId()).getRequestStatus());
+		Assert.assertEquals(GiftStatus.ACCEPTED, customerService.getGift(gifts.get(0).getId()).getGiftStatus());
 
 		// lets reject the other gift
 		customerService.rejectGift(gifts.get(1).getId(), receivingCustomer.getId());
@@ -739,7 +721,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(givingCustomer, dac.getCustomer());
 
 		// verify Gift request is in right state
-		Assert.assertEquals(RequestStatus.REJECTED, customerService.getGiftRequest(gifts.get(1).getId()).getRequestStatus());
+		Assert.assertEquals(GiftStatus.REJECTED, customerService.getGift(gifts.get(1).getId()).getGiftStatus());
 
 	}
 

@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.talool.core.gift.FaceBookGiftRequest;
+import com.talool.core.gift.FaceBookGift;
 
 /**
  * 
@@ -16,9 +16,9 @@ import com.talool.core.gift.FaceBookGiftRequest;
  * 
  */
 @Entity
-@Table(name = "gift_request")
+@Table(name = "gift")
 @DiscriminatorValue("F")
-public class FacebookGiftRequestImpl extends GiftRequestImpl implements FaceBookGiftRequest
+public class FacebookGiftImpl extends GiftImpl implements FaceBookGift
 {
 	private static final long serialVersionUID = 9115919880956633128L;
 
@@ -66,12 +66,12 @@ public class FacebookGiftRequestImpl extends GiftRequestImpl implements FaceBook
 			return false;
 		}
 
-		if (!(obj instanceof FacebookGiftRequestImpl))
+		if (!(obj instanceof FacebookGiftImpl))
 		{
 			return false;
 		}
 
-		final FacebookGiftRequestImpl other = (FacebookGiftRequestImpl) obj;
+		final FacebookGiftImpl other = (FacebookGiftImpl) obj;
 
 		return super.equals(obj) && new EqualsBuilder().append(getToFacebookId(), other.getToFacebookId())
 				.append(getOriginalToFacebookId(), other.getOriginalToFacebookId()).isEquals();

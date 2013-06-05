@@ -9,9 +9,9 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
-import com.talool.core.RequestStatus;
 import com.talool.core.SearchOptions;
-import com.talool.core.gift.GiftRequest;
+import com.talool.core.gift.Gift;
+import com.talool.core.gift.GiftStatus;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.service.HibernateService;
@@ -97,11 +97,18 @@ public interface CustomerService extends HibernateService
 
 	// Gift stuff
 
-	public void createGiftRequest(final GiftRequest giftRequest) throws ServiceException;
+	public void giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId, final String facebookId,
+			final String receipientName) throws ServiceException;
 
-	public GiftRequest getGiftRequest(final UUID giftRequestId) throws ServiceException;
+	public void giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
+			throws ServiceException;
 
-	public List<GiftRequest> getGifts(final UUID customerId, final RequestStatus[] requestStatus) throws ServiceException;
+	public void giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
+			throws ServiceException;
+
+	public Gift getGift(final UUID giftId) throws ServiceException;
+
+	public List<Gift> getGifts(final UUID customerId, final GiftStatus[] requestStatus) throws ServiceException;
 
 	public void acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException;
 

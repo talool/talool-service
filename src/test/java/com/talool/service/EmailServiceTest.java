@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
 import freemarker.template.Configuration;
@@ -16,6 +17,11 @@ import freemarker.template.TemplateException;
 
 public class EmailServiceTest
 {
+	@Test
+	public void testRandomConfirmationCode()
+	{
+		System.out.println(RandomStringUtils.randomAlphanumeric(14));
+	}
 
 	@Test
 	public void testTemplate()

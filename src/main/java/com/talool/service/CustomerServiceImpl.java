@@ -26,9 +26,12 @@ import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
-import com.talool.core.RequestStatus;
 import com.talool.core.SearchOptions;
-import com.talool.core.gift.GiftRequest;
+import com.talool.core.gift.EmailGift;
+import com.talool.core.gift.FaceBookGift;
+import com.talool.core.gift.Gift;
+import com.talool.core.gift.GiftStatus;
+import com.talool.core.gift.TaloolGift;
 import com.talool.core.service.CustomerService;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.ServiceException.Type;
@@ -39,10 +42,10 @@ import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.FavoriteMerchantImpl;
 import com.talool.domain.RelationshipImpl;
-import com.talool.domain.gift.EmailGiftRequestImpl;
-import com.talool.domain.gift.FacebookGiftRequestImpl;
-import com.talool.domain.gift.GiftRequestImpl;
-import com.talool.domain.gift.TaloolGiftRequestImpl;
+import com.talool.domain.gift.EmailGiftImpl;
+import com.talool.domain.gift.FacebookGiftImpl;
+import com.talool.domain.gift.GiftImpl;
+import com.talool.domain.gift.TaloolGiftImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 
@@ -67,7 +70,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	private static class GiftOwnership
 	{
-		GiftRequest giftRequest;
+		Gift giftRequest;
 		Customer receivingCustomer;
 	}
 
@@ -360,14 +363,18 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	@Override
 	public DealAcquire getDealAcquire(final UUID dealAcquireId) throws ServiceException
 	{
+		DealAcquire dac = null;
+
 		try
 		{
-			return daoDispatcher.find(DealAcquireImpl.class, dealAcquireId);
+			dac = (DealAcquire) getCurrentSession().load(DealAcquireImpl.class, dealAcquireId);
 		}
 		catch (Exception ex)
 		{
 			throw new ServiceException(String.format("Problem getDealAcquire %s", dealAcquireId), ex);
 		}
+
+		return dac;
 
 	}
 
@@ -557,12 +564,17 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 	}
 
-	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public void createGiftRequest(final GiftRequest giftRequest) throws ServiceException
+	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift giftRequest)
+			throws ServiceException
 	{
-		final DealAcquireImpl dac = (DealAcquireImpl) getCurrentSession().load(DealAcquireImpl.class,
-				giftRequest.getDealAcquire().getId());
+		final DealAcquire dac = getDealAcquire(dealAcquireId);
+
+		if (!dac.getCustomer().getId().equals(owningCustomerId))
+		{
+			throw new ServiceException(Type.CUSTOMER_DOES_NOT_OWN_DEAL, "dealAcquireId: " + dac.getId()
+					+ ", badCustomerId: " + dac.getCustomer().getId());
+		}
 
 		final AcquireStatus currentAcquireStatus = dac.getAcquireStatus();
 
@@ -571,7 +583,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException(Type.DEAL_ALREADY_REDEEMED, "dealAcquireId: " + dac.getId());
 		}
 
-		// Can only redeem a deal that is in a valid state!
+		// Can only gift a deal that is in a valid state!
 		if (currentAcquireStatus != AcquireStatus.ACCEPTED_CUSTOMER_SHARE &&
 				currentAcquireStatus != AcquireStatus.ACCEPTED_MERCHANT_SHARE &&
 				currentAcquireStatus != AcquireStatus.PURCHASED)
@@ -580,33 +592,29 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					String.format("acquireStatus %s for dealAcquireId %s", currentAcquireStatus, dac.getId()));
 		}
 
-		if (dac.getCustomer().getId() != giftRequest.getFromCustomer().getId())
-		{
-			throw new ServiceException(Type.CUSTOMER_DOES_NOT_OWN_DEAL, "gifteeId: " + giftRequest.getFromCustomer().getId()
-					+ ", owningCustimerId: " + dac.getCustomer().getId());
-		}
-
 		try
 		{
-			dac.setAcquireStatus(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE);
 
+			dac.setAcquireStatus(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE);
 			daoDispatcher.save(dac);
 
+			giftRequest.setDealAcquire(dac);
+			giftRequest.setFromCustomer(dac.getCustomer());
 			daoDispatcher.save(giftRequest);
 
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem in giftRequest", ex);
+			throw new ServiceException("Problem in createGift", ex);
 		}
 	}
 
 	@Override
-	public GiftRequest getGiftRequest(final UUID giftRequestId) throws ServiceException
+	public Gift getGift(final UUID giftRequestId) throws ServiceException
 	{
 		try
 		{
-			return daoDispatcher.find(GiftRequestImpl.class, giftRequestId);
+			return daoDispatcher.find(GiftImpl.class, giftRequestId);
 		}
 		catch (Exception ex)
 		{
@@ -616,7 +624,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	private GiftOwnership validateGiftOwnership(final UUID giftRequestId, final UUID customerId) throws ServiceException
 	{
-		final GiftRequest giftRequest = daoDispatcher.find(GiftRequestImpl.class, giftRequestId);
+		final Gift giftRequest = daoDispatcher.find(GiftImpl.class, giftRequestId);
 		if (giftRequest == null)
 		{
 			throw new ServiceException(String.format("giftRequestId %s does not exist", giftRequestId));
@@ -634,21 +642,21 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		giftOwnership.receivingCustomer = receivingCustomer;
 
-		if (giftRequest instanceof EmailGiftRequestImpl)
+		if (giftRequest instanceof EmailGiftImpl)
 		{
-			if (!((EmailGiftRequestImpl) giftRequest).getToEmail().equals(receivingCustomer.getEmail()))
+			if (!((EmailGiftImpl) giftRequest).getToEmail().equals(receivingCustomer.getEmail()))
 			{
 				throw new ServiceException(String.format(
 						"receivingCustomerId %s with email %s not the gift receiver for giftRequestId %s",
 						receivingCustomer.getId(), receivingCustomer.getEmail(), receivingCustomer));
 			}
 		}
-		else if (giftRequest instanceof FacebookGiftRequestImpl)
+		else if (giftRequest instanceof FacebookGiftImpl)
 		{
 			final SocialNetwork facebook = ServiceFactory.get().getTaloolService().
 					getSocialNetwork(SocialNetwork.NetworkName.Facebook);
 
-			if (!((FacebookGiftRequestImpl) giftRequest).getToFacebookId().
+			if (!((FacebookGiftImpl) giftRequest).getToFacebookId().
 					equals(receivingCustomer.getSocialAccounts().get(facebook).getLoginId()))
 			{
 				throw new ServiceException(String.format(
@@ -657,9 +665,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			}
 
 		}
-		else if (giftRequest instanceof TaloolGiftRequestImpl)
+		else if (giftRequest instanceof TaloolGiftImpl)
 		{
-			if (!((TaloolGiftRequestImpl) giftRequest).getToCustomer().getId().equals(receivingCustomer.getId()))
+			if (!((TaloolGiftImpl) giftRequest).getToCustomer().getId().equals(receivingCustomer.getId()))
 			{
 				throw new ServiceException(String.format(
 						"receivingCustomerId %s is not the gift receiver for giftRequestId %s", receivingCustomer.getId()));
@@ -685,7 +693,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		daoDispatcher.save(dac);
 
 		// update gift request
-		giftOwnership.giftRequest.setRequestStatus(RequestStatus.ACCEPTED);
+		giftOwnership.giftRequest.setGiftStatus(GiftStatus.ACCEPTED);
 		daoDispatcher.save(giftOwnership.giftRequest);
 
 	}
@@ -704,7 +712,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		daoDispatcher.save(dac);
 
 		// update gift request
-		giftOwnership.giftRequest.setRequestStatus(RequestStatus.REJECTED);
+		giftOwnership.giftRequest.setGiftStatus(GiftStatus.REJECTED);
 		daoDispatcher.save(giftOwnership.giftRequest);
 
 	}
@@ -759,16 +767,16 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<GiftRequest> getGifts(final UUID customerId, final RequestStatus[] requestStatus)
+	public List<Gift> getGifts(final UUID customerId, final GiftStatus[] giftStatus)
 			throws ServiceException
 	{
-		List<GiftRequest> gifts = null;
+		List<Gift> gifts = null;
 
 		try
 		{
 			Query query = (Query) getCurrentSession().getNamedQuery("getGifts");
 			query.setParameter("customerId", customerId, PostgresUUIDType.INSTANCE);
-			query.setParameterList("requestStatus", requestStatus);
+			query.setParameterList("giftStatus", giftStatus);
 
 			gifts = query.list();
 
@@ -786,5 +794,36 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		return gifts;
 
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId, final String facebookId,
+			final String receipientName) throws ServiceException
+	{
+		final FaceBookGift giftRequest = new FacebookGiftImpl();
+		giftRequest.setToFacebookId(facebookId);
+		giftRequest.setReceipientName(receipientName);
+		createGift(owningCustomerId, dealAcquireId, giftRequest);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
+			throws ServiceException
+	{
+		final EmailGift giftRequest = new EmailGiftImpl();
+		giftRequest.setToEmail(email);
+		giftRequest.setReceipientName(receipientName);
+		createGift(owningCustomerId, dealAcquireId, giftRequest);
+	}
+
+	@Override
+	public void giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
+			throws ServiceException
+	{
+		final TaloolGift giftRequest = new TaloolGiftImpl();
+		giftRequest.setToCustomer(getCustomerById(toTaloolCustomer));
+		createGift(owningCustomerId, dealAcquireId, giftRequest);
 	}
 }

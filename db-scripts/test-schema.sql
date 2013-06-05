@@ -562,14 +562,14 @@ ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Cust
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
 
-CREATE TYPE request_status AS ENUM ('PENDING', 'ACCEPTED','REJECTED');
+CREATE TYPE gift_status AS ENUM ('PENDING', 'ACCEPTED','REJECTED');
 
-CREATE TABLE gift_request (
-    gift_request_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+CREATE TABLE gift (
+    gift_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     request_type char(1) NOT NULL,
     from_customer_id UUID NOT NULL,
     deal_acquire_id UUID NOT NULL,
-    request_status request_status NOT NULL,
+    gift_status gift_status NOT NULL,
     to_facebook_id character varying(32),
     receipient_name character varying(32),
     to_email character varying(128),
@@ -578,16 +578,16 @@ CREATE TABLE gift_request (
     original_to_email character varying(128),
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY(gift_request_id)
+    PRIMARY KEY(gift_id)
 );
 
-ALTER TABLE public.gift_request OWNER TO talool;
-ALTER TABLE ONLY gift_request ADD CONSTRAINT "FK_GiftRequest_Customer" FOREIGN KEY (from_customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY gift_request ADD CONSTRAINT "FK_GiftRequest_DealAcquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
-CREATE INDEX gift_request_customer_id_idx ON gift_request (from_customer_id);
-CREATE INDEX gift_request_deal_acquire_id_idx ON gift_request (deal_acquire_id);
-CREATE INDEX gift_request_to_facebook_id_idx ON gift_request (to_facebook_id);
-CREATE INDEX gift_request_to_email_idx ON gift_request (to_email);
+ALTER TABLE public.gift OWNER TO talool;
+ALTER TABLE ONLY gift ADD CONSTRAINT "FK_Gift_Customer" FOREIGN KEY (from_customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY gift ADD CONSTRAINT "FK_Gift_DealAcquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
+CREATE INDEX gift_customer_id_idx ON gift (from_customer_id);
+CREATE INDEX gift_deal_acquire_id_idx ON gift (deal_acquire_id);
+CREATE INDEX gift_to_facebook_id_idx ON gift (to_facebook_id);
+CREATE INDEX gift_to_email_idx ON gift (to_email);
 
 CREATE TABLE customer_social_account (
 	customer_social_account_id bigserial NOT NULL,
@@ -628,7 +628,7 @@ CREATE TRIGGER update_address_update_dt BEFORE UPDATE ON address FOR EACH ROW EX
 CREATE TRIGGER deal_update_update_dt BEFORE UPDATE ON deal FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_offer_update_dt BEFORE UPDATE ON deal_offer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_acquire_update_dt BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
-CREATE TRIGGER gift_request_update_dt BEFORE UPDATE ON gift_request FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+CREATE TRIGGER gift_update_dt BEFORE UPDATE ON gift FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 
 CREATE TRIGGER deal_offer_purchase_insert BEFORE INSERT ON deal_offer_purchase FOR EACH ROW EXECUTE PROCEDURE deal_offer_purchase();
 CREATE TRIGGER deal_acquire_update BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE deal_acquire_update();

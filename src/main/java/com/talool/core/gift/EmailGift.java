@@ -6,7 +6,7 @@ package com.talool.core.gift;
  * @author clintz
  * 
  */
-public interface EmailGiftRequest extends GiftRequest
+public interface EmailGift extends Gift
 {
 	public String getToEmail();
 
