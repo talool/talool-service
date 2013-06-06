@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Deal Book
@@ -14,6 +15,8 @@ import java.util.Set;
 public interface Deal extends IdentifiableUUID, Serializable, TimeAware
 {
 	public DealOffer getDealOffer();
+
+	public UUID getDealOfferId();
 
 	public void setDealOffer(DealOffer dealOffer);
 
