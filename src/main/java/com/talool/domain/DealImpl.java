@@ -75,6 +75,10 @@ public class DealImpl implements Deal
 	@JoinColumn(name = "deal_offer_id")
 	private DealOffer dealOffer;
 
+	@Type(type = "pg-uuid")
+	@Column(name = "deal_offer_id", insertable = false, updatable = false)
+	private UUID dealOfferId;
+
 	@Column(name = "title", unique = false, nullable = true, length = 256)
 	private String title;
 
@@ -378,4 +382,9 @@ public class DealImpl implements Deal
 		this.updatedByMerchantAccount = merchantAccount;
 	}
 
+	@Override
+	public UUID getDealOfferId()
+	{
+		return dealOfferId;
+	}
 }

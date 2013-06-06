@@ -26,11 +26,10 @@ public final class QueryHelper
 					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id";
 
 	public static final String DEAL_ACQUIRES =
-			"select dealAcquire from DealAcquireImpl as dealAcquire,DealImpl as d left join fetch dealAcquire.deal as d " +
+			"select dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
 					"left join fetch d.image left join fetch d.merchant as m left join fetch m.locations as l " +
 					"left join fetch l.merchantImage left join fetch l.logo left join fetch l.address " +
-					"where d.merchant.id=:merchantId " +
-					"and dealAcquire.deal.id=d.id and dealAcquire.customer.id=:customerId";
+					"where dealAcquire.deal.merchant.id=:merchantId and dealAcquire.customer.id=:customerId";
 
 	private static final String MERCHANT_ACQUIRES =
 			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da," +

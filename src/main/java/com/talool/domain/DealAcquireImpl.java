@@ -52,7 +52,7 @@ public class DealAcquireImpl implements DealAcquire
 	private Deal deal;
 
 	@Type(type = "acquireStatus")
-	@Column(name = "acquire_status", nullable = false, columnDefinition = "acquire_status", updatable = false)
+	@Column(name = "acquire_status", nullable = false, columnDefinition = "acquire_status")
 	private AcquireStatus acquireStatus;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class)
