@@ -81,7 +81,7 @@ INSERT INTO customer(email, password, first_name, last_name, sex_t)
        VALUES ('christopher.justin@gmail.com', (select md5('pass123')), 'Chris', 'Lintz', 'M');
 
 INSERT INTO customer(email, password, first_name, last_name, sex_t)
-       VALUES ('douglasmccuen@gmail.com', (select md5('pass123')), 'Doug', 'Mccuen', 'M');      
+       VALUES ('doug@talool.com', (select md5('pass123')), 'Doug', 'Mccuen', 'M');      
 
 -------------- Talool Merchant/Address/Accounts ------------------
 INSERT INTO address (address1,address2,city,state_province_county,zip,country)
@@ -242,11 +242,11 @@ INSERT INTO deal_offer_purchase (deal_offer_id,customer_id)
 
 INSERT INTO deal_offer_purchase (deal_offer_id,customer_id) 
        VALUES ( (select deal_offer_id from deal_offer where title='The Kitchen Test Book #1'),  
-                (select customer_id from customer where email='douglasmccuen@gmail.com'));
+                (select customer_id from customer where email='doug@talool.com'));
 
 INSERT INTO deal_offer_purchase (deal_offer_id,customer_id)         
         VALUES ( (select deal_offer_id from deal_offer where title='Payback Book Test Book #1'),  
-                 (select customer_id from customer where email='douglasmccuen@gmail.com')); 
+                 (select customer_id from customer where email='doug@talool.com')); 
               
 
 -- select * from category c, tag as t, tag as cat_t  where c.category_tag_id=cat_t.tag_id and c.tag_id=t.tag_id order by c.category_tag_id;           
