@@ -14,7 +14,7 @@
 
 	<tx:annotation-driven order="1" />
 
-	<bean id="propertyConfigurer"
+	<bean id="persistencePropertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
