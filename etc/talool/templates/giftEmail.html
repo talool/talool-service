@@ -1,7 +1,7 @@
 <#import "/lib/talool.ftl" as oo>
 <#assign labelColor="#9b9b9b">
 <#assign detailColor="#2b2b2b">
-<#assign detailWidth=390>
+<#assign detailWidth=280>
 
 <@oo.emailContainer>
 	
@@ -48,8 +48,7 @@
 					about us
 				</td>
 				<td width="${detailWidth}" align="left" style="font-family:${oo.fontFamily};font-size:15px;color:${detailColor};padding-top:11px;padding-left:23px;padding-right:10px;line-height:21px">
-					Talool is committed to bringing you better deals and closer
-					relationships with the places you shop, eat, relax at, and visit.
+					${oo.aboutUs}
 				</td>
 			</tr>
 		</tbody>

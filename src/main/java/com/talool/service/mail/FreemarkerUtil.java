@@ -74,7 +74,7 @@ public final class FreemarkerUtil
 		data.put("merchantName", gift.getDealAcquire().getDeal().getMerchant().getName());
 		data.put("dealTitle", gift.getDealAcquire().getDeal().getTitle());
 		data.put("dealSummary", gift.getDealAcquire().getDeal().getSummary());
-		data.put("merchantImage", gift.getDealAcquire().getDeal().getMerchant().getCurrentLocation().getMerchantImage().getMediaUrl());
+		data.put("merchantImage", gift.getDealAcquire().getDeal().getImage().getMediaUrl());
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append(ServiceConfig.get().getGiftLink()).append(gift.getId());

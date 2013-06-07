@@ -6,8 +6,10 @@
 <#assign buttonBGColor="#efefef">
 <#assign grayTextColor="#a1a3aa">
 <#assign lightGrayTextColor="#b0b3b9">
-<#assign pageWidth=546>
+<#assign pageWidth=380>
 <#assign fontFamily="Helvetica,Arial,Sans-Serif">
+
+<#assign aboutUs="Talool is committed to bringing you better deals and closer relationships with the places you shop, eat, relax at, and visit.">
 
 
 <#macro emailContainer>
@@ -15,13 +17,13 @@
 	<html>
 		<head></head>
 		<body style="background-color:${bgcolor};">
-			<div style="background-color:${bgcolor}; padding: 10px 20px 50px;" align="center">
+			<div style="background-color:${bgcolor}; padding: 0px 10px 50px;" align="center">
 				<div width="100%" align="center" style="background-color:${bgcolor}">
 					<table bgcolor="${bgcolor}" border="0" cellpadding="0" cellspacing="0" 
 						style="border-spacing:0px;max-width:${pageWidth}px">
 						<tbody>
 							<tr>
-								<td style="padding-top:20px;padding-bottom:20px">
+								<td style="padding-top:10px;padding-bottom:20px">
 									<@box>
 										<#nested/>
 									</@box>
@@ -43,7 +45,7 @@
 		<tbody>
 			<tr>
 				<td colspan="5" height="16" style="vertical-align:top;max-width:${pageWidth}px">
-					<img src="https://statici.icloud.com/emailimages/common/box_top.png" width="100%" height="100%" alt="" style="display:block;max-width:${pageWidth - 1}px">
+					<img src="http://i1328.photobucket.com/albums/w525/talooltools/box_top_zps28516e2d.png" width="100%" height="100%" alt="" style="display:block;max-width:${pageWidth - 1}px">
                 </td>
 			</tr>
             <tr>
@@ -54,7 +56,7 @@
                     	<tbody>
                     		<tr>
                             	<td width="1" bgcolor="${boxInsetBorderColor}"></td>
-                              	<td bgcolor="${boxColor}" style="padding:20px 25px">
+                              	<td bgcolor="${boxColor}" style="padding:10px 0px">
                               		
                                 	<#nested/>
                                 	
@@ -69,7 +71,7 @@
 			</tr>
 			<tr>
 				<td colspan="5" height="16" style="vertical-align:top;max-width:${pageWidth}px">
-					<img src="https://statici.icloud.com/emailimages/common/box_bottom.png" width="100%" height="100%" alt="" style="display:block;max-width:${pageWidth - 1}px">
+					<img src="http://i1328.photobucket.com/albums/w525/talooltools/box_bottom_zps89655ac5.png" width="100%" height="100%" alt="" style="display:block;max-width:${pageWidth - 1}px">
 				</td>
 			</tr>
 		</tbody>
