@@ -64,7 +64,17 @@ public interface CustomerService extends HibernateService
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
 			throws ServiceException;
 
-	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
+	/**
+	 * Redeems the deal if all the acquireStatus is in the proper state. Returns a
+	 * confirmation code upon successful redemption.
+	 * 
+	 * @param dealAcquire
+	 * @param customerId
+	 * @return A String representing the confirmation code
+	 * 
+	 * @throws ServiceException
+	 */
+	public String redeemDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
 
 	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;
 

@@ -17,10 +17,33 @@ import freemarker.template.TemplateException;
 
 public class EmailServiceTest
 {
+	private static final char[] symbols = new char[36];
+
+	static
+	{
+		for (int idx = 0; idx < 10; ++idx)
+		{
+			symbols[idx] = (char) ('0' + idx);
+			System.out.println(symbols[idx]);
+		}
+
+		for (int idx = 10; idx < 36; ++idx)
+		{
+			symbols[idx] = (char) ('A' + idx - 10);
+			System.out.println(symbols[idx]);
+		}
+
+	}
+
 	@Test
 	public void testRandomConfirmationCode()
 	{
-		System.out.println(RandomStringUtils.randomAlphanumeric(14));
+
+		for (int i = 0; i < 100; i++)
+		{
+			System.out.println(RandomStringUtils.random(7, 0, symbols.length - 1, true, true, symbols));
+		}
+
 	}
 
 	@Test

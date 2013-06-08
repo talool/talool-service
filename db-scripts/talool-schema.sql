@@ -63,9 +63,9 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     INSERT INTO deal_acquire_history(deal_acquire_id,acquire_status,customer_id,
-     		    shared_by_merchant_id,shared_by_customer_id,share_cnt,update_dt) 
+     		    					 shared_by_customer_id,share_cnt,update_dt) 
        VALUES( OLD.deal_acquire_id,OLD.acquire_status,OLD.customer_id,
-               OLD.shared_by_merchant_id,OLD.shared_by_customer_id,OLD.share_cnt,OLD.update_dt);
+               OLD.shared_by_customer_id,OLD.share_cnt,OLD.update_dt);
   return NEW;
 END;
 $$;
@@ -522,27 +522,27 @@ CREATE TABLE deal_acquire (
     deal_id UUID NOT NULL,
     acquire_status acquire_status NOT NULL, 
     customer_id UUID NOT NULL,
-    shared_by_merchant_id UUID,
     shared_by_customer_id UUID,
     share_cnt int NOT NULL DEFAULT 0,
     latitude double precision,
     longitude double precision,
+    redemption_code char(6),
     redemption_dt timestamp without time zone,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY(deal_acquire_id)
+    PRIMARY KEY(deal_acquire_id),
+    UNIQUE (redemption_code)
 );
 
 ALTER TABLE public.deal_acquire OWNER TO talool;
 
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_DealDetail" FOREIGN KEY (deal_id) REFERENCES deal(deal_id);
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
 CREATE INDEX deal_acquire_deal_id_idx ON deal_acquire (deal_id);
+--CREATE INDEX deal_acquire_redemption_code_idx ON deal_acquire (redemption_code);
 CREATE INDEX deal_acquire_customer_id_idx ON deal_acquire (customer_id);
 CREATE INDEX deal_acquire_shared_by_customer_id_idx ON deal_acquire (shared_by_customer_id);
-CREATE INDEX deal_acquire_shared_by_merchant_id_idx ON deal_acquire (shared_by_merchant_id);
 
 CREATE TABLE deal_acquire_history (
     deal_acquire_id UUID NOT NULL,

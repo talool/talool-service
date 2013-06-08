@@ -32,6 +32,7 @@ import com.talool.core.gift.FaceBookGift;
 import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.core.gift.TaloolGift;
+import com.talool.core.purchase.RedemptionCodeStrategy;
 import com.talool.core.service.CustomerService;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.ServiceException.Type;
@@ -62,6 +63,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	private static final Logger LOG = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
 	private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
+
+	private RedemptionCodeStrategy redemptionCodeStrategy;
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
@@ -235,7 +238,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
+	public String redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
 			throws ServiceException
 	{
 		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
@@ -252,8 +255,32 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			dealAcq.setAcquireStatus(AcquireStatus.REDEEMED);
+			String redemptionCode = redemptionCodeStrategy.generateCode();
 
+			/**
+			 * TODO Refactor code so we optimistically write a redemption code , and
+			 * only retry on duplicate key violation. This is going to require some
+			 * hibernate changes because the session is broke when error occurs
+			 */
+
+			final Query query = getCurrentSession().getNamedQuery("getDealRedemptionCode");
+
+			query.setParameter("dealId", dealAcq.getDeal().getId());
+			query.setParameter("redemptionCode", redemptionCode);
+
+			if (query.list().size() > 0)
+			{
+				// this should very rareily happen if it all! - generate a new
+				// redemption code
+
+				LOG.warn(String.format("Duplicate redemptionCode %s on deal %s - regenerating new code...",
+						redemptionCode, dealAcq.getDeal().getId()));
+
+				redemptionCode = redemptionCodeStrategy.generateCode();
+			}
+
+			dealAcq.setAcquireStatus(AcquireStatus.REDEEMED);
+			dealAcq.setRedemptionCode(redemptionCode);
 			dealAcq.setRedemptionDate(Calendar.getInstance().getTime());
 
 			daoDispatcher.save(dealAcq);
@@ -261,8 +288,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem redeemDeal %s", ex);
+			throw new ServiceException("Problem in redeemDeal with dealAcquireId " + dealAcq.getId(), ex);
 		}
+
+		return dealAcq.getRedemptionCode();
 
 	}
 
@@ -829,6 +858,16 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			ServiceFactory.get().getEmailService().sendGiftEmail(giftRequest);
 		}
 
+	}
+
+	public RedemptionCodeStrategy getRedemptionCodeStrategy()
+	{
+		return redemptionCodeStrategy;
+	}
+
+	public void setRedemptionCodeStrategy(final RedemptionCodeStrategy redemptionCodeStrategy)
+	{
+		this.redemptionCodeStrategy = redemptionCodeStrategy;
 	}
 
 	@Override

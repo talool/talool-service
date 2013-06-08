@@ -70,6 +70,9 @@ public class DealAcquireImpl implements DealAcquire
 	@Target(LocationImpl.class)
 	private Location location;
 
+	@Column(name = "redemption_code", length = 6)
+	private String redemptionCode;
+
 	@Column(name = "redemption_dt", unique = false, nullable = true)
 	private Date redemptionDate;
 
@@ -220,6 +223,17 @@ public class DealAcquireImpl implements DealAcquire
 	public void setSharedByCustomer(final Customer customer)
 	{
 		this.sharedByCustomer = customer;
+	}
+
+	public void setRedemptionCode(final String redemptionCode)
+	{
+		this.redemptionCode = redemptionCode;
+	}
+
+	@Override
+	public String getRedemptionCode()
+	{
+		return redemptionCode;
 	}
 
 }

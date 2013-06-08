@@ -30,6 +30,8 @@ public interface DealAcquire extends IdentifiableUUID, Serializable, TimeAware
 
 	public Location getLocation();
 
+	public String getRedemptionCode();
+
 	public Date getRedemptionDate();
 
 }
