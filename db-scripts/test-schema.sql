@@ -526,12 +526,12 @@ CREATE TABLE deal_acquire (
     share_cnt int NOT NULL DEFAULT 0,
     latitude double precision,
     longitude double precision,
-    redemption_code char(6),
+    redemption_code character(6),
     redemption_dt timestamp without time zone,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY(deal_acquire_id),
-    UNIQUE (redemption_code)
+    UNIQUE (deal_id,redemption_code)
 );
 
 ALTER TABLE public.deal_acquire OWNER TO talool;
@@ -540,7 +540,7 @@ ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_DealDetail" FOREIGN
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
 CREATE INDEX deal_acquire_deal_id_idx ON deal_acquire (deal_id);
---CREATE INDEX deal_acquire_redemption_code_idx ON deal_acquire (redemption_code);
+CREATE UNIQUE INDEX deal_acquire_redemption_code_idx ON deal_acquire (redemption_code);
 CREATE INDEX deal_acquire_customer_id_idx ON deal_acquire (customer_id);
 CREATE INDEX deal_acquire_shared_by_customer_id_idx ON deal_acquire (shared_by_customer_id);
 

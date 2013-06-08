@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.StatelessSession;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.type.PostgresUUIDType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,62 +238,91 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 	}
 
+	/*
+	 * Redeems a deal. Uses a StatelessSession . Be careful with stateless
+	 * sessions:
+	 * 
+	 * http://docs.jboss.org/hibernate/core/3.3/api/org/hibernate/StatelessSession.
+	 * html
+	 * 
+	 * The reason a StatelessSession is used is so we dont break the transaction
+	 * upon any DB error, particularly a ConstraintViolation because we
+	 * optimistically believe redemptionCode is unique. If by chance it isn't, we
+	 * regenerate a new one.
+	 */
 	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
-	public String redeemDeal(final DealAcquire dealAcquire, final UUID customerId)
+	@Transactional(propagation = Propagation.NESTED)
+	public String redeemDeal(final UUID dealAcquireId, final UUID customerId)
 			throws ServiceException
 	{
-		final DealAcquireImpl dealAcq = (DealAcquireImpl) dealAcquire;
+		String redemptionCode = null;
+		Query query = null;
+		final StatelessSession statelessSession = getSessionFactory().openStatelessSession();
 
-		if (AcquireStatus.REDEEMED == dealAcq.getAcquireStatus())
+		try
 		{
-			throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquire);
+			// we need to first check owning customer and acquireStatus
+			query = statelessSession.getNamedQuery("getCustomerIdAcquireStatusOnDealAcquire");
+			query.setParameter("dealAcquireId", dealAcquireId);
+			final Object[] acquireFields = (Object[]) query.uniqueResult();
+			final UUID owningCustomer = (UUID) acquireFields[0];
+			final AcquireStatus acquireStatus = (AcquireStatus) acquireFields[1];
+
+			if (!owningCustomer.equals(customerId))
+			{
+				throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
+						"Customer does not own deal");
+			}
+
+			if (AcquireStatus.REDEEMED == acquireStatus)
+			{
+				throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquireId);
+			}
+
+			if (!AcquireStatus.ACCEPTED_CUSTOMER_SHARE.equals(acquireStatus) &&
+					!AcquireStatus.ACCEPTED_MERCHANT_SHARE.equals(acquireStatus) && !AcquireStatus.PURCHASED.equals(acquireStatus))
+			{
+				throw new ServiceException(String.format("AcquireStatus %s is not in proper state to redeem for dealAcquireId %s",
+						acquireStatus, dealAcquireId) + dealAcquireId);
+			}
+
 		}
-		if (!dealAcquire.getCustomer().getId().equals(customerId))
+		catch (ServiceException se)
 		{
-			throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
-					"Customer does not own deal");
+			throw se;
+		}
+		catch (Exception ex)
+		{
+			LOG.error("Problem redeeming deal: " + ex.getLocalizedMessage(), ex);
+			throw new ServiceException("Problem in redeemDeal with dealAcquireId " + dealAcquireId, ex);
 		}
 
 		try
 		{
-			String redemptionCode = redemptionCodeStrategy.generateCode();
-
-			/**
-			 * TODO Refactor code so we optimistically write a redemption code , and
-			 * only retry on duplicate key violation. This is going to require some
-			 * hibernate changes because the session is broke when error occurs
-			 */
-
-			final Query query = getCurrentSession().getNamedQuery("getDealRedemptionCode");
-
-			query.setParameter("dealId", dealAcq.getDeal().getId());
+			query = statelessSession.getNamedQuery("redeemDealAcquire");
+			redemptionCode = redemptionCodeStrategy.generateCode();
+			query.setParameter("dealAcquireStatus", AcquireStatus.REDEEMED);
+			query.setParameter("dealAcquireId", dealAcquireId);
 			query.setParameter("redemptionCode", redemptionCode);
-
-			if (query.list().size() > 0)
-			{
-				// this should very rareily happen if it all! - generate a new
-				// redemption code
-
-				LOG.warn(String.format("Duplicate redemptionCode %s on deal %s - regenerating new code...",
-						redemptionCode, dealAcq.getDeal().getId()));
-
-				redemptionCode = redemptionCodeStrategy.generateCode();
-			}
-
-			dealAcq.setAcquireStatus(AcquireStatus.REDEEMED);
-			dealAcq.setRedemptionCode(redemptionCode);
-			dealAcq.setRedemptionDate(Calendar.getInstance().getTime());
-
-			daoDispatcher.save(dealAcq);
-
+			query.setParameter("redemptionDate", Calendar.getInstance().getTime());
+			query.executeUpdate();
 		}
-		catch (Exception ex)
+		catch (ConstraintViolationException ce)
 		{
-			throw new ServiceException("Problem in redeemDeal with dealAcquireId " + dealAcq.getId(), ex);
+			// try one more time with a new redemptionCode
+			LOG.error("Constraint violation: " + ce.getSQLException().getMessage(), ce);
+			redemptionCode = redemptionCodeStrategy.generateCode();
+			LOG.warn("Regenerated redemptionCode: " + redemptionCode);
+			query.setParameter("redemptionCode", redemptionCode);
+			query.executeUpdate();
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem redeeming deal: " + e.getLocalizedMessage(), e);
+			throw new ServiceException("Problem in redeemDeal with dealAcquireId " + dealAcquireId, e);
 		}
 
-		return dealAcq.getRedemptionCode();
+		return redemptionCode;
 
 	}
 

@@ -1,5 +1,8 @@
 package com.talool.purchase;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.talool.core.purchase.RedemptionCodeStrategy;
@@ -51,7 +54,18 @@ public class DealUniqueConfirmationCodeStrategyImpl implements RedemptionCodeStr
 	@Override
 	public String generateCode()
 	{
-		return RandomStringUtils.random(codeLength, 0, SYMBOLS.length - 1, true, true, SYMBOLS);
+		String code = null;
+		try
+		{
+			code = RandomStringUtils.random(codeLength, 0, SYMBOLS.length - 1, true, true, SYMBOLS,
+					SecureRandom.getInstance("SHA1PRNG"));
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			e.printStackTrace();
+		}
+
+		return code;
 	}
 
 	public int getCodeLength()

@@ -74,7 +74,7 @@ public interface CustomerService extends HibernateService
 	 * 
 	 * @throws ServiceException
 	 */
-	public String redeemDeal(final DealAcquire dealAcquire, final UUID customerId) throws ServiceException;
+	public String redeemDeal(final UUID dealAcquireId, final UUID customerId) throws ServiceException;
 
 	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;
 

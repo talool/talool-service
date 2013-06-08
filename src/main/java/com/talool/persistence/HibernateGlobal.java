@@ -18,8 +18,13 @@ import org.hibernate.annotations.TypeDefs;
 						"OR d.dealOffer.merchant.id=:merchantId order by d.createdUpdated.created desc"),
 
 		@NamedQuery(
-				name = "getDealRedemptionCode",
-				query = "select d.id from DealAcquireImpl as d where d.deal.id=:dealId and d.redemptionCode=:redemptionCode"),
+				name = "redeemDealAcquire",
+				query = "update DealAcquireImpl as d set d.acquireStatus=:dealAcquireStatus, redemptionDate=:redemptionDate," +
+						"redemptionCode=:redemptionCode where d.id=:dealAcquireId"),
+
+		@NamedQuery(
+				name = "getCustomerIdAcquireStatusOnDealAcquire",
+				query = "select d.customer.id,d.acquireStatus from DealAcquireImpl as d where d.id=:dealAcquireId"),
 
 		@NamedQuery(
 				name = "allCategoryTags",
