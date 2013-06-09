@@ -23,7 +23,7 @@ import com.talool.core.Tag;
  */
 @Entity
 @Table(name = "tag", catalog = "public")
-@Cache(region = "Category", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(region = "TagCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class TagImpl implements Tag
 {
 
