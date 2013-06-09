@@ -23,7 +23,7 @@ import com.talool.core.Category;
  */
 @Entity
 @Table(name = "category", catalog = "public")
-@Cache(region = "Category", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(region = "CategoryCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CategoryImpl implements Category
 {
 	private static final long serialVersionUID = 2955686897079229757L;
