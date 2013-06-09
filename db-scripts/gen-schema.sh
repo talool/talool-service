@@ -15,7 +15,8 @@ set -e
 if [ $# -ne 3 ]
 then
   echo "Usage: `basename $0` schema.sql data.sql /Library/PostgreSQL/9.2/share/postgresql/contrib/postgis/" 
-  exit -1
+  echo "Usage: `basename $0` talool-schema.sql talool-data.sql /usr/pgsql-9.2/share/contrib/postgis-2.0/" 
+exit -1
 fi
 
 taloolSchema=$(dirname $0)/$1
