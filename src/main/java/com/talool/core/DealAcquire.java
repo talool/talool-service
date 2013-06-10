@@ -3,6 +3,8 @@ package com.talool.core;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * 
  * @author clintz
@@ -28,10 +30,12 @@ public interface DealAcquire extends IdentifiableUUID, Serializable, TimeAware
 
 	public Integer incrementShareCount();
 
-	public Location getLocation();
-
 	public String getRedemptionCode();
 
 	public Date getRedemptionDate();
+
+	public Geometry getGeometry();
+
+	public void setGeometry(Geometry geometry);
 
 }

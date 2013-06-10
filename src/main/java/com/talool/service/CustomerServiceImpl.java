@@ -9,6 +9,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.type.PostgresUUIDType;
+import org.hibernatespatial.GeometryUserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -52,6 +53,10 @@ import com.talool.domain.gift.GiftImpl;
 import com.talool.domain.gift.TaloolGiftImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * 
@@ -304,8 +309,14 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			redemptionCode = redemptionCodeStrategy.generateCode();
 			query.setParameter("dealAcquireStatus", AcquireStatus.REDEEMED);
 			query.setParameter("dealAcquireId", dealAcquireId);
-			query.setParameter("latitude", location == null ? null : location.getLatitude());
-			query.setParameter("longitude", location == null ? null : location.getLatitude());
+
+			final GeometryFactory factory = new GeometryFactory(
+					new PrecisionModel(PrecisionModel.FLOATING), 4326);
+
+			final Point point = (location == null || location.getLatitude() == null || location.getLongitude() == null) ?
+					null : factory.createPoint(new Coordinate(location.getLongitude(), location.getLatitude()));
+
+			query.setParameter("geom", point, GeometryUserType.TYPE);
 			query.setParameter("redemptionCode", redemptionCode);
 			query.setParameter("redemptionDate", Calendar.getInstance().getTime());
 			query.executeUpdate();

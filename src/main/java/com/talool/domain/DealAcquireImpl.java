@@ -19,14 +19,13 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Target;
 import org.hibernate.annotations.Type;
 
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
-import com.talool.core.Location;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -66,9 +65,9 @@ public class DealAcquireImpl implements DealAcquire
 	@Column(name = "share_cnt", unique = false, nullable = true)
 	private Integer shareCount;
 
-	@Embedded
-	@Target(LocationImpl.class)
-	private Location location;
+	@Type(type = "geomType")
+	@Column(name = "geom", nullable = true)
+	private com.vividsolutions.jts.geom.Geometry geometry;
 
 	@Column(name = "redemption_code", length = 6)
 	private String redemptionCode;
@@ -155,17 +154,6 @@ public class DealAcquireImpl implements DealAcquire
 	}
 
 	@Override
-	public Location getLocation()
-	{
-		return location;
-	}
-
-	public void setLocation(Location location)
-	{
-		this.location = location;
-	}
-
-	@Override
 	public Date getRedemptionDate()
 	{
 		return redemptionDate;
@@ -234,6 +222,18 @@ public class DealAcquireImpl implements DealAcquire
 	public String getRedemptionCode()
 	{
 		return redemptionCode;
+	}
+
+	@Override
+	public Geometry getGeometry()
+	{
+		return geometry;
+	}
+
+	@Override
+	public void setGeometry(Geometry geometry)
+	{
+		this.geometry = geometry;
 	}
 
 }
