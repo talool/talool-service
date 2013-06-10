@@ -33,6 +33,7 @@ import com.talool.core.AccountType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.Deal;
+import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
@@ -54,6 +55,7 @@ import com.talool.domain.CategoryImpl;
 import com.talool.domain.CategoryTagImpl;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireHistoryImpl;
+import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealImpl;
 import com.talool.domain.DealOfferImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
@@ -1050,6 +1052,24 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					merchantMedia.getMediaUrl(), ex));
 		}
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquire> getRedeemedDealAcquires(final UUID merchantId, final String redemptionCode) throws ServiceException
+	{
+		try
+		{
+
+			final Search search = new Search(DealAcquireImpl.class);
+			search.addFilterEqual("redemptionCode", redemptionCode);
+			search.addFilterEqual("deal.merchant.id", merchantId);
+			return (List<DealAcquire>) daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getRedeemedDealAcquires redemptionCode %s", redemptionCode), ex);
+		}
 	}
 
 }

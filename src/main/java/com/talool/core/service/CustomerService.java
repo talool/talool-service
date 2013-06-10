@@ -7,6 +7,7 @@ import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
@@ -74,7 +75,7 @@ public interface CustomerService extends HibernateService
 	 * 
 	 * @throws ServiceException
 	 */
-	public String redeemDeal(final UUID dealAcquireId, final UUID customerId) throws ServiceException;
+	public String redeemDeal(final UUID dealAcquireId, final UUID customerId, final Location location) throws ServiceException;
 
 	public List<Deal> getDealsByCustomerId(final UUID accountId) throws ServiceException;
 

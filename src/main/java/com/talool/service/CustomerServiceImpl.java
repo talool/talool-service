@@ -26,6 +26,7 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
+import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
@@ -252,7 +253,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	 */
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public String redeemDeal(final UUID dealAcquireId, final UUID customerId)
+	public String redeemDeal(final UUID dealAcquireId, final UUID customerId, final Location location)
 			throws ServiceException
 	{
 		String redemptionCode = null;
@@ -303,6 +304,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			redemptionCode = redemptionCodeStrategy.generateCode();
 			query.setParameter("dealAcquireStatus", AcquireStatus.REDEEMED);
 			query.setParameter("dealAcquireId", dealAcquireId);
+			query.setParameter("latitude", location == null ? null : location.getLatitude());
+			query.setParameter("longitude", location == null ? null : location.getLatitude());
 			query.setParameter("redemptionCode", redemptionCode);
 			query.setParameter("redemptionDate", Calendar.getInstance().getTime());
 			query.executeUpdate();

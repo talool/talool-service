@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.talool.core.AccountType;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
+import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.Tag;
 import com.talool.core.social.SocialNetwork;
@@ -49,5 +50,7 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId)
 			throws ServiceException;
+
+	public List<DealAcquire> getRedeemedDealAcquires(final UUID merchantId, final String redemptionCode) throws ServiceException;
 
 }
