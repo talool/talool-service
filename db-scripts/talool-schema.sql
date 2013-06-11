@@ -125,20 +125,6 @@ CREATE UNIQUE INDEX customer_email_idx ON customer (email);
 
 CREATE TYPE relationship_status AS ENUM ('PENDING', 'FRIEND','BLOCKED');
 
-CREATE TABLE deal_offer_auth (
-   deal_offer_auth_id bigint NOT NULL,  
-   request_by_merchant_id bigint NOT NULL,
-   request_for_merchant_id bigint NOT NULL,
-   auth_status_id smallint NOT NULL, 
-   request_by_account_id bigint,
-   received_by_account_id bigint,
-   allow_group_deal_create bool DEFAULT false,
-   allow_deal_create bool DEFAULT false,
-   create_dt timestamp without time zone NOT NULL,
-   update_dt timestamp without time zone NOT NULL,
-   PRIMARY KEY(deal_offer_auth_id)
-);
-
 CREATE TABLE friend_request (
     friend_request_id bigint NOT NULL,
     customer_id UUID NOT NULL,
@@ -164,7 +150,6 @@ ALTER SEQUENCE friend_request_friend_request_id_seq OWNED BY friend_request.frie
 ALTER TABLE ONLY friend_request ALTER COLUMN friend_request_id SET DEFAULT nextval('friend_request_friend_request_id_seq'::regclass);
 ALTER TABLE ONLY friend_request ADD CONSTRAINT "FK_FriendRequest_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 CREATE INDEX friend_request_customer_idx ON friend_request (customer_id);
-
 
 CREATE TABLE relationship (
 	relationship_id bigint NOT NULL,
@@ -420,6 +405,7 @@ CREATE TABLE deal_offer (
     image_id UUID, 
     expires timestamp without time zone,
     price numeric(10,2) NOT NULL,
+    auto_acquire_new_deals boolean DEFAULT true NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
