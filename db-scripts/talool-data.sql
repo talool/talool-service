@@ -87,7 +87,7 @@ INSERT INTO customer(email, password, first_name, last_name, sex_t)
 INSERT INTO address (address1,address2,city,state_province_county,zip,country)
        VALUES ('1267 Lafayette St.','Unit 504','Denver','CO','80218','US');
    	
-INSERT INTO merchant (merchant_name) VALUES ('Talool');
+INSERT INTO merchant (merchant_name,is_discoverable) VALUES ('Talool',false);
 
 INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
         VALUES( (select merchant_id from merchant where merchant_name='Talool'),
@@ -103,7 +103,7 @@ INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_c
 INSERT INTO address (address1,address2,city,state_province_county,zip,country)
        VALUES ('6715 NE 63rd St.','PO Box 195','Vancouver','WA','98661','US');
 
-INSERT INTO merchant (merchant_name) VALUES ('Payback Book');
+INSERT INTO merchant (merchant_name,is_discoverable) VALUES ('Payback Book',false);
 
 INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
         VALUES(  (select merchant_id from merchant where merchant_name='Payback Book'),

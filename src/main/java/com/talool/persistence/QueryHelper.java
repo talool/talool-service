@@ -23,7 +23,7 @@ public final class QueryHelper
 			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*,cat.*, addr.*,ST_Distance( mloc.geom,'${point}',true) "
 					+ "as distanceInMeters FROM public.merchant as merchant, public.category as cat, public.merchant_location as mloc, public.address as addr "
 					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) and mloc.address_id=addr.address_id "
-					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id";
+					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id and merchant.is_discoverable=${isDiscoverable}";
 
 	public static final String DEAL_ACQUIRES =
 			"select dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
@@ -49,6 +49,7 @@ public final class QueryHelper
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
 				ImmutableMap.<String, String> builder()
 						.put("merchant.name", "name")
+						.put("merchant.isDiscoverable", "isDiscoverable")
 						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 
 		DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),

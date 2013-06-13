@@ -256,6 +256,7 @@ CREATE TABLE merchant (
 	merchant_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     merchant_parent_id UUID,
     merchant_name character varying(64) NOT NULL,
+    is_discoverable boolean DEFAULT true NOT NULL,
     category_id bigint,
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,

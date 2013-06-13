@@ -796,6 +796,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
 				.put("point", point.toString())
+				.put("isDiscoverable", true)
 				.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
 
 		final String newSql = QueryHelper.buildQuery(QueryType.MerchantsWithinMeters, params,

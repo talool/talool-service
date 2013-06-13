@@ -63,4 +63,8 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 
 	public void setCategory(final Category category);
 
+	public boolean isDiscoverable();
+
+	public void setIsDiscoverable(boolean isDiscoverable);
+
 }

@@ -78,6 +78,9 @@ public class MerchantImpl implements Merchant
 	@Column(name = "merchant_name", unique = false, nullable = false, length = 64)
 	private String name;
 
+	@Column(name = "is_discoverable")
+	private boolean isDiscoverable;
+
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -285,5 +288,17 @@ public class MerchantImpl implements Merchant
 	public void setCategory(final Category category)
 	{
 		this.category = category;
+	}
+
+	@Override
+	public boolean isDiscoverable()
+	{
+		return isDiscoverable;
+	}
+
+	@Override
+	public void setIsDiscoverable(boolean isDiscoverable)
+	{
+		this.isDiscoverable = isDiscoverable;
 	}
 }
