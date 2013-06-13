@@ -641,7 +641,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Transactional(propagation = Propagation.NESTED)
-	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift giftRequest)
+	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift gift)
 			throws ServiceException
 	{
 		final DealAcquire dac = getDealAcquire(dealAcquireId);
@@ -674,15 +674,16 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			dac.setAcquireStatus(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE);
 			daoDispatcher.save(dac);
 
-			giftRequest.setDealAcquire(dac);
-			giftRequest.setFromCustomer(dac.getCustomer());
-			daoDispatcher.save(giftRequest);
+			gift.setDealAcquire(dac);
+			gift.setFromCustomer(dac.getCustomer());
+			daoDispatcher.save(gift);
 
 		}
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem in createGift", ex);
 		}
+
 	}
 
 	@Override
@@ -874,25 +875,26 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public void giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId, final String facebookId,
+	public UUID giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId, final String facebookId,
 			final String receipientName) throws ServiceException
 	{
-		final FaceBookGift giftRequest = new FacebookGiftImpl();
-		giftRequest.setToFacebookId(facebookId);
-		giftRequest.setReceipientName(receipientName);
-		createGift(owningCustomerId, dealAcquireId, giftRequest);
+		final FaceBookGift gift = new FacebookGiftImpl();
+		gift.setToFacebookId(facebookId);
+		gift.setReceipientName(receipientName);
+		createGift(owningCustomerId, dealAcquireId, gift);
+		return gift.getId();
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public void giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
+	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
 			throws ServiceException
 	{
 
-		final EmailGift giftRequest = new EmailGiftImpl();
-		giftRequest.setToEmail(email);
-		giftRequest.setReceipientName(receipientName);
-		createGift(owningCustomerId, dealAcquireId, giftRequest);
+		final EmailGift gift = new EmailGiftImpl();
+		gift.setToEmail(email);
+		gift.setReceipientName(receipientName);
+		createGift(owningCustomerId, dealAcquireId, gift);
 
 		if (!email.contains(IGNORE_TEST_EMAIL_DOMAIN))
 		{
@@ -900,8 +902,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			{
 				LOG.info("Sending gift email to " + email);
 			}
-			ServiceFactory.get().getEmailService().sendGiftEmail(giftRequest);
+			ServiceFactory.get().getEmailService().sendGiftEmail(gift);
 		}
+
+		return gift.getId();
 
 	}
 
@@ -916,11 +920,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public void giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
+	@Transactional(propagation = Propagation.NESTED)
+	public UUID giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
 			throws ServiceException
 	{
-		final TaloolGift giftRequest = new TaloolGiftImpl();
-		giftRequest.setToCustomer(getCustomerById(toTaloolCustomer));
-		createGift(owningCustomerId, dealAcquireId, giftRequest);
+		final TaloolGift gift = new TaloolGiftImpl();
+		gift.setToCustomer(getCustomerById(toTaloolCustomer));
+		createGift(owningCustomerId, dealAcquireId, gift);
+		return gift.getId();
 	}
 }

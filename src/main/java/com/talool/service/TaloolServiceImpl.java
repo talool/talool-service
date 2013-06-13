@@ -369,7 +369,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	{
 		try
 		{
-			return daoDispatcher.find(DealOfferImpl.class, dealOfferId);
+			final Search search = new Search(DealOfferImpl.class);
+			search.addFilterEqual("id", dealOfferId);
+			return (DealOffer) daoDispatcher.searchUnique(search);
 		}
 		catch (Exception e)
 		{

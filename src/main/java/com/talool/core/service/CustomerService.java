@@ -108,13 +108,31 @@ public interface CustomerService extends HibernateService
 
 	// Gift stuff
 
-	public void giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId, final String facebookId,
+	/**
+	 * 
+	 * @param owningCustomerId
+	 * @param dealAcquireId
+	 * @param facebookId
+	 * @param receipientName
+	 * @return Gift UUID
+	 * @throws ServiceException
+	 */
+	public UUID giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId, final String facebookId,
 			final String receipientName) throws ServiceException;
 
-	public void giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
+	/**
+	 * 
+	 * @param owningCustomerId
+	 * @param dealAcquireId
+	 * @param email
+	 *          Gift UUID
+	 * @param receipientName
+	 * @throws ServiceException
+	 */
+	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
 			throws ServiceException;
 
-	public void giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
+	public UUID giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
 			throws ServiceException;
 
 	public Gift getGift(final UUID giftId) throws ServiceException;
