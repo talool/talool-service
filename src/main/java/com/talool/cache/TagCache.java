@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.talool.core.Category;
 import com.talool.core.Tag;
+import com.talool.service.ServiceConfig;
 import com.talool.service.ServiceFactory;
 
 /**
@@ -30,8 +31,6 @@ public final class TagCache
 	private volatile Map<String, Category> tagNameCategoryMap = new HashMap<String, Category>();
 	private volatile List<Category> categories = new ArrayList<Category>();
 
-	private long cacheRefreshIntervalInMillis = 0;
-
 	private TagRefreshThread tagRefreshThread;
 
 	private class TagRefreshThread extends Thread
@@ -48,7 +47,6 @@ public final class TagCache
 			{
 				try
 				{
-
 					final Map<Category, List<Tag>> _categoryTagMap = ServiceFactory.get().getTaloolService()
 							.getCategoryTags();
 
@@ -84,9 +82,9 @@ public final class TagCache
 
 					if (LOG.isDebugEnabled())
 					{
-						LOG.debug(String.format("Refreshed %d categories and %d total tags", categoryTagMap
+						LOG.debug(String.format("Refreshed %d categories and %d total tags. Refreshing in %d secs", categoryTagMap
 								.keySet()
-								.size(), totalTags));
+								.size(), totalTags, ServiceConfig.get().getTagCacheRefreshInSecs()));
 
 					}
 
@@ -98,7 +96,7 @@ public final class TagCache
 
 				try
 				{
-					Thread.sleep(cacheRefreshIntervalInMillis);
+					Thread.sleep(ServiceConfig.get().getTagCacheRefreshInSecs() * 1000);
 				}
 				catch (InterruptedException e)
 				{
@@ -141,12 +139,9 @@ public final class TagCache
 
 	private TagCache(final int refreshInSecs)
 	{
-		cacheRefreshIntervalInMillis = refreshInSecs * 1000;
-
 		tagRefreshThread = new TagRefreshThread();
 		tagRefreshThread.setDaemon(true);
 		tagRefreshThread.start();
-
 	}
 
 	public static TagCache get()

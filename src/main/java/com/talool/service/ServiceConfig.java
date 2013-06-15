@@ -26,6 +26,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	private static final String GIFT_TEMPLATE = "gift.template";
 	private static final String GIFT_SUBJECT = "gift.subject";
 	private static final String GIFT_LINK = "gift.link";
+	private static final String TAG_CACHE_REFRESH_IN_SECS = "tag.cache.refresh.in.secs";
 
 	private ServiceConfig(String file) throws ConfigurationException
 	{
@@ -35,6 +36,11 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static ServiceConfig get()
 	{
 		return instance;
+	}
+
+	public int getTagCacheRefreshInSecs()
+	{
+		return getInt(TAG_CACHE_REFRESH_IN_SECS);
 	}
 
 	public String getSmtpAuth()
