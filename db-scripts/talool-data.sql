@@ -84,14 +84,11 @@ INSERT INTO customer(email, password, first_name, last_name, sex_t)
        VALUES ('doug@talool.com', (select md5('pass123')), 'Doug', 'Mccuen', 'M');      
 
 -------------- Talool Merchant/Address/Accounts ------------------
-INSERT INTO address (address1,address2,city,state_province_county,zip,country)
-       VALUES ('1267 Lafayette St.','Unit 504','Denver','CO','80218','US');
-   	
 INSERT INTO merchant (merchant_name,is_discoverable) VALUES ('Talool',false);
 
-INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address1,address2,city,state_province_county,zip,country)
         VALUES( (select merchant_id from merchant where merchant_name='Talool'),
-                'team@talool.com','http://www.talool.com','720-446-6075',(select max(address_id) from address));
+                'team@talool.com','http://www.talool.com','720-446-6075','1267 Lafayette St.','Unit 504','Denver','CO','80218','US');
           
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='Talool'),'doug@talool.com',(select md5('pass123')),'CEO',true);     
@@ -100,31 +97,25 @@ INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_c
        VALUES ((select merchant_id from merchant where merchant_name='Talool'),'chris@talool.com',(select md5('pass123')),'CTO',true);     
        
 --------------- --PaybackBook Merchant/Address/Accounts ----------------
-INSERT INTO address (address1,address2,city,state_province_county,zip,country)
-       VALUES ('6715 NE 63rd St.','PO Box 195','Vancouver','WA','98661','US');
-
 INSERT INTO merchant (merchant_name,is_discoverable) VALUES ('Payback Book',false);
 
-INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address1,address2,city,state_province_county,zip,country,geom)
         VALUES(  (select merchant_id from merchant where merchant_name='Payback Book'),
           		  'paybackbook@aol.com','http://www.paybackbook.com','1.360.699.1252',
-          		  (select address_id from address where address1='6715 NE 63rd St.'),
+          		  '6715 NE 63rd St.','PO Box 195','Vancouver','WA','98661','US',
           		  ST_GeomFromText('POINT(-122.602628 45.667817)', 4326));
 
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='Payback Book'),'paybackbook@aol.com',(select md5('pass123')),'Owner',true);     
        
 ---------------------The Kitche Merchant/Address/Accounts ----------------
-INSERT INTO address (address1,city,state_province_county,zip,country)
-       VALUES ('1039 Pearl St','Boulder','CO','80302','US');
-
 INSERT INTO merchant (merchant_name,category_id) 
        VALUES ('The Kitchen', (select category_id from category where category_name='Food'));
 
-INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address1,city,state_province_county,zip,country,geom)
         VALUES(  (select merchant_id from merchant where merchant_name='The Kitchen'),
 			      'info@thekitchencafe.com','http://thekitchencommunity.com','303.544.5973',
-       	 		  (select address_id from address where address1='1039 Pearl St'),
+       	 		 '1039 Pearl St','Boulder','CO','80302','US',
        	 		  ST_GeomFromText('POINT(-105.281686 40.017663)', 4326));
       
 
@@ -132,16 +123,13 @@ INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_c
        VALUES ((select merchant_id from merchant where merchant_name='The Kitchen'),'merle@thekitchencafe.com',(select md5('pass123')),'CFO',true);     
 
 --------------------- Centro Merchant/Address/Accounts ----------------
-INSERT INTO address (address1,city,state_province_county,zip,country)
-       VALUES ('950 Pearl St','Boulder','CO','80302','US');
-
 INSERT INTO merchant (merchant_name,category_id) 
        VALUES ('Centro Latin Kitchen',(select category_id from category where category_name='Food'));
              
-INSERT INTO merchant_location (merchant_id,email,website_url,phone,address_id,geom)
+INSERT INTO merchant_location (merchant_id,email,website_url,phone,address1,city,state_province_county,zip,country,geom)
         VALUES( (select merchant_id from merchant where merchant_name='Centro Latin Kitchen'),
         		'info@centrolatinkitchen.com','http://www.centrolatinkitchen.com','303.442.7771',
-        		(select address_id from address where address1='950 Pearl St'),
+        		'950 Pearl St','Boulder','CO','80302','US',
         		ST_GeomFromText('POINT(-105.2841748 40.0169992)', 4326));
        
 ---------Test Deal Offers & Deals -------------------------------   

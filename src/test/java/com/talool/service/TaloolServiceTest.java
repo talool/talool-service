@@ -27,7 +27,6 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import com.talool.cache.TagCache;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
-import com.talool.core.Address;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.Customer;
@@ -952,19 +951,15 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		}
 		merchant.addTag(cubanTag);
 
-		Address address = domainFactory.newAddress();
-		address.setAddress1(now + " East Street");
-		address.setAddress2("Apt " + now);
-		address.setCity("Denver");
-		address.setStateProvinceCounty("CO");
-		address.setZip("80218");
-		address.setCountry("US");
-
 		Location location = domainFactory.newLocation(-10.564142, -74.047852);
 
 		MerchantLocation mel = domainFactory.newMerchantLocation();
-		// mel.setMerchant(merchant);
-		mel.setAddress(address);
+		mel.setAddress1(now + " East Street");
+		mel.setAddress2("Apt " + now);
+		mel.setCity("Denver");
+		mel.setStateProvinceCounty("CO");
+		mel.setZip("80218");
+		mel.setCountry("US");
 
 		mel.setPhone("781-818-1212");
 		mel.setWebsiteUrl("http://merch1.com" + now);
@@ -1000,8 +995,18 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertNotNull(merchant.getPrimaryLocation().getUpdated());
 		Assert.assertNotNull(merchant.getPrimaryLocation().getCreated());
 
-		Assert.assertEquals(merchant.getPrimaryLocation().getAddress(), resultMerch
-				.getPrimaryLocation().getAddress());
+		Assert.assertEquals(merchant.getPrimaryLocation().getAddress1(), resultMerch
+				.getPrimaryLocation().getAddress1());
+		Assert.assertEquals(merchant.getPrimaryLocation().getAddress2(), resultMerch
+				.getPrimaryLocation().getAddress2());
+		Assert.assertEquals(merchant.getPrimaryLocation().getCity(), resultMerch
+				.getPrimaryLocation().getCity());
+		Assert.assertEquals(merchant.getPrimaryLocation().getStateProvinceCounty(), resultMerch
+				.getPrimaryLocation().getStateProvinceCounty());
+		Assert.assertEquals(merchant.getPrimaryLocation().getZip(), resultMerch
+				.getPrimaryLocation().getZip());
+		Assert.assertEquals(merchant.getPrimaryLocation().getCountry(), resultMerch
+				.getPrimaryLocation().getCountry());
 
 		Assert.assertTrue(resultMerch.getTags().contains(mexicanTag));
 		Assert.assertTrue(resultMerch.getTags().contains(tapasTag));

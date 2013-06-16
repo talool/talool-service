@@ -20,15 +20,15 @@ public final class QueryHelper
 			.<String, String> of();
 
 	public static final String MERCHANTS_WITHIN_METERS =
-			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*,cat.*, addr.*,ST_Distance( mloc.geom,'${point}',true) "
-					+ "as distanceInMeters FROM public.merchant as merchant, public.category as cat, public.merchant_location as mloc, public.address as addr "
-					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) and mloc.address_id=addr.address_id "
+			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*,cat.*,ST_Distance( mloc.geom,'${point}',true) "
+					+ "as distanceInMeters FROM public.merchant as merchant, public.category as cat, public.merchant_location as mloc "
+					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
 					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id and merchant.is_discoverable=${isDiscoverable}";
 
 	public static final String DEAL_ACQUIRES =
 			"select dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
 					"left join fetch d.image left join fetch d.merchant as m left join fetch m.locations as l " +
-					"left join fetch l.merchantImage left join fetch l.logo left join fetch l.address " +
+					"left join fetch l.merchantImage left join fetch l.logo " +
 					"where dealAcquire.deal.merchant.id=:merchantId and dealAcquire.customer.id=:customerId";
 
 	private static final String MERCHANT_ACQUIRES =

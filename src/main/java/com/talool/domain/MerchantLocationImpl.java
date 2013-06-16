@@ -12,7 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -26,7 +25,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernatespatial.GeometryUserType;
 
-import com.talool.core.Address;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
@@ -67,9 +65,23 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "phone", unique = true, nullable = true, length = 48)
 	private String phone;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = AddressImpl.class)
-	@JoinColumn(name = "address_id")
-	private Address address;
+	@Column(name = "address1", unique = false, nullable = true, length = 64)
+	private String address1;
+
+	@Column(name = "address2", unique = false, nullable = true, length = 64)
+	private String address2;
+
+	@Column(name = "city", unique = false, nullable = false, length = 64)
+	private String city;
+
+	@Column(name = "state_province_county", unique = false, nullable = true, length = 64)
+	private String stateProvinceCounty;
+
+	@Column(name = "zip", unique = false, nullable = true, length = 64)
+	private String zip;
+
+	@Column(name = "country", unique = false, nullable = false, length = 4)
+	private String country;
 
 	@Type(type = "geomType")
 	@Column(name = "geom", nullable = true)
@@ -150,18 +162,6 @@ public class MerchantLocationImpl implements MerchantLocation
 	}
 
 	@Override
-	public Address getAddress()
-	{
-		return address;
-	}
-
-	@Override
-	public void setAddress(Address address)
-	{
-		this.address = address;
-	}
-
-	@Override
 	public Date getCreated()
 	{
 		return createdUpdated.getCreated();
@@ -177,6 +177,72 @@ public class MerchantLocationImpl implements MerchantLocation
 	public String toString()
 	{
 		return ReflectionToStringBuilder.toString(this);
+	}
+
+	@Override
+	public void setAddress1(String address1)
+	{
+		this.address1 = address1;
+	}
+
+	@Override
+	public String getAddress2()
+	{
+		return address2;
+	}
+
+	@Override
+	public void setAddress2(String address2)
+	{
+		this.address2 = address2;
+	}
+
+	@Override
+	public String getCity()
+	{
+		return city;
+	}
+
+	@Override
+	public void setCity(String city)
+	{
+		this.city = city;
+	}
+
+	@Override
+	public String getStateProvinceCounty()
+	{
+		return stateProvinceCounty;
+	}
+
+	@Override
+	public void setStateProvinceCounty(String stateProvinceCounty)
+	{
+		this.stateProvinceCounty = stateProvinceCounty;
+	}
+
+	@Override
+	public String getZip()
+	{
+		return zip;
+	}
+
+	@Override
+	public void setZip(String zip)
+	{
+		this.zip = zip;
+	}
+
+	@Override
+	public String getCountry()
+	{
+		return country;
+	}
+
+	@Override
+	public void setCountry(String country)
+	{
+		this.country = country;
 	}
 
 	@Override
@@ -206,14 +272,19 @@ public class MerchantLocationImpl implements MerchantLocation
 
 		return new EqualsBuilder().append(getMerchant(), other.getMerchant())
 				.append(getLocationName(), other.getLocationName())
-				.append(getAddress(), other.getAddress()).isEquals();
+				.append(getAddress1(), other.getAddress1()).append(getAddress2(), other.getAddress2())
+				.append(getCity(), other.getCity()).append(getStateProvinceCounty(), other.getStateProvinceCounty())
+				.append(getCountry(), other.getCountry()).append(getZip(), other.getZip()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getMerchant()).append(getLocationName())
-				.append(getAddress()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getMerchant()).append(getLocationName()).
+				append(getAddress1()).append(getAddress2()).
+				append(getCity()).append(getStateProvinceCounty()).
+				append(getCountry()).append(getZip()).
+				hashCode();
 	}
 
 	@Override
@@ -273,5 +344,19 @@ public class MerchantLocationImpl implements MerchantLocation
 	public void setMerchantImage(MerchantMedia merchantImage)
 	{
 		this.merchantImage = merchantImage;
+	}
+
+	@Override
+	public String getAddress1()
+	{
+		return address1;
+	}
+
+	@Override
+	public String getNiceCityState()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(city).append(", ").append(stateProvinceCounty);
+		return sb.toString();
 	}
 }

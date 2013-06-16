@@ -50,7 +50,6 @@ import com.talool.core.Tag;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.core.social.SocialNetwork;
-import com.talool.domain.AddressImpl;
 import com.talool.domain.CategoryImpl;
 import com.talool.domain.CategoryTagImpl;
 import com.talool.domain.CustomerImpl;
@@ -810,7 +809,6 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
 			query.addScalar("name", StandardBasicTypes.STRING);
 			query.addEntity("merchant_location", MerchantLocationImpl.class);
-			query.addEntity("address", AddressImpl.class);
 			query.addEntity("category", CategoryImpl.class);
 
 			final Map<UUID, MerchantImpl> merchantMap = new HashMap<UUID, MerchantImpl>();
@@ -826,7 +824,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					final UUID uuid = (UUID) tuple[1];
 					final String name = (String) tuple[2];
 					final MerchantLocationImpl location = (MerchantLocationImpl) tuple[3];
-					final Category category = (Category) tuple[5];
+					final Category category = (Category) tuple[4];
 					location.setDistanceInMeters((Double) tuple[0]);
 					MerchantImpl merchant = merchantMap.get(uuid);
 
@@ -862,8 +860,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format(
-					"Problem getting merchants within lng/lat %s and maxMiles %d", location, maxMiles), ex);
+			String msg = String.format(
+					"Problem getting merchants within lng/lat %s and maxMiles %d", location, maxMiles);
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
 		}
 
 		return merchants;

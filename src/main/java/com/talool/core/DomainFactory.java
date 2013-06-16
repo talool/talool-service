@@ -16,8 +16,6 @@ public interface DomainFactory
 
 	public MerchantSocialAccount newMerchantSocialAccount(final String socialNetworkName);
 
-	public Address newAddress();
-
 	public Merchant newMerchant();
 
 	public Merchant newMerchant(boolean topLevelOnly);

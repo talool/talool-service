@@ -34,14 +34,36 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public void setPhone(String phone);
 
-	public Address getAddress();
+	public String getAddress1();
 
-	public void setAddress(Address address);
+	public void setAddress1(String address1);
+
+	public String getAddress2();
+
+	public void setAddress2(String address2);
+
+	public String getCity();
+
+	public void setCity(String city);
+
+	public String getStateProvinceCounty();
+
+	public void setStateProvinceCounty(String stateProvinceCounty);
+
+	public String getZip();
+
+	public void setZip(String zip);
+
+	public String getCountry();
+
+	public void setCountry(String country);
 
 	public Geometry getGeometry();
 
 	public void setGeometry(Geometry geometry);
 
 	public Double getDistanceInMeters();
+
+	public String getNiceCityState();
 
 }

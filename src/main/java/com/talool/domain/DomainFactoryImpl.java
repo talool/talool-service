@@ -8,7 +8,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.talool.core.Address;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
@@ -84,14 +83,6 @@ final class DomainFactoryImpl implements DomainFactory
 		}
 
 		return sac;
-	}
-
-	@Override
-	public Address newAddress()
-	{
-		Address address = new AddressImpl();
-		address.setCountry("US");
-		return address;
 	}
 
 	@Override
@@ -265,7 +256,6 @@ final class DomainFactoryImpl implements DomainFactory
 		if (!topLevelOnly)
 		{
 			MerchantLocation location = newMerchantLocation();
-			location.setAddress(newAddress());
 			merchant.addLocation(location);
 		}
 		return merchant;

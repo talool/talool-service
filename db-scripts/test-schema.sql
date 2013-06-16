@@ -76,34 +76,6 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
-CREATE TABLE address (
-    address_id bigint NOT NULL,
-    address1 character varying(64),
-    address2 character varying(64),
-    city character varying(64) NOT NULL,
-    state_province_county character varying(64) NOT NULL,
-    zip character varying(64),
-    country character varying(4),
-    create_dt timestamp NOT NULL DEFAULT NOW(),
-    update_dt timestamp NOT NULL DEFAULT NOW(),
-    PRIMARY KEY(address_id)
-);
-
-
-ALTER TABLE public.address OWNER TO talool;
-
-CREATE SEQUENCE address_address_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-ALTER TABLE public.address_address_id_seq OWNER TO talool;
-ALTER SEQUENCE address_address_id_seq OWNED BY address.address_id;
-ALTER TABLE ONLY address ALTER COLUMN address_id SET DEFAULT nextval('address_address_id_seq'::regclass);
-CREATE UNIQUE INDEX address_idx ON address (address1,address2,city,state_province_county,zip,country);
-
 CREATE TYPE sex_type AS ENUM ('M', 'F');
 
 CREATE TABLE customer (
@@ -320,11 +292,15 @@ CREATE TABLE merchant_location (
     logo_url_id UUID,
     merchant_image_id UUID,
     phone character varying(48),
-    address_id bigint NOT NULL,
+    address1 character varying(64),
+    address2 character varying(64),
+    city character varying(64) NOT NULL,
+    state_province_county character varying(64) NOT NULL,
+    zip character varying(64),
+    country character varying(4),
     create_dt timestamp without time zone DEFAULT now() NOT NULL,
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY (merchant_location_id),
-    UNIQUE (merchant_id,address_id)
+    PRIMARY KEY (merchant_location_id)
 );
 
 ALTER TABLE public.merchant_location OWNER TO talool;
@@ -340,7 +316,6 @@ ALTER TABLE public.merchant_location_merchant_location_id_seq OWNER TO talool;
 ALTER SEQUENCE merchant_location_merchant_location_id_seq OWNED BY merchant_location.merchant_location_id;
 ALTER TABLE ONLY merchant_location ALTER COLUMN merchant_location_id SET DEFAULT nextval('merchant_location_merchant_location_id_seq'::regclass);
 
-ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Address" FOREIGN KEY (address_id) REFERENCES address(address_id);
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Merchant" FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_Logo" FOREIGN KEY (logo_url_id) REFERENCES merchant_media(merchant_media_id);
 ALTER TABLE ONLY merchant_location ADD CONSTRAINT "FK_MerchantLocation_MerchantImage" FOREIGN KEY (merchant_image_id) REFERENCES merchant_media(merchant_media_id);
@@ -610,7 +585,6 @@ CREATE INDEX merchant_social_account_sn_id_idx ON merchant_social_account (socia
 
 CREATE TRIGGER update_merchant_update_dt BEFORE UPDATE ON merchant FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER update_customer_update_dt BEFORE UPDATE ON customer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
-CREATE TRIGGER update_address_update_dt BEFORE UPDATE ON address FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_update_update_dt BEFORE UPDATE ON deal FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_offer_update_dt BEFORE UPDATE ON deal_offer FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
 CREATE TRIGGER deal_acquire_update_dt BEFORE UPDATE ON deal_acquire FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
