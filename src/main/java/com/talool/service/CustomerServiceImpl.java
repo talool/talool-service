@@ -316,7 +316,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			final Point point = (location == null || location.getLatitude() == null || location.getLongitude() == null) ?
 					null : factory.createPoint(new Coordinate(location.getLongitude(), location.getLatitude()));
 
-			query.setParameter("geom", point, GeometryUserType.TYPE);
+			query.setParameter("redeemedAtGeometry", point, GeometryUserType.TYPE);
 			query.setParameter("redemptionCode", redemptionCode);
 			query.setParameter("redemptionDate", Calendar.getInstance().getTime());
 			query.executeUpdate();
@@ -671,13 +671,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 
-			dac.setAcquireStatus(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE);
-			daoDispatcher.save(dac);
-
 			gift.setDealAcquire(dac);
 			gift.setFromCustomer(dac.getCustomer());
 			daoDispatcher.save(gift);
 
+			dac.setGift(gift);
+			dac.setAcquireStatus(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE);
+			daoDispatcher.save(dac);
 		}
 		catch (Exception ex)
 		{
@@ -763,7 +763,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		final DealAcquire dac = giftOwnership.giftRequest.getDealAcquire();
 
 		dac.setAcquireStatus(AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
-		dac.setSharedByCustomer(dac.getCustomer());
+		// dac.setSharedByCustomer(dac.getCustomer());
 		dac.setCustomer(giftOwnership.receivingCustomer);
 
 		// update deal acquire

@@ -94,8 +94,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		protected UUID dealAcquireId;
 		protected AcquireStatus status;
 		protected UUID customerId;
-		protected UUID sharedbyMerchantId;
-		protected UUID sharedbyCustomerId;
+		protected UUID giftId;
 		protected Integer shareCount;
 		protected Date updated;
 
@@ -105,12 +104,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			this.status = dealAcquire.getAcquireStatus();
 			this.customerId = dealAcquire.getCustomer().getId();
 
-			if (dealAcquire.getSharedByCustomer() != null)
+			if (dealAcquire.getGiftId() != null)
 			{
-				this.sharedbyCustomerId = dealAcquire.getSharedByCustomer().getId();
+				this.giftId = dealAcquire.getGiftId();
 			}
 
-			this.shareCount = dealAcquire.getShareCount();
 			this.updated = dealAcquire.getUpdated();
 		}
 
@@ -698,7 +696,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		List<DealAcquire> dealAcquires = customerService.getDealAcquiresByCustomerId(receivingCustomerSocial.getId());
 		Assert.assertEquals(1, dealAcquires.size());
 		Assert.assertEquals(gifts.get(0).getDealAcquire().getId(), dealAcquires.get(0).getId());
-		Assert.assertEquals(dealAcquires.get(0).getSharedByCustomer(), givingCustomer);
+		// Assert.assertEquals(dealAcquires.get(0).getSharedByCustomer(),
+		// givingCustomer);
 		Assert.assertEquals(dealAcquires.get(0).getAcquireStatus(),
 				AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
 

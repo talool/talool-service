@@ -766,7 +766,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId)
+	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId, boolean chronological)
 			throws ServiceException
 	{
 		try
@@ -774,7 +774,15 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			final Search search = new Search(DealAcquireHistoryImpl.class);
 			search.addFilter(Filter.equal("primaryKey.dealAcquire.id", dealAcquireId));
 
-			search.addSort(Sort.asc("primaryKey.updated"));
+			if (chronological)
+			{
+				search.addSort(Sort.asc("primaryKey.updated"));
+			}
+			else
+			{
+				search.addSort(Sort.desc("primaryKey.updated"));
+			}
+
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)

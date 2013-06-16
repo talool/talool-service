@@ -2,7 +2,9 @@ package com.talool.core;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
+import com.talool.core.gift.Gift;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -14,28 +16,31 @@ public interface DealAcquire extends IdentifiableUUID, Serializable, TimeAware
 {
 	public Deal getDeal();
 
+	/**
+	 * If the DealAcquire was acquired via Gifting, Gift will not be null
+	 * 
+	 * @return
+	 */
+	public Gift getGift();
+
+	public UUID getGiftId();
+
+	public void setGift(final Gift gift);
+
 	public AcquireStatus getAcquireStatus();
 
-	public void setAcquireStatus(AcquireStatus status);
+	public void setAcquireStatus(final AcquireStatus status);
 
 	public Customer getCustomer();
 
-	public void setCustomer(Customer customer);
-
-	public Customer getSharedByCustomer();
-
-	public void setSharedByCustomer(Customer customer);
-
-	public Integer getShareCount();
-
-	public Integer incrementShareCount();
+	public void setCustomer(final Customer customer);
 
 	public String getRedemptionCode();
 
 	public Date getRedemptionDate();
 
-	public Geometry getGeometry();
+	public Geometry getRedeemedAtGeometry();
 
-	public void setGeometry(Geometry geometry);
+	public void setRedeemedAtGeometry(final Geometry geometry);
 
 }

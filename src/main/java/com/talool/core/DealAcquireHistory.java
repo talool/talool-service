@@ -2,6 +2,9 @@ package com.talool.core;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
+
+import com.talool.core.gift.Gift;
 
 /**
  * 
@@ -16,13 +19,14 @@ public interface DealAcquireHistory extends Serializable
 
 	public Customer getCustomer();
 
-	public Merchant getSharedByMerchant();
+	/**
+	 * If the DealAcquire was acquired via Gifting, Gift will not be null
+	 * 
+	 * @return
+	 */
+	public Gift getGift();
 
-	public Customer getSharedByCustomer();
-
-	public Integer getShareCount();
-
-	public void setShareCount(Integer shareCount);
+	public UUID getGiftId();
 
 	public Date getUpdated();
 

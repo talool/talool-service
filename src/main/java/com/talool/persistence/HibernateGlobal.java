@@ -20,7 +20,7 @@ import org.hibernate.annotations.TypeDefs;
 		@NamedQuery(
 				name = "redeemDealAcquire",
 				query = "update DealAcquireImpl as d set d.acquireStatus=:dealAcquireStatus, redemptionDate=:redemptionDate," +
-						"geom=:geom,redemptionCode=:redemptionCode where d.id=:dealAcquireId"),
+						"redeemedAtGeometry=:redeemedAtGeometry,redemptionCode=:redemptionCode where d.id=:dealAcquireId"),
 
 		@NamedQuery(
 				name = "getCustomerIdAcquireStatusOnDealAcquire",

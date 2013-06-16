@@ -2,6 +2,7 @@ package com.talool.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -22,7 +23,8 @@ import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
-import com.talool.core.Merchant;
+import com.talool.core.gift.Gift;
+import com.talool.domain.gift.GiftImpl;
 
 /**
  * 
@@ -60,16 +62,12 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
-	@JoinColumn(name = "shared_by_merchant_id")
-	private Merchant sharedByMerchant;
+	@OneToOne(targetEntity = GiftImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "gift_id")
+	private Gift gift;
 
-	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
-	@JoinColumn(name = "shared_by_customer_id")
-	private Customer sharedByCustomer;
-
-	@Column(name = "share_cnt", unique = false, nullable = true)
-	private Integer shareCount;
+	@Column(name = "gift_id", insertable = false, updatable = false)
+	private UUID giftId;
 
 	public DealAcquireHistoryImpl()
 	{
@@ -92,31 +90,6 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	public Customer getCustomer()
 	{
 		return customer;
-	}
-
-	@Override
-	public Merchant getSharedByMerchant()
-	{
-		return sharedByMerchant;
-	}
-
-	@Override
-	public Customer getSharedByCustomer()
-	{
-		return sharedByCustomer;
-	}
-
-	@Override
-	public Integer getShareCount()
-	{
-		return shareCount;
-	}
-
-	@Override
-	public void setShareCount(Integer shareCount)
-	{
-		this.shareCount = shareCount;
-
 	}
 
 	@Override
@@ -145,13 +118,19 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 		}
 
 		return new EqualsBuilder().append(getUpdated(), other.getUpdated())
-				.append(getDealAcquire(), other.getDealAcquire()).isEquals();
+				.append(getDealAcquire(), other.getDealAcquire()).
+				append(getCustomer(), other.getCustomer()).
+				append(getGift(), other.getGift()).
+				append(getUpdated(), other.getUpdated()).
+				isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getUpdated()).append(getDealAcquire()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getUpdated()).append(getDealAcquire()).
+				append(getCustomer()).append(getGift()).append(getUpdated()).
+				hashCode();
 	}
 
 	@Override
@@ -164,6 +143,18 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	public DealAcquire getDealAcquire()
 	{
 		return primaryKey.dealAcquire;
+	}
+
+	@Override
+	public Gift getGift()
+	{
+		return gift;
+	}
+
+	@Override
+	public UUID getGiftId()
+	{
+		return giftId;
 	}
 
 }

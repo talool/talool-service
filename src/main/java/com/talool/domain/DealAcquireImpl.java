@@ -3,7 +3,6 @@ package com.talool.domain;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -25,6 +24,8 @@ import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
+import com.talool.core.gift.Gift;
+import com.talool.domain.gift.GiftImpl;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -50,6 +51,13 @@ public class DealAcquireImpl implements DealAcquire
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
 
+	@OneToOne(targetEntity = GiftImpl.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "gift_id")
+	private Gift gift;
+
+	@Column(name = "gift_id", insertable = false, updatable = false)
+	private UUID giftId;
+
 	@Type(type = "acquireStatus")
 	@Column(name = "acquire_status", nullable = false, columnDefinition = "acquire_status")
 	private AcquireStatus acquireStatus;
@@ -58,16 +66,9 @@ public class DealAcquireImpl implements DealAcquire
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = CustomerImpl.class)
-	@JoinColumn(name = "shared_by_customer_id")
-	private Customer sharedByCustomer;
-
-	@Column(name = "share_cnt", unique = false, nullable = true)
-	private Integer shareCount;
-
 	@Type(type = "geomType")
-	@Column(name = "geom", nullable = true)
-	private com.vividsolutions.jts.geom.Geometry geometry;
+	@Column(name = "redeemed_at_geom", nullable = true)
+	private com.vividsolutions.jts.geom.Geometry redeemedAtGeometry;
 
 	@Column(name = "redemption_code", length = 6)
 	private String redemptionCode;
@@ -131,26 +132,9 @@ public class DealAcquireImpl implements DealAcquire
 		this.customer = customer;
 	}
 
-	@Override
-	public Customer getSharedByCustomer()
-	{
-		return sharedByCustomer;
-	}
-
 	public void setRedemptionDate(final Date date)
 	{
 		this.redemptionDate = date;
-	}
-
-	@Override
-	public Integer getShareCount()
-	{
-		return shareCount;
-	}
-
-	public void setShareCount(Integer shareCount)
-	{
-		this.shareCount = shareCount;
 	}
 
 	@Override
@@ -185,32 +169,22 @@ public class DealAcquireImpl implements DealAcquire
 		}
 
 		return new EqualsBuilder().append(getAcquireStatus(), other.getAcquireStatus())
-				.append(getDeal(), other.getDeal()).isEquals();
+				.append(getDeal(), other.getDeal()).append(getCustomer(), other.getCustomer()).
+				append(getGiftId(), other.getGiftId()).
+				isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getAcquireStatus()).append(getDeal()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getAcquireStatus()).append(getDeal()).append(getCustomer()).append(getGiftId())
+				.hashCode();
 	}
 
 	@Override
 	public String toString()
 	{
 		return ReflectionToStringBuilder.toString(this);
-	}
-
-	@Override
-	public Integer incrementShareCount()
-	{
-		shareCount += 1;
-		return shareCount;
-	}
-
-	@Override
-	public void setSharedByCustomer(final Customer customer)
-	{
-		this.sharedByCustomer = customer;
 	}
 
 	public void setRedemptionCode(final String redemptionCode)
@@ -225,15 +199,33 @@ public class DealAcquireImpl implements DealAcquire
 	}
 
 	@Override
-	public Geometry getGeometry()
+	public Geometry getRedeemedAtGeometry()
 	{
-		return geometry;
+		return redeemedAtGeometry;
 	}
 
 	@Override
-	public void setGeometry(Geometry geometry)
+	public void setRedeemedAtGeometry(final Geometry getRedeemedAtGeometry)
 	{
-		this.geometry = geometry;
+		this.redeemedAtGeometry = getRedeemedAtGeometry;
+	}
+
+	@Override
+	public Gift getGift()
+	{
+		return gift;
+	}
+
+	@Override
+	public void setGift(final Gift gift)
+	{
+		this.gift = gift;
+	}
+
+	@Override
+	public UUID getGiftId()
+	{
+		return giftId;
 	}
 
 }

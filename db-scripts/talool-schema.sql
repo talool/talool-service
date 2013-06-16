@@ -62,10 +62,8 @@ CREATE FUNCTION deal_acquire_update() RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    INSERT INTO deal_acquire_history(deal_acquire_id,acquire_status,customer_id,
-     		    					 shared_by_customer_id,share_cnt,update_dt) 
-       VALUES( OLD.deal_acquire_id,OLD.acquire_status,OLD.customer_id,
-               OLD.shared_by_customer_id,OLD.share_cnt,OLD.update_dt);
+    INSERT INTO deal_acquire_history(deal_acquire_id,acquire_status,customer_id,gift_id,update_dt) 
+    VALUES( OLD.deal_acquire_id,OLD.acquire_status,OLD.customer_id,OLD.gift_id,OLD.update_dt);
   return NEW;
 END;
 $$;
@@ -476,53 +474,6 @@ ALTER TABLE ONLY merchant_tag ADD CONSTRAINT "FK_MerchantTag_Tag" FOREIGN KEY (t
 CREATE INDEX merchant_tag_merchant_id_idx ON merchant_tag (merchant_id);
 CREATE INDEX merchant_tag_tag_id_idx ON merchant_tag (tag_id);
 
-CREATE TYPE acquire_status AS ENUM ('PURCHASED', 'REDEEMED','REJECTED_CUSTOMER_SHARE','REJECTED_MERCHANT_SHARE',
-'ACCEPTED_MERCHANT_SHARE','ACCEPTED_CUSTOMER_SHARE','PENDING_ACCEPT_MERCHANT_SHARE','PENDING_ACCEPT_CUSTOMER_SHARE');
-
-CREATE TABLE deal_acquire (
-    deal_acquire_id UUID NOT NULL DEFAULT uuid_generate_v4(),   
-    deal_id UUID NOT NULL,
-    acquire_status acquire_status NOT NULL, 
-    customer_id UUID NOT NULL,
-    shared_by_customer_id UUID,
-    share_cnt int NOT NULL DEFAULT 0,
-    geom geometry(POINT,4326),
-    redemption_code character(6),
-    redemption_dt timestamp without time zone,
-    create_dt timestamp without time zone DEFAULT now() NOT NULL,
-    update_dt timestamp without time zone DEFAULT now() NOT NULL,
-    PRIMARY KEY(deal_acquire_id),
-    UNIQUE (deal_id,redemption_code)
-);
-
-ALTER TABLE public.deal_acquire OWNER TO talool;
-
-ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_DealDetail" FOREIGN KEY (deal_id) REFERENCES deal(deal_id);
-ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
-CREATE INDEX deal_acquire_deal_id_idx ON deal_acquire (deal_id);
-CREATE UNIQUE INDEX deal_acquire_redemption_code_idx ON deal_acquire (redemption_code);
-CREATE INDEX deal_acquire_customer_id_idx ON deal_acquire (customer_id);
-CREATE INDEX deal_acquire_shared_by_customer_id_idx ON deal_acquire (shared_by_customer_id);
-
-CREATE TABLE deal_acquire_history (
-    deal_acquire_id UUID NOT NULL,
-    acquire_status acquire_status NOT NULL, 
-    customer_id UUID NOT NULL,
-    shared_by_merchant_id UUID,
-    shared_by_customer_id UUID,
-    share_cnt int NOT NULL DEFAULT 0,
-    update_dt timestamp without time zone NOT NULL,
-    PRIMARY KEY(deal_acquire_id,update_dt)
-);
-
-ALTER TABLE public.deal_acquire_history OWNER TO talool;
-
-ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Dealacquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
-ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
-ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByMerchant" FOREIGN KEY (shared_by_merchant_id) REFERENCES merchant(merchant_id);
-ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_SharedByCustomer" FOREIGN KEY (shared_by_customer_id) REFERENCES customer(customer_id);
-
 CREATE TYPE gift_status AS ENUM ('PENDING', 'ACCEPTED','REJECTED');
 
 CREATE TABLE gift (
@@ -541,6 +492,51 @@ CREATE TABLE gift (
     update_dt timestamp without time zone DEFAULT now() NOT NULL,
     PRIMARY KEY(gift_id)
 );
+
+CREATE TYPE acquire_status AS ENUM ('PURCHASED', 'REDEEMED','REJECTED_CUSTOMER_SHARE','REJECTED_MERCHANT_SHARE',
+'ACCEPTED_MERCHANT_SHARE','ACCEPTED_CUSTOMER_SHARE','PENDING_ACCEPT_MERCHANT_SHARE','PENDING_ACCEPT_CUSTOMER_SHARE');
+
+CREATE TABLE deal_acquire (
+    deal_acquire_id UUID NOT NULL DEFAULT uuid_generate_v4(),   
+    deal_id UUID NOT NULL,
+    acquire_status acquire_status NOT NULL, 
+    customer_id UUID NOT NULL,
+    gift_id UUID,
+    redeemed_at_geom geometry(POINT,4326),
+    redemption_code character(6),
+    redemption_dt timestamp without time zone,
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
+    update_dt timestamp without time zone DEFAULT now() NOT NULL,
+    PRIMARY KEY(deal_acquire_id),
+    UNIQUE (redemption_code,deal_id)
+);
+
+ALTER TABLE public.deal_acquire OWNER TO talool;
+
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_DealDetail" FOREIGN KEY (deal_id) REFERENCES deal(deal_id);
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY deal_acquire ADD CONSTRAINT "FK_Dealacquire_Gift" FOREIGN KEY (gift_id) REFERENCES gift(gift_id);
+CREATE INDEX deal_acquire_deal_id_idx ON deal_acquire (deal_id);
+CREATE INDEX deal_acquire_customer_id_idx ON deal_acquire (customer_id);
+CREATE INDEX deal_acquire_gift_id_idx ON deal_acquire (gift_id);
+
+CREATE TABLE deal_acquire_history (
+    deal_acquire_id UUID NOT NULL,
+    acquire_status acquire_status NOT NULL, 
+    customer_id UUID NOT NULL,
+    gift_id UUID,
+    update_dt timestamp without time zone NOT NULL,
+    PRIMARY KEY(deal_acquire_id,update_dt)
+);
+
+ALTER TABLE public.deal_acquire_history OWNER TO talool;
+
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Dealacquire" FOREIGN KEY (deal_acquire_id) REFERENCES deal_acquire(deal_acquire_id);
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+ALTER TABLE ONLY deal_acquire_history ADD CONSTRAINT "FK_DealacquireHistory_Gift" FOREIGN KEY (gift_id) REFERENCES gift(gift_id);
+CREATE INDEX deal_acquire_history_customer_id_idx ON deal_acquire_history (customer_id);
+CREATE INDEX deal_acquire_history_deal_acquire_id_idx ON deal_acquire_history (deal_acquire_id);
+CREATE INDEX deal_acquire_history_gift_id_idx ON deal_acquire_history (gift_id);
 
 ALTER TABLE public.gift OWNER TO talool;
 ALTER TABLE ONLY gift ADD CONSTRAINT "FK_Gift_Customer" FOREIGN KEY (from_customer_id) REFERENCES customer(customer_id);
