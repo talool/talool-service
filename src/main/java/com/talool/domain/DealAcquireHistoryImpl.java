@@ -62,7 +62,7 @@ public class DealAcquireHistoryImpl implements DealAcquireHistory
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	@OneToOne(targetEntity = GiftImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = GiftImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "gift_id")
 	private Gift gift;
 

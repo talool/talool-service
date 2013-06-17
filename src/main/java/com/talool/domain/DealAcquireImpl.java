@@ -51,7 +51,7 @@ public class DealAcquireImpl implements DealAcquire
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
 
-	@OneToOne(targetEntity = GiftImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = GiftImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "gift_id")
 	private Gift gift;
 

@@ -1083,4 +1083,25 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquireHistory> getDealAcquireHistoryByGiftId(final UUID giftId, final boolean chronological)
+			throws ServiceException
+	{
+		try
+		{
+			final Query query = getCurrentSession()
+					.createQuery(
+							"select d from DealAcquireHistoryImpl as d, GiftImpl as g where d.primaryKey.dealAcquire.id=g.dealAcquire.id and g.id=:giftId order by d.primaryKey.updated desc");
+			query.setParameter("giftId", giftId, PostgresUUIDType.INSTANCE);
+
+			return query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealAcquireHistoryByGiftId %s", giftId), ex);
+		}
+	}
+
 }

@@ -51,6 +51,9 @@ public interface TaloolService extends MerchantService, HibernateService
 	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId, final boolean chronological)
 			throws ServiceException;
 
+	public List<DealAcquireHistory> getDealAcquireHistoryByGiftId(final UUID giftId, final boolean chronological)
+			throws ServiceException;
+
 	public List<DealAcquire> getRedeemedDealAcquires(final UUID merchantId, final String redemptionCode) throws ServiceException;
 
 }
