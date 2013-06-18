@@ -80,7 +80,7 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "zip", unique = false, nullable = true, length = 64)
 	private String zip;
 
-	@Column(name = "country", unique = false, nullable = false, length = 4)
+	@Column(name = "country", unique = false, length = 3)
 	private String country;
 
 	@Type(type = "geomType")
