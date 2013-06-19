@@ -25,14 +25,28 @@ UPDATE merchant SET geom = 'SRID=4326;POINT(105.2700 40.0150)' where merchant_id
 
 --  Make sure to use Sphere get the right answer
 SELECT ST_Distance_Sphere( ST_GeomFromText('POINT(104.9842 39.7392)'), ST_GeomFromText('POINT(105.2700 40.0150)') ); -- Denver/Boulder
+-- Answer: 39182.7457216715
 
-Answer: 39182.7457216715
-
-Chicago 
+--Chicago 
 UPDATE merchant SET geom = 'SRID=4326;POINT(87.6500 41.8500)' where merchant_id='da6dc45d-2d50-4a17-9adf-f3ceb9c7786a'
 
-Kansas City
+--Kansas City
 UPDATE merchant SET geom = 'SRID=4326;POINT(94.5783 39.0997)' where merchant_location_id=2;
 
-Littleton 
-39.6133° N, 105.0161
+
+select
+        merchant.merchant_id as merchantId,
+        merchant.merchant_name as name,
+        ST_Distance( mloc.geom,
+        'SRID=4326;POINT(-105.27 40.015)',
+        true) as distanceInMiles 
+    FROM
+        public.merchant as merchant,
+        public.merchant_location as mloc 
+    where
+         mloc.merchant_id=merchant.merchant_id 
+         and merchant.is_discoverable=true
+   order by distanceInMeters desc;
+   
+
+SELECT ST_Distance( ST_GeographyFromText('POINT(-121.7422651 45.3044605)'), ST_GeographyFromText('POINT(-105.2700 40.0150)') ); -- Vancouver/Boulder

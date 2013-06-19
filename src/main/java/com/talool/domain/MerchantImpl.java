@@ -79,7 +79,7 @@ public class MerchantImpl implements Merchant
 	private String name;
 
 	@Column(name = "is_discoverable")
-	private boolean isDiscoverable;
+	private boolean isDiscoverable = true;
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = TagImpl.class)
 	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
