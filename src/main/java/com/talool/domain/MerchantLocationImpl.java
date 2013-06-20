@@ -19,6 +19,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
@@ -89,11 +91,13 @@ public class MerchantLocationImpl implements MerchantLocation
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
+	@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 	@JoinColumn(name = "logo_url_id")
 	private MerchantMedia logo;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
+	@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 	@JoinColumn(name = "merchant_image_id")
 	private MerchantMedia merchantImage;
 

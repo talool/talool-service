@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -25,6 +27,7 @@ import com.talool.core.MerchantMedia;
 @Entity
 @Table(name = "merchant_media", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
+@Cache(region = "MerchantMedia", usage = CacheConcurrencyStrategy.READ_ONLY)
 public class MerchantMediaImpl implements MerchantMedia
 {
 	private static final long serialVersionUID = 6837136446205380362L;
@@ -135,8 +138,10 @@ public class MerchantMediaImpl implements MerchantMedia
 	}
 
 	@Override
-	public String getMediaName() {
-		if (mediaUrl == null){
+	public String getMediaName()
+	{
+		if (mediaUrl == null)
+		{
 			return null;
 		}
 		else
