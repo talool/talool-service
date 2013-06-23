@@ -6,11 +6,10 @@
 		<artifactId>talool-base</artifactId>
 		<version>1.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.talool</groupId>
-	<artifactId>talool-persistence</artifactId>
+	<artifactId>talool-service</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.1-SNAPSHOT</version>
-	<name>Talool Persistence</name>
+	<version>1.0.2-SNAPSHOT</version>
+	<name>Talool Service</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<hibernate.version>3.6.10.Final</hibernate.version>
