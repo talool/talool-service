@@ -79,7 +79,8 @@ public interface MerchantService extends HibernateService
 
 	public Deal getDeal(final UUID dealId) throws ServiceException;
 
-	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId) throws ServiceException;
+	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts,
+			final String[] eagerlyLoadedProps) throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId) throws ServiceException;
 

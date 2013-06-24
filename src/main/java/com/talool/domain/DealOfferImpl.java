@@ -67,6 +67,9 @@ public class DealOfferImpl implements DealOffer
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
+	@Column(name = "location_name", unique = false, nullable = true, length = 64)
+	private String locationName;
+
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
 	@JoinColumn(name = "image_id")
@@ -334,6 +337,18 @@ public class DealOfferImpl implements DealOffer
 	public void setMerchant(Merchant merchant)
 	{
 		this.merchant = merchant;
+	}
+
+	@Override
+	public String getLocationName()
+	{
+		return locationName;
+	}
+
+	@Override
+	public void setLocationName(String name)
+	{
+		this.locationName = name;
 	}
 
 }

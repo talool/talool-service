@@ -286,6 +286,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			}
 
 			if (!AcquireStatus.ACCEPTED_CUSTOMER_SHARE.equals(acquireStatus) &&
+					!AcquireStatus.REJECTED_CUSTOMER_SHARE.equals(acquireStatus) &&
 					!AcquireStatus.ACCEPTED_MERCHANT_SHARE.equals(acquireStatus) && !AcquireStatus.PURCHASED.equals(acquireStatus))
 			{
 				throw new ServiceException(String.format("AcquireStatus %s is not in proper state to redeem for dealAcquireId %s",

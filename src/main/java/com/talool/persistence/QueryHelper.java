@@ -1,6 +1,8 @@
 package com.talool.persistence;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.hibernate.Query;
@@ -16,6 +18,12 @@ import com.talool.core.SearchOptions;
  */
 public final class QueryHelper
 {
+	public static final String ORDER_BY = " ORDER BY ";
+	public static final String ASC = " ASC ";
+	public static final String DESC = " DESC ";
+	public static final String LIMIT = " LIMIT ";
+	public static final String OFFSET = " OFFSET ";
+
 	private static final ImmutableMap<String, String> EMPTY_IMMUTABLE_PROPS = ImmutableMap
 			.<String, String> of();
 
@@ -44,6 +52,10 @@ public final class QueryHelper
 
 	private static final String FAVORITE_MERCHANTS = "select merchant from MerchantImpl as merchant, FavoriteMerchantImpl as f where f.customerId=:customerId and f.merchantId=merchant.id";
 
+	private static final String DEALS_BY_DEAL_OFFER_ID = "select d from DealImpl as d left join fetch d.image left join fetch d.merchant as merchant "
+			+
+			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId";
+
 	public enum QueryType
 	{
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
@@ -55,6 +67,8 @@ public final class QueryHelper
 		DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 
 		MerchantAcquires(MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
+
+		DealsByDealOfferId(DEALS_BY_DEAL_OFFER_ID, EMPTY_IMMUTABLE_PROPS),
 
 		GetMerchantMedias(MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS),
 
@@ -92,6 +106,44 @@ public final class QueryHelper
 			query.setMaxResults(searchOpts.getMaxResults());
 			query.setFirstResult(searchOpts.getMaxResults() * searchOpts.getPage());
 		}
+	}
+
+	// TODO NOT FINISHED - revist, this is tough building dynamic eager loaded
+	// props (nested props are hard)
+	public static String buildQuery(Class clazz, UUID identifier, final SearchOptions searchOpts,
+			final String[] eagerlyLoadedProps)
+	{
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("select a from ").append(clazz.getSimpleName()).append(" as a ");
+
+		// image merchant.locations
+		if (eagerlyLoadedProps != null)
+		{
+			final HashMap<String, String> eagerAliases = new HashMap<String, String>();
+
+			for (String prop : eagerlyLoadedProps)
+			{
+				String[] parts = prop.split(".");
+
+				for (String part : parts)
+				{
+					if (eagerAliases.containsKey(part))
+					{
+						continue;
+					}
+					else
+					{
+						// eagerAliases.put()
+					}
+				}
+
+			}
+
+		}
+
+		return null;
+
 	}
 
 	/**
@@ -135,16 +187,15 @@ public final class QueryHelper
 			// only build sorts if the property is part of the column map!
 			if (sortProp != null)
 			{
-				sb.append(" ORDER BY ");
-				sb.append(sortProp);
+				sb.append(ORDER_BY).append(sortProp);
 
 				if (searchOpts.isAscending())
 				{
-					sb.append(" ASC");
+					sb.append(ASC);
 				}
 				else
 				{
-					sb.append(" DESC");
+					sb.append(DESC);
 				}
 			}
 
@@ -155,9 +206,8 @@ public final class QueryHelper
 			return sb.toString();
 		}
 
-		sb.append(" LIMIT ").append(searchOpts.getMaxResults());
-		sb.append(" OFFSET ")
-				.append(searchOpts.getMaxResults() * searchOpts.getPage());
+		sb.append(LIMIT).append(searchOpts.getMaxResults());
+		sb.append(OFFSET).append(searchOpts.getMaxResults() * searchOpts.getPage());
 
 		return sb.toString();
 	}

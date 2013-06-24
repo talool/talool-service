@@ -393,18 +393,47 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId) throws ServiceException
+	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts,
+			final String[] eagerlyLoadedProps) throws ServiceException
 	{
 		try
 		{
-			final Search search = new Search(DealImpl.class);
-			search.addFilterEqual("dealOffer.id", dealOfferId);
-			return daoDispatcher.search(search);
+			final String newSql = QueryHelper.buildQuery(QueryType.DealsByDealOfferId, null, searchOpts);
+			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
+
+			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+
+			return query.list();
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem getDealsByDealOfferId for dealOfferId " + dealOfferId, ex);
+			throw new ServiceException("Problem getDealsByDealOfferId for dealOfferId " + dealOfferId + " " + ex.getLocalizedMessage(),
+					ex);
 		}
+
+	}
+
+	private static void setSearchOptions(final Search search, final SearchOptions searchOpts, final String[] eagerlyLoadedProps)
+	{
+		if (searchOpts != null)
+		{
+			if (searchOpts.getMaxResults() != null)
+			{
+				search.setMaxResults(searchOpts.getMaxResults());
+			}
+			if (searchOpts.getPage() != null)
+			{
+				search.setPage(searchOpts.getPage());
+			}
+			if (searchOpts.getSortProperty() != null)
+			{
+				search.addSort(searchOpts.getSortProperty(), !searchOpts.isAscending());
+			}
+		}
+
+		search.addFetches(eagerlyLoadedProps);
 
 	}
 

@@ -465,7 +465,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		dealAcquires = customerService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer()
 				.getId());
 
-		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId());
+		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("title").ascending(true).build();
+		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId(), searchOpts, new String[] { "merchant", "image" });
 
 		// test sort/pagination search options
 		testDealAquireSearchOptions(dealOfferPurchase, dealOffer, dealAcquires);
@@ -774,6 +775,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		dealOffer.setCode("code123");
 		dealOffer.setTitle("PaybackBook #1");
 		dealOffer.setDealType(DealType.PAID_BOOK);
+		dealOffer.setLocationName("Vancouver, WA");
 
 		MerchantMedia media = new MerchantMediaImpl();
 		media.setMediaType(MediaType.DEAL_OFFER_LOGO);
@@ -799,6 +801,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(dealOffer.getPrice(), dealOfferResult.getPrice());
 		Assert.assertEquals(dealOffer.getExpires(), dealOfferResult.getExpires());
 		Assert.assertEquals(dealOffer.getType(), dealOfferResult.getType());
+		Assert.assertEquals(dealOffer.getLocationName(), dealOfferResult.getLocationName());
 
 		Tag spaTag = taloolService.getTag("spa");
 		if (spaTag == null)
@@ -826,7 +829,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			assertDeal(newDeal, resultDeal);
 		}
 
-		List<Deal> resultDeals = taloolService.getDealsByDealOfferId(dealOffer.getId());
+		List<Deal> resultDeals = taloolService.getDealsByDealOfferId(dealOffer.getId(), null, null);
 
 		Assert.assertEquals(15, resultDeals.size());
 

@@ -31,6 +31,10 @@ public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
 
 	public void setDealType(DealType dealType);
 
+	public String getLocationName();
+
+	public void setLocationName(String name);
+
 	public DealType getType();
 
 	public void setTitle(String title);

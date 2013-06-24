@@ -7,10 +7,9 @@
     <relativePath>../pom.xml/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.talool</groupId>
-  <artifactId>talool-persistence</artifactId>
-  <name>Talool Persistence</name>
-  <version>1.0.1-SNAPSHOT</version>
+  <artifactId>talool-service</artifactId>
+  <name>Talool Service</name>
+  <version>1.0.2-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>
