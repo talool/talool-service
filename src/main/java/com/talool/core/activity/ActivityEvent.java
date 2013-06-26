@@ -13,7 +13,6 @@ public enum ActivityEvent
 {
 	// Be very careful of these and do not change!
 	UNKNOWN((short) 0, "unknown activity"),
-	GENERIC((short) 1, "generic message (string)"),
 	PURCHASE((short) 2, "customer purchased of deal offer"),
 	REDEEM((short) 3, "customer redeemed deal"),
 	REJECT((short) 4, "customer rejected gift"),
@@ -25,7 +24,8 @@ public enum ActivityEvent
 	FRIEND_GIFT_REJECT((short) 10, "friend rejected gift"),
 	FRIEND_GIFT_REDEEM((short) 11, "friend redeemed gift"),
 	MERCHANT_REACH((short) 12, "merchant message"),
-	TALOOL_REACH((short) 13, "Talool message");
+	TALOOL_REACH((short) 13, "Talool message"),
+	AD((short) 14, "Ad");
 
 	private short id;
 	private String description;
