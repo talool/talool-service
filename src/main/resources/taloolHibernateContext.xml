@@ -33,6 +33,11 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
+	<bean id="activityServiceImpl" class="com.talool.service.ActivityServiceImpl">
+		<property name="daoDispatcher" ref="daoDispatcher" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
 	<bean id="redemptionCodeStrategyImpl" class="com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl">
 	 <constructor-arg value="6"/>
 	</bean>

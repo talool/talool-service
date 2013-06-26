@@ -59,6 +59,11 @@ import org.hibernate.annotations.TypeDefs;
 				@Parameter(name = "identifierMethod", value = "getLetter"),
 				@Parameter(name = "valueOfMethod", value = "valueByLetter") }),
 
+		@TypeDef(name = "activityType", typeClass = GenericEnumUserType.class, parameters = {
+				@Parameter(name = "enumClass", value = "com.talool.core.activity.ActivityEvent"),
+				@Parameter(name = "identifierMethod", value = "getId"),
+				@Parameter(name = "valueOfMethod", value = "valueById") }),
+
 		@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters =
 		{ @Parameter(name = "enumClass", value = "com.talool.core.DealType") }),
 

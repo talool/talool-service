@@ -2,6 +2,8 @@ package com.talool.core;
 
 import java.util.UUID;
 
+import com.talool.core.activity.Activity;
+import com.talool.core.activity.ActivityEvent;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.MerchantSocialAccount;
 
@@ -33,6 +35,8 @@ public interface DomainFactory
 	public MerchantAccount newMerchantAccount(Merchant merchant);
 
 	public Customer newCustomer();
+
+	public Activity newActivity(final ActivityEvent activityType, final UUID customerId);
 
 	public Tag newTag(String tag);
 

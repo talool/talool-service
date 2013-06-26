@@ -891,7 +891,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
 			throws ServiceException
 	{
-
 		final EmailGift gift = new EmailGiftImpl();
 		gift.setToEmail(email);
 		gift.setReceipientName(receipientName);
@@ -929,5 +928,25 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		gift.setToCustomer(getCustomerById(toTaloolCustomer));
 		createGift(owningCustomerId, dealAcquireId, gift);
 		return gift.getId();
+	}
+
+	@Override
+	public Gift getGiftOnDealAcquire(final UUID dealAcquireId) throws ServiceException
+	{
+		final Search search = new Search(DealAcquireImpl.class);
+
+		try
+		{
+			search.addFilterEqual("id", dealAcquireId);
+			search.addField("gift");
+			return (Gift) daoDispatcher.searchUnique(search);
+		}
+		catch (Exception ex)
+		{
+			String msg = "Problem getGiftOnDealAcquire dealAcquireId: " + dealAcquireId;
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
+		}
+
 	}
 }

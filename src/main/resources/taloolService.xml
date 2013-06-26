@@ -24,6 +24,7 @@
 		<constructor-arg ref="taloolServiceImpl"/>
 		<constructor-arg ref="customerServiceImpl"/>
 		<constructor-arg ref="emailServiceImpl"/>
+		<constructor-arg ref="activityServiceImpl"/>
    </bean>
    
    <bean id="tagCache" class="com.talool.cache.TagCache" factory-method="createInstance">

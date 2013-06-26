@@ -8,6 +8,8 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.hibernate.Query;
 
 import com.google.common.collect.ImmutableMap;
+import com.googlecode.genericdao.search.Search;
+import com.googlecode.genericdao.search.Sort;
 import com.talool.core.SearchOptions;
 
 /**
@@ -210,6 +212,25 @@ public final class QueryHelper
 		sb.append(OFFSET).append(searchOpts.getMaxResults() * searchOpts.getPage());
 
 		return sb.toString();
+	}
+
+	public static void applySearchOptions(final SearchOptions searchOpts, final Search search)
+	{
+		if (searchOpts != null)
+		{
+			if (searchOpts.getMaxResults() != null)
+			{
+				search.setMaxResults(searchOpts.getMaxResults());
+			}
+			if (searchOpts.getPage() != null)
+			{
+				search.setPage(searchOpts.getPage());
+			}
+			if (searchOpts.getSortProperty() != null)
+			{
+				search.addSort(new Sort(searchOpts.getSortProperty(), !searchOpts.isAscending()));
+			}
+		}
 	}
 
 	public static String buildQuery(final QueryType queryType, final Map<String, Object> params,

@@ -14,6 +14,8 @@ import com.talool.core.social.SocialNetwork;
  */
 public interface Customer extends IdentifiableUUID, Serializable, TimeAware
 {
+	public String getFullName();
+
 	public String getFirstName();
 
 	public void setFirstName(String firstName);

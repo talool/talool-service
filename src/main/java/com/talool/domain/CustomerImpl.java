@@ -225,4 +225,10 @@ public class CustomerImpl implements Customer
 
 	}
 
+	@Override
+	public String getFullName()
+	{
+		return firstName + " " + lastName;
+	}
+
 }

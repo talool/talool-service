@@ -24,11 +24,14 @@ import com.talool.core.MerchantMedia;
 import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.core.Tag;
+import com.talool.core.activity.Activity;
+import com.talool.core.activity.ActivityEvent;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.MerchantSocialAccount;
 import com.talool.core.social.SocialNetwork;
+import com.talool.domain.activity.ActivityImpl;
 import com.talool.domain.social.CustomerSocialAccountImpl;
 import com.talool.domain.social.MerchantSocialAccountImpl;
 
@@ -260,5 +263,14 @@ final class DomainFactoryImpl implements DomainFactory
 		}
 		return merchant;
 
+	}
+
+	@Override
+	public Activity newActivity(final ActivityEvent activityType, final UUID customerId)
+	{
+		final ActivityImpl act = new ActivityImpl();
+		act.setActivityType(activityType);
+		act.setCustomerId(customerId);
+		return act;
 	}
 }
