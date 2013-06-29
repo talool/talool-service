@@ -72,6 +72,10 @@ public abstract class GiftImpl implements Gift
 	@Column(name = "create_dt", unique = false, insertable = false, updatable = false)
 	private Date created;
 
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
+	@JoinColumn(name = "to_customer_id")
+	private Customer toCustomer;
+
 	@Override
 	public UUID getId()
 	{
@@ -168,6 +172,19 @@ public abstract class GiftImpl implements Gift
 	{
 		return new HashCodeBuilder(17, 37).append(getFromCustomer()).append(getDealAcquire()).append(getGiftStatus()).
 				hashCode();
+	}
+
+	@Override
+	public Customer getToCustomer()
+	{
+		return toCustomer;
+	}
+
+	@Override
+	public void setToCustomer(Customer customer)
+	{
+		this.toCustomer = customer;
+
 	}
 
 }

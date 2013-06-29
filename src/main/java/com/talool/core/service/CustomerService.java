@@ -154,4 +154,6 @@ public interface CustomerService extends HibernateService
 
 	public void save(final CustomerSocialAccount socialAccount) throws ServiceException;
 
+	public Customer getCustomerBySocialLoginId(final String socialLoginId) throws ServiceException;
+
 }

@@ -31,6 +31,7 @@ import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
 import com.talool.core.SearchOptions;
+import com.talool.core.activity.Activity;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.gift.FaceBookGift;
 import com.talool.core.gift.Gift;
@@ -51,6 +52,7 @@ import com.talool.domain.gift.EmailGiftImpl;
 import com.talool.domain.gift.FacebookGiftImpl;
 import com.talool.domain.gift.GiftImpl;
 import com.talool.domain.gift.TaloolGiftImpl;
+import com.talool.domain.social.CustomerSocialAccountImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -646,6 +648,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throws ServiceException
 	{
 		final DealAcquire dac = getDealAcquire(dealAcquireId);
+		Customer toCust = null;
+		Activity sendActivity = null;
+		Activity recvActivity = null;
 
 		if (!dac.getCustomer().getId().equals(owningCustomerId))
 		{
@@ -674,15 +679,56 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			gift.setDealAcquire(dac);
 			gift.setFromCustomer(dac.getCustomer());
+
 			daoDispatcher.save(gift);
+
+			// Send Gift activity if toCustomer exists
+			if (gift instanceof FaceBookGift)
+			{
+				final String facebookId = ((FaceBookGift) (gift)).getToFacebookId();
+				toCust = getCustomerBySocialLoginId(facebookId);
+				gift.setToCustomer(toCust);
+				sendActivity = ActivityUtil.createFacebookSendGift(gift);
+				if (toCust != null)
+				{
+					recvActivity = ActivityUtil.createFacebookRecvGift(gift);
+				}
+			}
+			else if (gift instanceof EmailGift)
+			{
+				toCust = getCustomerByEmail(((EmailGift) gift).getToEmail());
+				sendActivity = ActivityUtil.createEmailSendGift(gift);
+				gift.setToCustomer(toCust);
+				if (toCust != null)
+				{
+					recvActivity = ActivityUtil.createEmailRecvGift(gift);
+				}
+			}
+
+			if (LOG.isDebugEnabled() && toCust != null)
+			{
+				LOG.debug("Sending immediate activity to Talool customer " + toCust.getEmail());
+			}
 
 			dac.setGift(gift);
 			dac.setAcquireStatus(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE);
 			daoDispatcher.save(dac);
+
+			getCurrentSession().flush();
+
+			if (sendActivity != null)
+			{
+				ServiceFactory.get().getActivityService().save(sendActivity);
+			}
+			if (recvActivity != null)
+			{
+				ServiceFactory.get().getActivityService().save(recvActivity);
+			}
+
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem in createGift", ex);
+			throw new ServiceException("Problem in createGift: " + ex.getLocalizedMessage(), ex);
 		}
 
 	}
@@ -742,14 +788,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						receivingCustomer.getId(), receivingCustomer.getSocialAccounts().get(facebook).getLoginId(), receivingCustomer));
 			}
 
-		}
-		else if (giftRequest instanceof TaloolGiftImpl)
-		{
-			if (!((TaloolGiftImpl) giftRequest).getToCustomer().getId().equals(receivingCustomer.getId()))
-			{
-				throw new ServiceException(String.format(
-						"receivingCustomerId %s is not the gift receiver for giftRequestId %s", receivingCustomer.getId()));
-			}
 		}
 
 		return giftOwnership;
@@ -883,6 +921,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		gift.setToFacebookId(facebookId);
 		gift.setReceipientName(receipientName);
 		createGift(owningCustomerId, dealAcquireId, gift);
+
+		// see if to customer
 		return gift.getId();
 	}
 
@@ -948,5 +988,23 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException(msg, ex);
 		}
 
+	}
+
+	@Override
+	public Customer getCustomerBySocialLoginId(final String socialLoginId) throws ServiceException
+	{
+		final Search search = new Search(CustomerSocialAccountImpl.class);
+		try
+		{
+			search.addFilterEqual("loginId", socialLoginId);
+			search.addField("customer");
+			return (Customer) daoDispatcher.searchUnique(search);
+		}
+		catch (Exception ex)
+		{
+			String msg = "Problem getCustomerBySocialLoginId socialLoginId: " + socialLoginId;
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
+		}
 	}
 }

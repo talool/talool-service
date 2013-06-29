@@ -31,4 +31,8 @@ public interface Gift extends IdentifiableUUID, Serializable, TimeAware
 
 	public void setGiftStatus(final GiftStatus giftStatus);
 
+	public Customer getToCustomer();
+
+	public void setToCustomer(final Customer customer);
+
 }

@@ -685,7 +685,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
 						gf.getDealAcquire().getAcquireStatus());
 
-				Assert.assertEquals(receivingCustomerSocial, ((TaloolGift) gf).getToCustomer());
 			}
 
 		}

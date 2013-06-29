@@ -1,6 +1,5 @@
 package com.talool.core.gift;
 
-import com.talool.core.Customer;
 
 /**
  * Gift request
@@ -10,8 +9,5 @@ import com.talool.core.Customer;
  */
 public interface TaloolGift extends Gift
 {
-	public Customer getToCustomer();
-
-	public void setToCustomer(final Customer toCustomer);
 
 }
