@@ -688,20 +688,20 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				final String facebookId = ((FaceBookGift) (gift)).getToFacebookId();
 				toCust = getCustomerBySocialLoginId(facebookId);
 				gift.setToCustomer(toCust);
-				sendActivity = ActivityUtil.createFacebookSendGift(gift);
+				sendActivity = ActivityFactory.createFacebookSendGift(gift);
 				if (toCust != null)
 				{
-					recvActivity = ActivityUtil.createFacebookRecvGift(gift);
+					recvActivity = ActivityFactory.createFacebookRecvGift(gift);
 				}
 			}
 			else if (gift instanceof EmailGift)
 			{
 				toCust = getCustomerByEmail(((EmailGift) gift).getToEmail());
-				sendActivity = ActivityUtil.createEmailSendGift(gift);
+				sendActivity = ActivityFactory.createEmailSendGift(gift);
 				gift.setToCustomer(toCust);
 				if (toCust != null)
 				{
-					recvActivity = ActivityUtil.createEmailRecvGift(gift);
+					recvActivity = ActivityFactory.createEmailRecvGift(gift);
 				}
 			}
 
