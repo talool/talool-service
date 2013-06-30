@@ -68,17 +68,18 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 	}
 
 	@Override
-	public void save(List<Activity> activities) throws ServiceException
+	public void save(final List<Activity> activities) throws ServiceException
 	{
-		try
+		for (final Activity act : activities)
 		{
-			daoDispatcher.save(activities);
-		}
-		catch (Exception ex)
-		{
-			String msg = "Problem getActivities";
-			LOG.error(msg, ex);
-			throw new ServiceException(msg, ex);
+			try
+			{
+				save(act);
+			}
+			catch (ServiceException se)
+			{
+				LOG.error(se.getLocalizedMessage(), se);
+			}
 		}
 	}
 

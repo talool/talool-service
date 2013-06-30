@@ -29,4 +29,7 @@ public final class ActivityBundle
 	public static final String WELCOME_TITLE = "welcome.title";
 	public static final String WELCOME_SUBTITLE = "welcome.subtitle";
 
+	public static final String WELCOME_GIFTS_TITLE = "welcome.gifts.title";
+	public static final String WELCOME_GIFTS_SUBTITLE = "welcome.gifts.subtitle";
+
 }

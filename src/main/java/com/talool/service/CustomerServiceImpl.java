@@ -87,45 +87,46 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
 		final List<Activity> activities = new ArrayList<Activity>();
 
+		try
+		{
+			// add welcome message!
+			activities.add(ActivityFactory.createWelcome(customer.getId(), gifts.size()));
+		}
+		catch (Exception ex)
+		{
+			LOG.error("Problem creating welcome activity: " + ex.getLocalizedMessage(), ex);
+		}
+
 		if (CollectionUtils.isNotEmpty(gifts))
 		{
-			if (LOG.isDebugEnabled())
-			{
-				LOG.debug(String.format("Sending %d gift activities for new customer %s %s", gifts.size(), customer.getEmail(),
-						customer.getId()));
-			}
-
 			for (final Gift gift : gifts)
 			{
-				Activity activity = null;
 				gift.setToCustomer(customer);
 				daoDispatcher.save(gift);
 
 				try
 				{
-					activity = ActivityFactory.createRecvGift(gift);
-					activities.add(activity);
-					if (LOG.isDebugEnabled())
-					{
-						LOG.debug(String.format("New receive activity %s for new customer %s", activity.getId(), customer.getId()));
-					}
+					activities.add(ActivityFactory.createRecvGift(gift));
 				}
 				catch (Exception e)
 				{
 					LOG.error("Problem creating activity for new user " + customer.getEmail());
 				}
 			}
+		}
 
-			try
+		try
+		{
+			ServiceFactory.get().getActivityService().save(activities);
+			if (LOG.isDebugEnabled())
 			{
-				activities.add(ActivityFactory.createWelcome(customer.getId()));
-				ServiceFactory.get().getActivityService().save(activities);
+				LOG.debug(String.format("Sending %d gift activities for new customer %s %s", gifts.size(), customer.getEmail(),
+						customer.getId()));
 			}
-			catch (Exception e)
-			{
-				LOG.error("Problem saving activities for new user " + customer.getEmail());
-			}
-
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem saving activities for new user " + customer.getEmail());
 		}
 
 	}

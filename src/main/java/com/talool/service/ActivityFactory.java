@@ -126,21 +126,21 @@ public final class ActivityFactory
 
 	}
 
-	public static Activity createWelcome(final UUID customerUuid) throws TException
+	public static Activity createWelcome(final UUID customerUuid, final int giftCount) throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.WELCOME, customerUuid);
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.WELCOME);
+		String title = null;
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.WELCOME_TITLE);
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.WELCOME_TITLE);
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.WELCOME_SUBTITLE, ServiceConfig.get().getConsumerLink());;
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.WELCOME_SUBTITLE);
 
 		tActivity.setSubtitle(title);
 
-		final ActivityLink_t link = new ActivityLink_t(LinkType.EXTERNAL, title);
+		final ActivityLink_t link = new ActivityLink_t(LinkType.EXTERNAL, ServiceConfig.get().getConsumersLink());
 		tActivity.setActivityLink(link);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
