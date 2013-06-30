@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
@@ -77,12 +78,54 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	private RedemptionCodeStrategy redemptionCodeStrategy;
 
 	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
+	@Transactional(propagation = Propagation.NESTED)
 	public void createAccount(final Customer customer, final String password) throws ServiceException
 	{
 		createAccount(AccountType.CUS, customer, password);
-	}
 
+		List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
+
+		if (CollectionUtils.isNotEmpty(gifts))
+		{
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug(String.format("Sending %d gift activities for new customer %s %s", gifts.size(), customer.getEmail(),
+						customer.getId()));
+			}
+
+			for (final Gift gift : gifts)
+			{
+				Activity activity = null;
+				gift.setToCustomer(customer);
+				daoDispatcher.save(gift);
+
+				try
+				{
+					activity = ActivityFactory.createRecvGift(gift);
+				}
+				catch (Exception e)
+				{
+					LOG.error("Problem creating activity for new user " + customer.getEmail());
+				}
+
+				try
+				{
+					ServiceFactory.get().getActivityService().save(activity);
+					if (LOG.isDebugEnabled())
+					{
+						LOG.debug(String.format("New receive activity %s for new customer %s", activity.getId(), customer.getId()));
+					}
+				}
+				catch (ServiceException se)
+				{
+					LOG.error("Problem saving activity for new user " + customer.getEmail());
+				}
+
+			}
+
+		}
+
+	}
 	private static class GiftOwnership
 	{
 		Gift giftRequest;
@@ -105,6 +148,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			save((CustomerImpl) account);
 			daoDispatcher.flush(CustomerImpl.class);
 			daoDispatcher.refresh((CustomerImpl) account);
+
+			// create any neccsary activities
 
 		}
 		catch (Exception e)
@@ -795,7 +840,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
-	public void acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException
+	public DealAcquire acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException
 	{
 		final GiftOwnership giftOwnership = validateGiftOwnership(giftRequestId, receipientCustomerId);
 
@@ -811,6 +856,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		// update gift request
 		giftOwnership.giftRequest.setGiftStatus(GiftStatus.ACCEPTED);
 		daoDispatcher.save(giftOwnership.giftRequest);
+
+		return dac;
 
 	}
 
@@ -890,7 +937,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			Query query = (Query) getCurrentSession().getNamedQuery("getGifts");
+			final Query query = (Query) getCurrentSession().getNamedQuery("getGifts");
 			query.setParameter("customerId", customerId, PostgresUUIDType.INSTANCE);
 			query.setParameterList("giftStatus", giftStatus);
 

@@ -148,7 +148,7 @@ public interface CustomerService extends HibernateService
 
 	public List<Gift> getGifts(final UUID customerId, final GiftStatus[] requestStatus) throws ServiceException;
 
-	public void acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException;
+	public DealAcquire acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException;
 
 	public void rejectGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException;
 

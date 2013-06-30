@@ -7,5 +7,5 @@ package com.talool.core.gift;
  */
 public enum GiftStatus
 {
-	PENDING, ACCEPTED, REJECTED;
+	PENDING, ACCEPTED, REJECTED, INVALIDATED;
 }

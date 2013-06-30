@@ -1,4 +1,4 @@
-
+-- owner must be POSTGRES!  Be sure you run this script as postgres!!!!!!!!
 alter table merchant_location alter column country SET DEFAULT 'US';
 
 
@@ -23,6 +23,12 @@ CREATE TABLE activity (
     PRIMARY KEY (activity_id)
 );
 
+-- owner must be POSTGRES!  Be sure you run this script as postgres!!!!!!!!
+-- owner must be POSTGRES!  Be sure you run this script as postgres!!!!!!!!
 ALTER TABLE public.activity OWNER TO talool;
 
 CREATE INDEX activity_activity_id_idx ON activity (customer_id);
+
+ALTER TYPE gift_status OWNER TO talool;
+
+ALTER TYPE gift_status ADD VALUE 'INVALIDATED' AFTER 'REJECTED';
