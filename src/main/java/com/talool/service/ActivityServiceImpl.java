@@ -61,7 +61,24 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getActivities for customerId %s", customerId), ex);
+			String msg = String.format("Problem getActivities for customerId %s", customerId);
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
+		}
+	}
+
+	@Override
+	public void save(List<Activity> activities) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(activities);
+		}
+		catch (Exception ex)
+		{
+			String msg = "Problem getActivities";
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
 		}
 	}
 

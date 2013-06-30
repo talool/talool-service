@@ -16,5 +16,7 @@ public interface ActivityService
 {
 	public void save(final Activity activity) throws ServiceException;
 
+	public void save(final List<Activity> activities) throws ServiceException;
+
 	public List<Activity> getActivities(final UUID customerId, final SearchOptions searchOpts) throws ServiceException;
 }

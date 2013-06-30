@@ -106,7 +106,7 @@ public final class ActivityFactory
 
 	public static Activity createReject(final Gift gift, UUID customerUuid) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.REJECT, customerUuid);
+		final Activity activity = domainFactory.newActivity(ActivityEvent.REJECT_GIFT, customerUuid);
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.REJECT_GIFT);
 
 		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
@@ -119,6 +119,29 @@ public final class ActivityFactory
 				ActivityBundle.REJECTED_GIFT_SUBTITLE, gift.getFromCustomer().getFullName());
 
 		tActivity.setSubtitle(title);
+
+		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
+
+		return activity;
+
+	}
+
+	public static Activity createWelcome(final UUID customerUuid) throws TException
+	{
+		final Activity activity = domainFactory.newActivity(ActivityEvent.WELCOME, customerUuid);
+		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.WELCOME);
+
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.WELCOME_TITLE);
+
+		tActivity.setTitle(title);
+
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.WELCOME_SUBTITLE, ServiceConfig.get().getConsumerLink());;
+
+		tActivity.setSubtitle(title);
+
+		final ActivityLink_t link = new ActivityLink_t(LinkType.EXTERNAL, title);
+		tActivity.setActivityLink(link);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
 

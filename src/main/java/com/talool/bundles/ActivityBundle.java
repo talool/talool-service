@@ -26,4 +26,7 @@ public final class ActivityBundle
 	public static final String REJECTED_GIFT_TITLE = "rejected.gift.title";
 	public static final String REJECTED_GIFT_SUBTITLE = "rejected.gift.subtitle";
 
+	public static final String WELCOME_TITLE = "welcome.title";
+	public static final String WELCOME_SUBTITLE = "welcome.subtitle";
+
 }

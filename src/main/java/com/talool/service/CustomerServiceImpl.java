@@ -1,5 +1,6 @@
 package com.talool.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
@@ -83,7 +84,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		createAccount(AccountType.CUS, customer, password);
 
-		List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
+		final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
+		final List<Activity> activities = new ArrayList<Activity>();
 
 		if (CollectionUtils.isNotEmpty(gifts))
 		{
@@ -102,25 +104,26 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				try
 				{
 					activity = ActivityFactory.createRecvGift(gift);
-				}
-				catch (Exception e)
-				{
-					LOG.error("Problem creating activity for new user " + customer.getEmail());
-				}
-
-				try
-				{
-					ServiceFactory.get().getActivityService().save(activity);
+					activities.add(activity);
 					if (LOG.isDebugEnabled())
 					{
 						LOG.debug(String.format("New receive activity %s for new customer %s", activity.getId(), customer.getId()));
 					}
 				}
-				catch (ServiceException se)
+				catch (Exception e)
 				{
-					LOG.error("Problem saving activity for new user " + customer.getEmail());
+					LOG.error("Problem creating activity for new user " + customer.getEmail());
 				}
+			}
 
+			try
+			{
+				activities.add(ActivityFactory.createWelcome(customer.getId()));
+				ServiceFactory.get().getActivityService().save(activities);
+			}
+			catch (Exception e)
+			{
+				LOG.error("Problem saving activities for new user " + customer.getEmail());
 			}
 
 		}

@@ -13,9 +13,10 @@ public enum ActivityEvent
 {
 	// Be very careful of these and do not change!
 	UNKNOWN((short) 0, "unknown activity"),
+	WELCOME((short) 1, "welcome new customer"),
 	PURCHASE((short) 2, "customer purchased of deal offer"),
 	REDEEM((short) 3, "customer redeemed deal"),
-	REJECT((short) 4, "customer rejected gift"),
+	REJECT_GIFT((short) 4, "customer rejected gift"),
 	FACEBOOK_RECV_GIFT((short) 5, "customer received Facebook gift"),
 	FACEBOOK_SEND_GIFT((short) 6, "customer sent Facebook gift"),
 	EMAIL_RECV_GIFT((short) 7, "customer received email gift"),
