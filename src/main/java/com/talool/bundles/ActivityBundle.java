@@ -14,11 +14,17 @@ public final class ActivityBundle
 
 	public static final String PURCHASED_DEAL_OFFER_TITLE = "purchased.dealoffer.title";
 
+	public static final String FRIEND_ACCEPTED_DEAL_TITLE = "friend.accepted.gift.title";
+	public static final String FRIEND_ACCEPTED_DEAL_SUBTITLE = "friend.accepted.gift.subtitle";
+
 	public static final String FRIEND_REDEEMED_DEAL_TITLE = "friend.redeemed.deal.title";
 	public static final String FRIEND_REDEEMED_DEAL_SUBTITLE = "friend.redeemed.deal.subtitle";
 
 	public static final String FRIEND_REJECTED_DEAL_TITLE = "friend.rejected.gift.title";
 	public static final String FRIEND_REJECTED_DEAL_SUBTITLE = "friend.rejected.gift.subtitle";
+
+	public static final String ACCEPTED_DEAL_TITLE = "accepted.gift.title";
+	public static final String ACCEPTED_DEAL_SUBTITLE = "accepted.gift.subtitle";
 
 	public static final String REDEEMED_DEAL_TITLE = "redeemed.deal.title";
 	public static final String REDEEMED_DEAL_SUBTITLE = "redeemed.deal.subtitle";

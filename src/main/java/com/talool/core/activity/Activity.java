@@ -19,6 +19,10 @@ public interface Activity extends IdentifiableUUID, Serializable
 
 	public UUID getCustomerId();
 
+	public UUID getGiftId();
+
+	public void setGiftId(final UUID giftId);
+
 	public void setCustomerId(final UUID customerId);
 
 	public void setActivityData(final byte[] activityData);

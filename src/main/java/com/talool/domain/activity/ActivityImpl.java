@@ -40,6 +40,10 @@ public class ActivityImpl implements Activity
 	@Column(name = "customer_id", nullable = false)
 	private UUID customerId;
 
+	@Type(type = "pg-uuid")
+	@Column(name = "gift_id")
+	private UUID giftId;
+
 	@Column(name = "activity_data", nullable = false)
 	private byte[] activityData;
 
@@ -130,5 +134,17 @@ public class ActivityImpl implements Activity
 	{
 		return new HashCodeBuilder(17, 37).append(getCustomerId()).append(getActivityEvent()).
 				append(getActivityDate()).append(getActivityData()).hashCode();
+	}
+
+	@Override
+	public UUID getGiftId()
+	{
+		return giftId;
+	}
+
+	@Override
+	public void setGiftId(UUID giftId)
+	{
+		this.giftId = giftId;
 	}
 }

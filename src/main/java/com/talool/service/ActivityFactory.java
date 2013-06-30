@@ -104,6 +104,28 @@ public final class ActivityFactory
 
 	}
 
+	public static Activity createFriendAcceptGift(final Gift gift) throws TException
+	{
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_ACCEPT, gift.getFromCustomer().getId());
+		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_ACCEPT);
+
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.FRIEND_ACCEPTED_DEAL_TITLE, gift.getReceipientName());
+
+		tActivity.setTitle(title);
+
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.FRIEND_ACCEPTED_DEAL_SUBTITLE, gift.getDealAcquire().getDeal().getTitle(), gift.getDealAcquire().getDeal()
+						.getMerchant().getName());
+
+		tActivity.setSubtitle(title);
+
+		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
+
+		return activity;
+
+	}
+
 	public static Activity createReject(final Gift gift, UUID customerUuid) throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.REJECT_GIFT, customerUuid);
@@ -238,14 +260,39 @@ public final class ActivityFactory
 
 		tActivity.setTitle(title);
 
+		// closed state for receives represents non-acquired gift
+		tActivity.setClosedState(false);
+
 		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.RECV_FACEBOOK_GIFT_SUBTITLE, gift
 				.getFromCustomer().getFullName());
 
 		tActivity.setSubtitle(title);
 
+		final ActivityLink_t link = new ActivityLink_t(LinkType.GIFT, gift.getId().toString());
+		tActivity.setActivityLink(link);
+
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
 
 		return activity;
+
+	}
+
+	/**
+	 * Sets the closeState to true on the activity bytes
+	 * 
+	 * @param activity
+	 * @return
+	 * @throws TException
+	 */
+	public static void closeState(final Activity activity) throws TException
+	{
+		final Activity_t tActivity = new Activity_t();
+
+		ThriftUtil.deserialize(activity.getActivityData(), tActivity, PROTOCOL_FACTORY);
+
+		tActivity.setClosedState(true);
+
+		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
 
 	}
 
@@ -261,6 +308,9 @@ public final class ActivityFactory
 
 		tActivity.setTitle(title);
 
+		// closed state for receives represents non-acquired gift
+		tActivity.setClosedState(false);
+
 		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
 				ActivityBundle.RECV_EMAIL_GIFT_SUBTITLE, gift.getFromCustomer().getFullName());
 
@@ -268,6 +318,27 @@ public final class ActivityFactory
 
 		final ActivityLink_t link = new ActivityLink_t(LinkType.GIFT, gift.getId().toString());
 		tActivity.setActivityLink(link);
+
+		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
+
+		return activity;
+
+	}
+
+	public static Activity createFriendAccept(final Gift gift) throws TException
+	{
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_ACCEPT, gift.getFromCustomer().getId());
+		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_ACCEPT);
+
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.FRIEND_ACCEPTED_DEAL_TITLE, gift.getReceipientName());
+		tActivity.setTitle(title);
+
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.FRIEND_ACCEPTED_DEAL_SUBTITLE, gift.getDealAcquire().getDeal().getTitle(), gift.getDealAcquire().getDeal()
+						.getMerchant().getName());
+
+		tActivity.setSubtitle(title);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
 

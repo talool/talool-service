@@ -50,6 +50,7 @@ import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.FavoriteMerchantImpl;
 import com.talool.domain.RelationshipImpl;
+import com.talool.domain.activity.ActivityImpl;
 import com.talool.domain.gift.EmailGiftImpl;
 import com.talool.domain.gift.FacebookGiftImpl;
 import com.talool.domain.gift.GiftImpl;
@@ -106,7 +107,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 				try
 				{
-					activities.add(ActivityFactory.createRecvGift(gift));
+					final Activity act = ActivityFactory.createRecvGift(gift);
+					act.setGiftId(gift.getId());
+					activities.add(act);
 				}
 				catch (Exception e)
 				{
@@ -132,7 +135,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 	private static class GiftOwnership
 	{
-		Gift giftRequest;
+		Gift gift;
 		Customer receivingCustomer;
 	}
 
@@ -741,6 +744,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				if (toCust != null)
 				{
 					recvActivity = ActivityFactory.createFacebookRecvGift(gift);
+					recvActivity.setGiftId(gift.getId());
 				}
 			}
 			else if (gift instanceof EmailGift)
@@ -751,6 +755,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				if (toCust != null)
 				{
 					recvActivity = ActivityFactory.createEmailRecvGift(gift);
+					recvActivity.setGiftId(gift.getId());
 				}
 			}
 
@@ -804,7 +809,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		final GiftOwnership giftOwnership = new GiftOwnership();
-		giftOwnership.giftRequest = giftRequest;
+		giftOwnership.gift = giftRequest;
 
 		final Customer receivingCustomer = getCustomerById(customerId);
 
@@ -844,11 +849,11 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
-	public DealAcquire acceptGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException
+	public DealAcquire acceptGift(final UUID giftId, final UUID receipientCustomerId) throws ServiceException
 	{
-		final GiftOwnership giftOwnership = validateGiftOwnership(giftRequestId, receipientCustomerId);
+		final GiftOwnership giftOwnership = validateGiftOwnership(giftId, receipientCustomerId);
 
-		final DealAcquire dac = giftOwnership.giftRequest.getDealAcquire();
+		final DealAcquire dac = giftOwnership.gift.getDealAcquire();
 
 		dac.setAcquireStatus(AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
 		// dac.setSharedByCustomer(dac.getCustomer());
@@ -858,8 +863,41 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		daoDispatcher.save(dac);
 
 		// update gift request
-		giftOwnership.giftRequest.setGiftStatus(GiftStatus.ACCEPTED);
-		daoDispatcher.save(giftOwnership.giftRequest);
+		giftOwnership.gift.setGiftStatus(GiftStatus.ACCEPTED);
+		daoDispatcher.save(giftOwnership.gift);
+
+		try
+		{
+			Activity activity = ActivityFactory.createFriendAccept(giftOwnership.gift);
+			ServiceFactory.get().getActivityService().save(activity);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem creating createFriendAccept: " + e.getLocalizedMessage(), e);
+		}
+
+		try
+		{
+			final Search search = new Search(ActivityImpl.class);
+			search.addFilterEqual("giftId", giftId);
+			search.addFilterEqual("customerId", receipientCustomerId);
+
+			final Activity act = (Activity) daoDispatcher.searchUnique(search);
+
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug("Closing state on gift activity - activityId: " + act.getId());
+			}
+
+			ActivityFactory.closeState(act);
+
+			daoDispatcher.save(act);
+
+		}
+		catch (Exception ex)
+		{
+			LOG.error("Problem finding/persisting closedState on activity: " + ex.getLocalizedMessage());
+		}
 
 		return dac;
 
@@ -871,7 +909,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		final GiftOwnership giftOwnership = validateGiftOwnership(giftRequestId, receipientCustomerId);
 
-		final DealAcquire dac = giftOwnership.giftRequest.getDealAcquire();
+		final DealAcquire dac = giftOwnership.gift.getDealAcquire();
 
 		dac.setAcquireStatus(AcquireStatus.REJECTED_CUSTOMER_SHARE);
 
@@ -879,8 +917,30 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		daoDispatcher.save(dac);
 
 		// update gift request
-		giftOwnership.giftRequest.setGiftStatus(GiftStatus.REJECTED);
-		daoDispatcher.save(giftOwnership.giftRequest);
+		giftOwnership.gift.setGiftStatus(GiftStatus.REJECTED);
+		daoDispatcher.save(giftOwnership.gift);
+
+		Activity activity;
+		try
+		{
+			activity = ActivityFactory.createReject(giftOwnership.gift, receipientCustomerId);
+			ServiceFactory.get().getActivityService().save(activity);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem creating rejectGift: " + e.getLocalizedMessage(), e);
+		}
+
+		try
+		{
+			// create the bi-directional activity
+			activity = ActivityFactory.createFriendRejectGift(giftOwnership.gift);
+			ServiceFactory.get().getActivityService().save(activity);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem creating createFriendRejectGift: " + e.getLocalizedMessage(), e);
+		}
 
 	}
 

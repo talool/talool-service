@@ -16,6 +16,7 @@ ALTER table deal_offer add column location_name character varying(64);
 CREATE TABLE activity (
 	activity_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     customer_id UUID NOT NULL,
+    gift_id UUID,
     activity_type smallint NOT NULL,
     activity_version character varying(36),
     activity_data bytea NOT NULL,
@@ -28,6 +29,7 @@ CREATE TABLE activity (
 ALTER TABLE public.activity OWNER TO talool;
 
 CREATE INDEX activity_activity_id_idx ON activity (customer_id);
+CREATE INDEX activity_gift_id_idx ON activity (gift_id);
 
 ALTER TYPE gift_status OWNER TO talool;
 
