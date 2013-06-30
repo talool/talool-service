@@ -278,7 +278,7 @@ public final class ActivityFactory
 	}
 
 	/**
-	 * Sets the closeState to true on the activity bytes
+	 * Sets the closeState to true on the serilized activity object
 	 * 
 	 * @param activity
 	 * @return
