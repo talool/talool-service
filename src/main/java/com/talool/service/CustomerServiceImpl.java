@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.thrift.TException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
@@ -878,28 +879,34 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			final Search search = new Search(ActivityImpl.class);
-			search.addFilterEqual("giftId", giftId);
-			search.addFilterEqual("customerId", receipientCustomerId);
-
-			final Activity act = (Activity) daoDispatcher.searchUnique(search);
-
-			if (LOG.isDebugEnabled())
-			{
-				LOG.debug("Closing state on gift activity - activityId: " + act.getId());
-			}
-
-			ActivityFactory.closeState(act);
-
-			daoDispatcher.save(act);
-
+			setClosedState(giftOwnership.gift, true);
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
-			LOG.error("Problem finding/persisting closedState on activity: " + ex.getLocalizedMessage());
+			LOG.error("Problem finding/persisting closedState on activity: " + e.getLocalizedMessage());
 		}
 
 		return dac;
+
+	}
+
+	@Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
+	private void setClosedState(final Gift gift, final boolean isClosed) throws TException
+	{
+		final Search search = new Search(ActivityImpl.class);
+		search.addFilterEqual("giftId", gift.getId());
+		search.addFilterEqual("customerId", gift.getToCustomer().getId());
+
+		final Activity act = (Activity) daoDispatcher.searchUnique(search);
+
+		if (LOG.isDebugEnabled())
+		{
+			LOG.debug("Closing state on gift activity - activityId: " + act.getId());
+		}
+
+		ActivityFactory.setClosedState(act, isClosed);
+
+		daoDispatcher.save(act);
 
 	}
 
@@ -942,11 +949,35 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem creating createFriendRejectGift: " + e.getLocalizedMessage(), e);
 		}
 
+		final Search search = new Search(ActivityImpl.class);
+		search.addFilterEqual("giftId", giftOwnership.gift.getId());
+		search.addFilterEqual("customerId", receipientCustomerId);
+
+		final Activity act = (Activity) daoDispatcher.searchUnique(search);
+
+		if (LOG.isDebugEnabled())
+		{
+			LOG.debug("Closing state on gift activity - activityId: " + act.getId());
+		}
+
+		// ActivityFactory.closeState(act);
+
+		daoDispatcher.save(act);
+
+		try
+		{
+			setClosedState(giftOwnership.gift, true);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem finding/persisting closedState on activity: " + e.getLocalizedMessage());
+		}
+
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void remove(CustomerSocialAccount cas) throws ServiceException
+	public void remove(final CustomerSocialAccount cas) throws ServiceException
 	{
 		try
 		{

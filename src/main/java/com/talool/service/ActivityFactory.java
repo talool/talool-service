@@ -284,13 +284,13 @@ public final class ActivityFactory
 	 * @return
 	 * @throws TException
 	 */
-	public static void closeState(final Activity activity) throws TException
+	public static void setClosedState(final Activity activity, final boolean isClosed) throws TException
 	{
 		final Activity_t tActivity = new Activity_t();
 
 		ThriftUtil.deserialize(activity.getActivityData(), tActivity, PROTOCOL_FACTORY);
 
-		tActivity.setClosedState(true);
+		tActivity.setClosedState(isClosed);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
 
