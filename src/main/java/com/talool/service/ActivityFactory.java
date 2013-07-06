@@ -260,9 +260,6 @@ public final class ActivityFactory
 
 		tActivity.setTitle(title);
 
-		// closed state for receives represents non-acquired gift
-		tActivity.setClosedState(false);
-
 		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.RECV_FACEBOOK_GIFT_SUBTITLE, gift
 				.getFromCustomer().getFullName());
 
@@ -284,13 +281,13 @@ public final class ActivityFactory
 	 * @return
 	 * @throws TException
 	 */
-	public static void setClosedState(final Activity activity, final boolean isClosed) throws TException
+	public static void setActionTaken(final Activity activity, final boolean actionTaken) throws TException
 	{
 		final Activity_t tActivity = new Activity_t();
 
 		ThriftUtil.deserialize(activity.getActivityData(), tActivity, PROTOCOL_FACTORY);
 
-		tActivity.setClosedState(isClosed);
+		tActivity.setActionTaken(actionTaken);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
 
@@ -307,9 +304,6 @@ public final class ActivityFactory
 						.getMerchant().getName());
 
 		tActivity.setTitle(title);
-
-		// closed state for receives represents non-acquired gift
-		tActivity.setClosedState(false);
 
 		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
 				ActivityBundle.RECV_EMAIL_GIFT_SUBTITLE, gift.getFromCustomer().getFullName());

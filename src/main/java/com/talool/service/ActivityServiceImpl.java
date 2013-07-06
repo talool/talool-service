@@ -68,6 +68,7 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.NESTED)
 	public void save(final List<Activity> activities) throws ServiceException
 	{
 		for (final Activity act : activities)
@@ -80,6 +81,26 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 			{
 				LOG.error(se.getLocalizedMessage(), se);
 			}
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void activityAction(final UUID actionId) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(ActivityImpl.class);
+			search.addFilterEqual("id", actionId);
+			Activity activity = (Activity) daoDispatcher.searchUnique(search);
+			ActivityFactory.setActionTaken(activity, true);
+			save(activity);
+		}
+		catch (Exception ex)
+		{
+			String msg = String.format("Problem activityAction for actionId %s", actionId);
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
 		}
 	}
 

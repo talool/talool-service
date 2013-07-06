@@ -904,7 +904,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.debug("Closing state on gift activity - activityId: " + act.getId());
 		}
 
-		ActivityFactory.setClosedState(act, isClosed);
+		ActivityFactory.setActionTaken(act, isClosed);
 
 		daoDispatcher.save(act);
 
