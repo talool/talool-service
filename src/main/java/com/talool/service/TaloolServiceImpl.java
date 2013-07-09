@@ -1217,9 +1217,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			final Query query = getCurrentSession()
 					.createSQLQuery(
-							"select d.deal_offer_id as \"dealOfferId\", d.title as title,count(a) as \"totalCodes\" from deal_offer d LEFT OUTER JOIN activation_code a ON (a.deal_offer_id=d.deal_offer_id) where d.merchant_id=:merchantId group by d.deal_offer_id,d.title")
+							"select d.deal_offer_id as \"dealOfferId\", d.title as title,count(a) as \"totalCodes\", " +
+									"(select count(*) from activation_code where customer_id is not null) as \"totalActivations\" " +
+									"from deal_offer d " +
+									"LEFT OUTER JOIN activation_code a ON (a.deal_offer_id=d.deal_offer_id) " +
+									"where d.merchant_id=:merchantId group by d.deal_offer_id,d.title")
 					.
 					addScalar("totalCodes", StandardBasicTypes.INTEGER).
+					addScalar("totalActivations", StandardBasicTypes.INTEGER).
 					addScalar("title", StandardBasicTypes.STRING).
 					addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
 
