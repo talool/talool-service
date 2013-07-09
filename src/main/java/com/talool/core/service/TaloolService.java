@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.talool.core.AccountType;
+import com.talool.core.ActivationSummary;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.DealAcquire;
@@ -59,5 +60,7 @@ public interface TaloolService extends MerchantService, HibernateService
 	public void createActivationCodes(final UUID dealOfferId, final int totalCodes) throws ServiceException;
 
 	public List<String> getActivationCodes(final UUID dealOfferId) throws ServiceException;
+
+	public List<ActivationSummary> getActivationSummaries(final UUID merchantId) throws ServiceException;
 
 }

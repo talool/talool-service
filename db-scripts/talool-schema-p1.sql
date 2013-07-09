@@ -43,6 +43,7 @@ CREATE TABLE activation_code (
 	deal_offer_id UUID NOT NULL,
     code character(7) NOT NULL,
     customer_id UUID,
+    create_dt timestamp without time zone DEFAULT now() NOT NULL,
     activated_dt timestamp without time zone,
     PRIMARY KEY (activation_code_id),
     UNIQUE (deal_offer_id,code)

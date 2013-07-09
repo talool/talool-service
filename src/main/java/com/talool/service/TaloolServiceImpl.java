@@ -31,6 +31,7 @@ import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.Sort;
 import com.talool.core.AccountType;
 import com.talool.core.ActivationCode;
+import com.talool.core.ActivationSummary;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.Deal;
@@ -1196,6 +1197,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			final Search search = new Search(ActivationCodeImpl.class);
 			search.addFilterEqual("dealOfferId", dealOfferId);
 			search.addField("code");
+			// we want ascending so the first created code is first in the list
+			search.addSort(new Sort("created", false));
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -1204,4 +1207,34 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ActivationSummary> getActivationSummaries(final UUID merchantId) throws ServiceException
+	{
+		List<ActivationSummary> summaries = null;
+
+		try
+		{
+			final Query query = getCurrentSession()
+					.createSQLQuery(
+							"select d.deal_offer_id as \"dealOfferId\", d.title as title,count(a) as \"totalCodes\" from deal_offer d LEFT OUTER JOIN activation_code a ON (a.deal_offer_id=d.deal_offer_id) where d.merchant_id=:merchantId group by d.deal_offer_id,d.title")
+					.
+					addScalar("totalCodes", StandardBasicTypes.INTEGER).
+					addScalar("title", StandardBasicTypes.STRING).
+					addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
+
+			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
+
+			query.setResultTransformer(Transformers.aliasToBean(ActivationSummary.class));
+
+			summaries = query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getActivationSummaries for merchantId %s", merchantId), ex);
+		}
+
+		return summaries;
+
+	}
 }

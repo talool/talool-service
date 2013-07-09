@@ -1073,11 +1073,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void testActivationCodes() throws ServiceException
 	{
 		List<DealOffer> dofs = taloolService.getDealOffers();
-		taloolService.createActivationCodes(dofs.get(0).getId(), 30000);
+		taloolService.createActivationCodes(dofs.get(0).getId(), 100);
 
 		List<String> codes = taloolService.getActivationCodes(dofs.get(0).getId());
 
-		Assert.assertEquals(100, codes.size());
+		Assert.assertTrue(codes.size() >= 100);
 		Assert.assertEquals(7, codes.get(0).length());
 
 	}

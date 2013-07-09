@@ -48,6 +48,9 @@ public class ActivationCodeImpl implements ActivationCode
 	@Column(name = "activated_dt")
 	private Date activatedDate;
 
+	@Column(name = "create_dt", insertable = false, updatable = false)
+	private Date created;
+
 	@Column(name = "code", length = 7, nullable = false)
 	private String code;
 
@@ -103,6 +106,11 @@ public class ActivationCodeImpl implements ActivationCode
 	public UUID getId()
 	{
 		return id;
+	}
+
+	public Date getCreated()
+	{
+		return created;
 	}
 
 	@Override
