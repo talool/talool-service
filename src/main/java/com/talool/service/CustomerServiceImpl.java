@@ -1135,7 +1135,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			final Search search = new Search(ActivationCodeImpl.class);
 			search.addFilterEqual("dealOfferId", dealOfferId);
-			search.addFilterEqual("code", code);
+			search.addFilterEqual("code", code.toLowerCase());
 
 			activationCode = (ActivationCodeImpl) daoDispatcher.searchUnique(search);
 
