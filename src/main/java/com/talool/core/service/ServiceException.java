@@ -18,7 +18,9 @@ public class ServiceException extends Exception
 		CUSTOMER_DOES_NOT_OWN_DEAL(1002, "Customer does not own deal"),
 		DEAL_ALREADY_REDEEMED(1003, "Deal already redeemed"),
 		GIFTING_NOT_ALLOWED(1004, "Cannot gift deal due to acquire status"),
-		MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found");
+		MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found"),
+		ACTIVIATION_CODE_NOT_FOUND(3000, "Activiation code not found"),
+		ACTIVIATION_CODE_ALREADY_ACTIVATED(3001, "Activiation code already activated");
 
 		private final int code;
 		private final String message;

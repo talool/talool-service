@@ -2,6 +2,7 @@ package com.talool.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
+import com.talool.core.ActivationCode;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
@@ -45,6 +47,7 @@ import com.talool.core.service.ServiceException;
 import com.talool.core.service.ServiceException.Type;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
+import com.talool.domain.ActivationCodeImpl;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
@@ -650,7 +653,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	@Transactional(propagation = Propagation.REQUIRED)
+	@Transactional(propagation = Propagation.NESTED)
 	public void createDealOfferPurchase(final UUID customerId, final UUID dealOfferId) throws ServiceException
 	{
 		try
@@ -1119,6 +1122,48 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			String msg = "Problem getCustomerBySocialLoginId socialLoginId: " + socialLoginId;
 			LOG.error(msg, ex);
 			throw new ServiceException(msg, ex);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void activateCode(final UUID customerId, final UUID dealOfferId, final String code) throws ServiceException
+	{
+		ActivationCode activationCode = null;
+
+		try
+		{
+			final Search search = new Search(ActivationCodeImpl.class);
+			search.addFilterEqual("dealOfferId", dealOfferId);
+			search.addFilterEqual("code", code);
+
+			activationCode = (ActivationCodeImpl) daoDispatcher.searchUnique(search);
+
+			if (activationCode == null)
+			{
+				throw new ServiceException(ServiceException.Type.ACTIVIATION_CODE_NOT_FOUND, code);
+			}
+
+			if (activationCode.getCustomerId() != null)
+			{
+				throw new ServiceException(ServiceException.Type.ACTIVIATION_CODE_ALREADY_ACTIVATED, code);
+			}
+
+			activationCode.setCustomerId(customerId);
+			activationCode.setActivatedDate(new Date(System.currentTimeMillis()));
+
+			daoDispatcher.save(activationCode);
+
+			createDealOfferPurchase(customerId, dealOfferId);
+
+		}
+		catch (ServiceException se)
+		{
+			throw se;
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem createActivationCodes dealOfferId %s", dealOfferId), ex);
 		}
 	}
 }

@@ -153,4 +153,6 @@ public interface CustomerService extends HibernateService
 
 	public Customer getCustomerBySocialLoginId(final String socialLoginId) throws ServiceException;
 
+	public void activateCode(final UUID customerId, final UUID dealOfferid, final String code) throws ServiceException;
+
 }

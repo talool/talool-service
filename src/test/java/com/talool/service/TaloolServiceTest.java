@@ -1080,5 +1080,9 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertTrue(codes.size() >= 100);
 		Assert.assertEquals(7, codes.get(0).length());
 
+		Customer customer = customerService.getCustomerByEmail("chris@talool.com");
+
+		customerService.activateCode(customer.getId(), dofs.get(0).getId(), codes.get(10));
+
 	}
 }
