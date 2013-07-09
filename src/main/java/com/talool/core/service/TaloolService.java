@@ -56,4 +56,8 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public List<DealAcquire> getRedeemedDealAcquires(final UUID merchantId, final String redemptionCode) throws ServiceException;
 
+	public void createActivationCodes(final UUID dealOfferId, final int totalCodes) throws ServiceException;
+
+	public List<String> getActivationCodes(final UUID dealOfferId) throws ServiceException;
+
 }

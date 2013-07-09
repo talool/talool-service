@@ -132,9 +132,6 @@ public interface CustomerService extends HibernateService
 	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
 			throws ServiceException;
 
-	public UUID giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
-			throws ServiceException;
-
 	public Gift getGift(final UUID giftId) throws ServiceException;
 
 	/**

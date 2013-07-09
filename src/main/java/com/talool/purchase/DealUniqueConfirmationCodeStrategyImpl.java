@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 
 import org.apache.commons.lang.RandomStringUtils;
 
-import com.talool.core.purchase.RedemptionCodeStrategy;
+import com.talool.core.purchase.UniqueCodeStrategy;
 
 /**
  * A simple upper-case alphanumeric confirmation code generator.
@@ -26,7 +26,7 @@ import com.talool.core.purchase.RedemptionCodeStrategy;
  * @author clintz
  * 
  */
-public class DealUniqueConfirmationCodeStrategyImpl implements RedemptionCodeStrategy
+public class DealUniqueConfirmationCodeStrategyImpl implements UniqueCodeStrategy
 {
 	private int codeLength = 6;
 

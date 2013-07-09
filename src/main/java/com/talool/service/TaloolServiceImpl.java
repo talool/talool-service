@@ -30,6 +30,7 @@ import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.Sort;
 import com.talool.core.AccountType;
+import com.talool.core.ActivationCode;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.Deal;
@@ -47,9 +48,11 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
+import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.core.social.SocialNetwork;
+import com.talool.domain.ActivationCodeImpl;
 import com.talool.domain.CategoryImpl;
 import com.talool.domain.CategoryTagImpl;
 import com.talool.domain.CustomerImpl;
@@ -66,6 +69,7 @@ import com.talool.domain.TagImpl;
 import com.talool.domain.social.SocialNetworkImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
+import com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl;
 import com.talool.utils.SpatialUtils;
 
 /**
@@ -80,6 +84,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 {
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
 	public static final float MILES_TO_METERS = 1609.34f;
+
+	private UniqueCodeStrategy activiationCodeStrategy = new DealUniqueConfirmationCodeStrategyImpl(7);
 
 	public TaloolServiceImpl()
 	{}
@@ -1130,6 +1136,71 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		catch (Exception ex)
 		{
 			throw new ServiceException(String.format("Problem getDealAcquireHistoryByGiftId %s", giftId), ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	/**
+	 * Special note: this method is intended to be temporary as we dont want to have activation codes a core part of our platform.
+	 * If activiation codes become core, the algorithm and functionality of this method should be revisited
+	 */
+	public void createActivationCodes(final UUID dealOfferId, final int totalCodes) throws ServiceException
+	{
+		final Set<ActivationCode> currentCodes = new HashSet<ActivationCode>();
+		final List<ActivationCode> newCodes = new ArrayList<ActivationCode>();
+
+		try
+		{
+			final Search search = new Search(ActivationCodeImpl.class);
+			search.addFilterEqual("dealOfferId", dealOfferId);
+			search.addField("code");
+			currentCodes.addAll(daoDispatcher.search(search));
+
+			int i = 0;
+			while (i < totalCodes)
+			{
+				final String code = activiationCodeStrategy.generateCode();
+
+				if (!currentCodes.contains(code))
+				{
+					final ActivationCode actCode = new ActivationCodeImpl();
+					actCode.setCode(code);
+					actCode.setDealOfferId(dealOfferId);
+					newCodes.add(actCode);
+					i++;
+				}
+				else
+				{
+					LOG.warn(String.format("duplicated activation code %s for dealOfferId %s", code, dealOfferId));
+				}
+			}
+
+			daoDispatcher.save(newCodes.toArray());
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem createActivationCodes dealOfferId %s", dealOfferId), ex);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getActivationCodes(final UUID dealOfferId) throws ServiceException
+	{
+		try
+		{
+			final Search search = new Search(ActivationCodeImpl.class);
+			search.addFilterEqual("dealOfferId", dealOfferId);
+			search.addField("code");
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem createActivationCodes dealOfferId %s", dealOfferId), ex);
 		}
 	}
 

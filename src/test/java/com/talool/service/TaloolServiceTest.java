@@ -626,7 +626,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		DealAcquire giftedDealAcquireViaFacebook = dacs.get(0);
 		DealAcquire giftedDealAcquireViaEmail = dacs.get(1);
 		DealAcquire giftedDealAcquireViaTalool = dacs.get(2);
-		DealAcquire finalDealAcquireTest = dacs.get(3);
 
 		// give gift to facebookId
 		customerService
@@ -648,14 +647,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				giftedDealAcquireViaEmail.getId(), receivingCustomerEmail.getEmail(),
 				receivingName);
 
-		// give 3rd to Talool
-		customerService.giftToTalool(givingCustomer.getId(), giftedDealAcquireViaTalool.getId(), receivingCustomerSocial.getId());
-
-		// send one to chris!
-		// customerService.giftToEmail(givingCustomer.getId(),
-		// finalDealAcquireTest.getId(), "doug@talool.com",
-		// "Doug Mccuen");
-
 		List<Gift> gifts = customerService.getGifts(receivingCustomerEmail.getId(),
 				new GiftStatus[] { GiftStatus.PENDING });
 
@@ -665,7 +656,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		gifts = customerService.getGifts(receivingCustomerSocial.getId(),
 				new GiftStatus[] { GiftStatus.PENDING });
 
-		Assert.assertEquals(2, gifts.size());
+		Assert.assertEquals(1, gifts.size());
 
 		for (Gift gf : gifts)
 		{
@@ -689,37 +680,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		}
 
-		// lets accept 1 gift
-		customerService.acceptGift(gifts.get(0).getId(), receivingCustomerSocial.getId());
+		// lets reject
+		customerService.rejectGift(gifts.get(0).getId(), receivingCustomerSocial.getId());
 
-		// verify the dealAcquire
-		List<DealAcquire> dealAcquires = customerService.getDealAcquiresByCustomerId(receivingCustomerSocial.getId());
-		Assert.assertEquals(1, dealAcquires.size());
-		Assert.assertEquals(gifts.get(0).getDealAcquire().getId(), dealAcquires.get(0).getId());
-		// Assert.assertEquals(dealAcquires.get(0).getSharedByCustomer(),
-		// givingCustomer);
-		Assert.assertEquals(dealAcquires.get(0).getAcquireStatus(),
-				AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
-
-		// verify Gift request is in right state
-		Assert.assertEquals(GiftStatus.ACCEPTED, customerService.getGift(gifts.get(0).getId()).getGiftStatus());
-
-		// lets reject the other gift
-		customerService.rejectGift(gifts.get(1).getId(), receivingCustomerSocial.getId());
-
-		// verify the dealAcquire
-		dealAcquires = customerService.getDealAcquiresByCustomerId(receivingCustomerSocial.getId());
-		// still just 1 acquire
-		Assert.assertEquals(1, dealAcquires.size());
-
-		// validate the dealAcquire we rejected was set properly and belongs to the
-		// giving customer
-		DealAcquire dac = customerService.getDealAcquire(gifts.get(1).getDealAcquire().getId());
-		Assert.assertEquals(AcquireStatus.REJECTED_CUSTOMER_SHARE, dac.getAcquireStatus());
-		Assert.assertEquals(givingCustomer, dac.getCustomer());
-
-		// verify Gift request is in right state
-		Assert.assertEquals(GiftStatus.REJECTED, customerService.getGift(gifts.get(1).getId()).getGiftStatus());
+		System.out.println(".");
 
 	}
 
@@ -1102,6 +1066,19 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// Assert.assertFalse(taloolService.emailExists(AccountType.CUS, ""));
 
 		return cust;
+
+	}
+
+	@Test
+	public void testActivationCodes() throws ServiceException
+	{
+		List<DealOffer> dofs = taloolService.getDealOffers();
+		taloolService.createActivationCodes(dofs.get(0).getId(), 30000);
+
+		List<String> codes = taloolService.getActivationCodes(dofs.get(0).getId());
+
+		Assert.assertEquals(100, codes.size());
+		Assert.assertEquals(7, codes.get(0).length());
 
 	}
 }

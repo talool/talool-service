@@ -9,6 +9,9 @@ INSERT INTO customer(email, password, first_name, last_name, sex_t)
 -- add Vince to talool
 INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
        VALUES ((select merchant_id from merchant where merchant_name='Talool'),'vince@talool.com',(select md5('pass123')),'VP Ops',true);
+       
+INSERT INTO merchant_account (merchant_id,email,password,role_title,allow_deal_creation)
+       VALUES ((select merchant_id from merchant where merchant_name='Talool'),'cory@talool.com',(select md5('pass123')),'Engineer',true);
 
 ALTER table deal_offer add column location_name character varying(64);
 
@@ -34,3 +37,20 @@ CREATE INDEX activity_gift_id_idx ON activity (gift_id);
 ALTER TYPE gift_status OWNER TO talool;
 
 ALTER TYPE gift_status ADD VALUE 'INVALIDATED' AFTER 'REJECTED';
+
+CREATE TABLE activation_code (
+    activation_code_id UUID NOT NULL DEFAULT uuid_generate_v4(),
+	deal_offer_id UUID NOT NULL,
+    code character(7) NOT NULL,
+    customer_id UUID,
+    activated_dt timestamp without time zone,
+    PRIMARY KEY (activation_code_id),
+    UNIQUE (deal_offer_id,code)
+);
+
+ALTER TABLE public.activation_code OWNER TO talool;
+
+CREATE INDEX activation_code_code_idx ON activation_code (code);
+
+CREATE INDEX activation_code_code_customer_id_idx ON activation_code (customer_id);
+

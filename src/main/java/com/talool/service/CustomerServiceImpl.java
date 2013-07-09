@@ -39,8 +39,7 @@ import com.talool.core.gift.EmailGift;
 import com.talool.core.gift.FaceBookGift;
 import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
-import com.talool.core.gift.TaloolGift;
-import com.talool.core.purchase.RedemptionCodeStrategy;
+import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.CustomerService;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.ServiceException.Type;
@@ -55,7 +54,6 @@ import com.talool.domain.activity.ActivityImpl;
 import com.talool.domain.gift.EmailGiftImpl;
 import com.talool.domain.gift.FacebookGiftImpl;
 import com.talool.domain.gift.GiftImpl;
-import com.talool.domain.gift.TaloolGiftImpl;
 import com.talool.domain.social.CustomerSocialAccountImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
@@ -78,7 +76,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
 
-	private RedemptionCodeStrategy redemptionCodeStrategy;
+	private UniqueCodeStrategy redemptionCodeStrategy;
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
@@ -949,21 +947,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem creating createFriendRejectGift: " + e.getLocalizedMessage(), e);
 		}
 
-		final Search search = new Search(ActivityImpl.class);
-		search.addFilterEqual("giftId", giftOwnership.gift.getId());
-		search.addFilterEqual("customerId", receipientCustomerId);
-
-		final Activity act = (Activity) daoDispatcher.searchUnique(search);
-
-		if (LOG.isDebugEnabled())
-		{
-			LOG.debug("Closing state on gift activity - activityId: " + act.getId());
-		}
-
-		// ActivityFactory.closeState(act);
-
-		daoDispatcher.save(act);
-
 		try
 		{
 			setClosedState(giftOwnership.gift, true);
@@ -1091,25 +1074,14 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	}
 
-	public RedemptionCodeStrategy getRedemptionCodeStrategy()
+	public UniqueCodeStrategy getRedemptionCodeStrategy()
 	{
 		return redemptionCodeStrategy;
 	}
 
-	public void setRedemptionCodeStrategy(final RedemptionCodeStrategy redemptionCodeStrategy)
+	public void setRedemptionCodeStrategy(final UniqueCodeStrategy redemptionCodeStrategy)
 	{
 		this.redemptionCodeStrategy = redemptionCodeStrategy;
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.NESTED)
-	public UUID giftToTalool(final UUID owningCustomerId, final UUID dealAcquireId, final UUID toTaloolCustomer)
-			throws ServiceException
-	{
-		final TaloolGift gift = new TaloolGiftImpl();
-		gift.setToCustomer(getCustomerById(toTaloolCustomer));
-		createGift(owningCustomerId, dealAcquireId, gift);
-		return gift.getId();
 	}
 
 	@Override
