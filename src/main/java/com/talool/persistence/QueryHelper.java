@@ -29,6 +29,16 @@ public final class QueryHelper
 	private static final ImmutableMap<String, String> EMPTY_IMMUTABLE_PROPS = ImmutableMap
 			.<String, String> of();
 
+	private static final String ACTIVATION_SUMMARY = "select n1.doid as \"dealOfferId\",n1.title, n1.total as \"totalCodes\", n2.ta as \"totalActivations\" from  "
+			+
+			"(select a.deal_offer_id as doid,count(*) as ta from activation_code a where customer_id is not null group by a.deal_offer_id) n2 "
+			+
+			"right outer join " +
+			"(select d.deal_offer_id as doid,d.title,count(*) as total from deal_offer d " +
+			"LEFT OUTER JOIN activation_code a ON (d.deal_offer_id=a.deal_offer_id) " +
+			"where d.merchant_id=:merchantId group by d.deal_offer_id,d.title) n1 " +
+			"on (n2.doid=n1.doid)";
+
 	public static final String MERCHANTS_WITHIN_METERS =
 			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*,cat.*,ST_Distance( mloc.geom,'${point}',true) "
 					+ "as distanceInMeters FROM public.merchant as merchant, public.category as cat, public.merchant_location as mloc "
@@ -73,6 +83,8 @@ public final class QueryHelper
 		DealsByDealOfferId(DEALS_BY_DEAL_OFFER_ID, EMPTY_IMMUTABLE_PROPS),
 
 		GetMerchantMedias(MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS),
+
+		ActivationSummary(ACTIVATION_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
 		FavoriteMerchants(FAVORITE_MERCHANTS, ImmutableMap.<String, String> builder()
 				.put("merchant.created", "merchant.createdUpdated.created").

@@ -15,7 +15,7 @@ public class ActivationSummary implements Serializable
 	private UUID dealOfferId;
 	private String title;
 	private int totalCodes;
-	private int totalActivations;
+	private Integer totalActivations;
 
 	public ActivationSummary()
 	{}
@@ -55,9 +55,17 @@ public class ActivationSummary implements Serializable
 		return totalActivations;
 	}
 
-	public void setTotalActivations(int totalActivations)
+	public void setTotalActivations(Integer totalActivations)
 	{
-		this.totalActivations = totalActivations;
+		if (totalActivations == null)
+		{
+			this.totalActivations = 0;
+		}
+		else
+		{
+			this.totalActivations = totalActivations;
+		}
+
 	}
 
 }
