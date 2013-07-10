@@ -494,6 +494,29 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getAllMerchants() throws ServiceException
+	{
+		List<Merchant> merchants = null;
+
+		try
+		{
+			final Query query = getSessionFactory()
+					.getCurrentSession()
+					.createQuery(
+							"select m from MerchantImpl as m left join fetch m.locations as l left join fetch m.tags as t left join fetch l.logo left join fetch l.merchantImage order by m.name asc");
+
+			merchants = query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealOffers"), ex);
+		}
+
+		return merchants;
+	}
+
 	@Override
 	public Long sizeOfCollection(Object collection) throws ServiceException
 	{

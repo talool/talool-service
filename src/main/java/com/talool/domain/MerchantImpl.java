@@ -26,7 +26,6 @@ import javax.persistence.Transient;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -139,12 +138,6 @@ public class MerchantImpl implements Merchant
 	public void setParent(Merchant parent)
 	{
 		this.parent = parent;
-	}
-
-	@Override
-	public String toString()
-	{
-		return ReflectionToStringBuilder.toString(this);
 	}
 
 	@Override

@@ -55,7 +55,10 @@ public interface MerchantService extends HibernateService
 	public List<Deal> getMerchantDeals(final UUID merchantId, final Boolean isActive)
 			throws ServiceException;
 
+	@Deprecated
 	public List<Merchant> getMerchants() throws ServiceException;
+
+	public List<Merchant> getAllMerchants() throws ServiceException;
 
 	/**
 	 * Gets deals by merchantId
