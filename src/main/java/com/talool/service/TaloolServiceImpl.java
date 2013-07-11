@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.ResultTransformer;
@@ -502,12 +503,15 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		try
 		{
-			final Query query = getSessionFactory()
-					.getCurrentSession()
-					.createQuery(
-							"select m from MerchantImpl as m left join fetch m.locations as l left join fetch m.tags as t left join fetch l.logo left join fetch l.merchantImage order by m.name asc");
+			// final Query query = getSessionFactory()
+			// .getCurrentSession()
+			// .createQuery(
+			// "select m from MerchantImpl as m left join fetch m.tags left join fetch m.locations as l left join fetch l.logo left join fetch l.merchantImage order by m.name asc");
+			Criteria criteria = getCurrentSession().createCriteria(MerchantImpl.class);
+			criteria.setFetchMode("tags", FetchMode.JOIN);
+			criteria.setFetchMode("locations", FetchMode.JOIN);
 
-			merchants = query.list();
+			merchants = criteria.list();
 		}
 		catch (Exception ex)
 		{

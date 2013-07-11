@@ -52,8 +52,9 @@ public final class QueryHelper
 					"where dealAcquire.deal.merchant.id=:merchantId and dealAcquire.customer.id=:customerId";
 
 	private static final String MERCHANT_ACQUIRES =
-			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da," +
-					"DealImpl d where da.customer.id=:customerId and da.deal.id=d.id and d.merchant.id=merchant.id";
+			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da, "
+					+ "DealImpl d left join fetch merchant.locations where da.customer.id=:customerId " +
+					"and da.deal.id=d.id and d.merchant.id=merchant.id";
 
 	private static final String MERCHANT_ACQUIRES_BY_CAT_ID =
 			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da,DealImpl d"

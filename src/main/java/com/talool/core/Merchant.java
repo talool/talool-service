@@ -50,15 +50,6 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 
 	public void addLocation(MerchantLocation mloc);
 
-	/**
-	 * Get number of merchant accounts (without loading all objects to count them)
-	 * 
-	 * Nice optimization on the persistent store
-	 * 
-	 * @return
-	 */
-	public Long getNumberOfMerchantAccounts();
-
 	public Category getCategory();
 
 	public void setCategory(final Category category);
