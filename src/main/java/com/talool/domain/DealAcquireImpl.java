@@ -62,7 +62,7 @@ public class DealAcquireImpl implements DealAcquire
 	@Column(name = "acquire_status", nullable = false, columnDefinition = "acquire_status")
 	private AcquireStatus acquireStatus;
 
-	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
