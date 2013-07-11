@@ -63,7 +63,9 @@ public final class QueryHelper
 	private static final String MERCHANT_MEDIAS =
 			"from MerchantMediaImpl as merchantMedia where merchantMedia.merchantId=:merchantId and merchantMedia.mediaType in (:mediaTypes)";
 
-	private static final String FAVORITE_MERCHANTS = "select merchant from MerchantImpl as merchant, FavoriteMerchantImpl as f where f.customerId=:customerId and f.merchantId=merchant.id";
+	private static final String FAVORITE_MERCHANTS = "select merchant from MerchantImpl as merchant, FavoriteMerchantImpl as f " +
+			"left join fetch merchant.locations " +
+			"where f.customerId=:customerId and f.merchantId=merchant.id";
 
 	private static final String DEALS_BY_DEAL_OFFER_ID = "select d from DealImpl as d left join fetch d.image left join fetch d.merchant as merchant "
 			+
