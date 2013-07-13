@@ -26,6 +26,7 @@ import javax.persistence.Transient;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
@@ -86,6 +87,7 @@ public class MerchantImpl implements Merchant
 	@JoinTable(name = "merchant_tag", joinColumns = { @JoinColumn(name = "merchant_id", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "tag_id", nullable = false, updatable = false) })
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	@Fetch(FetchMode.SUBSELECT)
+	@BatchSize(size = 5)
 	private Set<Tag> tags = new HashSet<Tag>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = MerchantAccountImpl.class)
@@ -95,7 +97,8 @@ public class MerchantImpl implements Merchant
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "merchant", targetEntity = MerchantLocationImpl.class)
 	@OrderBy("createdUpdated.created")
-	// @Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.SUBSELECT)
+	@BatchSize(size = 5)
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private List<MerchantLocation> locations = new ArrayList<MerchantLocation>();
 

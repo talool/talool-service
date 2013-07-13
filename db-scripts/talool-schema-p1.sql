@@ -62,9 +62,10 @@ ALTER TABLE customer_social_account ADD CONSTRAINT "FK_CustomerSocialAccount_Cus
 COMMIT;
 
 BEGIN;
+ALTER TABLE deal_offer_purchase ALTER COLUMN customer_id DROP NOT NULL;
 ALTER TABLE deal_offer_purchase DROP CONSTRAINT "FK_DealOfferPurchase_Customer";
 ALTER TABLE deal_offer_purchase ADD CONSTRAINT "FK_DealOfferPurchase_Customer" 
-      FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE;
+      FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE SET NULL;
 COMMIT;
 
 BEGIN;
