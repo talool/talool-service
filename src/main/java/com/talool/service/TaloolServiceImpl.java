@@ -13,6 +13,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.PostgresUUIDType;
@@ -503,6 +504,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 			final Criteria criteria = getCurrentSession().createCriteria(MerchantImpl.class);
+			criteria.addOrder(Order.asc("name"));
 
 			merchants = criteria.list();
 		}
