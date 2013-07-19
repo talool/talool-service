@@ -29,6 +29,7 @@ import com.talool.core.ActivationCode;
 import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
+import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
@@ -1154,8 +1155,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			daoDispatcher.save(activationCode);
 
+			final DealOffer dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
+			final Activity act = ActivityFactory.createActivatedByCode(dealOffer, customerId, code);
+
 			createDealOfferPurchase(customerId, dealOfferId);
 
+			ServiceFactory.get().getActivityService().save(act);
 		}
 		catch (ServiceException se)
 		{
