@@ -127,6 +127,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// this is an integration test hacked together via JUnit, so no big deal!
 		cleanTest();
 
+		testMerchantsWithin2();
+
 		testCategories();
 
 		testGetGiftsForCustomer();
@@ -152,6 +154,26 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		testMerchantsWithin();
 
 		testGiftRequests();
+
+	}
+
+	public void testMerchantsWithin2() throws ServiceException, InterruptedException
+	{
+
+		// The kitchen Boulder location
+		Location location = domainFactory.newLocation(-105.281686, 40.017663);
+		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("merchant.name").ascending(true)
+				.build();
+
+		List<Merchant> merchants = taloolService.getMerchantsWithin(location, 2, searchOpts);
+
+		Assert.assertEquals(2, merchants.size());
+
+		Assert.assertEquals("Centro Latin Kitchen", merchants.get(0).getName());
+		Assert.assertNotNull(merchants.get(0).getCategory());
+
+		Assert.assertEquals("The Kitchen", merchants.get(1).getName());
+		Assert.assertNotNull(merchants.get(1).getCategory());
 
 	}
 

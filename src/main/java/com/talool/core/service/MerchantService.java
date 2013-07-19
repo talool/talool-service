@@ -112,6 +112,9 @@ public interface MerchantService extends HibernateService
 	public List<Merchant> getMerchantsWithin(final Location location, final int maxMiles, final SearchOptions searchOptions)
 			throws ServiceException;
 
+	public List<Merchant> getMerchantsWithin2(final Location location, final int maxMiles, final SearchOptions searchOptions)
+			throws ServiceException;
+
 	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final MediaType[] mediaTypes,
 			final SearchOptions searchOptions)
 			throws ServiceException;

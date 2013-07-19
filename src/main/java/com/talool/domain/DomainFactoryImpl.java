@@ -269,7 +269,7 @@ final class DomainFactoryImpl implements DomainFactory
 	public Activity newActivity(final ActivityEvent activityType, final UUID customerId)
 	{
 		final ActivityImpl act = new ActivityImpl();
-		act.setActivityType(activityType);
+		act.setActivityEvent(activityType);
 		act.setCustomerId(customerId);
 		return act;
 	}

@@ -18,6 +18,7 @@ import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.StandardBasicTypes;
+import org.hibernatespatial.criterion.SpatialRestrictions;
 import org.postgis.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,8 @@ import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl;
 import com.talool.utils.SpatialUtils;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * Implementation of the TaloolService
@@ -922,6 +925,50 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			});
 
 			query.list();
+
+		}
+		catch (Exception ex)
+		{
+			String msg = String.format(
+					"Problem getting merchants within lng/lat %s and maxMiles %d", location, maxMiles);
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
+		}
+
+		return merchants;
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getMerchantsWithin2(final Location location,
+			final int maxMiles, SearchOptions searchOpts) throws ServiceException
+	{
+		List<Merchant> merchants = null;
+
+		final Coordinate coord = new Coordinate(location.getLongitude(), location.getLatitude());
+
+		@SuppressWarnings("deprecation")
+		final com.vividsolutions.jts.geom.Geometry point = new com.vividsolutions.jts.geom.Point(coord,
+				new PrecisionModel(PrecisionModel.FLOATING), 4326);
+
+		try
+		{
+			final Criteria criteria = getCurrentSession().createCriteria(MerchantImpl.class, "merchant");
+			criteria.createAlias("locations", "loc");
+
+			criteria.add(SpatialRestrictions.distanceWithin("loc.geometry", point, SpatialUtils.milesToMeters(maxMiles)));
+
+			merchants = criteria.list();
+
+			for (final Merchant merch : merchants)
+			{
+				for (MerchantLocation loc : merch.getLocations())
+				{
+					System.out.println("Distance away : " + SpatialUtils.metersToMiles(loc.getGeometry().distance(point)));
+				}
+
+			}
 
 		}
 		catch (Exception ex)

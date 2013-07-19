@@ -15,7 +15,7 @@ public interface Activity extends IdentifiableUUID, Serializable
 {
 	public ActivityEvent getActivityEvent();
 
-	public void setActivityType(final ActivityEvent type);
+	public void setActivityEvent(final ActivityEvent type);
 
 	public UUID getCustomerId();
 

@@ -49,7 +49,7 @@ public class ActivityImpl implements Activity
 
 	@Type(type = "activityType")
 	@Column(name = "activity_type", nullable = false)
-	private ActivityEvent activityType;
+	private ActivityEvent activityEvent;
 
 	@Column(name = "activity_dt", insertable = false, updatable = false)
 	private Date activityDate;
@@ -63,13 +63,13 @@ public class ActivityImpl implements Activity
 	@Override
 	public ActivityEvent getActivityEvent()
 	{
-		return activityType;
+		return activityEvent;
 	}
 
 	@Override
-	public void setActivityType(final ActivityEvent activityType)
+	public void setActivityEvent(final ActivityEvent activityEvent)
 	{
-		this.activityType = activityType;
+		this.activityEvent = activityEvent;
 	}
 
 	@Override

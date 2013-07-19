@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.googlecode.genericdao.search.Search;
+import com.googlecode.genericdao.search.Sort;
 import com.talool.core.SearchOptions;
 import com.talool.core.activity.Activity;
 import com.talool.core.service.ActivityService;
@@ -56,6 +57,7 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 			search.addFilterEqual("customerId", customerId);
 
 			QueryHelper.applySearchOptions(searchOpts, search);
+			search.addSort(Sort.asc("activityEvent"));
 
 			return daoDispatcher.search(search);
 		}

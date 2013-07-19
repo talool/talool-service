@@ -55,6 +55,25 @@ public final class ActivityFactory
 		return activity;
 	}
 
+	public static Activity createActivatedByCode(final DealOffer dealOffer, final UUID customerUuid, final String code)
+			throws TException
+	{
+		final Activity activity = domainFactory.newActivity(ActivityEvent.PURCHASE, customerUuid);
+		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.PURCHASE);
+
+		final String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.ACTIVATED_DEAL_OFFER_TITLE, dealOffer.getTitle(), code.toUpperCase());
+
+		tActivity.setTitle(title);
+
+		final ActivityLink_t link = new ActivityLink_t(LinkType.DEAL_OFFER, dealOffer.getId().toString());
+		tActivity.setActivityLink(link);
+
+		activity.setActivityData(com.talool.thrift.ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
+
+		return activity;
+	}
+
 	public static Activity createFriendGiftReedem(final DealAcquire dealAcquire) throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REDEEM, dealAcquire.getGift()

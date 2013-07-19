@@ -41,21 +41,21 @@ public class ActivityServiceTest extends HibernateFunctionalTestBase
 		UUID customerId = UUID.randomUUID();
 
 		Activity activity = new ActivityImpl();
-		activity.setActivityType(ActivityEvent.REDEEM);
+		activity.setActivityEvent(ActivityEvent.REDEEM);
 		activity.setCustomerId(customerId);
 		activity.setActivityData("abc1".getBytes());;
 
 		activityService.save(activity);
 
 		activity = new ActivityImpl();
-		activity.setActivityType(ActivityEvent.FACEBOOK_RECV_GIFT);
+		activity.setActivityEvent(ActivityEvent.FACEBOOK_RECV_GIFT);
 		activity.setCustomerId(customerId);
 		activity.setActivityData("abc2".getBytes());;
 
 		activityService.save(activity);
 
 		activity = new ActivityImpl();
-		activity.setActivityType(ActivityEvent.FACEBOOK_SEND_GIFT);
+		activity.setActivityEvent(ActivityEvent.FACEBOOK_SEND_GIFT);
 		activity.setCustomerId(customerId);
 		activity.setActivityData("abc3".getBytes());;
 

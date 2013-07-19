@@ -14,6 +14,8 @@ public final class ActivityBundle
 
 	public static final String PURCHASED_DEAL_OFFER_TITLE = "purchased.dealoffer.title";
 
+	public static final String ACTIVATED_DEAL_OFFER_TITLE = "activated.dealoffer.title";
+
 	public static final String FRIEND_ACCEPTED_DEAL_TITLE = "friend.accepted.gift.title";
 	public static final String FRIEND_ACCEPTED_DEAL_SUBTITLE = "friend.accepted.gift.subtitle";
 

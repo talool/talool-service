@@ -39,6 +39,19 @@ public final class QueryHelper
 			"where d.merchant_id=:merchantId group by d.deal_offer_id,d.title) n1 " +
 			"on (n2.doid=n1.doid)";
 
+	public static final String MERCHANTS_WITHIN_METERS2 =
+			"(select mloc.* " +
+					"FROM public.merchant as merchant, public.merchant_location as mloc "
+					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
+					+ "and mloc.merchant_id=merchant.merchant_id and merchant.is_discoverable=${isDiscoverable}) as merc_location " +
+					"(select merc.merchant_id as merchantId,merc.merchant_name as name,cat.* " +
+					"from merchant as merc, category as cat where d.customer_id=${customerId} and d.merchant_id=merc.merchant_id " +
+					"join " +
+					"(select mloc.* " +
+					"FROM public.merchant as merchant, public.merchant_location as mloc "
+					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
+					+ "and mloc.merchant_id=merchant.merchant_id and merchant.is_discoverable=${isDiscoverable}) as merc_location";
+
 	public static final String MERCHANTS_WITHIN_METERS =
 			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*,cat.*,ST_Distance( mloc.geom,'${point}',true) "
 					+ "as distanceInMeters FROM public.merchant as merchant, public.category as cat, public.merchant_location as mloc "
