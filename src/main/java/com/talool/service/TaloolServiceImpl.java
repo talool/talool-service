@@ -1080,6 +1080,19 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
+	public Category getCategory(final Integer categoryId) throws ServiceException
+	{
+		try
+		{
+			return (Category) getCurrentSession().get(CategoryImpl.class, categoryId);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getCategory %s", categoryId), ex);
+		}
+	}
+
+	@Override
 	public Map<Category, List<Tag>> getCategoryTags() throws ServiceException
 	{
 		final Map<Category, List<Tag>> catTagMap = new HashMap<Category, List<Tag>>();

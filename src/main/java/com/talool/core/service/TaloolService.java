@@ -38,6 +38,8 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public Category getCategory(final String categoryName) throws ServiceException;
 
+	public Category getCategory(final Integer categoryId) throws ServiceException;
+
 	public Map<Category, List<Tag>> getCategoryTags() throws ServiceException;
 
 	public void save(final Category category) throws ServiceException;

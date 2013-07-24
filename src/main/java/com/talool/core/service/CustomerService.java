@@ -82,6 +82,28 @@ public interface CustomerService extends HibernateService
 	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOptions)
 			throws ServiceException;
 
+	/**
+	 * Gets merchants acquired by customerId using searchOptions. If location is
+	 * not null, the distanceInMeters is calculated for every merchant location
+	 * 
+	 * @param customerId
+	 * @param categoryId
+	 * @param searchOptions
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOptions, final Location location)
+			throws ServiceException;
+
+	/**
+	 * Gets merchants acquired by customerId using searchOptions
+	 * 
+	 * @param customerId
+	 * @param categoryId
+	 * @param searchOptions
+	 * @return
+	 * @throws ServiceException
+	 */
 	public List<Merchant> getMerchantAcquires(final UUID customerId, final Integer categoryId, final SearchOptions searchOptions)
 			throws ServiceException;
 

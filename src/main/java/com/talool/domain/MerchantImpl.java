@@ -262,6 +262,11 @@ public class MerchantImpl implements Merchant
 		this.locations.add(mloc);
 	}
 
+	public void setLocations(List<MerchantLocation> locations)
+	{
+		this.locations = locations;
+	}
+
 	public MerchantLocation getCurrentLocation()
 	{
 		if (currentLocation == null)

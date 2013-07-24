@@ -39,19 +39,6 @@ public final class QueryHelper
 			"where d.merchant_id=:merchantId group by d.deal_offer_id,d.title) n1 " +
 			"on (n2.doid=n1.doid)";
 
-	public static final String MERCHANTS_WITHIN_METERS2 =
-			"(select mloc.* " +
-					"FROM public.merchant as merchant, public.merchant_location as mloc "
-					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
-					+ "and mloc.merchant_id=merchant.merchant_id and merchant.is_discoverable=${isDiscoverable}) as merc_location " +
-					"(select merc.merchant_id as merchantId,merc.merchant_name as name,cat.* " +
-					"from merchant as merc, category as cat where d.customer_id=${customerId} and d.merchant_id=merc.merchant_id " +
-					"join " +
-					"(select mloc.* " +
-					"FROM public.merchant as merchant, public.merchant_location as mloc "
-					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
-					+ "and mloc.merchant_id=merchant.merchant_id and merchant.is_discoverable=${isDiscoverable}) as merc_location";
-
 	public static final String MERCHANTS_WITHIN_METERS =
 			"select merchant.merchant_id as merchantId,merchant.merchant_name as name, mloc.*,cat.*,ST_Distance( mloc.geom,'${point}',true) "
 					+ "as distanceInMeters FROM public.merchant as merchant, public.category as cat, public.merchant_location as mloc "
@@ -68,6 +55,20 @@ public final class QueryHelper
 			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da, "
 					+ "DealImpl d left join fetch merchant.locations where da.customer.id=:customerId " +
 					"and da.deal.id=d.id and d.merchant.id=merchant.id";
+
+	private static final String MERCHANT_ACQUIRES_LOCATION =
+			"select merchant.merchant_id as merchantId,merchant.merchant_name as merchantName,merchant.category_id as categoryId," +
+					"location.merchant_location_name,location.email,location.website_url,location.phone,location.address1,location.address2," +
+					"location.city,location.state_province_county,location.zip,location.country," +
+					"merchantLogo.media_url as merchantLogo,merchantImage.media_url as merchantImage," +
+					"ST_Distance( location.geom,'${point}',true) as distanceInMeters " +
+					"from " +
+					"(select distinct m.* from deal_acquire as da,merchant as m,deal as d " +
+					"where da.customer_id=:customerId and m.merchant_id=d.merchant_id and d.deal_id=da.deal_id) as merchant, " +
+					"merchant_location as location " +
+					"left outer join merchant_media as merchantLogo on (merchantLogo.merchant_media_id=location.logo_url_id) " +
+					"left outer join merchant_media as merchantImage on (merchantImage.merchant_media_id=location.merchant_image_id) " +
+					"where merchant.merchant_id=location.merchant_id";
 
 	private static final String MERCHANT_ACQUIRES_BY_CAT_ID =
 			"select distinct merchant from MerchantImpl merchant, DealAcquireImpl da,DealImpl d"
@@ -95,6 +96,12 @@ public final class QueryHelper
 		DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 
 		MerchantAcquires(MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
+
+		MerchantAcquiresLocation(MERCHANT_ACQUIRES_LOCATION,
+				ImmutableMap.<String, String> builder()
+						.put("merchant.name", "merchant.merchant_name")
+						.put("merchant.isDiscoverable", "isDiscoverable")
+						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 
 		DealsByDealOfferId(DEALS_BY_DEAL_OFFER_ID, EMPTY_IMMUTABLE_PROPS),
 

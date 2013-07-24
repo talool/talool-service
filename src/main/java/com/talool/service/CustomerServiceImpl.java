@@ -13,6 +13,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.type.PostgresUUIDType;
+import org.hibernate.type.StandardBasicTypes;
 import org.hibernatespatial.GeometryUserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.ImmutableMap;
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
 import com.talool.core.AccountType;
@@ -31,6 +33,7 @@ import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.FactoryManager;
 import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
 import com.talool.core.Location;
@@ -59,6 +62,7 @@ import com.talool.domain.gift.EmailGiftImpl;
 import com.talool.domain.gift.FacebookGiftImpl;
 import com.talool.domain.gift.GiftImpl;
 import com.talool.domain.social.CustomerSocialAccountImpl;
+import com.talool.hibernate.MerchantAcquiresResultTransformer;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -474,6 +478,69 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s",
 					customerId), ex);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts, Location location)
+			throws ServiceException
+	{
+		if (location == null)
+		{
+			return getMerchantAcquires(customerId, searchOpts);
+		}
+
+		List<Merchant> merchants = null;
+
+		try
+		{
+			// boulder
+			location = FactoryManager.get().getDomainFactory().newLocation(-105.2700, 40.0150);
+
+			final org.postgis.Point point = new org.postgis.Point(location.getLongitude(), location.getLatitude());
+			point.setSrid(4326);
+
+			final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
+					.put("point", point.toString()).build();
+
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquiresLocation, params, searchOpts,
+					true);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("categoryId", StandardBasicTypes.INTEGER);
+
+			query.addScalar("merchant_location_name", StandardBasicTypes.STRING);
+			query.addScalar("email", StandardBasicTypes.STRING);
+			query.addScalar("website_url", StandardBasicTypes.STRING);
+			query.addScalar("phone", StandardBasicTypes.STRING);
+			query.addScalar("address1", StandardBasicTypes.STRING);
+			query.addScalar("address2", StandardBasicTypes.STRING);
+			query.addScalar("city", StandardBasicTypes.STRING);
+			query.addScalar("state_province_county", StandardBasicTypes.STRING);
+			query.addScalar("zip", StandardBasicTypes.STRING);
+			query.addScalar("country", StandardBasicTypes.STRING);
+
+			query.addScalar("merchantLogo", StandardBasicTypes.STRING);
+			query.addScalar("merchantImage", StandardBasicTypes.STRING);
+
+			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
+			query.setResultTransformer(new MerchantAcquiresResultTransformer());
+
+			query.setParameter("customerId", customerId, PostgresUUIDType.INSTANCE);
+			merchants = query.list();
+
+		}
+		catch (Exception ex)
+		{
+			String msg = "Problem getting merchants acquired in location ";
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
+		}
+
+		return merchants;
 	}
 
 	@SuppressWarnings("unchecked")
