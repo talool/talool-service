@@ -508,6 +508,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.addScalar("merchantName", StandardBasicTypes.STRING);
 			query.addScalar("categoryId", StandardBasicTypes.INTEGER);
 
+			query.addScalar("merchant_location_id", StandardBasicTypes.LONG);
 			query.addScalar("merchant_location_name", StandardBasicTypes.STRING);
 			query.addScalar("email", StandardBasicTypes.STRING);
 			query.addScalar("website_url", StandardBasicTypes.STRING);

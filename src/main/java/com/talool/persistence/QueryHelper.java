@@ -57,8 +57,10 @@ public final class QueryHelper
 					"and da.deal.id=d.id and d.merchant.id=merchant.id";
 
 	private static final String MERCHANT_ACQUIRES_LOCATION =
-			"select merchant.merchant_id as merchantId,merchant.merchant_name as merchantName,merchant.category_id as categoryId," +
-					"location.merchant_location_name,location.email,location.website_url,location.phone,location.address1,location.address2," +
+			"select merchant.merchant_id as merchantId,merchant.merchant_name as merchantName,merchant.category_id as categoryId,"
+					+
+					"location.merchant_location_id,location.merchant_location_name,location.email,location.website_url,location.phone,location.address1,location.address2,"
+					+
 					"location.city,location.state_province_county,location.zip,location.country,location.geom," +
 					"merchantLogo.media_url as merchantLogo,merchantImage.media_url as merchantImage," +
 					"ST_Distance( location.geom,'${point}',true) as distanceInMeters " +

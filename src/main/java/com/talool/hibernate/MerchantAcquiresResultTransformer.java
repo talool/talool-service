@@ -37,23 +37,25 @@ public class MerchantAcquiresResultTransformer implements ResultTransformer
 		final String merchantName = (String) tuple[1];
 		final Integer categoryId = (Integer) tuple[2];
 
-		final String locationName = (String) tuple[3];
-		final String email = (String) tuple[4];
-		final String websiteUrl = (String) tuple[5];
-		final String phone = (String) tuple[6];
-		final String address1 = (String) tuple[7];
-		final String address2 = (String) tuple[8];
-		final String city = (String) tuple[9];
-		final String state = (String) tuple[10];
-		final String zip = (String) tuple[11];
-		final String country = (String) tuple[12];
-		final Geometry point = (Geometry) tuple[13];
+		final Long locationId = (Long) tuple[3];
+		final String locationName = (String) tuple[4];
+		final String email = (String) tuple[5];
+		final String websiteUrl = (String) tuple[6];
+		final String phone = (String) tuple[7];
+		final String address1 = (String) tuple[8];
+		final String address2 = (String) tuple[9];
+		final String city = (String) tuple[10];
+		final String state = (String) tuple[11];
+		final String zip = (String) tuple[12];
+		final String country = (String) tuple[13];
+		final Geometry point = (Geometry) tuple[14];
 
-		final String merchantLogo = (String) tuple[14];
-		final String merchantImage = (String) tuple[15];
-		final Double distanceInMeters = (Double) tuple[16];
+		final String merchantLogo = (String) tuple[15];
+		final String merchantImage = (String) tuple[16];
+		final Double distanceInMeters = (Double) tuple[17];
 
 		final MerchantLocationImpl location = new MerchantLocationImpl();
+		location.setId(locationId);
 		location.setLocationName(locationName);
 		location.setEmail(email);
 		location.setWebsiteUrl(websiteUrl);
