@@ -16,6 +16,7 @@ import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantLocationImpl;
 import com.talool.domain.MerchantMediaImpl;
 import com.talool.service.ServiceFactory;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -46,9 +47,11 @@ public class MerchantAcquiresResultTransformer implements ResultTransformer
 		final String state = (String) tuple[10];
 		final String zip = (String) tuple[11];
 		final String country = (String) tuple[12];
-		final String merchantLogo = (String) tuple[13];
-		final String merchantImage = (String) tuple[14];
-		final Double distanceInMeters = (Double) tuple[15];
+		final Geometry point = (Geometry) tuple[13];
+
+		final String merchantLogo = (String) tuple[14];
+		final String merchantImage = (String) tuple[15];
+		final Double distanceInMeters = (Double) tuple[16];
 
 		final MerchantLocationImpl location = new MerchantLocationImpl();
 		location.setLocationName(locationName);
@@ -57,10 +60,11 @@ public class MerchantAcquiresResultTransformer implements ResultTransformer
 		location.setPhone(phone);
 		location.setAddress1(address1);
 		location.setAddress2(address2);
-		location.setCountry(country);
 		location.setCity(city);
 		location.setStateProvinceCounty(state);
 		location.setZip(zip);
+		location.setCountry(country);
+		location.setGeometry(point);
 
 		location.setDistanceInMeters(distanceInMeters);
 

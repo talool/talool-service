@@ -518,6 +518,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.addScalar("state_province_county", StandardBasicTypes.STRING);
 			query.addScalar("zip", StandardBasicTypes.STRING);
 			query.addScalar("country", StandardBasicTypes.STRING);
+			query.addScalar("geom", GeometryUserType.TYPE);
 
 			query.addScalar("merchantLogo", StandardBasicTypes.STRING);
 			query.addScalar("merchantImage", StandardBasicTypes.STRING);
