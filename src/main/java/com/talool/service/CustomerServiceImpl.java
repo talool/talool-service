@@ -33,7 +33,6 @@ import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
-import com.talool.core.FactoryManager;
 import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
 import com.talool.core.Location;
@@ -482,7 +481,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts, Location location)
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts, final Location location)
 			throws ServiceException
 	{
 		if (location == null)
@@ -494,9 +493,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			// boulder
-			location = FactoryManager.get().getDomainFactory().newLocation(-105.2700, 40.0150);
-
 			final org.postgis.Point point = new org.postgis.Point(location.getLongitude(), location.getLatitude());
 			point.setSrid(4326);
 
@@ -530,6 +526,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.setResultTransformer(new MerchantAcquiresResultTransformer());
 
 			query.setParameter("customerId", customerId, PostgresUUIDType.INSTANCE);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+
 			merchants = query.list();
 
 		}
