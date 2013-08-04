@@ -13,6 +13,8 @@ public class ServiceException extends Exception
 	public static enum Type
 	{
 		UNKNOWN(0, "Unknown"),
+		VALID_EMAIL_REQUIRED(100, "Valid email required"),
+		PASS_REQUIRED(101, "Password is required"),
 		EMAIL_ALREADY_TAKEN(1000, "Email already taken"),
 		INVALID_USERNAME_OR_PASSWORD(1001, "Invalid username or password"),
 		CUSTOMER_DOES_NOT_OWN_DEAL(1002, "Customer does not own deal"),

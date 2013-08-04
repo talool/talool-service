@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.thrift.TException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -89,6 +91,17 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	@Transactional(propagation = Propagation.NESTED)
 	public void createAccount(final Customer customer, final String password) throws ServiceException
 	{
+
+		if (!EmailValidator.getInstance().isValid(customer.getEmail()))
+		{
+			throw new ServiceException(Type.VALID_EMAIL_REQUIRED);
+		}
+
+		if (StringUtils.isEmpty(password))
+		{
+			throw new ServiceException(Type.PASS_REQUIRED);
+		}
+
 		createAccount(AccountType.CUS, customer, password);
 
 		final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());

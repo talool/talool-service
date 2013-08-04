@@ -46,7 +46,7 @@ public final class QueryHelper
 					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id and merchant.is_discoverable=${isDiscoverable}";
 
 	public static final String DEAL_ACQUIRES =
-			"select dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
+			"select distinct dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
 					"left join fetch d.image left join fetch d.merchant as m left join fetch m.locations as l " +
 					"left join fetch l.merchantImage left join fetch l.logo " +
 					"where dealAcquire.deal.merchant.id=:merchantId and dealAcquire.customer.id=:customerId";
