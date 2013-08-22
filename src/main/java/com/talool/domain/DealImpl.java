@@ -87,10 +87,10 @@ public class DealImpl implements Deal
 	@JoinColumn(name = "image_id")
 	private MerchantMedia image;
 
-	@Column(name = "summary", unique = false, nullable = true, length = 256)
+	@Column(name = "summary", unique = false, nullable = true, length = 512)
 	private String summary;
 
-	@Column(name = "details", unique = false, nullable = true, length = 256)
+	@Column(name = "details", unique = false, nullable = true, length = 512)
 	private String details;
 
 	@Column(name = "code", unique = false, nullable = true, length = 128)
