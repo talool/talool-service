@@ -1,15 +1,21 @@
-<html>
-<head></head>
-<body>
-Thank you for signing up to Talool!<br/><br/>
+<#import "/lib/talool.ftl" as oo>
 
-Talool is committed to bringing you better deals and closer relationships with the places you shop, eat, relax, and visit.
-Your Talool login is your email address ${email} .  Please feel welcome to visit the following links below.
-<br/><br/>
-<a href="http://www.talool.com/privacy">Talool Privacy</a>
-<br/><br/>
-Sincerely,
-<br/><br/>
-The Talool Team
-</body>
-</html>
+<@oo.emailContainer>
+
+	Thank you for registering!  Your Talool login is ${email}.  We hope you enjoy 
+	all the offers from our paticipating merchants.  If you have questions, you can send us 
+	a message at <a href="mailto:support@talool.com">support@talool.com</a>.
+	
+	<br/><br/>
+	
+	${oo.aboutUs}  
+	Find out more at <a href="http://www.talool.com">talool.com</a>
+	
+	<br/><br/>
+	<br/><br/>
+	
+	Sincerely,
+	<br/><br/>
+	The Talool Team
+
+</@oo.emailContainer>

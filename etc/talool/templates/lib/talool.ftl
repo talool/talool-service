@@ -9,7 +9,7 @@
 <#assign pageWidth=380>
 <#assign fontFamily="Helvetica,Arial,Sans-Serif">
 
-<#assign aboutUs="Talool is committed to bringing you better deals and closer relationships with the places you shop, eat, relax at, and visit.">
+<#assign aboutUs="Talool is committed to bringing you better deals and closer relationships with the places where you shop, eat, relax, and visit.">
 
 
 <#macro emailContainer>
