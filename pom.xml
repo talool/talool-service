@@ -11,6 +11,11 @@
 	<version>1.0.2-SNAPSHOT</version>
 	<name>Talool Service</name>
 	<url>http://maven.apache.org</url>
+	<scm>
+		<connection>scm:git:git@github.com:talool/talool-service.git</connection>
+		<url>scm:git:git@github.com:talool/talool-service.git</url>
+		<developerConnection>scm:git:git@github.com:talool/talool-service.git</developerConnection>
+	</scm>
 	<properties>
 		<hibernate.version>3.6.10.Final</hibernate.version>
 	</properties>
@@ -198,28 +203,29 @@
 			<version>1.4.0</version>
 		</dependency>
 	</dependencies>
-	 <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>com.talool.service.mail.EmailServiceImpl</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>com.talool.service.mail.EmailServiceImpl</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
