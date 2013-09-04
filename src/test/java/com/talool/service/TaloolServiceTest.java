@@ -18,6 +18,7 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		final DealOfferPurchase dealOfferPurchase = testDealOfferPurchase(customer, dealOffer);
 
-		testDealAcquires(dealOfferPurchase, dealOffer);
+		// deprecated
+		// testDealAcquires(dealOfferPurchase, dealOffer);
 
 		testFavoriteMerchants();
 
@@ -484,6 +486,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	{
 		List<DealAcquire> dealAcquires = null;
 
+		// Deprecated getDealAcquiresByCustomerId
 		dealAcquires = customerService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer()
 				.getId());
 
@@ -1091,7 +1094,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	@Test
+	@Ignore
 	public void testActivationCodes() throws ServiceException
 	{
 		List<DealOffer> dofs = taloolService.getDealOffers();
