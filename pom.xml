@@ -20,6 +20,10 @@
 	</properties>
 	<repositories>
 		<repository>
+			<id>talool-maven-ftp</id>
+			<url>ftp://syslog1/repository</url>
+		</repository>
+		<repository>
 			<id>OSGEO GeoTools repo</id>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
