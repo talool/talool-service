@@ -65,4 +65,6 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public List<ActivationSummary> getActivationSummaries(final UUID merchantId) throws ServiceException;
 
+	public void deleteCustomer(final UUID customerId) throws ServiceException;
+
 }
