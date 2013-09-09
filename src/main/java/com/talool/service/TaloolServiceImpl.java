@@ -1319,4 +1319,22 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		return summaries;
 
 	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteCustomer(final UUID customerId) throws ServiceException
+	{
+		try
+		{
+			final Query query = getCurrentSession().createQuery("delete from CustomerImpl where id=:customerId").
+					setParameter("customerId", customerId);
+
+			query.executeUpdate();
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem deleteing customerId " + customerId, e);
+		}
+
+	}
 }

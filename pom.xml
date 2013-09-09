@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 	<version>1.0.3-SNAPSHOT</version>
 	<name>Talool Service</name>
-	<url>http://maven.apache.org</url>
+
 	<scm>
 		<connection>scm:git:git@github.com:talool/talool-service.git</connection>
 		<url>scm:git:git@github.com:talool/talool-service.git</url>

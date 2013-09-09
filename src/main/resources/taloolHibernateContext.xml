@@ -39,6 +39,11 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
+	<bean id="analyticServiceImpl" class="com.talool.service.AnalyticServiceImpl">
+		<property name="daoDispatcher" ref="daoDispatcher" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
 	<bean id="redemptionCodeStrategyImpl" class="com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl">
 	 <constructor-arg value="6"/>
 	</bean>
