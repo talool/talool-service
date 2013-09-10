@@ -103,6 +103,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		createAccount(AccountType.CUS, customer, password);
+		
+		ServiceFactory.get().getEmailService().sendCustomerRegistrationEmail(customer);
 
 		final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
 		final List<Activity> activities = new ArrayList<Activity>();
