@@ -12,6 +12,8 @@ import com.talool.core.gift.EmailGift;
 public interface EmailService
 {
 	public void sendCustomerRegistrationEmail(final Customer customer) throws ServiceException;
+	
+	public void sendPasswordRecoveryEmail(final Customer customer) throws ServiceException;
 
 	public void sendGiftEmail(final EmailGift gift) throws ServiceException;
 

@@ -83,6 +83,33 @@ public class EmailServiceImpl implements EmailService
 		}
 
 	}
+	
+	@Override
+	public void sendPasswordRecoveryEmail(final Customer customer) throws ServiceException
+	{
+		try
+		{
+			sendEmail(ServiceConfig.get().getPasswordRecoverySubj(), customer.getEmail(), ServiceConfig.get().getMailFrom(),
+					FreemarkerUtil.get().renderPasswordRecoveryEmail(customer));
+
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug("Password recovery email successfully sent to " + customer.getEmail());
+			}
+
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			throw new ServiceException(e.getLocalizedMessage(), e);
+		}
+		catch (TemplateException e)
+		{
+			e.printStackTrace();
+			throw new ServiceException(Type.MAIL_TEMPLATE_NOT_FOUND, e);
+		}
+
+	}
 
 	@Override
 	public void sendEmail(final String subject, final String recipient, final String from, final String messageBody)

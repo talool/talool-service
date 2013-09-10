@@ -63,6 +63,25 @@ public final class FreemarkerUtil
 		return stringWriter.toString();
 
 	}
+	
+	public String renderPasswordRecoveryEmail(final Customer customer) throws IOException, TemplateException
+	{
+		System.out.println("rendering");
+		final Template template = freemarkerConfig.getTemplate(ServiceConfig.get().getPasswordRecoveryTemplate());
+
+		// Build the data-model
+		// TODO build the single use link to reset the password
+		StringBuilder sb = new StringBuilder(ServiceConfig.get().getPasswordRecoveryLink());
+		sb.append("/").append(customer.getId());
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("resetLink", sb.toString());
+
+		StringWriter stringWriter = new StringWriter();
+		template.process(data, stringWriter);
+
+		return stringWriter.toString();
+
+	}
 
 	public String renderGiftEmail(final Gift gift) throws IOException, TemplateException
 	{
