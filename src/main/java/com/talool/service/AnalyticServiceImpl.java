@@ -1,5 +1,7 @@
 package com.talool.service;
 
+import java.util.UUID;
+
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -92,6 +94,42 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
+		return count;
+	}
+	
+	public Long getTotalActivatedCodes(final UUID dealOfferId) throws ServiceException
+	{
+		Long count = null;
+		
+		try
+		{
+			final Query query = getCurrentSession().createQuery("select count(*) FROM ActivationCodeImpl where activatedDate is not null AND dealOfferId = :offerId");
+			query.setParameter("offerId", dealOfferId);
+			count = (Long) query.uniqueResult();
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(e.getLocalizedMessage(), e);
+		}
+		
+		return count;
+	}
+	
+	public Long getTotalRedemptions(final UUID customerId) throws ServiceException
+	{
+		Long count = null;
+		
+		try
+		{
+			final Query query = getCurrentSession().createQuery("select count(*) FROM DealAcquireImpl where redemptionCode is not null AND customer.id = :customerId");
+			query.setParameter("customerId", customerId);
+			count = (Long) query.uniqueResult();
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(e.getLocalizedMessage(), e);
+		}
+		
 		return count;
 	}
 
