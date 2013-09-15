@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.thrift.TException;
@@ -103,8 +105,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		createAccount(AccountType.CUS, customer, password);
-		
+
 		ServiceFactory.get().getEmailService().sendCustomerRegistrationEmail(customer);
+
+		LOG.info("Sent registration email to " + customer.getEmail());
 
 		final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
 		final List<Activity> activities = new ArrayList<Activity>();
@@ -1256,5 +1260,23 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			throw new ServiceException(String.format("Problem createActivationCodes dealOfferId %s", dealOfferId), ex);
 		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void createPasswordReset(final Customer customer) throws ServiceException
+	{
+		try
+		{
+			customer.setResetPasswordCode(RandomStringUtils.randomAlphanumeric(16));
+			customer.setResetPasswordExpires(DateUtils.addHours(Calendar.getInstance().getTime(), 2));
+
+			daoDispatcher.save(customer);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem creating password reset for email " + customer.getEmail(), e);
+		}
+
 	}
 }

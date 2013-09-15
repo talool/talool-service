@@ -32,6 +32,14 @@ public interface Customer extends IdentifiableUUID, Serializable, TimeAware
 
 	public void setPassword(String password);
 
+	public void setResetPasswordCode(String code);
+
+	public String getResetPasswordCode();
+
+	public void setResetPasswordExpires(Date expires);
+
+	public Date getResetPasswordExpires();
+
 	public Sex getSex();
 
 	public void setSex(Sex sex);

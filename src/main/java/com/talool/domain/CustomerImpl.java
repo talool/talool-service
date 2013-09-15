@@ -66,6 +66,12 @@ public class CustomerImpl implements Customer
 	@Column(name = "password", unique = false, nullable = false, length = 64)
 	private String password;
 
+	@Column(name = "reset_pw_code", length = 32)
+	private String resetPassordCode;
+
+	@Column(name = "reset_pw_expires")
+	private Date resetPassordExpires;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = CustomerSocialAccountImpl.class, orphanRemoval = true)
 	@MapKey(name = "socialNetwork")
 	@JoinColumn(name = "customer_id")
@@ -229,6 +235,30 @@ public class CustomerImpl implements Customer
 	public String getFullName()
 	{
 		return firstName + " " + lastName;
+	}
+
+	@Override
+	public void setResetPasswordCode(String code)
+	{
+		this.resetPassordCode = code;
+	}
+
+	@Override
+	public String getResetPasswordCode()
+	{
+		return resetPassordCode;
+	}
+
+	@Override
+	public void setResetPasswordExpires(Date expires)
+	{
+		this.resetPassordExpires = expires;
+	}
+
+	@Override
+	public Date getResetPasswordExpires()
+	{
+		return resetPassordExpires;
 	}
 
 }
