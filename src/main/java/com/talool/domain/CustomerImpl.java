@@ -30,6 +30,7 @@ import com.talool.core.Sex;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.social.CustomerSocialAccountImpl;
+import com.talool.service.EncryptService;
 
 @Entity
 @Table(name = "customer", catalog = "public")
@@ -191,7 +192,15 @@ public class CustomerImpl implements Customer
 	@Override
 	public void setPassword(String password)
 	{
-		this.password = password;
+		try
+		{
+			this.password = EncryptService.MD5(password);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem encrypting password");
+		}
+
 	}
 
 	@Override

@@ -28,8 +28,18 @@ public interface Customer extends IdentifiableUUID, Serializable, TimeAware
 
 	public void setEmail(String email);
 
+	/**
+	 * Gets the encrypted password
+	 * 
+	 * @return
+	 */
 	public String getPassword();
 
+	/**
+	 * Encrptys and sets the password
+	 * 
+	 * @param password
+	 */
 	public void setPassword(String password);
 
 	public void setResetPasswordCode(String code);

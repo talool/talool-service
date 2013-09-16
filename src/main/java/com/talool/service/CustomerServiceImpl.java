@@ -174,9 +174,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				LOG.debug("Creating accountType:" + accountType + ": " + account.toString());
 			}
 
-			final String md5pass = EncryptService.MD5(password);
-
-			((CustomerImpl) (account)).setPassword(md5pass);
+			// set encrypted password
+			((CustomerImpl) (account)).setPassword(password);
 			save((CustomerImpl) account);
 			daoDispatcher.flush(CustomerImpl.class);
 			daoDispatcher.refresh((CustomerImpl) account);
@@ -1272,6 +1271,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			customer.setResetPasswordExpires(DateUtils.addHours(Calendar.getInstance().getTime(), 2));
 
 			daoDispatcher.save(customer);
+
+			ServiceFactory.get().getEmailService().sendPasswordRecoveryEmail(customer);
 		}
 		catch (Exception e)
 		{
