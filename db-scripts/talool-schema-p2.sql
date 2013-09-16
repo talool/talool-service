@@ -16,3 +16,10 @@ BEGIN;
 ALTER TABLE activity ADD CONSTRAINT "FK_Activity_Customer" 
       FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE;
 COMMIT;
+
+
+BEGIN;
+ALTER TABLE customer ADD COLUMN reset_pw_code character varying(16);
+ALTER TABLE customer ADD COLUMN reset_pw_expires timestamp;
+COMMIT;
+

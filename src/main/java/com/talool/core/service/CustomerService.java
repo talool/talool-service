@@ -177,4 +177,13 @@ public interface CustomerService extends HibernateService
 
 	public void activateCode(final UUID customerId, final UUID dealOfferid, final String code) throws ServiceException;
 
+	/**
+	 * Creates a password reset code and a password reset expires. These are saved
+	 * on the customer (getPasswordResetCode, getPasswordResetExpires)
+	 * 
+	 * @param customer
+	 * @throws ServiceException
+	 */
+	public void createPasswordReset(final Customer customer) throws ServiceException;
+
 }
