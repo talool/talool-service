@@ -40,6 +40,11 @@
 	</pluginRepositories>
 	<dependencies>
 		<dependency>
+		  <groupId>com.braintreepayments.gateway</groupId>
+		  <artifactId>braintree-java</artifactId>
+		  <version>2.24.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.talool</groupId>
 			<artifactId>talool-thrift</artifactId>
 			<version>1.0.2-SNAPSHOT</version>

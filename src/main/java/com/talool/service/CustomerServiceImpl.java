@@ -256,6 +256,11 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		Customer customer = null;
 
+		if (!EmailValidator.getInstance().isValid(email))
+		{
+			throw new ServiceException(Type.VALID_EMAIL_REQUIRED);
+		}
+
 		try
 		{
 			Search search = new Search(CustomerImpl.class);
