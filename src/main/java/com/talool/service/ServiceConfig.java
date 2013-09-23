@@ -32,6 +32,8 @@ public class ServiceConfig extends PropertiesConfiguration
 	private static final String CONSUMERS_LINK = "consumers.link";
 	private static final String TAG_CACHE_REFRESH_IN_SECS = "tag.cache.refresh.in.secs";
 
+	private static final String BRAINTREE_SANDBOX_ENABLED = "braintree.sandbox.enabled";
+
 	private ServiceConfig(String file) throws ConfigurationException
 	{
 		super(file);
@@ -40,6 +42,11 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static ServiceConfig get()
 	{
 		return instance;
+	}
+
+	public boolean isBraintreeSandboxEnabled()
+	{
+		return getBoolean(BRAINTREE_SANDBOX_ENABLED);
 	}
 
 	public int getTagCacheRefreshInSecs()
@@ -96,7 +103,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	{
 		return getString(REGISTRATION_SUBJ);
 	}
-	
+
 	public String getPasswordRecoveryTemplate()
 	{
 		return getString(PW_RECOVERY_TEMPLATE);
@@ -106,7 +113,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	{
 		return getString(PW_RECOVERY_SUBJ);
 	}
-	
+
 	public String getPasswordRecoveryLink()
 	{
 		return getString(PW_RECOVERY_LINK);

@@ -15,6 +15,7 @@ import com.talool.core.DealOffer;
 import com.talool.payment.Card;
 import com.talool.payment.PaymentDetail;
 import com.talool.payment.TransactionResult;
+import com.talool.service.ServiceConfig;
 
 /**
  * 
@@ -56,7 +57,7 @@ public class BraintreeUtil
 	private void initGateway()
 	{
 		gateway = new BraintreeGateway(
-				Environment.SANDBOX,
+				ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX : Environment.PRODUCTION,
 				MERCHANT_ID,
 				PUBLIC_KEY,
 				PRIVATE_KEY
