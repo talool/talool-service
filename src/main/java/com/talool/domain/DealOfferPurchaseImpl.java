@@ -24,6 +24,7 @@ import com.talool.core.Customer;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Location;
+import com.talool.payment.PaymentProcessor;
 
 /**
  * 
@@ -58,6 +59,13 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 
 	@Column(name = "create_dt", unique = false, nullable = true, insertable = false, updatable = false)
 	private Date created;
+
+	@Type(type = "paymentProcessor")
+	@Column(name = "payment_processor_t", nullable = true, columnDefinition = "payment_processor_t")
+	private PaymentProcessor paymentProcessor;
+
+	@Column(name = "processor_transaction_id", unique = true, nullable = true, length = 32)
+	private String processorTransactionId;
 
 	public DealOfferPurchaseImpl()
 	{}
@@ -143,6 +151,30 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	public String toString()
 	{
 		return ReflectionToStringBuilder.toString(this);
+	}
+
+	@Override
+	public String getProcessorTransactionId()
+	{
+		return getProcessorTransactionId();
+	}
+
+	@Override
+	public void setProcessorTransactionId(String processorTransactionId)
+	{
+		this.processorTransactionId = processorTransactionId;
+	}
+
+	@Override
+	public PaymentProcessor getPaymentProcessor()
+	{
+		return paymentProcessor;
+	}
+
+	@Override
+	public void setPaymentProcessor(PaymentProcessor paymentProcessor)
+	{
+		this.paymentProcessor = paymentProcessor;
 	}
 
 }

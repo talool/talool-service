@@ -17,7 +17,7 @@ import org.hibernate.usertype.UserType;
 // TODO - DONT USE THIS - IT DOESNT WORK YET.  NEED A HIBERNATE4 IMPL verison
 public class GenericEnumUserType implements UserType, ParameterizedType
 {
-
+	public static final GenericEnumUserType INSTANCE = new GenericEnumUserType();
 	@SuppressWarnings("rawtypes")
 	private Class<? extends Enum> enumClass;
 	private Class<?> identifierType;

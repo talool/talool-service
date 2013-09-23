@@ -19,8 +19,8 @@ import com.talool.core.Customer;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
 import com.talool.core.service.ServiceException;
-import com.talool.core.service.ServiceException.Type;
 import com.talool.domain.CustomerImpl;
+import com.talool.service.ErrorCode;
 import com.talool.service.ServiceConfig;
 
 import freemarker.template.TemplateException;
@@ -79,11 +79,11 @@ public class EmailServiceImpl implements EmailService
 		catch (TemplateException e)
 		{
 			e.printStackTrace();
-			throw new ServiceException(Type.MAIL_TEMPLATE_NOT_FOUND, e);
+			throw new ServiceException(ErrorCode.MAIL_TEMPLATE_NOT_FOUND, e);
 		}
 
 	}
-	
+
 	@Override
 	public void sendPasswordRecoveryEmail(final Customer customer) throws ServiceException
 	{
@@ -106,7 +106,7 @@ public class EmailServiceImpl implements EmailService
 		catch (TemplateException e)
 		{
 			e.printStackTrace();
-			throw new ServiceException(Type.MAIL_TEMPLATE_NOT_FOUND, e);
+			throw new ServiceException(ErrorCode.MAIL_TEMPLATE_NOT_FOUND, e);
 		}
 
 	}
@@ -184,7 +184,7 @@ public class EmailServiceImpl implements EmailService
 		catch (TemplateException e)
 		{
 			e.printStackTrace();
-			throw new ServiceException(Type.MAIL_TEMPLATE_NOT_FOUND, e);
+			throw new ServiceException(ErrorCode.MAIL_TEMPLATE_NOT_FOUND, e);
 		}
 
 	}

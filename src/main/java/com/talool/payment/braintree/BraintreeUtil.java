@@ -1,8 +1,6 @@
 package com.talool.payment.braintree;
 
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +10,31 @@ import com.braintreegateway.Environment;
 import com.braintreegateway.Result;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
+import com.talool.core.Customer;
+import com.talool.core.DealOffer;
+import com.talool.payment.Card;
+import com.talool.payment.PaymentDetail;
+import com.talool.payment.TransactionResult;
 
+/**
+ * 
+ * @author clintz
+ * 
+ */
 public class BraintreeUtil
 {
 	private static final BraintreeUtil instance = new BraintreeUtil();
 
 	private static BraintreeGateway gateway;
+
+	// venmo constants
+	public static final String KEY_ZIPCODE = "zipcode";
+	public static final String KEY_CVV = "cvv";
+	public static final String KEY_EXPIRATION_YEAR = "expiration_year";
+	public static final String KEY_EXPIRATION_MONTH = "expiration_month";
+	public static final String KEY_SECURITY_CODE = "security_code";
+	public static final String KEY_ACCOUNT_NUMBER = "card_number";
+	public static final String VENMO_SDK_SESSION = "venmo_sdk_session";
 
 	private static final String MERCHANT_ID = "mkf3rwysqz6w9x44";
 	private static final String PUBLIC_KEY = "ck6f7kcdq8jwq5b8";
@@ -46,36 +63,31 @@ public class BraintreeUtil
 				);
 	}
 
-	/**
-	 * Creates a payment transaction in braintree
-	 * 
-	 * @param customerId
-	 * @param card
-	 * @param venmoSession
-	 * @param amount
-	 * @return Braintree transaction
-	 */
-	public Result<Transaction> processCard(final UUID customerId, Map<String, String> cardDetails,
-			final BigDecimal amount)
+	public static TransactionResult processCard(final Customer customer, final DealOffer dealOffer, final PaymentDetail paymentDetail)
 	{
+		final String venmoSession = paymentDetail.getPaymentMetadata().get(VENMO_SDK_SESSION);
+		final Card card = paymentDetail.getCard();
+
 		final TransactionRequest request = new TransactionRequest()
-				.amount(amount)
+				.amount(new BigDecimal(dealOffer.getPrice()))
 				.creditCard()
-				.number(null)
-				.expirationMonth(null)
-				.expirationYear(null)
-				.cvv(null)
+				.number(card.getAccountnumber())
+				.expirationMonth(card.getExpirationMonth())
+				.expirationYear(card.getExpirationYear())
+				.cvv(card.getSecurityCode())
 				.done()
 				.options()
-				.venmoSdkSession(null)
+				.venmoSdkSession(venmoSession)
 				.submitForSettlement(true)
-				.storeInVaultOnSuccess(true)
+				.storeInVault(paymentDetail.isSaveCard())
 				.done();
 
-		Result<Transaction> result = gateway.transaction().sale(request);
+		final Result<Transaction> result = gateway.transaction().sale(request);
 
-		return result;
+		final TransactionResult transactionResult = result.isSuccess() ? TransactionResult.successfulTransaction(result.getTarget().getId())
+				: TransactionResult.failedTransaction(result.getMessage());
+
+		return transactionResult;
 
 	}
-
 }

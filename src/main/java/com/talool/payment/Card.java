@@ -7,19 +7,21 @@ package com.talool.payment;
  */
 public final class Card
 {
-	private String cardNumber;
+	private String accountNumber;
 	private String expirationMonth;
 	private String expirationYear;
-	private String cvv;
+	private String securityCode;
+	private String zipCode;
 
-	public String getCardNumber()
+	public String getAccountnumber()
 	{
-		return cardNumber;
+		return accountNumber;
 	}
 
-	public void setCardNumber(String cardNumber)
+	public Card setAccountNumber(String cardNumber)
 	{
-		this.cardNumber = cardNumber;
+		this.accountNumber = cardNumber;
+		return this;
 	}
 
 	public String getExpirationMonth()
@@ -27,9 +29,10 @@ public final class Card
 		return expirationMonth;
 	}
 
-	public void setExpirationMonth(String expirationMonth)
+	public Card setExpirationMonth(String expirationMonth)
 	{
 		this.expirationMonth = expirationMonth;
+		return this;
 	}
 
 	public String getExpirationYear()
@@ -37,19 +40,32 @@ public final class Card
 		return expirationYear;
 	}
 
-	public void setExpirationYear(String expirationYear)
+	public Card setExpirationYear(String expirationYear)
 	{
 		this.expirationYear = expirationYear;
+		return this;
 	}
 
-	public String getCvv()
+	public String getSecurityCode()
 	{
-		return cvv;
+		return securityCode;
 	}
 
-	public void setCvv(String cvv)
+	public Card setSecurityCode(String securityCode)
 	{
-		this.cvv = cvv;
+		this.securityCode = securityCode;
+		return this;
+	}
+
+	public String getZipCode()
+	{
+		return zipCode;
+	}
+
+	public Card setZipCode(String zipCode)
+	{
+		this.zipCode = zipCode;
+		return this;
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.talool.core.service;
 
+import com.talool.service.ErrorCode;
+
 /**
  * 
  * 
@@ -10,50 +12,7 @@ public class ServiceException extends Exception
 {
 	private static final long serialVersionUID = 2550012244176023296L;
 
-	public static enum Type
-	{
-		UNKNOWN(0, "Unknown"),
-		VALID_EMAIL_REQUIRED(100, "Valid email required"),
-		PASS_REQUIRED(101, "Password is required"),
-		PASS_CONFIRM_MUST_MATCH(102, "Password confirmation does not match"),
-		PASS_RESET_CODE_REQUIRED(103, "Password reset code required"),
-		PASS_RESET_CODE_EXPIRED(104, "Password reset code expired"),
-		PASS_RESET_CODE_INVALID(105, "Password reset code invalid"),
-
-		EMAIL_ALREADY_TAKEN(1000, "Email already taken"),
-		INVALID_USERNAME_OR_PASSWORD(1001, "Invalid username or password"),
-		CUSTOMER_DOES_NOT_OWN_DEAL(1002, "Customer does not own deal"),
-		DEAL_ALREADY_REDEEMED(1003, "Deal already redeemed"),
-		GIFTING_NOT_ALLOWED(1004, "Cannot gift deal due to acquire status"),
-		CUSTOMER_NOT_FOUND(1005, "Customer not found"),
-		EMAIL_REQUIRED(1006, "Email is required"),
-
-		MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found"),
-		ACTIVIATION_CODE_NOT_FOUND(3000, "Activiation code not found"),
-		ACTIVIATION_CODE_ALREADY_ACTIVATED(3001, "Activiation code already activated");
-
-		private final int code;
-		private final String message;
-
-		Type(int code, String message)
-		{
-			this.code = code;
-			this.message = message;
-		}
-
-		public int getCode()
-		{
-			return code;
-		}
-
-		public String getMessage()
-		{
-			return message;
-		}
-
-	}
-
-	protected Type type = Type.UNKNOWN;
+	protected ErrorCode errorCode = ErrorCode.UNKNOWN;
 
 	public ServiceException()
 	{
@@ -75,33 +34,33 @@ public class ServiceException extends Exception
 		super(arg0);
 	}
 
-	public ServiceException(Type type)
+	public ServiceException(ErrorCode errorCode)
 	{
 		super();
-		this.type = type;
+		this.errorCode = errorCode;
 	}
 
-	public ServiceException(Type type, String arg0, Throwable arg1)
+	public ServiceException(ErrorCode errorCode, String arg0, Throwable arg1)
 	{
 		super(arg0, arg1);
-		this.type = type;
+		this.errorCode = errorCode;
 	}
 
-	public ServiceException(Type type, String arg0)
+	public ServiceException(ErrorCode errorCode, String arg0)
 	{
 		super(arg0);
-		this.type = type;
+		this.errorCode = errorCode;
 	}
 
-	public ServiceException(Type type, Throwable arg0)
+	public ServiceException(ErrorCode errorCode, Throwable arg0)
 	{
 		super(arg0);
-		this.type = type;
+		this.errorCode = errorCode;
 	}
 
-	public Type getType()
+	public ErrorCode getErrorCode()
 	{
-		return type;
+		return errorCode;
 	}
 
 	@Override
@@ -109,9 +68,9 @@ public class ServiceException extends Exception
 	{
 		StringBuilder sb = new StringBuilder();
 
-		if (type != null)
+		if (errorCode != null)
 		{
-			sb.append(type.getMessage());
+			sb.append(errorCode.getMessage());
 			if (super.getMessage() != null)
 			{
 				sb.append(": ").append(super.getMessage());

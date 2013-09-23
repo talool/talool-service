@@ -52,6 +52,7 @@ import com.talool.core.gift.FaceBookGift;
 import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.core.gift.TaloolGift;
+import com.talool.core.service.InvalidInputException;
 import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
@@ -664,7 +665,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		}
 		catch (ServiceException ex)
 		{
-			Assert.assertEquals(ServiceException.Type.GIFTING_NOT_ALLOWED, ex.getType());
+			Assert.assertEquals(ErrorCode.GIFTING_NOT_ALLOWED, ex.getErrorCode());
 		}
 
 		// give 2nd via email
@@ -1095,7 +1096,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	}
 
 	@Ignore
-	public void testActivationCodes() throws ServiceException
+	public void testActivationCodes() throws ServiceException, InvalidInputException
 	{
 		List<DealOffer> dofs = taloolService.getDealOffers();
 		taloolService.createActivationCodes(dofs.get(0).getId(), 100);

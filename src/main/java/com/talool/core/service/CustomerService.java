@@ -15,6 +15,8 @@ import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
+import com.talool.payment.PaymentDetail;
+import com.talool.payment.TransactionResult;
 import com.talool.service.HibernateService;
 
 /**
@@ -38,7 +40,7 @@ public interface CustomerService extends HibernateService
 
 	public Customer getCustomerById(final UUID id) throws ServiceException;
 
-	public Customer getCustomerByEmail(final String email) throws ServiceException;
+	public Customer getCustomerByEmail(final String email) throws ServiceException, InvalidInputException;
 
 	public List<Customer> getCustomers() throws ServiceException;
 
@@ -185,5 +187,8 @@ public interface CustomerService extends HibernateService
 	 * @throws ServiceException
 	 */
 	public void createPasswordReset(final Customer customer) throws ServiceException;
+
+	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId,
+			final PaymentDetail paymentDetail) throws ServiceException, NotFoundException;
 
 }

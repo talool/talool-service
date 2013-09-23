@@ -50,8 +50,9 @@ import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.CustomerService;
+import com.talool.core.service.InvalidInputException;
+import com.talool.core.service.NotFoundException;
 import com.talool.core.service.ServiceException;
-import com.talool.core.service.ServiceException.Type;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.ActivationCodeImpl;
@@ -66,6 +67,9 @@ import com.talool.domain.gift.FacebookGiftImpl;
 import com.talool.domain.gift.GiftImpl;
 import com.talool.domain.social.CustomerSocialAccountImpl;
 import com.talool.hibernate.MerchantAcquiresResultTransformer;
+import com.talool.payment.PaymentDetail;
+import com.talool.payment.TransactionResult;
+import com.talool.payment.braintree.BraintreeUtil;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -96,12 +100,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		if (!EmailValidator.getInstance().isValid(customer.getEmail()))
 		{
-			throw new ServiceException(Type.VALID_EMAIL_REQUIRED);
+			throw new ServiceException(ErrorCode.VALID_EMAIL_REQUIRED);
 		}
 
 		if (StringUtils.isEmpty(password))
 		{
-			throw new ServiceException(Type.PASS_REQUIRED);
+			throw new ServiceException(ErrorCode.PASS_REQUIRED);
 		}
 
 		createAccount(AccountType.CUS, customer, password);
@@ -252,13 +256,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public Customer getCustomerByEmail(final String email) throws ServiceException
+	public Customer getCustomerByEmail(final String email) throws ServiceException, InvalidInputException
 	{
 		Customer customer = null;
 
 		if (!EmailValidator.getInstance().isValid(email))
 		{
-			throw new ServiceException(Type.VALID_EMAIL_REQUIRED);
+			throw new InvalidInputException(ErrorCode.VALID_EMAIL_REQUIRED, email);
 		}
 
 		try
@@ -359,7 +363,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			if (!owningCustomer.equals(customerId))
 			{
-				throw new ServiceException(ServiceException.Type.CUSTOMER_DOES_NOT_OWN_DEAL,
+				throw new ServiceException(ErrorCode.CUSTOMER_DOES_NOT_OWN_DEAL,
 						"Customer does not own deal");
 			}
 
@@ -745,6 +749,25 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	}
 
+	@Transactional(propagation = Propagation.NESTED)
+	public void createDealOfferPurchase(final Customer customer, final DealOffer dealOffer, final TransactionResult transactionResult)
+			throws ServiceException
+	{
+		try
+		{
+			final DealOfferPurchase purchase = new DealOfferPurchaseImpl(customer, dealOffer);
+			purchase.setPaymentProcessor(transactionResult.getPaymentProcessor());
+			purchase.setProcessorTransactionId(transactionResult.getTransactionId());
+			daoDispatcher.save(purchase);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem creating dealOfferPurchase customerId %s dealOfferId %s",
+					customer.getId(), dealOffer.getId()), ex);
+		}
+
+	}
+
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
 	public void createDealOfferPurchase(final UUID customerId, final UUID dealOfferId) throws ServiceException
@@ -762,7 +785,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		catch (Exception ex)
 		{
 			throw new ServiceException(String.format("Problem creating dealOfferPurchase customerId %s dealOfferId %s",
-					customerId, dealOfferId));
+					customerId, dealOfferId), ex);
 		}
 
 	}
@@ -801,7 +824,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		if (!dac.getCustomer().getId().equals(owningCustomerId))
 		{
-			throw new ServiceException(Type.CUSTOMER_DOES_NOT_OWN_DEAL, "dealAcquireId: " + dac.getId()
+			throw new ServiceException(ErrorCode.CUSTOMER_DOES_NOT_OWN_DEAL, "dealAcquireId: " + dac.getId()
 					+ ", badCustomerId: " + dac.getCustomer().getId());
 		}
 
@@ -809,7 +832,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		if (currentAcquireStatus == AcquireStatus.REDEEMED)
 		{
-			throw new ServiceException(Type.DEAL_ALREADY_REDEEMED, "dealAcquireId: " + dac.getId());
+			throw new ServiceException(ErrorCode.DEAL_ALREADY_REDEEMED, "dealAcquireId: " + dac.getId());
 		}
 
 		// Can only gift a deal that is in a valid state!
@@ -819,7 +842,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				currentAcquireStatus != AcquireStatus.REJECTED_MERCHANT_SHARE &&
 				currentAcquireStatus != AcquireStatus.PURCHASED)
 		{
-			throw new ServiceException(Type.GIFTING_NOT_ALLOWED,
+			throw new ServiceException(ErrorCode.GIFTING_NOT_ALLOWED,
 					String.format("acquireStatus %s for dealAcquireId %s", currentAcquireStatus, dac.getId()));
 		}
 
@@ -1236,12 +1259,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			if (activationCode == null)
 			{
-				throw new ServiceException(ServiceException.Type.ACTIVIATION_CODE_NOT_FOUND, code);
+				throw new ServiceException(ErrorCode.ACTIVIATION_CODE_NOT_FOUND, code);
 			}
 
 			if (activationCode.getCustomerId() != null)
 			{
-				throw new ServiceException(ServiceException.Type.ACTIVIATION_CODE_ALREADY_ACTIVATED, code);
+				throw new ServiceException(ErrorCode.ACTIVIATION_CODE_ALREADY_ACTIVATED, code);
 			}
 
 			activationCode.setCustomerId(customerId);
@@ -1283,6 +1306,66 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			throw new ServiceException("Problem creating password reset for email " + customer.getEmail(), e);
 		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	/**
+	 * TODO Test rollback on failures, VOID charge
+	 */
+	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId, final PaymentDetail paymentDetail)
+			throws ServiceException, NotFoundException
+	{
+		DealOffer dealOffer = null;
+		Customer customer = null;
+
+		try
+		{
+			// TODO Optimize the heavy call which pulls dealOffers - maybe ehcache
+			// DealOffers
+			dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
+			customer = ServiceFactory.get().getCustomerService().getCustomerById(customerId);
+		}
+		catch (ServiceException se)
+		{
+			throw se;
+		}
+
+		if (dealOffer == null)
+		{
+			throw new NotFoundException("deal offer", dealOfferId == null ? null : dealOfferId.toString());
+		}
+
+		if (customer == null)
+		{
+			throw new NotFoundException("customer", customerId == null ? null : customerId.toString());
+		}
+
+		final TransactionResult transactionResult = BraintreeUtil.processCard(customer, dealOffer, paymentDetail);
+
+		if (transactionResult.isSuccess())
+		{
+			createDealOfferPurchase(customer, dealOffer, transactionResult);
+
+			try
+			{
+				// create a purchase activity. if it fails, we will not rollback the
+				// entire transaction
+				final Activity activity = ActivityFactory.createPurchase(dealOffer, customer.getId());
+				ServiceFactory.get().getActivityService().save(activity);
+			}
+			catch (TException e)
+			{
+				LOG.error(String.format("Activity not created for purchase customerId '%s' dealOfferId '%s'", customerId, dealOfferId), e);
+			}
+
+		}
+		else
+		{
+			LOG.warn(String.format("Transaction failed for customerId '%s' with message '%s'", customerId, transactionResult.getMessage()));
+		}
+		return transactionResult;
 
 	}
 }
