@@ -1368,4 +1368,61 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		return transactionResult;
 
 	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId, final String paymentCode) throws ServiceException,
+			NotFoundException
+	{
+		DealOffer dealOffer = null;
+		Customer customer = null;
+
+		try
+		{
+			// TODO Optimize the heavy call which pulls dealOffers - maybe ehcache
+			// DealOffers
+			dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
+			customer = ServiceFactory.get().getCustomerService().getCustomerById(customerId);
+		}
+		catch (ServiceException se)
+		{
+			throw se;
+		}
+
+		if (dealOffer == null)
+		{
+			throw new NotFoundException("deal offer", dealOfferId == null ? null : dealOfferId.toString());
+		}
+
+		if (customer == null)
+		{
+			throw new NotFoundException("customer", customerId == null ? null : customerId.toString());
+		}
+
+		final TransactionResult transactionResult = BraintreeUtil.processPaymentCode(customer, dealOffer, paymentCode);
+
+		if (transactionResult.isSuccess())
+		{
+			createDealOfferPurchase(customer, dealOffer, transactionResult);
+
+			try
+			{
+				// create a purchase activity. if it fails, we will not rollback the
+				// entire transaction
+				final Activity activity = ActivityFactory.createPurchase(dealOffer, customer.getId());
+				ServiceFactory.get().getActivityService().save(activity);
+			}
+			catch (TException e)
+			{
+				LOG.error(String.format("Activity not created for purchase customerId '%s' dealOfferId '%s'", customerId, dealOfferId), e);
+			}
+
+		}
+		else
+		{
+			LOG.warn(String.format("Transaction failed for customerId '%s' with message '%s'", customerId, transactionResult.getMessage()));
+		}
+		return transactionResult;
+
+	}
 }

@@ -64,6 +64,21 @@ public class BraintreeUtil
 				);
 	}
 
+	public static TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer, final String paymentCode)
+	{
+
+		final TransactionRequest request = new TransactionRequest()
+				.venmoSdkPaymentMethodCode(paymentCode).amount(new BigDecimal(dealOffer.getPrice()));
+
+		Result<Transaction> result = gateway.transaction().sale(request);
+
+		final TransactionResult transactionResult = result.isSuccess() ? TransactionResult.successfulTransaction(result.getTarget().getId())
+				: TransactionResult.failedTransaction(result.getMessage());
+
+		return transactionResult;
+
+	}
+
 	public static TransactionResult processCard(final Customer customer, final DealOffer dealOffer, final PaymentDetail paymentDetail)
 	{
 		final String venmoSession = paymentDetail.getPaymentMetadata().get(VENMO_SDK_SESSION);

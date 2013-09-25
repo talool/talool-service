@@ -191,4 +191,7 @@ public interface CustomerService extends HibernateService
 	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId,
 			final PaymentDetail paymentDetail) throws ServiceException, NotFoundException;
 
+	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId,
+			final String paymentCode) throws ServiceException, NotFoundException;
+
 }
