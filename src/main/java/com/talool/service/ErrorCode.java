@@ -1,5 +1,6 @@
 package com.talool.service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,6 +25,7 @@ public enum ErrorCode
 	GIFTING_NOT_ALLOWED(1004, "Cannot gift deal due to acquire status"),
 	CUSTOMER_NOT_FOUND(1005, "Customer not found"),
 	EMAIL_REQUIRED(1006, "Email is required"),
+	EMAIL_OR_PASS_INVALID(1007, "Invalid email or password"),
 
 	MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found"),
 	ACTIVIATION_CODE_NOT_FOUND(3000, "Activiation code not found"),
@@ -31,7 +33,7 @@ public enum ErrorCode
 
 	private final int code;
 	private final String message;
-	private static Map<Integer, ErrorCode> errorCodeMap;
+	private static Map<Integer, ErrorCode> errorCodeMap = new HashMap<Integer, ErrorCode>();
 
 	static
 	{
