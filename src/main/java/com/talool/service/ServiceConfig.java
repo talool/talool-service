@@ -33,6 +33,9 @@ public class ServiceConfig extends PropertiesConfiguration
 	private static final String TAG_CACHE_REFRESH_IN_SECS = "tag.cache.refresh.in.secs";
 
 	private static final String BRAINTREE_SANDBOX_ENABLED = "braintree.sandbox.enabled";
+	private static final String BRAINTREE_MERCHANT_ID = "braintree.merchant.id";
+	private static final String BRAINTREE_PUBLIC_KEY = "braintree.public.key";
+	private static final String BRAINTREE_PRIVATE_KEY = "braintree.private.key";
 
 	private ServiceConfig(String file) throws ConfigurationException
 	{
@@ -42,6 +45,21 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static ServiceConfig get()
 	{
 		return instance;
+	}
+
+	public String getBraintreePublicKey()
+	{
+		return getString(BRAINTREE_PUBLIC_KEY);
+	}
+
+	public String getBraintreeMerchantId()
+	{
+		return getString(BRAINTREE_MERCHANT_ID);
+	}
+
+	public String getBraintreePrivateKey()
+	{
+		return getString(BRAINTREE_PRIVATE_KEY);
 	}
 
 	public boolean isBraintreeSandboxEnabled()

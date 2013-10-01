@@ -52,6 +52,7 @@ import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.CustomerService;
 import com.talool.core.service.InvalidInputException;
 import com.talool.core.service.NotFoundException;
+import com.talool.core.service.ProcessorException;
 import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
@@ -1319,6 +1320,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		DealOffer dealOffer = null;
 		Customer customer = null;
+		TransactionResult transactionResult = null;
 
 		try
 		{
@@ -1342,11 +1344,35 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new NotFoundException("customer", customerId == null ? null : customerId.toString());
 		}
 
-		final TransactionResult transactionResult = BraintreeUtil.processCard(customer, dealOffer, paymentDetail);
+		try
+		{
+			transactionResult = BraintreeUtil.processCard(customer, dealOffer, paymentDetail);
+		}
+		catch (ProcessorException e)
+		{
+			throw new ServiceException(ErrorCode.GENERAL_PROCESSOR_ERROR, e);
+		}
 
 		if (transactionResult.isSuccess())
 		{
-			createDealOfferPurchase(customer, dealOffer, transactionResult);
+			try
+			{
+				createDealOfferPurchase(customer, dealOffer, transactionResult);
+				getCurrentSession().flush();
+			}
+			catch (ServiceException e)
+			{
+				try
+				{
+					rollbackPaymentTransaction(customerId, dealOfferId, transactionResult, e);
+				}
+				catch (ProcessorException pe)
+				{
+					LOG.error("Transaction not rolled back with processor! " + pe.getMessage(), pe);
+				}
+
+				throw e;
+			}
 
 			try
 			{
@@ -1369,6 +1395,21 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	}
 
+	private void rollbackPaymentTransaction(final UUID customerId, final UUID dealOfferId, final TransactionResult transactionResult,
+			final ServiceException causedException) throws ProcessorException
+	{
+		LOG.error(String.format("Creating dealOffer failed customerId '%s' dealOfferId '%s' rolling back transactionId '%s'",
+				customerId, dealOfferId, transactionResult.getTransactionId()), causedException);
+
+		TransactionResult voidedTrans = null;
+
+		voidedTrans = BraintreeUtil.voidTransaction(transactionResult.getTransactionId());
+
+		LOG.error(String.format("Payment transaction roll back of transactionId '%s' success %s ", transactionResult.getTransactionId(),
+				voidedTrans.isSuccess()));
+
+	}
+
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
 	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId, final String paymentCode) throws ServiceException,
@@ -1376,6 +1417,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		DealOffer dealOffer = null;
 		Customer customer = null;
+		Activity activity = null;
+		TransactionResult transactionResult = null;
 
 		try
 		{
@@ -1399,20 +1442,47 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new NotFoundException("customer", customerId == null ? null : customerId.toString());
 		}
 
-		final TransactionResult transactionResult = BraintreeUtil.processPaymentCode(customer, dealOffer, paymentCode);
+		try
+		{
+			transactionResult = BraintreeUtil.processPaymentCode(customer, dealOffer, paymentCode);
+		}
+		catch (ProcessorException e)
+		{
+			throw new ServiceException(ErrorCode.GENERAL_PROCESSOR_ERROR, e);
+		}
 
 		if (transactionResult.isSuccess())
 		{
-			createDealOfferPurchase(customer, dealOffer, transactionResult);
+			try
+			{
+				createDealOfferPurchase(customer, dealOffer, transactionResult);
+				getCurrentSession().flush();
+			}
+			catch (ServiceException e)
+			{
+				try
+				{
+					rollbackPaymentTransaction(customerId, dealOfferId, transactionResult, e);
+				}
+				catch (ProcessorException pe)
+				{
+					LOG.error("Transaction not rolled back with processor! " + pe.getMessage(), pe);
+				}
+
+				throw e;
+			}
 
 			try
 			{
-				// create a purchase activity. if it fails, we will not rollback the
-				// entire transaction
-				final Activity activity = ActivityFactory.createPurchase(dealOffer, customer.getId());
+				// if it fails, we will not rollback the entire transaction
+				activity = ActivityFactory.createPurchase(dealOffer, customer.getId());
 				ServiceFactory.get().getActivityService().save(activity);
 			}
 			catch (TException e)
+			{
+				LOG.error(String.format("Activity not created for purchase customerId '%s' dealOfferId '%s'", customerId, dealOfferId), e);
+			}
+			catch (ServiceException e)
 			{
 				LOG.error(String.format("Activity not created for purchase customerId '%s' dealOfferId '%s'", customerId, dealOfferId), e);
 			}

@@ -27,6 +27,8 @@ public enum ErrorCode
 	EMAIL_REQUIRED(1006, "Email is required"),
 	EMAIL_OR_PASS_INVALID(1007, "Invalid email or password"),
 
+	GENERAL_PROCESSOR_ERROR(1500, "Unknown processor error"),
+
 	MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found"),
 	ACTIVIATION_CODE_NOT_FOUND(3000, "Activiation code not found"),
 	ACTIVIATION_CODE_ALREADY_ACTIVATED(3001, "Activiation code already activated");
