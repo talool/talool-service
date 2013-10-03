@@ -1389,7 +1389,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		else
 		{
-			LOG.warn(String.format("Transaction failed for customerId '%s' with message '%s'", customerId, transactionResult.getMessage()));
+			LOG.error(String.format("Transaction failed for customerId %s errorCode %s errorText %s", customerId,
+					transactionResult.getErrorCode(), transactionResult.getErrorText()));
 		}
 		return transactionResult;
 
@@ -1490,7 +1491,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		else
 		{
-			LOG.warn(String.format("Transaction failed for customerId '%s' with message '%s'", customerId, transactionResult.getMessage()));
+			LOG.error(String.format("Transaction failed for customerId %s errorCode %s errorText %s", customerId,
+					transactionResult.getErrorCode(), transactionResult.getErrorText()));
 		}
 		return transactionResult;
 

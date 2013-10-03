@@ -94,28 +94,31 @@ public class BraintreeUtil
 			return TransactionResult.successfulTransaction(result.getTarget().getId());
 		}
 
+		// validation errors
 		if (result.getErrors() != null)
 		{
-			// validation errors
 			return TransactionResult.failedTransaction(result.getMessage());
 		}
-		else
+
+		switch (result.getTransaction().getStatus())
 		{
-			switch (result.getTransaction().getStatus())
-			{
-				case PROCESSOR_DECLINED:
-					// transaction.getProcessorResponseCode();
-					// transaction.getProcessorResponseText();
-					return TransactionResult.failedTransaction(result.getMessage());
+			case PROCESSOR_DECLINED:
 
-				case GATEWAY_REJECTED:
-					// result.getTransaction().getGatewayRejectionReason();
-					return TransactionResult.failedTransaction(result.getMessage());
+				// for (ValidationError error :
+				// result.getErrors().getAllDeepValidationErrors())
+				// {
+				// System.out.println(error.getCode());
+				// System.out.println(error.getMessage());
+				// }
+				return TransactionResult.failedTransaction(result.getTransaction().getProcessorResponseText(), result.getTransaction()
+						.getProcessorResponseCode());
 
-				default:
-					return TransactionResult.failedTransaction("Unknown processor error");
+			case GATEWAY_REJECTED:
+				return TransactionResult.failedTransaction(result.getMessage(), result.getTransaction().getGatewayRejectionReason().name());
 
-			}
+			default:
+				return TransactionResult.failedTransaction(TransactionResult.GENERIC_FAILURE_MESSAGE);
+
 		}
 
 	}
