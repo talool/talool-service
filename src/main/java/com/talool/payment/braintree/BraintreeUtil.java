@@ -151,7 +151,7 @@ public class BraintreeUtil
 		{
 			transRequest = new TransactionRequest()
 					.venmoSdkPaymentMethodCode(paymentCode)
-					.amount(new BigDecimal(dealOffer.getPrice()))
+					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
 					.descriptor()
 					.name(createDescriptor(dealOffer))
 					.done()
@@ -184,7 +184,7 @@ public class BraintreeUtil
 			final Card card = paymentDetail.getCard();
 
 			transRequest = new TransactionRequest()
-					.amount(new BigDecimal(dealOffer.getPrice()))
+					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
 					.creditCard()
 					.number(card.getAccountnumber())
 					.expirationMonth(card.getExpirationMonth())
