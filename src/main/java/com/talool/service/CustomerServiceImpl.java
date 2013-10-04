@@ -1254,44 +1254,55 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			final String uCode = code.toUpperCase();
-			// remove zeros and ohhs because too similar in printed book
-			final String cleanCode = uCode.replaceAll("(O|0)", "(0|O)");
 
-			final SQLQuery sqlQuery = getCurrentSession().createSQLQuery(
-					"select activation_code_id from activation_code where code ~ '" + cleanCode + "'");
+			// we have no choice but to try the users original input
+			search = new Search(ActivationCodeImpl.class);
+			search.addFilterEqual("dealOfferId", dealOfferId);
+			search.addFilterEqual("code", uCode);
+			activationCode = (ActivationCodeImpl)
+					daoDispatcher.searchUnique(search);
 
-			sqlQuery.addScalar("activation_code_id", PostgresUUIDType.INSTANCE);
-
-			@SuppressWarnings("unchecked")
-			final List<UUID> codes = sqlQuery.list();
-
-			if (CollectionUtils.isEmpty(codes))
+			if (activationCode == null)
 			{
-				throw new ServiceException(ErrorCode.ACTIVIATION_CODE_NOT_FOUND, code);
-			}
+				// remove zeros and ohhs because too similar in printed book
+				final String cleanCode = uCode.replaceAll("(O|0)", "(0|O)");
+				if (cleanCode.equals(uCode))
+				{
+					// there is nothing to replace,code doesnt exist
+					throw new ServiceException(ErrorCode.ACTIVIATION_CODE_NOT_FOUND, code);
+				}
 
-			if (codes.size() > 1)
-			{
-				// we have no choice but to try the users original input
-				search = new Search(ActivationCodeImpl.class);
-				search.addFilterEqual("dealOfferId", dealOfferId);
-				search.addFilterEqual("code", uCode);
-				activationCode = (ActivationCodeImpl)
-						daoDispatcher.searchUnique(search);
+				final SQLQuery sqlQuery = getCurrentSession().createSQLQuery(
+						"select activation_code_id from activation_code where code ~ '" + cleanCode + "'");
 
-				if (activationCode == null)
+				sqlQuery.addScalar("activation_code_id", PostgresUUIDType.INSTANCE);
+
+				@SuppressWarnings("unchecked")
+				final List<UUID> codes = sqlQuery.list();
+
+				if (CollectionUtils.isEmpty(codes))
 				{
 					throw new ServiceException(ErrorCode.ACTIVIATION_CODE_NOT_FOUND, code);
 				}
 
+				if (codes.size() > 1)
+				{
+					// there are multiple ones and we don't know what to pick!
+					throw new ServiceException(ErrorCode.ACTIVIATION_CODE_NOT_FOUND, code);
+				}
+				else
+				{
+					// guaranteed to be 1 code here
+					search = new Search(ActivationCodeImpl.class);
+					search.addFilterEqual("id", codes.get(0));
+					activationCode = (ActivationCodeImpl)
+							daoDispatcher.searchUnique(search);
+				}
 			}
-			else
+
+			if (activationCode == null)
 			{
-				// guaranteed to be 1 code here
-				search = new Search(ActivationCodeImpl.class);
-				search.addFilterEqual("id", codes.get(0));
-				activationCode = (ActivationCodeImpl)
-						daoDispatcher.searchUnique(search);
+				throw new ServiceException(ErrorCode.ACTIVIATION_CODE_NOT_FOUND, code);
 			}
 
 			if (activationCode.getCustomerId() != null)
