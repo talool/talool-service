@@ -3,18 +3,18 @@
   <parent>
     <artifactId>talool-base</artifactId>
     <groupId>com.talool</groupId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <relativePath>../pom.xml/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>talool-service</artifactId>
   <name>Talool Service</name>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.3</version>
   <url>http://maven.apache.org</url>
   <scm>
-    <connection>git@github.com:talool/talool-service.git</connection>
-    <developerConnection>git@github.com:talool/talool-service.git</developerConnection>
-    <url>git@github.com:talool/talool-service.git</url>
+    <connection>scm:git:git@github.com:talool/talool-service.git</connection>
+    <developerConnection>scm:git:git@github.com:talool/talool-service.git</developerConnection>
+    <url>scm:git:git@github.com:talool/talool-service.git</url>
   </scm>
   <build>
     <plugins>
