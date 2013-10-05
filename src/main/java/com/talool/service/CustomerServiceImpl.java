@@ -16,6 +16,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.PostgresUUIDType;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernatespatial.GeometryUserType;
@@ -50,6 +51,7 @@ import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.CustomerService;
+import com.talool.core.service.CustomerSummary;
 import com.talool.core.service.InvalidInputException;
 import com.talool.core.service.NotFoundException;
 import com.talool.core.service.ProcessorException;
@@ -1546,5 +1548,35 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		final String cleanCode = code.replaceAll("(O|0)", "%");
 		System.out.println(cleanCode);
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts) throws ServiceException
+	{
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.CustomerSummary, null, searchOpts,
+					true);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(CustomerSummary.class));
+			query.addScalar("customerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("email", StandardBasicTypes.STRING);
+			query.addScalar("firstName", StandardBasicTypes.STRING);
+			query.addScalar("lastName", StandardBasicTypes.STRING);
+			query.addScalar("redemptions", StandardBasicTypes.INTEGER);
+			query.addScalar("giftGives", StandardBasicTypes.INTEGER);
+			query.addScalar("registrationDate", StandardBasicTypes.DATE);
+			query.addScalar("commaSeperatedDealOfferTitles", StandardBasicTypes.STRING);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+
+			return (List<CustomerSummary>) query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomerSummary: " + ex.getMessage(), ex);
+		}
 	}
 }
