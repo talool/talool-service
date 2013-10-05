@@ -29,32 +29,21 @@ public final class QueryHelper
 	private static final ImmutableMap<String, String> EMPTY_IMMUTABLE_PROPS = ImmutableMap
 			.<String, String> of();
 
-	private static final String CUSTOMER_SUMMARY = "select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,c.create_dt as registrationDate,"
-			+
-			"(select count(*) "
-			+
-			"from deal_acquire as d "
-			+
-			"where d.customer_id = c.customer_id "
-			+
-			"and d.acquire_status='REDEEMED' "
-			+
-			") as redemptions,"
-			+
-			"(select count(*) "
-			+
-			"from gift as g "
-			+
-			"where g.from_customer_id = c.customer_id "
-			+
-			") as giftGives, "
-			+
-			"(select array_to_string(array(select distinct d.title from deal_offer as d,customer as cust,"
-			+
-			"deal_offer_purchase as dof WHERE d.deal_offer_id=dof.deal_offer_id and cust.customer_id=c.customer_id and cust.customer_id=dof.customer_id), ', ')) "
-			+
-			"as commaSeperatedDealOfferTitles from customer as c " +
-			"order by redemptions desc";
+	private static final String CUSTOMER_SUMMARY =
+			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
+					+ "c.create_dt as registrationDate,(select count(*) "
+					+ "from deal_acquire as d "
+					+ "where d.customer_id = c.customer_id "
+					+ "and d.acquire_status='REDEEMED' "
+					+ ") as redemptions,"
+					+ "(select count(*) "
+					+ "from gift as g "
+					+ "where g.from_customer_id = c.customer_id "
+					+ ") as giftGives, "
+					+ "(select array_to_string(array(select distinct d.title from deal_offer as d,customer as cust,"
+					+ "deal_offer_purchase as dof WHERE d.deal_offer_id=dof.deal_offer_id and cust.customer_id=c.customer_id and cust.customer_id=dof.customer_id), ', ')) "
+					+ "as commaSeperatedDealOfferTitles from customer as c "
+					+ "order by redemptions desc";
 
 	private static final String ACTIVATION_SUMMARY = "select n1.doid as \"dealOfferId\",n1.title, n1.total as \"totalCodes\", n2.ta as \"totalActivations\" from  "
 			+
