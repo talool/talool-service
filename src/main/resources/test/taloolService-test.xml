@@ -33,6 +33,7 @@
 	    <constructor-arg ref="customerServiceImpl"/>
 	    <constructor-arg ref="emailServiceImpl"/>
 	    <constructor-arg ref="activityServiceImpl"/>
+	    <constructor-arg ref="analyticServiceImpl"/>
 	</bean>
 		
 				

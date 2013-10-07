@@ -17,6 +17,7 @@ public class SearchOptions implements Serializable
 	private String sortProperty;
 	private Integer maxResults;
 	private Integer page;
+	private Long firstResult;
 
 	private SearchOptions(final Builder builder)
 	{
@@ -24,6 +25,12 @@ public class SearchOptions implements Serializable
 		this.maxResults = builder.maxResults;
 		this.page = builder.page;
 		this.ascending = builder.ascending;
+		this.firstResult = builder.firstResult;
+	}
+
+	public Long getFirstResult()
+	{
+		return firstResult;
 	}
 
 	public static class Builder
@@ -36,6 +43,11 @@ public class SearchOptions implements Serializable
 
 			return new SearchOptions(this);
 
+		}
+
+		public Long getFirstResult()
+		{
+			return firstResult;
 		}
 
 		/**
@@ -86,9 +98,22 @@ public class SearchOptions implements Serializable
 			return this;
 		}
 
+		/**
+		 * The row/position of first result to start at
+		 * 
+		 * @param page
+		 * @return
+		 */
+		public Builder firstResult(Long firstResult)
+		{
+			this.firstResult = firstResult;
+			return this;
+		}
+
 		private Boolean ascending = true;
 		private String sortProperty;
 		private int maxResults;
+		private Long firstResult;
 		private int page;
 
 	}

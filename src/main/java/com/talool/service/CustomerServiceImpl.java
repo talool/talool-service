@@ -51,7 +51,6 @@ import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.CustomerService;
-import com.talool.core.service.CustomerSummary;
 import com.talool.core.service.InvalidInputException;
 import com.talool.core.service.NotFoundException;
 import com.talool.core.service.ProcessorException;
@@ -75,6 +74,8 @@ import com.talool.payment.TransactionResult;
 import com.talool.payment.braintree.BraintreeUtil;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
+import com.talool.stats.CustomerSummary;
+import com.talool.stats.PaginatedResult;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -1552,14 +1553,18 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts) throws ServiceException
+	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts, final boolean calculateRowSize) throws ServiceException
 	{
+		PaginatedResult<CustomerSummary> paginatedResult = null;
+		List<CustomerSummary> summaries = null;
+		Long totalResults = null;
+
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.CustomerSummary, null, searchOpts,
+			String newSql = QueryHelper.buildQuery(QueryType.CustomerSummary, null, searchOpts,
 					true);
 
-			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(CustomerSummary.class));
 			query.addScalar("customerId", PostgresUUIDType.INSTANCE);
 			query.addScalar("email", StandardBasicTypes.STRING);
@@ -1571,12 +1576,46 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.addScalar("commaSeperatedDealOfferTitles", StandardBasicTypes.STRING);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<CustomerSummary>) query.list();
 
-			return (List<CustomerSummary>) query.list();
+			if (calculateRowSize && summaries != null)
+			{
+
+				newSql = QueryHelper.buildQuery(QueryType.CustomerSummaryCnt, null, null, true);
+
+				query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+
+				query.addScalar("totalResults", StandardBasicTypes.INTEGER);
+				totalResults = (Long) query.uniqueResult();
+			}
+
+			paginatedResult = new PaginatedResult<CustomerSummary>(searchOpts, totalResults, summaries);
 		}
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem getCustomerSummary: " + ex.getMessage(), ex);
 		}
+
+		return paginatedResult;
+	}
+
+	@Override
+	public long getCustomerSummaryCount() throws ServiceException
+	{
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.CustomerSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomerSummary: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
 	}
 }

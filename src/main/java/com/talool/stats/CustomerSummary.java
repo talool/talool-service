@@ -1,4 +1,4 @@
-package com.talool.core.service;
+package com.talool.stats;
 
 import java.io.Serializable;
 import java.util.Date;

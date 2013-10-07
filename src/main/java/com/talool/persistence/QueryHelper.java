@@ -42,8 +42,9 @@ public final class QueryHelper
 					+ ") as giftGives, "
 					+ "(select array_to_string(array(select distinct d.title from deal_offer as d,customer as cust,"
 					+ "deal_offer_purchase as dof WHERE d.deal_offer_id=dof.deal_offer_id and cust.customer_id=c.customer_id and cust.customer_id=dof.customer_id), ', ')) "
-					+ "as commaSeperatedDealOfferTitles from customer as c "
-					+ "order by redemptions desc";
+					+ "as commaSeperatedDealOfferTitles from customer as c ";
+
+	private static final String CUSTOMER_SUMMARY_CNT = "select count(*) as totalResults from customer";
 
 	private static final String ACTIVATION_SUMMARY = "select n1.doid as \"dealOfferId\",n1.title, n1.total as \"totalCodes\", n2.ta as \"totalActivations\" from  "
 			+
@@ -115,6 +116,8 @@ public final class QueryHelper
 
 		CustomerSummary(CUSTOMER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
+		CustomerSummaryCnt(CUSTOMER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+
 		MerchantAcquires(MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 
 		MerchantAcquiresLocation(MERCHANT_ACQUIRES_LOCATION,
@@ -161,7 +164,14 @@ public final class QueryHelper
 		if (searchOpts != null)
 		{
 			query.setMaxResults(searchOpts.getMaxResults());
-			query.setFirstResult(searchOpts.getMaxResults() * searchOpts.getPage());
+			if (searchOpts.getFirstResult() == null)
+			{
+				query.setFirstResult(searchOpts.getMaxResults() * searchOpts.getPage());
+			}
+			else
+			{
+				query.setFirstResult(Integer.valueOf(searchOpts.getFirstResult().toString()));
+			}
 		}
 	}
 

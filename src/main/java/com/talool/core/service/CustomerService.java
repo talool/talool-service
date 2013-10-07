@@ -18,6 +18,8 @@ import com.talool.core.social.SocialNetwork;
 import com.talool.payment.PaymentDetail;
 import com.talool.payment.TransactionResult;
 import com.talool.service.HibernateService;
+import com.talool.stats.CustomerSummary;
+import com.talool.stats.PaginatedResult;
 
 /**
  * Customer Service
@@ -194,6 +196,9 @@ public interface CustomerService extends HibernateService
 	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId,
 			final String paymentCode) throws ServiceException, NotFoundException;
 
-	public List<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts) throws ServiceException;
+	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts, final boolean calculateTotalResults)
+			throws ServiceException;
+
+	public long getCustomerSummaryCount() throws ServiceException;
 
 }

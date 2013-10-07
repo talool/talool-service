@@ -57,6 +57,8 @@ import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.MerchantMediaImpl;
+import com.talool.stats.CustomerSummary;
+import com.talool.stats.PaginatedResult;
 import com.talool.utils.DealAcquireComparator;
 import com.talool.utils.DealAcquireComparator.ComparatorType;
 import com.talool.utils.MerchantComparator;
@@ -1109,6 +1111,18 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Customer customer = customerService.getCustomerByEmail("chris@talool.com");
 
 		customerService.activateCode(customer.getId(), dofs.get(0).getId(), codes.get(10));
+
+	}
+
+	@Test
+	public void testCustomerSummary() throws ServiceException, InvalidInputException
+	{
+		SearchOptions searchOpts = new SearchOptions.Builder().
+				sortProperty("redemptions").ascending(false).maxResults(100).page(0).build();
+
+		PaginatedResult<CustomerSummary> summary = customerService.getCustomerSummary(searchOpts, true);
+
+		System.out.println("total results :" + summary.getTotalResults() + ", size:" + summary.getResults().size());
 
 	}
 }
