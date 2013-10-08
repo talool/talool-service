@@ -116,8 +116,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		ServiceFactory.get().getEmailService().sendCustomerRegistrationEmail(customer);
 
-		LOG.info("Sent registration email to " + customer.getEmail());
-
 		final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
 		final List<Activity> activities = new ArrayList<Activity>();
 
