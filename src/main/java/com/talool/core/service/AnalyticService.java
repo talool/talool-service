@@ -19,9 +19,13 @@ public interface AnalyticService extends HibernateService
 	public Long getTotalEmailGifts() throws ServiceException;
 
 	public Long getTotalFacebookGifts() throws ServiceException;
-	
+
 	public Long getTotalActivatedCodes(UUID dealOfferId) throws ServiceException;
-	
+
 	public Long getTotalRedemptions(UUID customerId) throws ServiceException;
+
+	public Long getTotalFacebookCustomers() throws ServiceException;
+
+	public Long getTotalEmailCustomers() throws ServiceException;
 
 }

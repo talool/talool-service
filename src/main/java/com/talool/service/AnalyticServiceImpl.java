@@ -3,6 +3,8 @@ package com.talool.service;
 import java.util.UUID;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,14 +98,15 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 
 		return count;
 	}
-	
+
 	public Long getTotalActivatedCodes(final UUID dealOfferId) throws ServiceException
 	{
 		Long count = null;
-		
+
 		try
 		{
-			final Query query = getCurrentSession().createQuery("select count(*) FROM ActivationCodeImpl where activatedDate is not null AND dealOfferId = :offerId");
+			final Query query = getCurrentSession().createQuery(
+					"select count(*) FROM ActivationCodeImpl where activatedDate is not null AND dealOfferId = :offerId");
 			query.setParameter("offerId", dealOfferId);
 			count = (Long) query.uniqueResult();
 		}
@@ -111,17 +114,18 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
-		
+
 		return count;
 	}
-	
+
 	public Long getTotalRedemptions(final UUID customerId) throws ServiceException
 	{
 		Long count = null;
-		
+
 		try
 		{
-			final Query query = getCurrentSession().createQuery("select count(*) FROM DealAcquireImpl where redemptionCode is not null AND customer.id = :customerId");
+			final Query query = getCurrentSession().createQuery(
+					"select count(*) FROM DealAcquireImpl where redemptionCode is not null AND customer.id = :customerId");
 			query.setParameter("customerId", customerId);
 			count = (Long) query.uniqueResult();
 		}
@@ -129,8 +133,36 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
-		
+
 		return count;
+	}
+
+	@Override
+	public Long getTotalFacebookCustomers() throws ServiceException
+	{
+		Long count = null;
+
+		try
+		{
+			final SQLQuery query = getCurrentSession().createSQLQuery(
+					"select count(*) as cnt from customer as c,customer_social_account as csa where csa.customer_id=c.customer_id and csa.social_network_id=1");
+			query.addScalar("cnt", StandardBasicTypes.LONG);
+			count = (Long) query.uniqueResult();
+
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(e.getLocalizedMessage(), e);
+		}
+
+		return count;
+	}
+
+	@Override
+	public Long getTotalEmailCustomers() throws ServiceException
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

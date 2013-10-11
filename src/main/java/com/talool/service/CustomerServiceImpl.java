@@ -1004,7 +1004,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception e)
 		{
-			LOG.error("Problem finding/persisting closedState on activity: " + e.getLocalizedMessage());
+			LOG.error(String.format("Problem finding/persisting closedState on activity. receipCustomerId %s giftId %s",
+					receipientCustomerId.toString(), giftId), e);
 		}
 
 		return dac;
