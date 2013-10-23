@@ -26,6 +26,7 @@ public enum ErrorCode
 	CUSTOMER_NOT_FOUND(1005, "Customer not found"),
 	EMAIL_REQUIRED(1006, "Email is required"),
 	EMAIL_OR_PASS_INVALID(1007, "Invalid email or password"),
+	NOT_GIFT_RECIPIENT(1008, "Not the gift recipient"),
 
 	GENERAL_PROCESSOR_ERROR(1500, "Unknown processor error"),
 
