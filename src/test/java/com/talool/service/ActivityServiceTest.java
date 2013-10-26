@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import com.talool.domain.activity.ActivityImpl;
 
 @TestExecutionListeners(TransactionalTestExecutionListener.class)
 // Rolls back transactions by default
+@Ignore
 public class ActivityServiceTest extends HibernateFunctionalTestBase
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ActivityServiceTest.class);

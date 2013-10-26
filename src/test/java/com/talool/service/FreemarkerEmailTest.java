@@ -5,6 +5,7 @@ import java.net.URL;
 
 import org.apache.commons.io.Charsets;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import freemarker.template.TemplateException;
  * @author clintz
  * 
  */
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:taloolCommon.xml", "classpath:taloolMailService.xml" })
 public class FreemarkerEmailTest

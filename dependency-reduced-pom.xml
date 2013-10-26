@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>talool-service</artifactId>
   <name>Talool Service</name>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.4</version>
   <scm>
     <connection>scm:git:git@github.com:talool/talool-service.git</connection>
     <developerConnection>scm:git:git@github.com:talool/talool-service.git</developerConnection>

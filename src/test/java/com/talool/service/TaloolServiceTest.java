@@ -44,8 +44,6 @@ import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
-import com.talool.core.Relationship;
-import com.talool.core.RelationshipStatus;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 import com.talool.core.gift.FaceBookGift;
@@ -131,15 +129,13 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// this is an integration test hacked together via JUnit, so no big deal!
 		cleanTest();
 
-		testMerchantsWithin2();
+		// testMerchantsWithin2();
 
 		testCategories();
 
 		testGetGiftsForCustomer();
 
 		testMedia();
-
-		testRelationship();
 
 		Customer customer = testCreateCustomer();
 
@@ -156,7 +152,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		testFavoriteMerchants();
 
-		testMerchantsWithin();
+		// testMerchantsWithin();
 
 		testGiftRequests();
 
@@ -715,24 +711,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	public void testRelationship() throws Exception
-	{
-		Customer fromCustomer = testCreateCustomer();
-		Customer toCustomer = testCreateCustomer();
-
-		customerService.save(domainFactory.newRelationship(fromCustomer, toCustomer,
-				RelationshipStatus.FRIEND));
-
-		List<Relationship> rels = customerService.getRelationshipsFrom(fromCustomer.getId());
-		Assert.assertEquals(1, rels.size());
-		Assert.assertEquals(rels.get(0).getToCustomer(), toCustomer);
-
-		rels = customerService.getRelationshipsTo(toCustomer.getId());
-		Assert.assertEquals(1, rels.size());
-		Assert.assertEquals(rels.get(0).getFromCustomer(), fromCustomer);
-
-	}
-
 	public DealOfferPurchase testDealOfferPurchase(final Customer customer, final DealOffer dealOffer)
 			throws ServiceException
 	{
@@ -1114,7 +1092,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	@Test
 	public void testCustomerSummary() throws ServiceException, InvalidInputException
 	{
 		SearchOptions searchOpts = new SearchOptions.Builder().

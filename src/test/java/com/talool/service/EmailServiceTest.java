@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
+@Ignore
 public class EmailServiceTest
 {
 	private static final char[] symbols = new char[36];
