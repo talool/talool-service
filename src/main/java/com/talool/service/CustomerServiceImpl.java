@@ -1502,11 +1502,20 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			{
 				createDealOfferPurchase(customer, dealOffer, transactionResult);
 				getCurrentSession().flush();
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug("processing braintree for " + customer.getEmail() + " " + transactionResult.getTransactionId());
+				}
 			}
 			catch (ServiceException e)
 			{
 				try
 				{
+					if (LOG.isDebugEnabled())
+					{
+						LOG.debug("rolling back braintree transaction " + customer.getEmail());
+					}
+
 					rollbackPaymentTransaction(customerId, dealOfferId, transactionResult, e);
 				}
 				catch (ProcessorException pe)
