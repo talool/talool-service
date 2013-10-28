@@ -48,10 +48,6 @@ public class BraintreeUtil
 	public static final String KEY_ACCOUNT_NUMBER = "card_number";
 	public static final String VENMO_SDK_SESSION = "venmo_sdk_session";
 
-	private static final String MERCHANT_ID = "mkf3rwysqz6w9x44";
-	private static final String PUBLIC_KEY = "ck6f7kcdq8jwq5b8";
-	private static final String PRIVATE_KEY = "ac3b232be33cce4cf3ce108106d0a93e";
-
 	private BraintreeUtil()
 	{
 		super();
@@ -67,9 +63,9 @@ public class BraintreeUtil
 	{
 		gateway = new BraintreeGateway(
 				ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX : Environment.PRODUCTION,
-				MERCHANT_ID,
-				PUBLIC_KEY,
-				PRIVATE_KEY
+				ServiceConfig.get().getBraintreeMerchantId(),
+				ServiceConfig.get().getBraintreePublicKey(),
+				ServiceConfig.get().getBraintreePrivateKey()
 				);
 	}
 
