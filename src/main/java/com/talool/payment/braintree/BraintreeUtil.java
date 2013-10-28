@@ -68,6 +68,15 @@ public class BraintreeUtil
 				ServiceConfig.get().getBraintreePrivateKey()
 				);
 	}
+	
+	public static String getDebugString()
+	{
+		return String.format("Merchant Id: %s,  Public Key: %s, Private Key: %s, Env: %s", 
+				ServiceConfig.get().getBraintreeMerchantId(),
+				ServiceConfig.get().getBraintreePublicKey(),
+				ServiceConfig.get().getBraintreePrivateKey(),
+				ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX.toString() : Environment.PRODUCTION.toString());
+	}
 
 	/**
 	 * Creates a descriptor seen on card statements
