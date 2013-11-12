@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DealOfferSummary;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
 import com.talool.core.Merchant;
@@ -120,5 +121,8 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException;
+
+	public List<DealOfferSummary> getDealOffersWithin(final Location location, final int maxMiles, final SearchOptions searchOptions)
+			throws ServiceException;
 
 }

@@ -41,6 +41,8 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DealOfferSummary;
+import com.talool.core.DealOfferSummary.DealOfferSummaryBuilder;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
@@ -1335,6 +1337,73 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem deleteing customerId " + customerId, e);
 		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOfferSummary> getDealOffersWithin(final Location location, final int maxMiles, final SearchOptions searchOpts)
+			throws ServiceException
+	{
+		final List<DealOfferSummary> summaries = new ArrayList<DealOfferSummary>();
+		final List<Merchant> merchants = new ArrayList<Merchant>();
+
+		final Point point = new Point(location.getLongitude(), location.getLatitude());
+		point.setSrid(4326);
+
+		final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
+				.put("point", point.toString())
+				.put("isDiscoverable", true)
+				.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
+
+		final String newSql = QueryHelper.buildQuery(QueryType.DealOfferIDsWithinMeters, params,
+				searchOpts);
+
+		try
+		{
+			final SQLQuery query =
+					getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+
+			query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
+			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
+
+			query.setResultTransformer(new ResultTransformer()
+			{
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public Object transformTuple(Object[] tuple, String[] aliases)
+				{
+					final DealOfferSummaryBuilder summary = new DealOfferSummary.
+							DealOfferSummaryBuilder((UUID) tuple[0], null, null, true);
+
+					summary.distanceInMeters((Double) tuple[1]);
+					summaries.add(summary.build());
+
+					return null;
+				}
+
+				@SuppressWarnings("rawtypes")
+				@Override
+				public List transformList(List collection)
+				{
+					return merchants;
+				}
+			});
+
+			query.list();
+
+		}
+		catch (Exception ex)
+		{
+			String msg = String.format(
+					"Problem getting merchants within lng/lat %s and maxMiles %d", location, maxMiles);
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
+		}
+
+		return summaries;
 
 	}
 }

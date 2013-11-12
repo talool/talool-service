@@ -41,7 +41,7 @@ import org.hibernate.annotations.TypeDefs;
 		 */
 		@NamedQuery(
 				name = "getGifts",
-				query = "select gift from GiftImpl as gift left join fetch gift.fromCustomer " +
+				query = "select distinct gift from GiftImpl as gift left join fetch gift.fromCustomer " +
 						"left join fetch gift.dealAcquire as da left join fetch da.deal as d " +
 						"left join fetch d.image left join fetch d.merchant as m left join fetch m.locations " +
 						"where gift.giftStatus in (:giftStatus) AND (gift.toCustomer.id=:customerId OR " +

@@ -35,6 +35,7 @@ import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DealOfferSummary;
 import com.talool.core.DealType;
 import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
@@ -129,7 +130,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// this is an integration test hacked together via JUnit, so no big deal!
 		cleanTest();
 
-		// testMerchantsWithin2();
+		testDealOffersWithin();
 
 		testCategories();
 
@@ -175,6 +176,19 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		Assert.assertEquals("The Kitchen", merchants.get(1).getName());
 		Assert.assertNotNull(merchants.get(1).getCategory());
+
+	}
+
+	public void testDealOffersWithin() throws ServiceException, InterruptedException
+	{
+
+		// The kitchen Boulder location
+		Location location = domainFactory.newLocation(-105.281686, 40.017663);
+		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("distanceInMeters").build();
+
+		List<DealOfferSummary> dealOffers = taloolService.getDealOffersWithin(location, 2, searchOpts);
+
+		Assert.assertEquals(2, dealOffers.size());
 
 	}
 
