@@ -179,7 +179,7 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT title AS t, d.deal_id AS did, count(*) AS cnt " +
 					"FROM deal AS d, deal_acquire AS da " +
-					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.acquire_status = 'REDEEMED" +
+					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.acquire_status = 'REDEEMED' " +
 					"GROUP BY d.deal_id " +
 					"ORDER BY cnt DESC " +
 					"LIMIT 10");
