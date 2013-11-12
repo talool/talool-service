@@ -179,10 +179,10 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT title AS t, d.deal_id AS did, count(*) AS cnt " +
 					"FROM deal AS d, deal_acquire AS da " +
-					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId " +
+					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.acquire_status = 'REDEEMED" +
 					"GROUP BY d.deal_id " +
 					"ORDER BY cnt DESC " +
-					"LIMIT 5");
+					"LIMIT 10");
 			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
@@ -222,7 +222,7 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 					"FROM deal AS d, deal_acquire AS da, customer AS c " +
 					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
 					"ORDER BY rdate DESC " +
-					"LIMIT 5");
+					"LIMIT 10");
 			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
@@ -270,7 +270,7 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 					"FROM deal AS d, deal_acquire AS da, customer AS c " +
 					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
 					"GROUP BY uid ORDER BY deals DESC " +
-					"LIMIT 5");
+					"LIMIT 10");
 			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("fname", StandardBasicTypes.STRING);
@@ -319,7 +319,7 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId " +
 					"GROUP BY d.deal_id " +
 					"ORDER BY cnt DESC " +
-					"LIMIT 5");
+					"LIMIT 10");
 			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
