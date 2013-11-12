@@ -15,12 +15,13 @@
 	<import resource="./taloolCommon-test.xml" />
 	<import resource="./dataSource-test.xml"/>
 	<import resource="./taloolHibernateContext-test.xml" />
+	<import resource="./taloolMailService-test.xml"/>
 
 
 	<bean id="serviceFactory" class="com.talool.service.ServiceFactory" factory-method="createInstance">
 		<constructor-arg ref="taloolServiceImpl"/>
 		<constructor-arg ref="customerServiceImpl"/>
-		<constructor-arg> <null /></constructor-arg>
+		<constructor-arg ref="emailServiceImpl"/>
 		<constructor-arg ref="activityServiceImpl"/>
 		<constructor-arg ref="analyticServiceImpl"/>
    </bean>
