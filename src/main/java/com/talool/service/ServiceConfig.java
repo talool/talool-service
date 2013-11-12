@@ -40,6 +40,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	private ServiceConfig(String file) throws ConfigurationException
 	{
 		super(file);
+
 	}
 
 	public static ServiceConfig get()

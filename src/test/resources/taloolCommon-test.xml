@@ -12,17 +12,20 @@
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-
 	<tx:annotation-driven order="1" />
-	
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" 
-		destroy-method="close">
-		<property name="driverClassName" value="org.postgresql.Driver" />
-		<property name="url" value="jdbc:postgresql://dev-db1:5432/talool" />
-		<property name="username" value="talool" />
-		<property name="password" value="talool" />
+
+	<bean id="persistencePropertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:/etc/talool/service.properties</value>
+			</list>
+		</property>
 	</bean>
 	
-	<!--  <context:property-placeholder location="jdbc.properties" /> -->
-
+	<bean id="serviceConfig" class="com.talool.service.ServiceConfig"
+		factory-method="createInstance">
+		<constructor-arg value="service.properties" />
+	</bean>
+	
 </beans>

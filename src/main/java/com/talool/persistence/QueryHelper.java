@@ -62,6 +62,13 @@ public final class QueryHelper
 					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
 					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id and merchant.is_discoverable=${isDiscoverable}";
 
+	public static final String DEAL_OFFER_IDS_WITHIN_METERS =
+			"select distinct dof.deal_offer_id as dealOfferId,ST_Distance( mloc.geom,'${point}',true) "
+					+ "as distanceInMeters FROM public.merchant as merchant, public.merchant_location as mloc, "
+					+ "public.deal_offer as dof "
+					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
+					+ "and mloc.merchant_id=merchant.merchant_id and merchant.is_discoverable=${isDiscoverable} and dof.merchant_id=merchant.merchant_id";
+
 	public static final String DEAL_ACQUIRES =
 			"select distinct dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
 					"left join fetch d.image left join fetch d.merchant as m left join fetch m.locations as l " +
@@ -109,6 +116,11 @@ public final class QueryHelper
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
 				ImmutableMap.<String, String> builder()
 						.put("merchant.name", "name")
+						.put("merchant.isDiscoverable", "isDiscoverable")
+						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
+
+		DealOfferIDsWithinMeters(DEAL_OFFER_IDS_WITHIN_METERS,
+				ImmutableMap.<String, String> builder()
 						.put("merchant.isDiscoverable", "isDiscoverable")
 						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 

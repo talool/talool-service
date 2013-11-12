@@ -12,11 +12,13 @@
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-	<!-- Enables the Spring MVC @Controller programming model -->
-	<context:component-scan base-package="com.talool" />
+            
+<bean id="freemarkerUtil" class="com.talool.service.mail.FreemarkerUtil" factory-method="createInstance" 
+	         depends-on="serviceConfig"/>
 	
-	<import resource="./dataSource-test.xml"/>
-	<import resource="./taloolService-test.xml"/>
-
-    </beans>
-	
+<bean id="emailServiceImpl" class="com.talool.service.mail.EmailServiceImpl" factory-method="createInstance"
+	       depends-on="serviceConfig,freemarkerUtil"/>
+	            
+            
+            
+</beans>

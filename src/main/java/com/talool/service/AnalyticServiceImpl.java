@@ -170,9 +170,9 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 	}
 
 	@Override
-	public List<AvailableDeal> getAvailableDeals(UUID merchantId) throws ServiceException 
+	public List<AvailableDeal> getAvailableDeals(UUID merchantId) throws ServiceException
 	{
-		List<AvailableDeal> availableDeals= new ArrayList<AvailableDeal>();
+		List<AvailableDeal> availableDeals = new ArrayList<AvailableDeal>();
 
 		try
 		{
@@ -188,16 +188,15 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
 			query.addScalar("cnt", StandardBasicTypes.LONG);
-			
-			
+
 			@SuppressWarnings("unchecked")
 			List<Object[]> l = query.list();
 
 			for (Object[] o : l)
 			{
-				String title = (String)o[0];
-				UUID id = (UUID)o[1];
-				Long cnt = (Long)o[2];
+				String title = (String) o[0];
+				UUID id = (UUID) o[1];
+				Long cnt = (Long) o[2];
 				availableDeals.add(new AvailableDeal(title, id, cnt));
 			}
 
@@ -206,15 +205,15 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
-		
+
 		return availableDeals;
 	}
 
 	@Override
-	public List<RecentRedemption> getRecentRedemptions(UUID merchantId) throws ServiceException 
+	public List<RecentRedemption> getRecentRedemptions(UUID merchantId) throws ServiceException
 	{
 		List<RecentRedemption> rr = new ArrayList<RecentRedemption>();
-		
+
 		try
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
@@ -232,20 +231,20 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			query.addScalar("cid", PostgresUUIDType.INSTANCE);
 			query.addScalar("code", StandardBasicTypes.STRING);
 			query.addScalar("rdate", StandardBasicTypes.DATE);
-			
+
 			@SuppressWarnings("unchecked")
 			List<Object[]> l = query.list();
 
 			for (Object[] o : l)
 			{
-				String title = (String)o[0];
-				UUID id = (UUID)o[1];
-				String fname = (String)o[2];
-				String lname = (String)o[3];
+				String title = (String) o[0];
+				UUID id = (UUID) o[1];
+				String fname = (String) o[2];
+				String lname = (String) o[3];
 				String name = new StringBuilder(fname).append(" ").append(lname).toString();
-				UUID cId = (UUID)o[4];
-				String code = (String)o[5];
-				Date date = (Date)o[6];
+				UUID cId = (UUID) o[4];
+				String code = (String) o[5];
+				Date date = (Date) o[6];
 				rr.add(new RecentRedemption(title, id, name, cId, code, date));
 			}
 
@@ -254,15 +253,15 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
-		
+
 		return rr;
 	}
 
 	@Override
-	public List<ActiveUser> getActiveUsers(UUID merchantId) throws ServiceException 
+	public List<ActiveUser> getActiveUsers(UUID merchantId) throws ServiceException
 	{
 		List<ActiveUser> au = new ArrayList<ActiveUser>();
-		
+
 		try
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
@@ -277,21 +276,21 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			query.addScalar("lname", StandardBasicTypes.STRING);
 			query.addScalar("uid", PostgresUUIDType.INSTANCE);
 			query.addScalar("deals", StandardBasicTypes.LONG);
-			//query.addScalar("visits", StandardBasicTypes.LONG);
-			//query.addScalar("messages", StandardBasicTypes.LONG);
-			
+			// query.addScalar("visits", StandardBasicTypes.LONG);
+			// query.addScalar("messages", StandardBasicTypes.LONG);
+
 			@SuppressWarnings("unchecked")
 			List<Object[]> l = query.list();
 
 			for (Object[] o : l)
 			{
-				String fname = (String)o[0];
-				String lname = (String)o[1];
+				String fname = (String) o[0];
+				String lname = (String) o[1];
 				String name = new StringBuilder(fname).append(" ").append(lname).toString();
-				UUID id = (UUID)o[2];
-				Long d = (Long)o[3];
-				//Long v = (Long)o[4];
-				//Long m = (Long)o[5];
+				UUID id = (UUID) o[2];
+				Long d = (Long) o[3];
+				// Long v = (Long)o[4];
+				// Long m = (Long)o[5];
 				au.add(new ActiveUser(name, id, d, d, d));
 			}
 
@@ -300,17 +299,17 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
-		
+
 		return au;
 	}
 
 	@Override
-	public List<MerchantReach> getMerchantReaches(UUID merchantId) throws ServiceException 
+	public List<MerchantReach> getMerchantReaches(UUID merchantId) throws ServiceException
 	{
 		// TODO Auto-generated method stub
 
 		List<MerchantReach> mr = new ArrayList<MerchantReach>();
-		
+
 		try
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
@@ -325,18 +324,17 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
 			query.addScalar("cnt", StandardBasicTypes.LONG);
-			
-			
+
 			@SuppressWarnings("unchecked")
 			List<Object[]> l = query.list();
 
 			for (Object[] o : l)
 			{
-				String message = (String)o[0];
-				UUID id = (UUID)o[1];
-				Long q = (Long)o[2];
-				Long t = (Long)o[3];
-				Long a = (Long)o[4];
+				String message = (String) o[0];
+				UUID id = (UUID) o[1];
+				Long q = (Long) o[2];
+				Long t = (Long) o[3];
+				Long a = (Long) o[4];
 				mr.add(new MerchantReach(message, id, q, t, a));
 			}
 
@@ -345,11 +343,8 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
-		
+
 		return mr;
 	}
-	
-	
-	
 
 }

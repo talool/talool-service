@@ -1,5 +1,6 @@
 package com.talool.service;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,7 +23,7 @@ import com.talool.core.service.TaloolService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-@ContextConfiguration("classpath:test/taloolService-test.xml")
+@ContextConfiguration("classpath:./taloolService-test.xml")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 /**
  * Before/After behave like OpenSessionInViewFilter
@@ -46,6 +47,12 @@ public abstract class HibernateFunctionalTestBase extends AbstractJUnit4SpringCo
 		// open a Hibernate session
 		final SessionFactory sessionFactory = (SessionFactory) applicationContext
 				.getBean("sessionFactory");
+
+		final BasicDataSource dataSource = (BasicDataSource) applicationContext
+				.getBean("dataSource");
+
+		logger.info("DataSource " + dataSource.getUrl());
+
 		final Session session = sessionFactory.openSession();
 		TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
 
