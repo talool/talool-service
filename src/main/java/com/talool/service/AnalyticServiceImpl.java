@@ -178,12 +178,12 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT title AS t, d.deal_id AS did, count(*) AS cnt " +
-							"FROM deal AS d, deal_acquire AS da " +
-							"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId " +
-							"GROUP BY d.deal_id " +
-							"ORDER BY cnt DESC " +
-							"LIMIT 5");
-
+					"FROM deal AS d, deal_acquire AS da " +
+					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.acquire_status = 'REDEEMED' " +
+					"GROUP BY d.deal_id " +
+					"ORDER BY cnt DESC " +
+					"LIMIT 10");
+			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
@@ -216,17 +216,13 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 
 		try
 		{
-			final SQLQuery query = getCurrentSession()
-					.createSQLQuery(
-							"SELECT title AS t, d.deal_id AS did, first_name AS fname, last_name AS lname, c.customer_id AS cid, redemption_code AS code, redemption_dt AS rdate "
-									+
-									"FROM deal AS d, deal_acquire AS da, customer AS c "
-									+
-									"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' "
-									+
-									"ORDER BY rdate DESC " +
-									"LIMIT 5");
-
+			final SQLQuery query = getCurrentSession().createSQLQuery(
+					"SELECT title AS t, d.deal_id AS did, first_name AS fname, last_name AS lname, c.customer_id AS cid, redemption_code AS code, redemption_dt AS rdate " +
+					"FROM deal AS d, deal_acquire AS da, customer AS c " +
+					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
+					"ORDER BY rdate DESC " +
+					"LIMIT 10");
+			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
@@ -270,11 +266,11 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT first_name AS fname, last_name AS lname, c.customer_id AS uid, count(*) AS deals " +
-							"FROM deal AS d, deal_acquire AS da, customer AS c " +
-							"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
-							"GROUP BY uid ORDER BY deals DESC " +
-							"LIMIT 5");
-
+					"FROM deal AS d, deal_acquire AS da, customer AS c " +
+					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
+					"GROUP BY uid ORDER BY deals DESC " +
+					"LIMIT 10");
+			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("fname", StandardBasicTypes.STRING);
 			query.addScalar("lname", StandardBasicTypes.STRING);
@@ -318,12 +314,12 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT title AS t, d.deal_id AS did, count(*) AS cnt " +
-							"FROM deal AS d, deal_acquire AS da " +
-							"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId " +
-							"GROUP BY d.deal_id " +
-							"ORDER BY cnt DESC " +
-							"LIMIT 5");
-
+					"FROM deal AS d, deal_acquire AS da " +
+					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId " +
+					"GROUP BY d.deal_id " +
+					"ORDER BY cnt DESC " +
+					"LIMIT 10");
+			
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
