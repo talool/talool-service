@@ -63,7 +63,7 @@ public class DealOfferImpl implements DealOffer
 	@JoinColumn(name = "updated_by_merchant_account_id")
 	private MerchantAccount updatedByMerchantAccount;
 
-	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.EAGER)
 	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
@@ -96,6 +96,10 @@ public class DealOfferImpl implements DealOffer
 	@Type(type = "dealType")
 	@Column(name = "deal_type", nullable = false, columnDefinition = "deal_type")
 	private DealType dealType;
+
+	@Type(type = "geomType")
+	@Column(name = "geom", nullable = true)
+	private com.vividsolutions.jts.geom.Geometry geometry;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -349,6 +353,16 @@ public class DealOfferImpl implements DealOffer
 	public void setLocationName(String name)
 	{
 		this.locationName = name;
+	}
+
+	public com.vividsolutions.jts.geom.Geometry getGeometry()
+	{
+		return geometry;
+	}
+
+	public void setGeometry(com.vividsolutions.jts.geom.Geometry geometry)
+	{
+		this.geometry = geometry;
 	}
 
 }

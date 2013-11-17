@@ -31,6 +31,10 @@
 		<constructor-arg value="${tag.cache.refresh.in.secs}"/>
    </bean>
    
+    <bean id="dealOfferMetadataCache" class="com.talool.cache.DealOfferMetadataCache" 
+      factory-method="createInstance">
+   </bean>
+   
 				
 	<bean id="domainFactory" class="com.talool.domain.DomainFactoryImpl"/>
 	

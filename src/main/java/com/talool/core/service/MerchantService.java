@@ -1,13 +1,14 @@
 package com.talool.core.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
+import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
-import com.talool.core.DealOfferSummary;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
 import com.talool.core.Merchant;
@@ -18,6 +19,7 @@ import com.talool.core.MerchantMedia;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 import com.talool.service.HibernateService;
+import com.talool.stats.DealOfferMetrics;
 
 /**
  * r Merchant Service
@@ -122,7 +124,9 @@ public interface MerchantService extends HibernateService
 
 	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException;
 
-	public List<DealOfferSummary> getDealOffersWithin(final Location location, final int maxMiles, final SearchOptions searchOptions)
-			throws ServiceException;
+	public List<DealOfferGeoSummary> getDealOfferGeoSummariesWithin(final Location location, final int maxMiles,
+			final SearchOptions searchOptions) throws ServiceException;
+
+	public Map<UUID, DealOfferMetrics> getDealOfferMetrics() throws ServiceException;
 
 }

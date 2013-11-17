@@ -29,6 +29,14 @@ public final class QueryHelper
 	private static final ImmutableMap<String, String> EMPTY_IMMUTABLE_PROPS = ImmutableMap
 			.<String, String> of();
 
+	private static final String DEAL_OFFER_BASIC_STATS =
+			"select dof.deal_offer_id as dealOfferId,count(distinct d.merchant_id) as totalMerchants,count(d.deal_id) as totalDeals " +
+					"from merchant as m,deal as d,deal_offer as dof " +
+					"where d.deal_offer_id in (select deal_offer_id from deal_offer ) " +
+					"and d.deal_offer_id = dof.deal_offer_id and m.merchant_id=d.merchant_id " +
+					"group by dof.deal_offer_id ";
+	// "order by totalMerchants desc";
+
 	private static final String CUSTOMER_SUMMARY =
 			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
 					+ "c.create_dt as registrationDate,(select count(*) "
@@ -63,11 +71,11 @@ public final class QueryHelper
 					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id and merchant.is_discoverable=${isDiscoverable}";
 
 	public static final String DEAL_OFFER_IDS_WITHIN_METERS =
-			"select distinct dof.deal_offer_id as dealOfferId,ST_Distance( mloc.geom,'${point}',true) "
-					+ "as distanceInMeters FROM public.merchant as merchant, public.merchant_location as mloc, "
-					+ "public.deal_offer as dof "
-					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
-					+ "and mloc.merchant_id=merchant.merchant_id and merchant.is_discoverable=${isDiscoverable} and dof.merchant_id=merchant.merchant_id";
+			"select dof.deal_offer_id as dealOfferId," +
+					"ST_Distance( dof.geom, '${point}',true) as distanceInMeters " +
+					"from public.deal_offer as dof " +
+					"where ST_DWithin(dof.geom,'${point}',${distanceInMeters},true) and " +
+					"dof.is_active=true and (expires is null OR expires>now())";
 
 	public static final String DEAL_ACQUIRES =
 			"select distinct dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
@@ -125,6 +133,8 @@ public final class QueryHelper
 						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 
 		DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
+
+		DealOfferBasicStats(DEAL_OFFER_BASIC_STATS, EMPTY_IMMUTABLE_PROPS),
 
 		CustomerSummary(CUSTOMER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 

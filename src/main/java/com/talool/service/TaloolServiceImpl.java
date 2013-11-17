@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableMap;
 import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.Sort;
+import com.talool.cache.DealOfferMetadataCache;
 import com.talool.core.AccountType;
 import com.talool.core.ActivationCode;
 import com.talool.core.ActivationSummary;
@@ -40,9 +41,8 @@ import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
+import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
-import com.talool.core.DealOfferSummary;
-import com.talool.core.DealOfferSummary.DealOfferSummaryBuilder;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
@@ -75,6 +75,8 @@ import com.talool.domain.social.SocialNetworkImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl;
+import com.talool.stats.DealOfferMetadata;
+import com.talool.stats.DealOfferMetrics;
 import com.talool.utils.SpatialUtils;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -567,9 +569,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	{
 		try
 		{
-			final Search search = new Search(DealOfferImpl.class);
-			search.addSort(Sort.desc("createdUpdated.updated"));
-			return daoDispatcher.search(search);
+			final Criteria criteria = getCurrentSession().createCriteria(DealOfferImpl.class);
+			return criteria.list();
+
 		}
 		catch (Exception ex)
 		{
@@ -1340,12 +1342,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferSummary> getDealOffersWithin(final Location location, final int maxMiles, final SearchOptions searchOpts)
+	public List<DealOfferGeoSummary> getDealOfferGeoSummariesWithin(final Location location, final int maxMiles, final SearchOptions searchOpts)
 			throws ServiceException
 	{
-		final List<DealOfferSummary> summaries = new ArrayList<DealOfferSummary>();
+		final List<DealOfferGeoSummary> summaries = new ArrayList<DealOfferGeoSummary>();
 		final List<Merchant> merchants = new ArrayList<Merchant>();
 
 		final Point point = new Point(location.getLongitude(), location.getLatitude());
@@ -1353,7 +1354,6 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
 				.put("point", point.toString())
-				.put("isDiscoverable", true)
 				.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
 
 		final String newSql = QueryHelper.buildQuery(QueryType.DealOfferIDsWithinMeters, params,
@@ -1375,11 +1375,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				@Override
 				public Object transformTuple(Object[] tuple, String[] aliases)
 				{
-					final DealOfferSummaryBuilder summary = new DealOfferSummary.
-							DealOfferSummaryBuilder((UUID) tuple[0], null, null, true);
+					final UUID dealOfferId = (UUID) tuple[0];
+					final Double distanceInMeters = ((Double) tuple[1]);
+					final DealOfferMetadata metadata = DealOfferMetadataCache.get().getDealOfferMetrics(dealOfferId);
 
-					summary.distanceInMeters((Double) tuple[1]);
-					summaries.add(summary.build());
+					final DealOfferGeoSummary geoSummary = new DealOfferGeoSummary(metadata.getDealOffer(),
+							distanceInMeters, null, metadata.getDealOfferMetrics().getLongMetrics(), metadata.getDealOfferMetrics().getDoubleMetrics());
+					summaries.add(geoSummary);
 
 					return null;
 				}
@@ -1404,6 +1406,59 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 		return summaries;
+
+	}
+
+	@Override
+	public Map<UUID, DealOfferMetrics> getDealOfferMetrics() throws ServiceException
+	{
+		final Map<UUID, DealOfferMetrics> dealOfferMetrics = new HashMap<UUID, DealOfferMetrics>();
+
+		final String newSql = QueryHelper.buildQuery(QueryType.DealOfferBasicStats, null, null);
+
+		try
+		{
+			final SQLQuery query =
+					getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+
+			query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
+			query.addScalar("totalMerchants", StandardBasicTypes.LONG);
+			query.addScalar("totalDeals", StandardBasicTypes.LONG);
+
+			query.setResultTransformer(new ResultTransformer()
+			{
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public Object transformTuple(Object[] tuple, String[] aliases)
+				{
+					final UUID dealOfferId = (UUID) tuple[0];
+					final DealOfferMetrics metric = new DealOfferMetrics(dealOfferId);
+					metric.addLongMetric(DealOfferMetrics.MetricType.TotalMerchants.toString(), (Long) tuple[1]);
+					metric.addLongMetric(DealOfferMetrics.MetricType.TotalDeals.toString(), (Long) tuple[2]);
+					dealOfferMetrics.put(dealOfferId, metric);
+					return null;
+				}
+
+				@SuppressWarnings("rawtypes")
+				@Override
+				public List transformList(List collection)
+				{
+					return collection;
+				}
+
+			});
+
+			query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem executing dealOfferMetrics", ex);
+		}
+
+		return dealOfferMetrics;
 
 	}
 }

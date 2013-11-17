@@ -74,7 +74,7 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
-CREATE TYPE sex_type AS ENUM ('M', 'F');
+CREATE TYPE sex_type AS ENUM ('M', 'F','U');
 
 CREATE TABLE customer (
   	customer_id UUID NOT NULL DEFAULT uuid_generate_v4(),

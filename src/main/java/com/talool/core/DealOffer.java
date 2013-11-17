@@ -3,6 +3,8 @@ package com.talool.core;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * Deal Offer interface
  * 
@@ -64,5 +66,9 @@ public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
 	public boolean isActive();
 
 	public void setActive(boolean isActive);
+
+	public Geometry getGeometry();
+
+	public void setGeometry(Geometry geometry);
 
 }

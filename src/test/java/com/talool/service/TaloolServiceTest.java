@@ -34,8 +34,8 @@ import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
+import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
-import com.talool.core.DealOfferSummary;
 import com.talool.core.DealType;
 import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
@@ -73,11 +73,15 @@ import com.talool.utils.MerchantComparator;
 // Rolls back transactions by default
 public class TaloolServiceTest extends HibernateFunctionalTestBase
 {
+
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceTest.class);
 
 	private static final String TALOOL_IGNORED_TEST_DOMAIN = "test.talool.com";
 
 	private DomainFactory domainFactory;
+
+	private Location Binghamton_NY;
+	private Location Boulder_CO;
 
 	private class TagNameComparator implements Comparator<Tag>
 	{
@@ -121,6 +125,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void setup()
 	{
 		domainFactory = FactoryManager.get().getDomainFactory();
+		Binghamton_NY = domainFactory.newLocation(-75.98, 42.23);
+		Boulder_CO = domainFactory.newLocation(-105.281686, 40.017663);
 	}
 
 	@Test
@@ -130,7 +136,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// this is an integration test hacked together via JUnit, so no big deal!
 		cleanTest();
 
-		// testDealOffersWithin();
+		testDealOffersWithin();
 
 		// testCategories();
 
@@ -159,48 +165,23 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	public void testMerchantsWithin2() throws ServiceException, InterruptedException
-	{
-
-		// The kitchen Boulder location
-		Location location = domainFactory.newLocation(-105.281686, 40.017663);
-		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("merchant.name").ascending(true)
-				.build();
-
-		List<Merchant> merchants = taloolService.getMerchantsWithin(location, 2, searchOpts);
-
-		Assert.assertEquals(2, merchants.size());
-
-		Assert.assertEquals("Centro Latin Kitchen", merchants.get(0).getName());
-		Assert.assertNotNull(merchants.get(0).getCategory());
-
-		Assert.assertEquals("The Kitchen", merchants.get(1).getName());
-		Assert.assertNotNull(merchants.get(1).getCategory());
-
-	}
-
 	public void testDealOffersWithin() throws ServiceException, InterruptedException
 	{
-
-		// The kitchen Boulder location
-		Location location = domainFactory.newLocation(-105.281686, 40.017663);
 		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("distanceInMeters").build();
 
-		List<DealOfferSummary> dealOffers = taloolService.getDealOffersWithin(location, 2, searchOpts);
+		List<DealOfferGeoSummary> dealOffers = taloolService.getDealOfferGeoSummariesWithin(Binghamton_NY, 100, searchOpts);
 
-		Assert.assertEquals(1, dealOffers.size());
+		Assert.assertEquals(2, dealOffers.size());
 
 	}
 
 	public void testMerchantsWithin() throws ServiceException, InterruptedException
 	{
 
-		// The kitchen Boulder location
-		Location location = domainFactory.newLocation(-105.281686, 40.017663);
 		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("merchant.name").ascending(true)
 				.build();
 
-		List<Merchant> merchants = taloolService.getMerchantsWithin(location, 2, searchOpts);
+		List<Merchant> merchants = taloolService.getMerchantsWithin(Boulder_CO, 2, searchOpts);
 
 		Assert.assertEquals(2, merchants.size());
 

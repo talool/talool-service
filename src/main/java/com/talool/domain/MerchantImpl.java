@@ -95,7 +95,7 @@ public class MerchantImpl implements Merchant
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<MerchantAccount> merchantAccounts = new HashSet<MerchantAccount>();
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "merchant", targetEntity = MerchantLocationImpl.class)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "merchant", targetEntity = MerchantLocationImpl.class)
 	@OrderBy("createdUpdated.created")
 	@Fetch(FetchMode.SUBSELECT)
 	@BatchSize(size = 5)
