@@ -73,7 +73,17 @@ public class DealOfferImpl implements DealOffer
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
 	@JoinColumn(name = "image_id")
-	private MerchantMedia image;
+	private MerchantMedia dealOfferLogo;
+
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinColumn(name = "deal_offer_background_image_id")
+	private MerchantMedia dealOfferBackgroundImage;
+
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinColumn(name = "deal_offer_merchant_logo_id")
+	private MerchantMedia dealOfferMerchantLogo;
 
 	@Column(name = "summary", unique = false, nullable = true, length = 256)
 	private String summary;
@@ -217,15 +227,15 @@ public class DealOfferImpl implements DealOffer
 	}
 
 	@Override
-	public void setImage(final MerchantMedia image)
+	public void setDealOfferLogo(final MerchantMedia image)
 	{
-		this.image = image;
+		this.dealOfferLogo = image;
 	}
 
 	@Override
-	public MerchantMedia getImage()
+	public MerchantMedia getDealOfferLogo()
 	{
-		return image;
+		return dealOfferLogo;
 	}
 
 	@Override
@@ -363,6 +373,30 @@ public class DealOfferImpl implements DealOffer
 	public void setGeometry(com.vividsolutions.jts.geom.Geometry geometry)
 	{
 		this.geometry = geometry;
+	}
+
+	@Override
+	public void setDealOfferBackgroundImage(final MerchantMedia dealOfferBackgroundImage)
+	{
+		this.dealOfferBackgroundImage = dealOfferBackgroundImage;
+	}
+
+	@Override
+	public MerchantMedia getDealOfferBackgroundImage()
+	{
+		return dealOfferBackgroundImage;
+	}
+
+	@Override
+	public void setDealOfferMerchantLogo(final MerchantMedia dealOfferMerchantLogo)
+	{
+		this.dealOfferMerchantLogo = dealOfferMerchantLogo;
+	}
+
+	@Override
+	public MerchantMedia getDealOfferMerchantLogo()
+	{
+		return dealOfferMerchantLogo;
 	}
 
 }

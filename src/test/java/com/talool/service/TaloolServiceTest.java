@@ -171,7 +171,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		List<DealOfferGeoSummary> dealOffers = taloolService.getDealOfferGeoSummariesWithin(Binghamton_NY, 100, searchOpts);
 
-		Assert.assertEquals(2, dealOffers.size());
+		Assert.assertEquals(0, dealOffers.size());
 
 	}
 
@@ -745,7 +745,19 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		media.setMediaType(MediaType.DEAL_OFFER_LOGO);
 		media.setMediaUrl("http://cdn.dzone.com/static/images/vaannila/hibernate/hibernateManyToOnePic1.gif");
 		media.setMerchantId(dealOffer.getMerchant().getId());
-		dealOffer.setImage(media);
+		dealOffer.setDealOfferLogo(media);
+
+		MerchantMedia media2 = new MerchantMediaImpl();
+		media2.setMediaType(MediaType.DEAL_OFFER_MERCHANT_LOGO);
+		media2.setMediaUrl("http://cdn.dzone.com/static/images/vaannila/hibernate/hibernateManyToOnePic3.gif");
+		media2.setMerchantId(dealOffer.getMerchant().getId());
+		dealOffer.setDealOfferMerchantLogo(media2);
+
+		MerchantMedia media3 = new MerchantMediaImpl();
+		media3.setMediaType(MediaType.DEAL_OFFER_BACKGROUND_IMAGE);
+		media3.setMediaUrl("http://cdn.dzone.com/static/images/vaannila/hibernate/hibernateManyToOnePic6.gif");
+		media3.setMerchantId(dealOffer.getMerchant().getId());
+		dealOffer.setDealOfferBackgroundImage(media3);
 
 		dealOffer.setPrice(20.00f);
 		dealOffer.setSummary("Payback Book Boulder, CO");
@@ -758,7 +770,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		Assert.assertEquals(dealOffer.getCode(), dealOfferResult.getCode());
 		Assert.assertEquals(dealOffer.getTitle(), dealOfferResult.getTitle());
-		Assert.assertEquals(dealOffer.getImage(), dealOfferResult.getImage());
+		Assert.assertEquals(dealOffer.getDealOfferLogo(), dealOfferResult.getDealOfferLogo());
 		Assert.assertEquals(dealOffer.getSummary(), dealOfferResult.getSummary());
 		Assert.assertEquals(dealOffer.getCreatedByMerchantAccount().getId(), dealOfferResult
 				.getCreatedByMerchantAccount().getId());
@@ -766,6 +778,9 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(dealOffer.getExpires(), dealOfferResult.getExpires());
 		Assert.assertEquals(dealOffer.getType(), dealOfferResult.getType());
 		Assert.assertEquals(dealOffer.getLocationName(), dealOfferResult.getLocationName());
+
+		Assert.assertEquals(dealOffer.getDealOfferBackgroundImage().getMediaUrl(), dealOfferResult.getDealOfferBackgroundImage().getMediaUrl());
+		Assert.assertEquals(dealOffer.getDealOfferMerchantLogo().getMediaUrl(), dealOfferResult.getDealOfferMerchantLogo().getMediaUrl());
 
 		Tag spaTag = taloolService.getTag("spa");
 		if (spaTag == null)
