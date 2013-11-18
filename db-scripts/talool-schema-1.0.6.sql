@@ -30,9 +30,6 @@ update deal_offer set geom=ST_GeomFromText('POINT(-75.98 42.23)', 4326)
 ALTER TYPE media_type ADD VALUE 'DEAL_OFFER_BACKGROUND_IMAGE' AFTER 'DEAL_OFFER_LOGO';
 ALTER TYPE media_type ADD VALUE 'DEAL_OFFER_MERCHANT_LOGO' AFTER 'DEAL_OFFER_BACKGROUND_IMAGE';
 
-ALTER TABLE deal_offer ADD COLUMN deal_offer_merchant_logo_id UUID;
-ALTER TABLE deal_offer ADD COLUMN deal_offer_background_image_id UUID;
-
 COMMIT;
 
 
