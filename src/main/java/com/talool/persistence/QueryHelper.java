@@ -70,12 +70,17 @@ public final class QueryHelper
 					+ "where ST_DWithin(mloc.geom,'${point}',${distanceInMeters},true) "
 					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id and merchant.is_discoverable=${isDiscoverable}";
 
-	public static final String DEAL_OFFER_IDS_WITHIN_METERS =
+	public static final String ACTIVE_DEAL_OFFER_IDS_WITHIN_METERS =
 			"select dof.deal_offer_id as dealOfferId," +
 					"ST_Distance( dof.geom, '${point}',true) as distanceInMeters " +
 					"from public.deal_offer as dof " +
 					"where ST_DWithin(dof.geom,'${point}',${distanceInMeters},true) and " +
 					"dof.is_active=true and (expires is null OR expires>now())";
+
+	public static final String ACTIVE_DEAL_OFFER_IDS =
+			"select deal_offer_id as dealOfferId " +
+					"from public.deal_offer " +
+					"where is_active=true and (expires is null OR expires>now())";
 
 	public static final String DEAL_ACQUIRES =
 			"select distinct dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
@@ -127,10 +132,9 @@ public final class QueryHelper
 						.put("merchant.isDiscoverable", "isDiscoverable")
 						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 
-		DealOfferIDsWithinMeters(DEAL_OFFER_IDS_WITHIN_METERS,
-				ImmutableMap.<String, String> builder()
-						.put("merchant.isDiscoverable", "isDiscoverable")
-						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
+		ActiveDealOfferIDsWithinMeters(ACTIVE_DEAL_OFFER_IDS_WITHIN_METERS, EMPTY_IMMUTABLE_PROPS),
+
+		ActiveDealOfferIDs(ACTIVE_DEAL_OFFER_IDS, EMPTY_IMMUTABLE_PROPS),
 
 		DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 

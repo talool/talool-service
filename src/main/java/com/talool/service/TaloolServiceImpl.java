@@ -41,6 +41,7 @@ import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
+import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.FactoryManager;
@@ -1343,46 +1344,59 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public List<DealOfferGeoSummary> getDealOfferGeoSummariesWithin(final Location location, final int maxMiles, final SearchOptions searchOpts)
+	public DealOfferGeoSummariesResult getDealOfferGeoSummariesWithin(final Location location, final int maxMiles,
+			final SearchOptions searchOpts, final SearchOptions fallbackSearchOpts)
 			throws ServiceException
 	{
 		final List<DealOfferGeoSummary> summaries = new ArrayList<DealOfferGeoSummary>();
-		final List<Merchant> merchants = new ArrayList<Merchant>();
+		final boolean usedFallback = !isLocationAvailable(location);
+		String newSql = null;
+		SQLQuery query = null;
 
-		final Point point = new Point(location.getLongitude(), location.getLatitude());
-		point.setSrid(4326);
+		if (usedFallback)
+		{
+			// we need to default to all deals if location is unavailable, but return
+			// if no fallbackSearchOpts
+			if (fallbackSearchOpts == null)
+			{
+				LOG.warn("location and fallbackSearchOpts not available, returning null");
+				return null;
+			}
+			newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDs, null, fallbackSearchOpts);
+			query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
+		}
+		else
+		{
+			final Point point = new Point(location.getLongitude(), location.getLatitude());
+			point.setSrid(4326);
+			final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
+					.put("point", point.toString())
+					.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
 
-		final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
-				.put("point", point.toString())
-				.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
-
-		final String newSql = QueryHelper.buildQuery(QueryType.DealOfferIDsWithinMeters, params,
-				searchOpts);
+			newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDsWithinMeters, params,
+					searchOpts);
+			query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
+			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
+		}
 
 		try
 		{
-			final SQLQuery query =
-					getSessionFactory().getCurrentSession().createSQLQuery(newSql);
-
-			query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
-			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
-
 			query.setResultTransformer(new ResultTransformer()
 			{
-
 				private static final long serialVersionUID = 1L;
 
 				@Override
 				public Object transformTuple(Object[] tuple, String[] aliases)
 				{
 					final UUID dealOfferId = (UUID) tuple[0];
-					final Double distanceInMeters = ((Double) tuple[1]);
+					final Double distanceInMeters = usedFallback ? null : (Double) tuple[1];
 					final DealOfferMetadata metadata = DealOfferMetadataCache.get().getDealOfferMetrics(dealOfferId);
 
 					final DealOfferGeoSummary geoSummary = new DealOfferGeoSummary(metadata.getDealOffer(),
 							distanceInMeters, null, metadata.getDealOfferMetrics().getLongMetrics(), metadata.getDealOfferMetrics().getDoubleMetrics());
 					summaries.add(geoSummary);
-
 					return null;
 				}
 
@@ -1390,7 +1404,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				@Override
 				public List transformList(List collection)
 				{
-					return merchants;
+					return summaries;
 				}
 			});
 
@@ -1405,8 +1419,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throw new ServiceException(msg, ex);
 		}
 
-		return summaries;
+		return new DealOfferGeoSummariesResult(summaries, usedFallback);
+	}
 
+	protected static boolean isLocationAvailable(final Location location)
+	{
+		return (location != null && location.getLongitude() != null && location.getLatitude() != null && (location.getLongitude() != 0.0 && location
+				.getLatitude() != 0.0));
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
-import com.talool.core.DealOfferGeoSummary;
+import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
@@ -124,8 +124,20 @@ public interface MerchantService extends HibernateService
 
 	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException;
 
-	public List<DealOfferGeoSummary> getDealOfferGeoSummariesWithin(final Location location, final int maxMiles,
-			final SearchOptions searchOptions) throws ServiceException;
+	/**
+	 * Gets active and non-expired DealOffer summaries within maxMiles of a
+	 * location. If the location is null or fields are zero or null then the
+	 * fallbackSearchOptions are used.
+	 * 
+	 * @param location
+	 * @param maxMiles
+	 * @param searchOptions
+	 * @param fallbackSearchOptions
+	 * @return
+	 * @throws ServiceException
+	 */
+	public DealOfferGeoSummariesResult getDealOfferGeoSummariesWithin(final Location location, final int maxMiles,
+			final SearchOptions searchOptions, final SearchOptions fallbackSearchOptions) throws ServiceException;
 
 	public Map<UUID, DealOfferMetrics> getDealOfferMetrics() throws ServiceException;
 

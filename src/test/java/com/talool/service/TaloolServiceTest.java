@@ -34,6 +34,7 @@ import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
+import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.DealType;
@@ -169,8 +170,9 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	{
 		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("distanceInMeters").build();
 
-		List<DealOfferGeoSummary> dealOffers = taloolService.getDealOfferGeoSummariesWithin(Binghamton_NY, 100, searchOpts);
+		DealOfferGeoSummariesResult result = taloolService.getDealOfferGeoSummariesWithin(Binghamton_NY, 100, searchOpts, null);
 
+		List<DealOfferGeoSummary> dealOffers = result.getSummaries();
 		Assert.assertEquals(0, dealOffers.size());
 
 	}
