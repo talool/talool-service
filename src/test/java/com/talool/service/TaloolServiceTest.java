@@ -755,13 +755,13 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		media2.setMediaType(MediaType.DEAL_OFFER_MERCHANT_LOGO);
 		media2.setMediaUrl("http://cdn.dzone.com/static/images/vaannila/hibernate/hibernateManyToOnePic3.gif");
 		media2.setMerchantId(dealOffer.getMerchant().getId());
-		dealOffer.setDealOfferMerchantLogo(media2);
+		dealOffer.setDealOfferIcon(media2);
 
 		MerchantMedia media3 = new MerchantMediaImpl();
 		media3.setMediaType(MediaType.DEAL_OFFER_BACKGROUND_IMAGE);
 		media3.setMediaUrl("http://cdn.dzone.com/static/images/vaannila/hibernate/hibernateManyToOnePic6.gif");
 		media3.setMerchantId(dealOffer.getMerchant().getId());
-		dealOffer.setDealOfferBackgroundImage(media3);
+		dealOffer.setDealOfferBackground(media3);
 
 		dealOffer.setPrice(20.00f);
 		dealOffer.setSummary("Payback Book Boulder, CO");
@@ -783,8 +783,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(dealOffer.getType(), dealOfferResult.getType());
 		Assert.assertEquals(dealOffer.getLocationName(), dealOfferResult.getLocationName());
 
-		Assert.assertEquals(dealOffer.getDealOfferBackgroundImage().getMediaUrl(), dealOfferResult.getDealOfferBackgroundImage().getMediaUrl());
-		Assert.assertEquals(dealOffer.getDealOfferMerchantLogo().getMediaUrl(), dealOfferResult.getDealOfferMerchantLogo().getMediaUrl());
+		Assert.assertEquals(dealOffer.getDealOfferBackground().getMediaUrl(), dealOfferResult.getDealOfferBackground().getMediaUrl());
+		Assert.assertEquals(dealOffer.getDealOfferIcon().getMediaUrl(), dealOfferResult.getDealOfferIcon().getMediaUrl());
 
 		Tag spaTag = taloolService.getTag("spa");
 		if (spaTag == null)

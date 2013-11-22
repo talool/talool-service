@@ -72,18 +72,18 @@ public class DealOfferImpl implements DealOffer
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
-	@JoinColumn(name = "image_id")
+	@JoinColumn(name = "deal_offer_logo_id")
 	private MerchantMedia dealOfferLogo;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
-	@JoinColumn(name = "deal_offer_background_image_id")
-	private MerchantMedia dealOfferBackgroundImage;
+	@JoinColumn(name = "deal_offer_background_id")
+	private MerchantMedia dealOfferBackground;
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantMediaImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
-	@JoinColumn(name = "deal_offer_merchant_logo_id")
-	private MerchantMedia dealOfferMerchantLogo;
+	@JoinColumn(name = "deal_offer_icon_id")
+	private MerchantMedia dealOfferIcon;
 
 	@Column(name = "summary", unique = false, nullable = true, length = 256)
 	private String summary;
@@ -376,27 +376,27 @@ public class DealOfferImpl implements DealOffer
 	}
 
 	@Override
-	public void setDealOfferBackgroundImage(final MerchantMedia dealOfferBackgroundImage)
+	public void setDealOfferBackground(final MerchantMedia dealOfferBackgroundImage)
 	{
-		this.dealOfferBackgroundImage = dealOfferBackgroundImage;
+		this.dealOfferBackground = dealOfferBackgroundImage;
 	}
 
 	@Override
-	public MerchantMedia getDealOfferBackgroundImage()
+	public MerchantMedia getDealOfferBackground()
 	{
-		return dealOfferBackgroundImage;
+		return dealOfferBackground;
 	}
 
 	@Override
-	public void setDealOfferMerchantLogo(final MerchantMedia dealOfferMerchantLogo)
+	public void setDealOfferIcon(final MerchantMedia dealOfferIcon)
 	{
-		this.dealOfferMerchantLogo = dealOfferMerchantLogo;
+		this.dealOfferIcon = dealOfferIcon;
 	}
 
 	@Override
-	public MerchantMedia getDealOfferMerchantLogo()
+	public MerchantMedia getDealOfferIcon()
 	{
-		return dealOfferMerchantLogo;
+		return dealOfferIcon;
 	}
 
 }

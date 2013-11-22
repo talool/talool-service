@@ -55,13 +55,13 @@ public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
 
 	public MerchantMedia getDealOfferLogo();
 
-	public void setDealOfferBackgroundImage(MerchantMedia imageUrl);
+	public void setDealOfferBackground(MerchantMedia imageUrl);
 
-	public MerchantMedia getDealOfferBackgroundImage();
+	public MerchantMedia getDealOfferBackground();
 
-	public void setDealOfferMerchantLogo(MerchantMedia imageUrl);
+	public void setDealOfferIcon(MerchantMedia imageUrl);
 
-	public MerchantMedia getDealOfferMerchantLogo();
+	public MerchantMedia getDealOfferIcon();
 
 	public void setExpires(Date expires);
 
