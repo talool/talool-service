@@ -1349,66 +1349,66 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throws ServiceException
 	{
 		final List<DealOfferGeoSummary> summaries = new ArrayList<DealOfferGeoSummary>();
-		final boolean usedFallback = !isLocationAvailable(location);
+		boolean usingFallback = !isLocationAvailable(location);
 		String newSql = null;
 		SQLQuery query = null;
 
-		if (usedFallback)
+		final ResultTransformer resultTransformer = new ResultTransformer()
 		{
-			// we need to default to all deals if location is unavailable, but return
-			// if no fallbackSearchOpts
-			if (fallbackSearchOpts == null)
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Object transformTuple(Object[] tuple, String[] aliases)
 			{
-				LOG.warn("location and fallbackSearchOpts not available, returning null");
+				final UUID dealOfferId = (UUID) tuple[0];
+				final Double distanceInMeters = tuple.length == 2 ? (Double) tuple[1] : null;
+				final DealOfferMetadata metadata = DealOfferMetadataCache.get().getDealOfferMetrics(dealOfferId);
+
+				final DealOfferGeoSummary geoSummary = new DealOfferGeoSummary(metadata.getDealOffer(),
+						distanceInMeters, null, metadata.getDealOfferMetrics().getLongMetrics(), metadata.getDealOfferMetrics().getDoubleMetrics());
+				summaries.add(geoSummary);
 				return null;
 			}
-			newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDs, null, fallbackSearchOpts);
-			query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
-			query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
-		}
-		else
-		{
-			final Point point = new Point(location.getLongitude(), location.getLatitude());
-			point.setSrid(4326);
-			final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
-					.put("point", point.toString())
-					.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
 
-			newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDsWithinMeters, params,
-					searchOpts);
-			query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
-			query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
-			query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
-		}
+			@SuppressWarnings("rawtypes")
+			@Override
+			public List transformList(List collection)
+			{
+				return summaries;
+			}
+		};
 
 		try
 		{
-			query.setResultTransformer(new ResultTransformer()
+			if (!usingFallback)
 			{
-				private static final long serialVersionUID = 1L;
+				final Point point = new Point(location.getLongitude(), location.getLatitude());
+				point.setSrid(4326);
+				final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
+						.put("point", point.toString())
+						.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles)).build();
 
-				@Override
-				public Object transformTuple(Object[] tuple, String[] aliases)
-				{
-					final UUID dealOfferId = (UUID) tuple[0];
-					final Double distanceInMeters = usedFallback ? null : (Double) tuple[1];
-					final DealOfferMetadata metadata = DealOfferMetadataCache.get().getDealOfferMetrics(dealOfferId);
+				newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDsWithinMeters, params,
+						searchOpts);
+				query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+				query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
+				query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
 
-					final DealOfferGeoSummary geoSummary = new DealOfferGeoSummary(metadata.getDealOffer(),
-							distanceInMeters, null, metadata.getDealOfferMetrics().getLongMetrics(), metadata.getDealOfferMetrics().getDoubleMetrics());
-					summaries.add(geoSummary);
-					return null;
-				}
+				query.setResultTransformer(resultTransformer);
+				query.list();
+			}
 
-				@SuppressWarnings("rawtypes")
-				@Override
-				public List transformList(List collection)
-				{
-					return summaries;
-				}
-			});
-
-			query.list();
+			// if no results are found with the spacial query, or we are using the
+			// fall back because location is unavailable, then fall back to query
+			if (CollectionUtils.isEmpty(summaries) && fallbackSearchOpts != null)
+			{
+				usingFallback = true;
+				newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDs, null, fallbackSearchOpts);
+				query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
+				query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
+				query.setResultTransformer(resultTransformer);
+				query.list();
+			}
 
 		}
 		catch (Exception ex)
@@ -1419,7 +1419,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throw new ServiceException(msg, ex);
 		}
 
-		return new DealOfferGeoSummariesResult(summaries, usedFallback);
+		return new DealOfferGeoSummariesResult(summaries, usingFallback);
 	}
 
 	protected static boolean isLocationAvailable(final Location location)
