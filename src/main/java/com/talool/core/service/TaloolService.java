@@ -11,6 +11,7 @@ import com.talool.core.Category;
 import com.talool.core.CategoryTag;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
+import com.talool.core.DealOffer;
 import com.talool.core.Tag;
 import com.talool.core.social.SocialNetwork;
 import com.talool.service.HibernateService;
@@ -66,5 +67,7 @@ public interface TaloolService extends MerchantService, HibernateService
 	public List<ActivationSummary> getActivationSummaries(final UUID merchantId) throws ServiceException;
 
 	public void deleteCustomer(final UUID customerId) throws ServiceException;
+
+	public DealOffer cloneDealOffer(final DealOffer dealOffer) throws ServiceException;
 
 }

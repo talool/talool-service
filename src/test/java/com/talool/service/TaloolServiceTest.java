@@ -169,7 +169,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void testDealOffersWithin() throws ServiceException, InterruptedException
 	{
 
-		List<Merchant> merchants = taloolService.getMerchantsByDealOfferId(UUID.fromString("f4e42d5e-7edf-42ca-9e35-2c15995c1756"));
+		List<Merchant> merchants = taloolService.getMerchantsByDealOfferId(UUID.fromString("f4e42d5e-7edf-42ca-9e35-2c15995c1756"), null);
 		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("distanceInMeters").build();
 
 		DealOfferGeoSummariesResult result = taloolService.getDealOfferGeoSummariesWithin(Binghamton_NY, 100, searchOpts, null);

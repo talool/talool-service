@@ -1483,14 +1483,17 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Merchant> getMerchantsByDealOfferId(final UUID dealOfferId) throws ServiceException
+	public List<Merchant> getMerchantsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts) throws ServiceException
 	{
 		try
 		{
-			final Query query = sessionFactory.getCurrentSession().createQuery(
-					"select distinct d.merchant from DealImpl as d where d.dealOffer.id=:dealOfferId");
+			final String newHql = QueryHelper.buildQuery(QueryType.MerchantsByDealOfferId, null, searchOpts,
+					true);
 
+			final Query query = sessionFactory.getCurrentSession().createQuery(newHql);
 			query.setParameter("dealOfferId", dealOfferId);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
 
 			return query.list();
 		}
@@ -1498,5 +1501,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException(String.format("Problem getMerchantsByDealOfferId %s ", dealOfferId), ex);
 		}
+	}
+
+	@Override
+	public DealOffer cloneDealOffer(final DealOffer dealOffer) throws ServiceException
+	{
+		return null;
 	}
 }

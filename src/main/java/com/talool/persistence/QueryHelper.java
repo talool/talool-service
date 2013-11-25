@@ -124,6 +124,8 @@ public final class QueryHelper
 			+
 			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId";
 
+	private static final String MERCHANTS_BY_DEAL_OFFER_ID = "select distinct merchant from MerchantImpl as merchant,DealImpl as dof where dof.dealOffer.id=:dealOfferId and dof.merchant.id=merchant.id";
+
 	public enum QueryType
 	{
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
@@ -137,6 +139,9 @@ public final class QueryHelper
 		ActiveDealOfferIDs(ACTIVE_DEAL_OFFER_IDS, EMPTY_IMMUTABLE_PROPS),
 
 		DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
+
+		MerchantsByDealOfferId(MERCHANTS_BY_DEAL_OFFER_ID, ImmutableMap.<String, String> builder()
+				.put("merchant.name", "merchant.name").build()),
 
 		DealOfferBasicStats(DEAL_OFFER_BASIC_STATS, EMPTY_IMMUTABLE_PROPS),
 
