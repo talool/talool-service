@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
@@ -116,6 +117,27 @@ public class DealImpl implements Deal
 
 	public DealImpl()
 	{}
+
+	public DealImpl copy()
+	{
+		DealImpl deal = new DealImpl(this.createdByMerchantAccount);
+
+		deal.setActive(this.isActive);
+		deal.setCode(this.code);
+		deal.setUpdatedByMerchantAccount(getUpdatedByMerchantAccount());
+		deal.setTitle(title);
+		deal.setSummary(this.summary);
+		deal.setImage(image);
+		deal.setMerchant(merchant);
+
+		if (CollectionUtils.isNotEmpty(tags))
+		{
+			deal.setTags(new HashSet<Tag>(this.tags));
+		}
+
+		return deal;
+
+	}
 
 	public DealImpl(final DealOffer dealOffer)
 	{

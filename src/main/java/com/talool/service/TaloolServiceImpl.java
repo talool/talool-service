@@ -1504,8 +1504,38 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public DealOffer cloneDealOffer(final DealOffer dealOffer) throws ServiceException
+	@Transactional(propagation = Propagation.NESTED)
+	public DealOffer deepCopyDealOffer(final UUID dealOfferId) throws ServiceException
 	{
-		return null;
+		try
+		{
+			final DealOffer dealOffer = getDealOffer(dealOfferId);
+			final DealOffer newDealOffer = ((DealOfferImpl) dealOffer).copy();
+			newDealOffer.setActive(false);
+			newDealOffer.setTitle("copy of '" + dealOffer.getTitle() + "'");
+
+			daoDispatcher.save(newDealOffer);
+
+			final List<Deal> deals = getDealsByDealOfferId(dealOffer.getId(), null, null);
+			final Deal[] newDeals = new Deal[deals.size()];
+			int idx = 0;
+
+			for (Deal deal : deals)
+			{
+				final Deal newDeal = ((DealImpl) deal).copy();
+				deal = null;
+				newDeal.setDealOffer(newDealOffer);
+				newDeals[idx++] = newDeal;
+			}
+
+			daoDispatcher.save((Object[]) newDeals);
+
+			return newDealOffer;
+		}
+		catch (ServiceException se)
+		{
+			throw se;
+		}
+
 	}
 }

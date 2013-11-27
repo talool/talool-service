@@ -68,6 +68,15 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public void deleteCustomer(final UUID customerId) throws ServiceException;
 
-	public DealOffer cloneDealOffer(final DealOffer dealOffer) throws ServiceException;
+	/**
+	 * Copies all deals of an existing deal offer and assigns them to the newly
+	 * copied deal offer. The deal offer is set to in-active and the title of the
+	 * new deal offer is "copy of {orginalDealOfferTitle}"
+	 * 
+	 * @param dealOffer
+	 * @return
+	 * @throws ServiceException
+	 */
+	public DealOffer deepCopyDealOffer(final UUID dealOfferId) throws ServiceException;
 
 }

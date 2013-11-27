@@ -190,6 +190,26 @@ public class DealOfferImpl implements DealOffer
 		this.isActive = isActive;
 	}
 
+	public DealOffer copy()
+	{
+		final DealOfferImpl newDealOffer = new DealOfferImpl(this.merchant, this.createdByMerchantAccount);
+		newDealOffer.setActive(this.isActive);
+		newDealOffer.setCode(this.code);
+		newDealOffer.setDealOfferBackground(this.dealOfferBackground);
+		newDealOffer.setDealOfferIcon(this.dealOfferIcon);
+		newDealOffer.setDealOfferLogo(this.dealOfferLogo);
+		newDealOffer.setDealType(this.dealType);
+		newDealOffer.setExpires(this.expires);
+		newDealOffer.setGeometry(this.geometry);
+		newDealOffer.setLocationName(this.locationName);
+		newDealOffer.setPrice(this.price);
+		newDealOffer.setSummary(this.summary);
+		newDealOffer.setTitle(this.title);
+		newDealOffer.setUpdatedByMerchantAccount(this.updatedByMerchantAccount);
+
+		return newDealOffer;
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{

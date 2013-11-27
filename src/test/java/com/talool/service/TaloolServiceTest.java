@@ -137,6 +137,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		// this is an integration test hacked together via JUnit, so no big deal!
 		cleanTest();
 
+		testDeepCopyDealOffer();
+
 		testDealOffersWithin();
 
 		// testCategories();
@@ -176,6 +178,14 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		List<DealOfferGeoSummary> dealOffers = result.getSummaries();
 		Assert.assertEquals(0, dealOffers.size());
+
+	}
+
+	public void testDeepCopyDealOffer() throws ServiceException, InterruptedException
+	{
+		DealOffer copiedDealOffer = taloolService.deepCopyDealOffer(UUID.fromString("22b35c53-d96c-411a-8eb0-23d47c29ac84"));
+
+		Assert.assertTrue(copiedDealOffer.getTitle().startsWith("copy"));
 
 	}
 
