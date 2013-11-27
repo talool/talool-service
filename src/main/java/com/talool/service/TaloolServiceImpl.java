@@ -1364,6 +1364,12 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				final Double distanceInMeters = tuple.length == 2 ? (Double) tuple[1] : null;
 				final DealOfferMetadata metadata = DealOfferMetadataCache.get().getDealOfferMetrics(dealOfferId);
 
+				if (metadata == null)
+				{
+					LOG.warn(String.format("Metadata cache does not yet contain dealOfferId %s . Skipping", dealOfferId));
+					return null;
+				}
+
 				final DealOfferGeoSummary geoSummary = new DealOfferGeoSummary(metadata.getDealOffer(),
 						distanceInMeters, null, metadata.getDealOfferMetrics().getLongMetrics(), metadata.getDealOfferMetrics().getDoubleMetrics());
 				summaries.add(geoSummary);
