@@ -27,8 +27,15 @@ public final class FreemarkerUtil
 
 	private FreemarkerUtil() throws IOException
 	{
-		freemarkerConfig
-				.setDirectoryForTemplateLoading(new File(ServiceConfig.get().getTemplateDir()));
+		if (ServiceConfig.get().getTemplateDir().startsWith("classpath"))
+		{
+			freemarkerConfig.setClassForTemplateLoading(this.getClass(), "templates");
+		}
+		else
+		{
+			freemarkerConfig
+					.setDirectoryForTemplateLoading(new File(ServiceConfig.get().getTemplateDir()));
+		}
 
 	};
 
