@@ -3,7 +3,7 @@
   <parent>
     <artifactId>talool-base</artifactId>
     <groupId>com.talool</groupId>
-    <version>1.0.1</version>
+    <version>1.0.3</version>
     <relativePath>../pom.xml/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -40,8 +40,8 @@
   </build>
   <repositories>
     <repository>
-      <id>talool-maven-ftp</id>
-      <url>ftp://syslog1/repository</url>
+      <id>talool-maven-release</id>
+      <url>http://syslog1:8081/nexus/content/repositories/releases/</url>
     </repository>
     <repository>
       <id>OSGEO GeoTools repo</id>
