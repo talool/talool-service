@@ -1390,7 +1390,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			transactionResult = BraintreeUtil.processCard(customer, dealOffer, paymentDetail);
+			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail);
 		}
 		catch (ProcessorException e)
 		{
@@ -1448,7 +1448,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		TransactionResult voidedTrans = null;
 
-		voidedTrans = BraintreeUtil.voidTransaction(transactionResult.getTransactionId());
+		voidedTrans = BraintreeUtil.get().voidTransaction(transactionResult.getTransactionId());
 
 		LOG.error(String.format("Payment transaction roll back of transactionId '%s' success %s ", transactionResult.getTransactionId(),
 				voidedTrans.isSuccess()));
@@ -1489,7 +1489,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			transactionResult = BraintreeUtil.processPaymentCode(customer, dealOffer, paymentCode);
+			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode);
 		}
 		catch (ProcessorException e)
 		{

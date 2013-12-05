@@ -14,7 +14,6 @@ import com.braintreegateway.TransactionRequest;
 import com.talool.core.Customer;
 import com.talool.core.DealOffer;
 import com.talool.core.service.ProcessorException;
-import com.talool.domain.DealOfferImpl;
 import com.talool.payment.Card;
 import com.talool.payment.PaymentDetail;
 import com.talool.payment.TransactionResult;
@@ -31,12 +30,12 @@ import com.talool.service.ServiceConfig;
  */
 public class BraintreeUtil
 {
+	public static final String COMPANY_PREFIX_DESCRIPTOR = "TALOOL-*";
 	private static final Logger LOG = LoggerFactory.getLogger(BraintreeUtil.class);
 	private static final BraintreeUtil instance = new BraintreeUtil();
-	private static final String COMPANY_PREFIX_DESCRIPTOR = "TAL*";
+	private static final String CLEAN_REGEX_DESCRIPTOR = "[^a-zA-Z0-9\\s]";
 	private static final String CUSTOM_FIELD_PRODUCT = "product";
 	private static final int PRODUCT_DESCRIPTOR_MAX_LEN = 22;
-
 	private static BraintreeGateway gateway;
 
 	// venmo constants
@@ -54,7 +53,7 @@ public class BraintreeUtil
 		initGateway();
 	}
 
-	public BraintreeUtil get()
+	public static BraintreeUtil get()
 	{
 		return instance;
 	}
@@ -68,10 +67,10 @@ public class BraintreeUtil
 				ServiceConfig.get().getBraintreePrivateKey()
 				);
 	}
-	
-	public static String getDebugString()
+
+	public String getDebugString()
 	{
-		return String.format("Merchant Id: %s,  Public Key: %s, Private Key: %s, Env: %s", 
+		return String.format("Merchant Id: %s,  Public Key: %s, Private Key: %s, Env: %s",
 				ServiceConfig.get().getBraintreeMerchantId(),
 				ServiceConfig.get().getBraintreePublicKey(),
 				ServiceConfig.get().getBraintreePrivateKey(),
@@ -87,12 +86,13 @@ public class BraintreeUtil
 	 * @param dealOffer
 	 * @return descriptor as a String
 	 */
-	private static String createDescriptor(final DealOffer dealOffer)
+	public String createDescriptor(final DealOffer dealOffer)
 	{
-		return StringUtils.left(COMPANY_PREFIX_DESCRIPTOR + dealOffer.getTitle(), PRODUCT_DESCRIPTOR_MAX_LEN).toUpperCase();
+		return StringUtils.left(COMPANY_PREFIX_DESCRIPTOR + dealOffer.getTitle().replaceAll(CLEAN_REGEX_DESCRIPTOR, "").trim(),
+				PRODUCT_DESCRIPTOR_MAX_LEN).toUpperCase();
 	}
 
-	private static TransactionResult getTransactionResult(final Result<Transaction> result) throws ProcessorException
+	private TransactionResult getTransactionResult(final Result<Transaction> result) throws ProcessorException
 	{
 		if (result.isSuccess())
 		{
@@ -128,7 +128,7 @@ public class BraintreeUtil
 
 	}
 
-	public static TransactionResult voidTransaction(final String transactionId) throws ProcessorException
+	public TransactionResult voidTransaction(final String transactionId) throws ProcessorException
 	{
 		TransactionResult transResult = null;
 
@@ -145,7 +145,7 @@ public class BraintreeUtil
 		return transResult;
 	}
 
-	public static TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer,
+	public TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer,
 			final String paymentCode) throws ProcessorException
 	{
 		Result<Transaction> result = null;
@@ -176,7 +176,7 @@ public class BraintreeUtil
 
 	}
 
-	public static TransactionResult processCard(final Customer customer, final DealOffer dealOffer,
+	public TransactionResult processCard(final Customer customer, final DealOffer dealOffer,
 			final PaymentDetail paymentDetail) throws ProcessorException
 	{
 		Result<Transaction> result = null;
@@ -220,11 +220,4 @@ public class BraintreeUtil
 
 	}
 
-	public static void main(String args[])
-	{
-		DealOffer dof = new DealOfferImpl();
-		dof.setTitle("Boulder Payback Book");
-
-		System.out.println(BraintreeUtil.createDescriptor(dof));
-	}
 }
