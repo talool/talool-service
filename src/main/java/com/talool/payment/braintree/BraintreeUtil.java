@@ -30,7 +30,7 @@ import com.talool.service.ServiceConfig;
  */
 public class BraintreeUtil
 {
-	public static final String COMPANY_PREFIX_DESCRIPTOR = "TALOOL-*";
+	public static final String COMPANY_PREFIX_DESCRIPTOR = "TALOOL *";
 	private static final Logger LOG = LoggerFactory.getLogger(BraintreeUtil.class);
 	private static final BraintreeUtil instance = new BraintreeUtil();
 	private static final String CLEAN_REGEX_DESCRIPTOR = "[^a-zA-Z0-9\\s]";

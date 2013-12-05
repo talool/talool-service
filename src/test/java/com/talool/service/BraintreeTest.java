@@ -22,6 +22,7 @@ public class BraintreeTest
 	{
 		DealOffer dof = new DealOfferImpl();
 
+		// tests removing special characters
 		dof.setTitle("Co'mpany&@+");
 
 		Assert.assertEquals(BraintreeUtil.COMPANY_PREFIX_DESCRIPTOR + "COMPANY", BraintreeUtil.get().createDescriptor(dof));
