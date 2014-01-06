@@ -32,11 +32,11 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 SET search_path = public, pg_catalog;
 
-CREATE FUNCTION update_dt_column() RETURNS trigger
+CREATE OR REPLACE FUNCTION update_dt_column() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 	BEGIN
-	   NEW.update_dt = now(); 
+	   NEW.update_dt = now() at time zone 'utc';
 	   RETURN NEW;
 	END;
 	$$;

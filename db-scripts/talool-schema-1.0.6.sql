@@ -14,9 +14,13 @@ ALTER TABLE deal_offer ADD COLUMN geom geometry(POINT,4326);
 ALTER TABLE deal_offer ADD COLUMN deal_offer_merchant_logo_id UUID;
 ALTER TABLE deal_offer ADD COLUMN deal_offer_background_image_id UUID;
 
+ALTER TABLE deal_offer DROP CONSTRAINT "FK_DealOffer_DealOffer_MerchantLogo";
+
 ALTER TABLE deal_offer ADD CONSTRAINT "FK_DealOffer_DealOffer_MerchantLogo" 
       FOREIGN KEY (deal_offer_merchant_logo_id) REFERENCES merchant_media(merchant_media_id);
       
+ALTER TABLE deal_offer DROP CONSTRAINT "FK_DealOffer_DealOffer_BackgroundImage";
+
 ALTER TABLE deal_offer ADD CONSTRAINT "FK_DealOffer_DealOffer_BackgroundImage" 
       FOREIGN KEY (deal_offer_background_image_id) REFERENCES merchant_media(merchant_media_id);
 
@@ -59,5 +63,15 @@ ALTER TABLE deal_offer ADD CONSTRAINT "FK_DealOffer_DealOffer_Logo"
 --ALTER TABLE merchant_media ALTER COLUMN media_type TYPE media_type USING (media_type::media_type)
 
 --DROP TYPE _old_media_type;
+
+CREATE OR REPLACE FUNCTION update_dt_column() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+	BEGIN
+	   NEW.update_dt = now() at time zone 'utc';
+	   RETURN NEW;
+	END;
+	$$;
+	
 
 
