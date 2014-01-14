@@ -63,10 +63,17 @@ public final class DealOfferMetadataCache
 
 							if (LOG.isDebugEnabled())
 							{
+								if (dealOfferMetrics == null)
+								{
+									LOG.info(String.format("%s has no dealOfferMetrics yet (probably no merchants for dealOffer yet)", dealOffer.getTitle()));
+								}
+								else
+								{
+									LOG.info(String.format("%s has %d merchants and %d deals", dealOffer.getTitle(),
+											dealOfferMetrics.getLongMetrics().get(DealOfferMetrics.MetricType.TotalMerchants.toString()), dealOfferMetrics.getLongMetrics()
+													.get(DealOfferMetrics.MetricType.TotalDeals.toString())));
+								}
 
-								LOG.info(String.format("%s has %d merchants and %d deals", dealOffer.getTitle(),
-										dealOfferMetrics.getLongMetrics().get(DealOfferMetrics.MetricType.TotalMerchants.toString()), dealOfferMetrics.getLongMetrics()
-												.get(DealOfferMetrics.MetricType.TotalDeals.toString())));
 							}
 						}
 
