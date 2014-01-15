@@ -142,4 +142,6 @@ public interface MerchantService extends HibernateService
 	public Map<UUID, DealOfferMetrics> getDealOfferMetrics() throws ServiceException;
 
 	public List<Merchant> getMerchantsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOptions) throws ServiceException;
+
+	public List<Merchant> getMerchantsCreatedByMerchant(final UUID merchantId) throws ServiceException;
 }

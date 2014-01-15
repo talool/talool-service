@@ -1,6 +1,7 @@
 package com.talool.core;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -66,4 +67,11 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 
 	public String getNiceCityState();
 
+	public MerchantAccount getCreatedByMerchantAccount();
+
+	public void setCreatedByMerchantAccount(MerchantAccount createdByMerchantAccount);
+
+	public Merchant getCreatedByMerchant();
+
+	public UUID getCreatedByMerchantId();
 }

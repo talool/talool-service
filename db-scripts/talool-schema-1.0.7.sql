@@ -27,6 +27,9 @@ update merchant_location set created_by_merchant_account_id=(select merchant_acc
 update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='doug@entertainment.com')
    where merchant_id=(select merchant_id from merchant where merchant_name='A Hair Better');
 
+update deal_offer set geom=ST_GeomFromText('POINT(-105.2797 40.0176)', 4326) 
+  where title='Entertainment Book';
+    
 COMMIT;
 
 --select m.merchant_id from merchant_location where created_by_merchant_id=:myMerchantId

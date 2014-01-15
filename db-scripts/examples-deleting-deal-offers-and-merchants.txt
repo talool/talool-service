@@ -5,22 +5,22 @@
 #
 ###################################################
 
-delete from deal_tag where deal_id in (select deal_id from deal,deal_offer where deal_offer.title='PaybackBook #1' and deal_offer.deal_offer_id=deal.deal_offer_id);
+delete from deal_tag where deal_id in (select deal_id from deal,deal_offer where deal_offer.title='Entertainment Book' and deal_offer.deal_offer_id=deal.deal_offer_id);
 
-delete from deal_acquire where deal_id in (select deal_id from deal,deal_offer where deal_offer.title='PaybackBook #1' and deal_offer.deal_offer_id=deal.deal_offer_id );
+delete from deal_acquire where deal_id in (select deal_id from deal,deal_offer where deal_offer.title='Entertainment Book' and deal_offer.deal_offer_id=deal.deal_offer_id );
 
-delete from deal where deal_offer_id in (select deal_offer_id from deal_offer where title='PaybackBook #1');
+delete from deal where deal_offer_id in (select deal_offer_id from deal_offer where title='Entertainment Book');
 
-delete from deal_offer where title='PaybackBook #1';
+delete from deal_offer where title='Entertainment Book';
 
 #### Example on how to remove a merchant (do these in order) 
 
-delete from merchant_location where merchant_id in ( select merchant_id from merchant where merchant_name like 'Merch%');
+delete from merchant_location where merchant_id in ( select merchant_id from merchant where merchant_name like 'Que%');
 
-delete from merchant_media where merchant_id in ( select merchant_id from merchant where merchant_name like 'Merch%');
+delete from merchant_media where merchant_id in ( select merchant_id from merchant where merchant_name like 'Que%');
 
-delete from merchant_account where merchant_id in ( select merchant_id from merchant where merchant_name like 'Merch%');
+delete from merchant_account where merchant_id in ( select merchant_id from merchant where merchant_name like 'Que%');
 
-delete from merchant_tag where merchant_id in ( select merchant_id from merchant where merchant_name like 'Merch%');
+delete from merchant_tag where merchant_id in ( select merchant_id from merchant where merchant_name like 'Que%');
 
-delete from merchant where merchant_name like 'Merch%';
+delete from merchant where merchant_name like 'Que%';

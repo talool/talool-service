@@ -1,6 +1,7 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -25,6 +27,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernatespatial.GeometryUserType;
 
 import com.talool.core.Merchant;
+import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.vividsolutions.jts.geom.Geometry;
@@ -101,6 +104,17 @@ public class MerchantLocationImpl implements MerchantLocation
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
+
+	@OneToOne(targetEntity = MerchantAccountImpl.class, fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "created_by_merchant_account_id", nullable = false)
+	private MerchantAccount createdByMerchantAccount;
+
+	@OneToOne(targetEntity = MerchantImpl.class, fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "created_by_merchant_id", nullable = false)
+	private Merchant createdByMerchant;
+
+	@Column(name = "created_by_merchant_id", insertable = false, updatable = false)
+	private UUID createdByMerchantId;
 
 	public Long getId()
 	{
@@ -351,5 +365,27 @@ public class MerchantLocationImpl implements MerchantLocation
 		StringBuilder sb = new StringBuilder();
 		sb.append(city).append(", ").append(stateProvinceCounty);
 		return sb.toString();
+	}
+
+	public MerchantAccount getCreatedByMerchantAccount()
+	{
+		return createdByMerchantAccount;
+	}
+
+	public void setCreatedByMerchantAccount(MerchantAccount createdByMerchantAccount)
+	{
+		this.createdByMerchantAccount = createdByMerchantAccount;
+		this.createdByMerchant = createdByMerchantAccount.getMerchant();
+	}
+
+	public Merchant getCreatedByMerchant()
+	{
+		return createdByMerchant;
+	}
+
+	@Override
+	public UUID getCreatedByMerchantId()
+	{
+		return createdByMerchantId;
 	}
 }

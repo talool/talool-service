@@ -1544,4 +1544,28 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Merchant> getMerchantsCreatedByMerchant(final UUID merchantId) throws ServiceException
+	{
+		List<Merchant> merchants;
+
+		try
+		{
+			final Query query = sessionFactory.getCurrentSession().createQuery(
+					"select ml.merchant from MerchantLocationImpl ml where ml.createdByMerchantId=:merchantId order by ml.merchant.name desc");
+
+			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
+
+			merchants = query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getMerchantsCreatedByMerchant merchantId %s", merchantId), ex);
+		}
+
+		return merchants;
+	}
+
 }

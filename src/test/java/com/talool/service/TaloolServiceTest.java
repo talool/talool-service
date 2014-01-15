@@ -946,7 +946,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		Location location = domainFactory.newLocation(-10.564142, -74.047852);
 
-		MerchantLocation mel = domainFactory.newMerchantLocation();
+		final MerchantLocation mel = domainFactory.newMerchantLocation();
+
+		final List<Merchant> taloolMerchs = taloolService.getMerchantByName("Talool");
+		MerchantAccount merchAccount = taloolService.authenticateMerchantAccount(taloolMerchs.get(0).getId(), "chris@talool.com", "pass123");
+		mel.setCreatedByMerchantAccount(merchAccount);
+
 		mel.setAddress1(now + " East Street");
 		mel.setAddress2("Apt " + now);
 		mel.setCity("Denver");
