@@ -34,6 +34,10 @@ import org.hibernate.annotations.TypeDefs;
 				name = "deleteCustomerSocialAccount",
 				query = "delete from CustomerSocialAccountImpl where customer.id=:customerId and socialNetwork.id=:socialNetworkId"),
 
+		@NamedQuery(
+				name = "getMerchantsCreatedByMerchant",
+				query = "select distinct merch from MerchantLocationImpl ml inner join ml.merchant merch where ml.createdByMerchantId=:merchantId order by merch.name desc"),
+
 		/*
 		 * giftedDealAcquires is a great example of force fetching eagerly in HQL on
 		 * entities we know we need to pull in. Avoids many select statements from

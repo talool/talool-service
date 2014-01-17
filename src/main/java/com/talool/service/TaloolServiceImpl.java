@@ -1553,11 +1553,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		try
 		{
-			final Query query = sessionFactory.getCurrentSession().createQuery(
-					"select ml.merchant from MerchantLocationImpl ml where ml.createdByMerchantId=:merchantId order by ml.merchant.name desc");
-
+			final Query query = sessionFactory.getCurrentSession().getNamedQuery("getMerchantsCreatedByMerchant");
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
-
 			merchants = query.list();
 		}
 		catch (Exception ex)
