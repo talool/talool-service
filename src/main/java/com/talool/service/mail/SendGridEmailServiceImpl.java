@@ -20,16 +20,15 @@ public class SendGridEmailServiceImpl implements EmailService {
 	private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailServiceImpl.class);
 
 	private static SendGridEmailServiceImpl instance;
-	
-	private final String sgUsername;
-	private final String sgPassword;
 
 	private SendGridEmailServiceImpl()
-	{
-		// TODO move this to the service config
-		sgUsername = "vince@talool.com";
-		sgPassword = "321Abc990";
-	};
+	{  
+		/*
+		 * Make sure the SendGrid credentials are set in the Service Config
+		 * u: vince@talool.com
+		 * p: 321Abc990
+		 */
+	}
 
 	public static synchronized SendGridEmailServiceImpl createInstance() throws IOException
 	{
@@ -45,16 +44,23 @@ public class SendGridEmailServiceImpl implements EmailService {
 	public void sendEmail(String subject, String recipient, String from,
 			String messageBody) throws ServiceException {
 		
-		SendGrid sendgrid = new SendGrid(sgUsername, sgPassword);
-
-		sendgrid.addTo(recipient);
-		//sendgrid.addToName("");
-		sendgrid.setFrom(from);
-		//sendgrid.addFromName("");
-		sendgrid.setSubject(subject);
-		sendgrid.setHtml(messageBody);
-
-		sendgrid.send();
+		if (ServiceConfig.get().getMailUsername() != null)
+		{
+			SendGrid sendgrid = new SendGrid(ServiceConfig.get().getMailUsername(), ServiceConfig.get().getMailPassword());
+	
+			sendgrid.addTo(recipient);
+			//sendgrid.addToName("");
+			sendgrid.setFrom(from);
+			//sendgrid.addFromName("");
+			sendgrid.setSubject(subject);
+			sendgrid.setHtml(messageBody);
+	
+			sendgrid.send();
+		}
+		else
+		{
+			// TODO throw a service exception?
+		}
 	}
 	
 	@Override
