@@ -39,6 +39,11 @@
 	</pluginRepositories>
 	<dependencies>
 		<dependency>
+		  <groupId>com.sendgrid</groupId>
+		  <artifactId>sendgrid-java</artifactId>
+		  <version>0.1.2</version>
+		</dependency>
+		<dependency>
 		  <groupId>com.braintreepayments.gateway</groupId>
 		  <artifactId>braintree-java</artifactId>
 		  <version>2.24.0</version>

@@ -16,7 +16,7 @@
 <bean id="freemarkerUtil" class="com.talool.service.mail.FreemarkerUtil" factory-method="createInstance" 
 	         depends-on="serviceConfig"/>
 	
-<bean id="emailServiceImpl" class="com.talool.service.mail.EmailServiceImpl" factory-method="createInstance"
+<bean id="emailServiceImpl" class="com.talool.service.mail.SendGridEmailServiceImpl" factory-method="createInstance"
 	       depends-on="serviceConfig,freemarkerUtil"/>
 	            
             
