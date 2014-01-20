@@ -220,6 +220,11 @@ public interface CustomerService extends HibernateService
 	public PaginatedResult<CustomerSummary> getPublisherCustomerSummary(final UUID publisherMerchantId,
 			final SearchOptions searchOpts, final boolean calculateRowSize) throws ServiceException;
 
+	public PaginatedResult<CustomerSummary> getPublisherCustomerSummaryByEmail(final UUID publisherMerchantId,
+			final SearchOptions searchOpts, final String email, final boolean calculateRowSize) throws ServiceException;
+
+	public long getPublisherCustomerSummaryEmailCount(final UUID publisherMerchantId, final String email) throws ServiceException;
+
 	public long getCustomerSummaryCount() throws ServiceException;
 
 	public long getPublisherCustomerSummaryCount(final UUID publisherMerchantId) throws ServiceException;

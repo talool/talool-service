@@ -62,10 +62,30 @@ public final class QueryHelper
 					"select c.customer_id from customer as c, deal_offer_purchase as dop,deal_offer as dof " +
 					"where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id)";
 
+	private static final String PUBLISHER_CUSTOMER_EMAIL_SUMMARY =
+			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
+					+ "c.create_dt as registrationDate,(select count(*) "
+					+ "from deal_acquire as d "
+					+ "where d.customer_id = c.customer_id "
+					+ "and d.acquire_status='REDEEMED' "
+					+ ") as redemptions,"
+					+ "(select array_to_string(array(select distinct d.title from deal_offer as d,customer as cust,"
+					+ "deal_offer_purchase as dof WHERE d.merchant_id=:publisherMerchantId and d.deal_offer_id=dof.deal_offer_id and cust.customer_id=c.customer_id and cust.customer_id=dof.customer_id), ', ')) "
+					+ "as commaSeperatedDealOfferTitles from customer as c "
+					+
+					"where c.customer_id in ("
+					+
+					"select c.customer_id from customer as c, deal_offer_purchase as dop,deal_offer as dof "
+					+
+					"where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id and c.email like :email)";
+
 	private static final String CUSTOMER_SUMMARY_CNT = "select count(*) as totalResults from customer";
 
 	private static final String PUBLISHER_CUSTOMER_SUMMARY_CNT = "select count(distinct c.customer_id) as totalResults from customer as c, deal_offer_purchase as dop,deal_offer as dof "
 			+ "where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id";
+
+	private static final String PUBLISHER_CUSTOMER_EMAIL_SUMMARY_CNT = "select count(distinct c.customer_id) as totalResults from customer as c, deal_offer_purchase as dop,deal_offer as dof "
+			+ "where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id and c.email like :email";
 
 	private static final String ACTIVATION_SUMMARY = "select n1.doid as \"dealOfferId\",n1.title, n1.total as \"totalCodes\", n2.ta as \"totalActivations\" from  "
 			+
@@ -161,6 +181,10 @@ public final class QueryHelper
 		CustomerSummary(CUSTOMER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
 		PublisherCustomerSummary(PUBLISHER_CUSTOMER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+
+		PublisherCustomerEmailSummary(PUBLISHER_CUSTOMER_EMAIL_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+
+		PublisherCustomerEmailSummaryCnt(PUBLISHER_CUSTOMER_EMAIL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 
 		CustomerSummaryCnt(CUSTOMER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 
