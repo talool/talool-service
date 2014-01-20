@@ -196,9 +196,32 @@ public interface CustomerService extends HibernateService
 	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId,
 			final String paymentCode) throws ServiceException, NotFoundException;
 
+	/**
+	 * Gets all customers in Talool
+	 * 
+	 * @param searchOpts
+	 * @param calculateTotalResults
+	 * @return
+	 * @throws ServiceException
+	 */
 	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts, final boolean calculateTotalResults)
 			throws ServiceException;
 
+	/**
+	 * Gets all the customers of a publisher. A publishers customers are defined
+	 * by having at least 1 deal offer belonging to the publisher
+	 * 
+	 * @param publisherMerchantId
+	 * @param searchOpts
+	 * @param calculateRowSize
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<CustomerSummary> getPublisherCustomerSummary(final UUID publisherMerchantId,
+			final SearchOptions searchOpts, final boolean calculateRowSize) throws ServiceException;
+
 	public long getCustomerSummaryCount() throws ServiceException;
+
+	public long getPublisherCustomerSummaryCount(final UUID publisherMerchantId) throws ServiceException;
 
 }

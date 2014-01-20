@@ -1579,7 +1579,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.addScalar("firstName", StandardBasicTypes.STRING);
 			query.addScalar("lastName", StandardBasicTypes.STRING);
 			query.addScalar("redemptions", StandardBasicTypes.INTEGER);
-			query.addScalar("giftGives", StandardBasicTypes.INTEGER);
 			query.addScalar("registrationDate", StandardBasicTypes.DATE);
 			query.addScalar("commaSeperatedDealOfferTitles", StandardBasicTypes.STRING);
 
@@ -1593,7 +1592,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 				query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 
-				query.addScalar("totalResults", StandardBasicTypes.INTEGER);
+				query.addScalar("totalResults", StandardBasicTypes.LONG);
 				totalResults = (Long) query.uniqueResult();
 			}
 
@@ -1616,6 +1615,76 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			final String newSql = QueryHelper.buildQuery(QueryType.CustomerSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomerSummary: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<CustomerSummary> getPublisherCustomerSummary(final UUID publisherMerchantId, final SearchOptions searchOpts,
+			final boolean calculateRowSize)
+			throws ServiceException
+	{
+		PaginatedResult<CustomerSummary> paginatedResult = null;
+		List<CustomerSummary> summaries = null;
+		Long totalResults = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummary, null, searchOpts,
+					true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(CustomerSummary.class));
+			query.addScalar("customerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("email", StandardBasicTypes.STRING);
+			query.addScalar("firstName", StandardBasicTypes.STRING);
+			query.addScalar("lastName", StandardBasicTypes.STRING);
+			query.addScalar("redemptions", StandardBasicTypes.INTEGER);
+			query.addScalar("registrationDate", StandardBasicTypes.DATE);
+			query.addScalar("commaSeperatedDealOfferTitles", StandardBasicTypes.STRING);
+
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<CustomerSummary>) query.list();
+
+			if (calculateRowSize && summaries != null)
+			{
+				newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummaryCnt, null, null, true);
+				query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+				query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+				query.addScalar("totalResults", StandardBasicTypes.LONG);
+				totalResults = (Long) query.uniqueResult();
+			}
+
+			paginatedResult = new PaginatedResult<CustomerSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomerSummary: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@Override
+	public long getPublisherCustomerSummaryCount(final UUID publisherMerchantId) throws ServiceException
+	{
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
 		}
