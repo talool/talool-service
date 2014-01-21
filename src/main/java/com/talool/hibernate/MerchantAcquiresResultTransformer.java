@@ -90,23 +90,19 @@ public class MerchantAcquiresResultTransformer implements ResultTransformer
 				e.printStackTrace();
 			}
 
-			final MerchantMedia logo = new MerchantMediaImpl();
-			logo.setMediaUrl(merchantLogo);
-			location.setLogo(logo);
-
-			final MerchantMedia mercImg = new MerchantMediaImpl();
-			mercImg.setMediaUrl(merchantImage);
-			location.setMerchantImage(mercImg);
-
-			merchant.getLocations().add(location);
-
 			merchantMap.put(merchantId, merchant);
 			merchants.add(merchant);
 		}
-		else
-		{
-			merchant.getLocations().add(location);
-		}
+
+		final MerchantMedia logo = new MerchantMediaImpl();
+		logo.setMediaUrl(merchantLogo);
+		location.setLogo(logo);
+
+		final MerchantMedia mercImg = new MerchantMediaImpl();
+		mercImg.setMediaUrl(merchantImage);
+		location.setMerchantImage(mercImg);
+
+		merchant.getLocations().add(location);
 
 		return null;
 	}

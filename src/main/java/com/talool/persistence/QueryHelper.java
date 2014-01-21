@@ -132,7 +132,7 @@ public final class QueryHelper
 					"location.merchant_location_id,location.merchant_location_name,location.email,location.website_url,location.phone,location.address1,location.address2,"
 					+
 					"location.city,location.state_province_county,location.zip,location.country,location.geom," +
-					"merchantLogo.media_url as merchantLogo,merchantImage.media_url as merchantImage," +
+					"merchantLogo.media_url as logo_url_id,merchantImage.media_url as merchant_image_id," +
 					"ST_Distance( location.geom,'${point}',true) as distanceInMeters " +
 					"from " +
 					"(select distinct m.* from deal_acquire as da,merchant as m,deal as d " +
