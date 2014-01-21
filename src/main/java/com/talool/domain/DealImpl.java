@@ -129,6 +129,7 @@ public class DealImpl implements Deal
 		deal.setSummary(this.summary);
 		deal.setImage(image);
 		deal.setMerchant(merchant);
+		deal.setDetails(this.details);
 
 		if (CollectionUtils.isNotEmpty(tags))
 		{
