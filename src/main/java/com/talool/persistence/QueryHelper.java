@@ -65,9 +65,9 @@ public final class QueryHelper
 	private static final String PUBLISHER_CUSTOMER_EMAIL_SUMMARY =
 			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
 					+ "c.create_dt as registrationDate,(select count(*) "
-					+ "from deal_acquire as d "
-					+ "where d.customer_id = c.customer_id "
-					+ "and d.acquire_status='REDEEMED' "
+					+ "from deal_acquire as daq,deal as d,deal_offer as dof "
+					+ "where daq.customer_id = c.customer_id "
+					+ "and daq.acquire_status='REDEEMED' and daq.deal_id=d.deal_id and d.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId"
 					+ ") as redemptions,"
 					+ "(select array_to_string(array(select distinct d.title from deal_offer as d,customer as cust,"
 					+ "deal_offer_purchase as dof WHERE d.merchant_id=:publisherMerchantId and d.deal_offer_id=dof.deal_offer_id and cust.customer_id=c.customer_id and cust.customer_id=dof.customer_id), ', ')) "
