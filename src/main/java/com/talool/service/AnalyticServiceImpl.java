@@ -14,7 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.talool.core.service.AnalyticService;
+import com.talool.core.service.CustomerService;
 import com.talool.core.service.ServiceException;
+import com.talool.core.service.TaloolService;
+import com.talool.persistence.QueryHelper;
+import com.talool.persistence.QueryHelper.QueryType;
 
 /**
  * 
@@ -26,6 +30,8 @@ import com.talool.core.service.ServiceException;
 @Repository
 public class AnalyticServiceImpl extends AbstractHibernateService implements AnalyticService
 {
+	private TaloolService taloolService;
+	private CustomerService customerService;
 
 	@Override
 	public Long getTotalCustomers() throws ServiceException
@@ -44,6 +50,19 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		}
 
 		return count;
+	}
+
+	@Override
+	public Long getPublishersCustomerTotal(final UUID publisherMerchantId) throws ServiceException
+	{
+		try
+		{
+			return customerService.getPublisherCustomerSummaryCount(publisherMerchantId);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(e.getLocalizedMessage(), e);
+		}
 	}
 
 	@Override
@@ -178,12 +197,12 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT title AS t, d.deal_id AS did, count(*) AS cnt " +
-					"FROM deal AS d, deal_acquire AS da " +
-					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.acquire_status = 'REDEEMED' " +
-					"GROUP BY d.deal_id " +
-					"ORDER BY cnt DESC " +
-					"LIMIT 10");
-			
+							"FROM deal AS d, deal_acquire AS da " +
+							"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.acquire_status = 'REDEEMED' " +
+							"GROUP BY d.deal_id " +
+							"ORDER BY cnt DESC " +
+							"LIMIT 10");
+
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
@@ -216,13 +235,17 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 
 		try
 		{
-			final SQLQuery query = getCurrentSession().createSQLQuery(
-					"SELECT title AS t, d.deal_id AS did, first_name AS fname, last_name AS lname, c.customer_id AS cid, redemption_code AS code, redemption_dt AS rdate " +
-					"FROM deal AS d, deal_acquire AS da, customer AS c " +
-					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
-					"ORDER BY rdate DESC " +
-					"LIMIT 10");
-			
+			final SQLQuery query = getCurrentSession()
+					.createSQLQuery(
+							"SELECT title AS t, d.deal_id AS did, first_name AS fname, last_name AS lname, c.customer_id AS cid, redemption_code AS code, redemption_dt AS rdate "
+									+
+									"FROM deal AS d, deal_acquire AS da, customer AS c "
+									+
+									"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' "
+									+
+									"ORDER BY rdate DESC " +
+									"LIMIT 10");
+
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
@@ -266,11 +289,11 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT first_name AS fname, last_name AS lname, c.customer_id AS uid, count(*) AS deals " +
-					"FROM deal AS d, deal_acquire AS da, customer AS c " +
-					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
-					"GROUP BY uid ORDER BY deals DESC " +
-					"LIMIT 10");
-			
+							"FROM deal AS d, deal_acquire AS da, customer AS c " +
+							"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId AND da.customer_id = c.customer_id AND da.acquire_status = 'REDEEMED' " +
+							"GROUP BY uid ORDER BY deals DESC " +
+							"LIMIT 10");
+
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("fname", StandardBasicTypes.STRING);
 			query.addScalar("lname", StandardBasicTypes.STRING);
@@ -314,12 +337,12 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		{
 			final SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT title AS t, d.deal_id AS did, count(*) AS cnt " +
-					"FROM deal AS d, deal_acquire AS da " +
-					"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId " +
-					"GROUP BY d.deal_id " +
-					"ORDER BY cnt DESC " +
-					"LIMIT 10");
-			
+							"FROM deal AS d, deal_acquire AS da " +
+							"WHERE d.deal_id = da.deal_id AND d.merchant_id = :merchantId " +
+							"GROUP BY d.deal_id " +
+							"ORDER BY cnt DESC " +
+							"LIMIT 10");
+
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("t", StandardBasicTypes.STRING);
 			query.addScalar("did", PostgresUUIDType.INSTANCE);
@@ -345,6 +368,47 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		}
 
 		return mr;
+	}
+
+	public TaloolService getTaloolService()
+	{
+		return taloolService;
+	}
+
+	public void setTaloolService(TaloolService taloolService)
+	{
+		this.taloolService = taloolService;
+	}
+
+	public CustomerService getCustomerService()
+	{
+		return customerService;
+	}
+
+	public void setCustomerService(CustomerService customerService)
+	{
+		this.customerService = customerService;
+	}
+
+	@Override
+	public Long getPublishersCustomerRedemptionTotal(UUID publisherMerchantId) throws ServiceException
+	{
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerRedemptionTotal, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherCustomerRedemptionTotal: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
 	}
 
 }

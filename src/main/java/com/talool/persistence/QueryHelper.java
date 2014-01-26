@@ -62,6 +62,11 @@ public final class QueryHelper
 					"select c.customer_id from customer as c, deal_offer_purchase as dop,deal_offer as dof " +
 					"where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id)";
 
+	private static final String PUBLISHER_CUSTOMER_REDEMPTION_CNT =
+			"select count(c.customer_id) as totalResults from customer as c, deal_acquire as daq,deal as d,deal_offer as dof "
+					+ "where daq.customer_id = c.customer_id "
+					+ "and daq.acquire_status='REDEEMED' and daq.deal_id=d.deal_id and d.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId";
+
 	private static final String PUBLISHER_CUSTOMER_EMAIL_SUMMARY =
 			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
 					+ "c.create_dt as registrationDate,(select count(*) "
@@ -181,6 +186,8 @@ public final class QueryHelper
 		CustomerSummary(CUSTOMER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
 		PublisherCustomerSummary(PUBLISHER_CUSTOMER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+
+		PublisherCustomerRedemptionTotal(PUBLISHER_CUSTOMER_REDEMPTION_CNT, EMPTY_IMMUTABLE_PROPS),
 
 		PublisherCustomerEmailSummary(PUBLISHER_CUSTOMER_EMAIL_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 

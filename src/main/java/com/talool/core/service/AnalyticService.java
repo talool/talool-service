@@ -17,6 +17,10 @@ public interface AnalyticService extends HibernateService
 {
 	public Long getTotalCustomers() throws ServiceException;
 
+	public Long getPublishersCustomerTotal(final UUID publisherMerchantId) throws ServiceException;
+
+	public Long getPublishersCustomerRedemptionTotal(final UUID publisherMerchantId) throws ServiceException;
+
 	public Long getTotalRedemptions() throws ServiceException;
 
 	public Long getTotalEmailGifts() throws ServiceException;
@@ -30,20 +34,22 @@ public interface AnalyticService extends HibernateService
 	public Long getTotalFacebookCustomers() throws ServiceException;
 
 	public Long getTotalEmailCustomers() throws ServiceException;
-	
+
 	public List<AvailableDeal> getAvailableDeals(UUID merchantId) throws ServiceException;
-	
+
 	public List<RecentRedemption> getRecentRedemptions(UUID merchantId) throws ServiceException;
-	
+
 	public List<ActiveUser> getActiveUsers(UUID merchantId) throws ServiceException;
-	
+
 	public List<MerchantReach> getMerchantReaches(UUID merchantId) throws ServiceException;
-	
-	public class AvailableDeal implements Serializable {
+
+	public class AvailableDeal implements Serializable
+	{
 		private static final long serialVersionUID = 1L;
 		public String title;
 		public UUID dealId;
 		public Long redemptionCount;
+
 		public AvailableDeal(String title, UUID dealId, Long redemptionCount)
 		{
 			this.title = title;
@@ -51,8 +57,9 @@ public interface AnalyticService extends HibernateService
 			this.redemptionCount = redemptionCount;
 		}
 	}
-	
-	public class RecentRedemption implements Serializable {
+
+	public class RecentRedemption implements Serializable
+	{
 		private static final long serialVersionUID = 1L;
 		public String title;
 		public UUID dealId;
@@ -60,6 +67,7 @@ public interface AnalyticService extends HibernateService
 		public UUID customerId;
 		public String code;
 		public Date date;
+
 		public RecentRedemption(String title, UUID dealId, String cName, UUID cId, String c, Date d)
 		{
 			this.title = title;
@@ -70,14 +78,16 @@ public interface AnalyticService extends HibernateService
 			this.date = d;
 		}
 	}
-	
-	public class ActiveUser implements Serializable {
+
+	public class ActiveUser implements Serializable
+	{
 		private static final long serialVersionUID = 1L;
 		public String customerName;
 		public UUID customerId;
 		public Long dealCount;
 		public Long visitCount;
 		public Long messageCount;
+
 		public ActiveUser(String cName, UUID cId, Long d, Long v, Long m)
 		{
 			this.customerName = cName;
@@ -87,14 +97,16 @@ public interface AnalyticService extends HibernateService
 			this.messageCount = m;
 		}
 	}
-	
-	public class MerchantReach implements Serializable {
+
+	public class MerchantReach implements Serializable
+	{
 		private static final long serialVersionUID = 1L;
 		public String message;
 		public UUID messageId;
 		public Long quota;
 		public Long targetedUserCount;
 		public Long acquiredUserCount;
+
 		public MerchantReach(String m, UUID mid, Long q, Long t, Long a)
 		{
 			this.message = m;
@@ -106,5 +118,3 @@ public interface AnalyticService extends HibernateService
 	}
 
 }
-
-

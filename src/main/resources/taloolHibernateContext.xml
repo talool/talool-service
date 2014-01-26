@@ -42,6 +42,8 @@
 	<bean id="analyticServiceImpl" class="com.talool.service.AnalyticServiceImpl">
 		<property name="daoDispatcher" ref="daoDispatcher" />
 		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="taloolService" ref="taloolServiceImpl" />
+		<property name="customerService" ref="customerServiceImpl" />
 	</bean>
 	
 	<bean id="redemptionCodeStrategyImpl" class="com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl">
