@@ -67,6 +67,14 @@ public final class QueryHelper
 					+ "where daq.customer_id = c.customer_id "
 					+ "and daq.acquire_status='REDEEMED' and daq.deal_id=d.deal_id and d.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId";
 
+	private static final String PUBLISHER_EMAIL_GIFT_CNT =
+			"select count(*) as totalResults from gift as g, deal_acquire as daq,deal as d,deal_offer as dof "
+					+ "where g.to_email is not null and g.deal_acquire_id=daq.deal_acquire_id and daq.deal_id=d.deal_id and d.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId";
+
+	private static final String PUBLISHER_FACEBOOK_GIFT_CNT =
+			"select count(*) as totalResults from gift as g, deal_acquire as daq,deal as d,deal_offer as dof "
+					+ "where g.to_facebook_id is not null and g.deal_acquire_id=daq.deal_acquire_id and daq.deal_id=d.deal_id and d.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId";
+
 	private static final String PUBLISHER_CUSTOMER_EMAIL_SUMMARY =
 			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
 					+ "c.create_dt as registrationDate,(select count(*) "
@@ -196,6 +204,10 @@ public final class QueryHelper
 		CustomerSummaryCnt(CUSTOMER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 
 		PublisherCustomerSummaryCnt(PUBLISHER_CUSTOMER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+
+		PublisherEmailGiftCnt(PUBLISHER_EMAIL_GIFT_CNT, EMPTY_IMMUTABLE_PROPS),
+
+		PublisherFacebookGiftCnt(PUBLISHER_FACEBOOK_GIFT_CNT, EMPTY_IMMUTABLE_PROPS),
 
 		MerchantAcquires(MERCHANT_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 

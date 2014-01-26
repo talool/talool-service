@@ -15,25 +15,85 @@ import com.talool.service.HibernateService;
  */
 public interface AnalyticService extends HibernateService
 {
-	public Long getTotalCustomers() throws ServiceException;
+	/**
+	 * Gets total customers count in Talool
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getTotalCustomers() throws ServiceException;
 
-	public Long getPublishersCustomerTotal(final UUID publisherMerchantId) throws ServiceException;
+	/**
+	 * Gets the publishers total customers count
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getPublishersCustomerTotal(final UUID publisherMerchantId) throws ServiceException;
 
-	public Long getPublishersCustomerRedemptionTotal(final UUID publisherMerchantId) throws ServiceException;
+	/**
+	 * Gets the publishers total redemption count
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getPublishersCustomerRedemptionTotal(final UUID publisherMerchantId) throws ServiceException;
 
-	public Long getTotalRedemptions() throws ServiceException;
+	/**
+	 * Gets total redemption count in Talool
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getTotalRedemptions() throws ServiceException;
 
-	public Long getTotalEmailGifts() throws ServiceException;
+	/**
+	 * Gets the publishers total email gift count
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getPublishersEmailGiftTotal(final UUID publisherMerchantId) throws ServiceException;
 
-	public Long getTotalFacebookGifts() throws ServiceException;
+	/**
+	 * Gets the publishers total facebook gift count
+	 * 
+	 * @param publisherMerchantId
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getPublishersFacebookGiftTotal(final UUID publisherMerchantId) throws ServiceException;
 
-	public Long getTotalActivatedCodes(UUID dealOfferId) throws ServiceException;
+	/**
+	 * Gets the total email gift count in Talool
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getTotalEmailGifts() throws ServiceException;
 
-	public Long getTotalRedemptions(UUID customerId) throws ServiceException;
+	/**
+	 * Gets the total facebook gift count in Talool
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getTotalFacebookGifts() throws ServiceException;
 
-	public Long getTotalFacebookCustomers() throws ServiceException;
+	public long getTotalActivatedCodes(UUID dealOfferId) throws ServiceException;
 
-	public Long getTotalEmailCustomers() throws ServiceException;
+	public long getTotalRedemptions(UUID customerId) throws ServiceException;
+
+	/**
+	 * Gets the publishers total facebook customer count
+	 * 
+	 * @param publisherMerchantId
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getPublishersFacebookCustomerTotal(final UUID publisherMerchantId) throws ServiceException;
+
+	public long getTotalFacebookCustomers() throws ServiceException;
 
 	public List<AvailableDeal> getAvailableDeals(UUID merchantId) throws ServiceException;
 

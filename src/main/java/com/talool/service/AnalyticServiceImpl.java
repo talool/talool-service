@@ -33,14 +33,24 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 	private TaloolService taloolService;
 	private CustomerService customerService;
 
+	private static final String TOTAL_TALOOL_CUSTOMERS = "select count(*) FROM CustomerImpl";
+	private static final String TOTAL_TALOOL_REDEMPTIONS = "select count(*) FROM DealAcquireImpl where redemptionCode is not null";
+	private static final String TOTAL_TALOOL_EMAIL_GIFTS = "select count(*) FROM GiftImpl where toEmail is not null";
+	private static final String TOTAL_TALOOL_FB_GIFTS = "select count(*) FROM GiftImpl where toFacebookId is not null";
+	private static final String TOTAL_TALOOL_FB_CUSTOMERS = "select count(*) as cnt from customer as c,customer_social_account as csa where csa.customer_id=c.customer_id and csa.social_network_id=1";
+	private static final String TOTAL_PUB_FB_CUSTOMERS = "select count(*) as cnt from customer as c,deal_offer_purchase as dop,deal_offer as dof," +
+			"customer_social_account as csa " +
+			"where dop.customer_id=c.customer_id and dop.deal_offer_id=dof.deal_offer_id and " +
+			"dof.merchant_id=:publisherMerchantId and csa.customer_id=c.customer_id and csa.social_network_id=1";
+
 	@Override
-	public Long getTotalCustomers() throws ServiceException
+	public long getTotalCustomers() throws ServiceException
 	{
 		Long count = null;
 
 		try
 		{
-			final Query query = getCurrentSession().createQuery("select count(*) FROM CustomerImpl");
+			final Query query = getCurrentSession().createQuery(TOTAL_TALOOL_CUSTOMERS);
 
 			count = (Long) query.uniqueResult();
 		}
@@ -49,11 +59,11 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
-		return count;
+		return count == null ? 0 : count;
 	}
 
 	@Override
-	public Long getPublishersCustomerTotal(final UUID publisherMerchantId) throws ServiceException
+	public long getPublishersCustomerTotal(final UUID publisherMerchantId) throws ServiceException
 	{
 		try
 		{
@@ -66,13 +76,13 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 	}
 
 	@Override
-	public Long getTotalRedemptions() throws ServiceException
+	public long getTotalRedemptions() throws ServiceException
 	{
 		Long count = null;
 
 		try
 		{
-			final Query query = getCurrentSession().createQuery("select count(*) FROM DealAcquireImpl where redemptionCode is not null");
+			final Query query = getCurrentSession().createQuery(TOTAL_TALOOL_REDEMPTIONS);
 
 			count = (Long) query.uniqueResult();
 		}
@@ -81,18 +91,17 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
-		return count;
+		return count == null ? 0 : count;
 	}
 
 	@Override
-	public Long getTotalEmailGifts() throws ServiceException
+	public long getTotalEmailGifts() throws ServiceException
 	{
 		Long count = null;
 
 		try
 		{
-			final Query query = getCurrentSession().createQuery("select count(*) FROM GiftImpl where toEmail is not null");
-
+			final Query query = getCurrentSession().createQuery(TOTAL_TALOOL_EMAIL_GIFTS);
 			count = (Long) query.uniqueResult();
 		}
 		catch (Exception e)
@@ -100,17 +109,17 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
-		return count;
+		return count == null ? 0 : count;
 	}
 
 	@Override
-	public Long getTotalFacebookGifts() throws ServiceException
+	public long getTotalFacebookGifts() throws ServiceException
 	{
 		Long count = null;
 
 		try
 		{
-			final Query query = getCurrentSession().createQuery("select count(*) FROM GiftImpl where toFacebookId is not null");
+			final Query query = getCurrentSession().createQuery(TOTAL_TALOOL_FB_GIFTS);
 
 			count = (Long) query.uniqueResult();
 		}
@@ -119,10 +128,10 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
-		return count;
+		return count == null ? 0 : count;
 	}
 
-	public Long getTotalActivatedCodes(final UUID dealOfferId) throws ServiceException
+	public long getTotalActivatedCodes(final UUID dealOfferId) throws ServiceException
 	{
 		Long count = null;
 
@@ -138,10 +147,10 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
-		return count;
+		return count == null ? 0 : count;
 	}
 
-	public Long getTotalRedemptions(final UUID customerId) throws ServiceException
+	public long getTotalRedemptions(final UUID customerId) throws ServiceException
 	{
 		Long count = null;
 
@@ -157,18 +166,17 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
-		return count;
+		return count == null ? 0 : count;
 	}
 
 	@Override
-	public Long getTotalFacebookCustomers() throws ServiceException
+	public long getTotalFacebookCustomers() throws ServiceException
 	{
 		Long count = null;
 
 		try
 		{
-			final SQLQuery query = getCurrentSession().createSQLQuery(
-					"select count(*) as cnt from customer as c,customer_social_account as csa where csa.customer_id=c.customer_id and csa.social_network_id=1");
+			final SQLQuery query = getCurrentSession().createSQLQuery(TOTAL_TALOOL_FB_CUSTOMERS);
 			query.addScalar("cnt", StandardBasicTypes.LONG);
 			count = (Long) query.uniqueResult();
 
@@ -178,14 +186,7 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			throw new ServiceException(e.getLocalizedMessage(), e);
 		}
 
-		return count;
-	}
-
-	@Override
-	public Long getTotalEmailCustomers() throws ServiceException
-	{
-		// TODO Auto-generated method stub
-		return null;
+		return count == null ? 0 : count;
 	}
 
 	@Override
@@ -391,7 +392,7 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 	}
 
 	@Override
-	public Long getPublishersCustomerRedemptionTotal(UUID publisherMerchantId) throws ServiceException
+	public long getPublishersCustomerRedemptionTotal(UUID publisherMerchantId) throws ServiceException
 	{
 		Long total = null;
 
@@ -406,6 +407,68 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem getPublisherCustomerRedemptionTotal: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@Override
+	public long getPublishersEmailGiftTotal(UUID publisherMerchantId) throws ServiceException
+	{
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherEmailGiftCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublishersEmailGiftTotal: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@Override
+	public long getPublishersFacebookGiftTotal(UUID publisherMerchantId) throws ServiceException
+	{
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherFacebookGiftCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublishersFacebookGiftTotal: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@Override
+	public long getPublishersFacebookCustomerTotal(final UUID publisherMerchantId) throws ServiceException
+	{
+		Long total = null;
+
+		try
+		{
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(TOTAL_PUB_FB_CUSTOMERS);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("cnt", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublishersFacebookCustomerTotal: " + ex.getMessage(), ex);
 		}
 
 		return total == null ? 0 : total;
