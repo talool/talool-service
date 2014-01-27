@@ -43,6 +43,24 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 			"where dop.customer_id=c.customer_id and dop.deal_offer_id=dof.deal_offer_id and " +
 			"dof.merchant_id=:publisherMerchantId and csa.customer_id=c.customer_id and csa.social_network_id=1";
 
+	private static final String TOTAL_DEAL_OFFER_ACTIVATED_CODES = "select count(*) FROM ActivationCodeImpl where activatedDate is not null AND dealOfferId = :offerId";
+
+	private static final String PUBLISHER_ACTIVATED_CODE_SUMMARY =
+			"select dof.title,count(ac.activated_dt) as totalCodeActivations,count(*) as totalCodes " +
+					"from deal_offer as dof left outer join activation_code ac " +
+					"on (dof.deal_offer_id=ac.deal_offer_id) " +
+					"where dof.merchant_id=:publisherMerchantId and dof.is_active=true " +
+					"group by dof.deal_offer_id " +
+					"order by totalCodeActivations desc";
+
+	private static final String TALOOL_ACTIVATED_CODE_SUMMARY =
+			"select dof.title,count(ac.activated_dt) as totalCodeActivations,count(*) as totalCodes " +
+					"from deal_offer as dof left outer join activation_code ac " +
+					"on (dof.deal_offer_id=ac.deal_offer_id) " +
+					"where dof.is_active=true " +
+					"group by dof.deal_offer_id " +
+					"order by totalCodeActivations desc";
+
 	@Override
 	public long getTotalCustomers() throws ServiceException
 	{
@@ -137,8 +155,7 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 
 		try
 		{
-			final Query query = getCurrentSession().createQuery(
-					"select count(*) FROM ActivationCodeImpl where activatedDate is not null AND dealOfferId = :offerId");
+			final Query query = getCurrentSession().createQuery(TOTAL_DEAL_OFFER_ACTIVATED_CODES);
 			query.setParameter("offerId", dealOfferId);
 			count = (Long) query.uniqueResult();
 		}
@@ -474,4 +491,73 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		return total == null ? 0 : total;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ActivationCodeSummary> getPublishersActivationCodeSummaries(final UUID publisherMerchantId) throws ServiceException
+	{
+		List<ActivationCodeSummary> summaries = null;
+
+		try
+		{
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(PUBLISHER_ACTIVATED_CODE_SUMMARY);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("title", StandardBasicTypes.STRING);
+			query.addScalar("totalCodeActivations", StandardBasicTypes.LONG);
+			query.addScalar("totalCodes", StandardBasicTypes.LONG);
+
+			final List<Object[]> results = query.list();
+
+			if (results != null)
+			{
+				summaries = new ArrayList<ActivationCodeSummary>();
+				for (Object[] result : results)
+				{
+					summaries.add(new ActivationCodeSummary((String) result[0], (Long) result[1], (Long) result[2]));
+				}
+
+			}
+
+			return summaries;
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublishersActivationCodeSummary: " + ex.getMessage(), ex);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ActivationCodeSummary> getActivationCodeSummaries() throws ServiceException
+	{
+		List<ActivationCodeSummary> summaries = null;
+
+		try
+		{
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(TALOOL_ACTIVATED_CODE_SUMMARY);
+			query.addScalar("title", StandardBasicTypes.STRING);
+			query.addScalar("totalCodeActivations", StandardBasicTypes.LONG);
+			query.addScalar("totalCodes", StandardBasicTypes.LONG);
+
+			final List<Object[]> results = query.list();
+
+			if (results != null)
+			{
+				summaries = new ArrayList<ActivationCodeSummary>();
+				for (Object[] result : results)
+				{
+					summaries.add(new ActivationCodeSummary((String) result[0], (Long) result[1], (Long) result[2]));
+				}
+
+			}
+
+			return summaries;
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublishersActivationCodeSummary: " + ex.getMessage(), ex);
+		}
+	}
 }

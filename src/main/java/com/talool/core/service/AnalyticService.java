@@ -32,6 +32,16 @@ public interface AnalyticService extends HibernateService
 	public long getPublishersCustomerTotal(final UUID publisherMerchantId) throws ServiceException;
 
 	/**
+	 * Gets all activation code summaries in Talool
+	 * 
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<ActivationCodeSummary> getActivationCodeSummaries() throws ServiceException;
+
+	public List<ActivationCodeSummary> getPublishersActivationCodeSummaries(final UUID publisherMerchantId) throws ServiceException;
+
+	/**
 	 * Gets the publishers total redemption count
 	 * 
 	 * @return
@@ -80,6 +90,13 @@ public interface AnalyticService extends HibernateService
 	 */
 	public long getTotalFacebookGifts() throws ServiceException;
 
+	/**
+	 * Gets the total activated codes for the deal offer
+	 * 
+	 * @param dealOfferId
+	 * @return
+	 * @throws ServiceException
+	 */
 	public long getTotalActivatedCodes(UUID dealOfferId) throws ServiceException;
 
 	public long getTotalRedemptions(UUID customerId) throws ServiceException;
@@ -156,6 +173,22 @@ public interface AnalyticService extends HibernateService
 			this.visitCount = v;
 			this.messageCount = m;
 		}
+	}
+
+	public class ActivationCodeSummary implements Serializable
+	{
+		private static final long serialVersionUID = -6982479518083932037L;
+		public final String dealOfferTitle;
+		public final long totalActivatedCodes;
+		public final long totalCodes;
+
+		public ActivationCodeSummary(String dealOfferTitle, long totalActivatedCodes, long totalCodes)
+		{
+			this.dealOfferTitle = dealOfferTitle;
+			this.totalActivatedCodes = totalActivatedCodes;
+			this.totalCodes = totalCodes;
+		}
+
 	}
 
 	public class MerchantReach implements Serializable
