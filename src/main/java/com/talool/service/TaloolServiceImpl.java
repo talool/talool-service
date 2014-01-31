@@ -13,6 +13,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -418,7 +419,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			final String newSql = QueryHelper.buildQuery(QueryType.DealsByDealOfferId, null, searchOpts);
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
-
+			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
