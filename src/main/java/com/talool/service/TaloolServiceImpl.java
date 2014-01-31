@@ -412,6 +412,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts,
 			final String[] eagerlyLoadedProps) throws ServiceException
 	{
+		List<Deal> deals = null;
+
 		try
 		{
 			final String newSql = QueryHelper.buildQuery(QueryType.DealsByDealOfferId, null, searchOpts);
@@ -421,13 +423,16 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 
-			return query.list();
+			deals = query.list();
+
 		}
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem getDealsByDealOfferId for dealOfferId " + dealOfferId + " " + ex.getLocalizedMessage(),
 					ex);
 		}
+
+		return deals;
 
 	}
 

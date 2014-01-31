@@ -166,7 +166,12 @@ public final class QueryHelper
 			"left join fetch merchant.locations " +
 			"where f.customerId=:customerId and f.merchantId=merchant.id";
 
-	private static final String DEALS_BY_DEAL_OFFER_ID = "select d from DealImpl as d left join fetch d.image left join fetch d.merchant as merchant "
+	// DEALS_BY_DEAL_OFFER_ID works because merchant.locations is now a
+	// Set instead of a List. Otherwise Hibernate is dumb, and we will have
+	// duplicate
+	// locations on the Merchant object because of the merchant.location
+	// collection. BEWARE - fetch joins on collections will produce duplicates!
+	private static final String DEALS_BY_DEAL_OFFER_ID = "select distinct d from DealImpl as d left join fetch d.image left join fetch d.merchant as merchant "
 			+
 			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId";
 

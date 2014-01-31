@@ -1,8 +1,8 @@
 package com.talool.domain;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -100,7 +100,7 @@ public class MerchantImpl implements Merchant
 	@Fetch(FetchMode.SUBSELECT)
 	@BatchSize(size = 5)
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	private List<MerchantLocation> locations = new ArrayList<MerchantLocation>();
+	private Set<MerchantLocation> locations = new LinkedHashSet<MerchantLocation>();
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -186,7 +186,7 @@ public class MerchantImpl implements Merchant
 	{
 		if (CollectionUtils.isNotEmpty(locations))
 		{
-			return locations.get(0);
+			return locations.iterator().next();
 		}
 
 		return null;
@@ -250,7 +250,7 @@ public class MerchantImpl implements Merchant
 	}
 
 	@Override
-	public List<MerchantLocation> getLocations()
+	public Set<MerchantLocation> getLocations()
 	{
 		return this.locations;
 	}
@@ -259,10 +259,10 @@ public class MerchantImpl implements Merchant
 	public void addLocation(MerchantLocation mloc)
 	{
 		mloc.setMerchant(this);
-		this.locations.add(mloc);
+		locations.add(mloc);
 	}
 
-	public void setLocations(List<MerchantLocation> locations)
+	public void setLocations(Set<MerchantLocation> locations)
 	{
 		this.locations = locations;
 	}

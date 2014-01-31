@@ -30,7 +30,7 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 	 * 
 	 * @return
 	 */
-	public List<MerchantLocation> getLocations();
+	public Set<MerchantLocation> getLocations();
 
 	public Merchant getParent();
 

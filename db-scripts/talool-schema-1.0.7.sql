@@ -93,6 +93,11 @@ update merchant_location set created_by_merchant_id=(select merchant_id from mer
 update deal_offer set geom=ST_GeomFromText('POINT(-105.2797 40.0176)', 4326) 
   where title='Entertainment Book';
     
+ALTER TABLE merchant DROP CONSTRAINT merchant_merchant_name_key;
+
+-- 
+CREATE UNIQUE INDEX customer_email_lower_idx ON customer (lower(email));
+
 COMMIT;
 
 --select m.merchant_id from merchant_location where created_by_merchant_id=:myMerchantId
