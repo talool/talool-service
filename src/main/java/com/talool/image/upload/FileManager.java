@@ -46,6 +46,14 @@ public class FileManager
 		return IOUtils.copy(fileIS, fileOS);
 	}
 	
+	public static int save(File image, UUID merchantId, boolean original) throws IOException
+	{
+		File imageFile = FileNameUtils.getOutputFile(image, merchantId, original);
+		FileOutputStream fileOS = new FileOutputStream(imageFile, false);
+		FileInputStream fileIS = new FileInputStream(image);
+		return IOUtils.copy(fileIS, fileOS);
+	}
+	
 	/**
 	 * 
 	 * @param image
@@ -83,7 +91,7 @@ public class FileManager
 	public File process(File image, MediaType mediaType, UUID merchantId) throws IOException
 	{
 		// stash the original file
-		FileNameUtils.saveImage(image, merchantId, true);
+		save(image, merchantId, true);
 
 		// write it to the base folder
 		// TODO the file should have already been saved to the base folder.  need to check website uploads

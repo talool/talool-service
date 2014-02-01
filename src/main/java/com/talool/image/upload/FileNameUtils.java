@@ -64,8 +64,10 @@ public class FileNameUtils
 		return merchantFolder;
 	}
 	
-	/*
-	 * TODO describe why this is used
+	/**
+	 * @param imageUrl - a url that will be download to our servers
+	 * @return The output file that will eventually store the downloaded media.  It will be an empty/new file when returned.
+	 * @throws IOException
 	 */
 	public static File getFile(URL imageUrl) throws IOException
 	{
@@ -75,16 +77,20 @@ public class FileNameUtils
 		return getFile(imageName);
 	}
 
-	/*
-	 * TODO describe why this is used
+	/**
+	 * @param image - a that has been uploaded to our servers
+	 * @return The output file that will eventually store the copied media.  It will be an empty/new file when returned.
+	 * @throws IOException
 	 */
 	public static File getFile(File image) throws IOException
 	{
 		return getFile(image.getName());
 	}
 	
-	/*
-	 * TODO describe why this is used
+	/**
+	 * @param imageName - the name of the file
+	 * @return The output file that will eventually store the media.  It will be an empty/new file when returned.
+	 * @throws IOException
 	 */
 	public static File getFile(String imageName) throws IOException
 	{
@@ -111,52 +117,35 @@ public class FileNameUtils
 		return f;
 	}
 
-	public static String prefixUniqueAndClean(final String fileName)
-	{
-		// TODO refactor this to hash the filename (or full url) plus the size of the file.
-		// actually, this should be used for originals, 
-		// but getPngFileName should be used for all processed files.  
-		// the hash should be generated before processing to check if the file already exists
-		return dateFormat.format(System.currentTimeMillis()) + fileName.replaceAll(" ", "_");
-	}
-
-	/*
-	 * TODO consider renaming file if there is a name collision renaming happen
-	 * automatically with imagemagick, but i don't think we want it to
-	 * 
-	 * TODO WTF? The FileManager should save files...
-	 */
-	public static int saveImage(File image, UUID merchantId, boolean original) throws IOException
-	{
-		File imageFile = getOutputFile(image, merchantId, original);
-		FileOutputStream fileOS = new FileOutputStream(imageFile, false);
-		FileInputStream fileIS = new FileInputStream(image);
-		return IOUtils.copy(fileIS, fileOS);
-	}
-
-	/*
-	 * TODO hash the UUID if we don't like it in the url and the file system
-	 */
 	private static String getMerchantFolderName(UUID merchantId)
 	{
 		return merchantId.toString();
 	}
 
 	/*
-	 * Helps ensure we always save PNGs for display in the apps We should avoid
-	 * this method for original files.
+	 * Helps ensure we always save PNGs for display in the apps.
+	 * We should avoid this method for original files.
 	 */
 	private static String getPngFileName(File image)
 	{
 		return getPngFileName(image.getName());
 	}
-
 	public static String getPngFileName(String imageName)
 	{
 		int dot = imageName.lastIndexOf(".");
 		final StringBuilder sb = new StringBuilder();
 		sb.append(prefixUniqueAndClean(imageName.substring(0, dot)));
 		return sb.append(".png").toString();
+	}
+	
+	public static String prefixUniqueAndClean(final String fileName)
+	{
+		// TODO refactor this so we can detect duplicate images
+		// hash the filename (or full url) plus the size of the file.
+		// actually, this should be used for originals, 
+		// but getPngFileName should be used for all processed files.  
+		// the hash should be generated before processing to check if the file already exists
+		return dateFormat.format(System.currentTimeMillis()) + fileName.replaceAll(" ", "_");
 	}
 	
 	/*
