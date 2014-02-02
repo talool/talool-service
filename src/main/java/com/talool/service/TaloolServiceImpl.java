@@ -130,7 +130,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					: new Search(MerchantImpl.class);
 
 			search.addField("id");
-			search.addFilterEqual("email", email);
+			search.addFilterEqual("email", email.toLowerCase());
 			final UUID id = (UUID) daoDispatcher.searchUnique(search);
 			return id == null ? false : true;
 		}
@@ -410,14 +410,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts,
-			final String[] eagerlyLoadedProps) throws ServiceException
+	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts, boolean activeDealsOnly) throws ServiceException
 	{
 		List<Deal> deals = null;
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.DealsByDealOfferId, null, searchOpts);
+			final String newSql = activeDealsOnly ? QueryHelper.buildQuery(QueryType.ActiveDealsByDealOfferId, null, searchOpts) : QueryHelper.buildQuery(
+					QueryType.DealsByDealOfferId, null, searchOpts);
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
@@ -1528,7 +1528,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			daoDispatcher.save(newDealOffer);
 
-			final List<Deal> deals = getDealsByDealOfferId(dealOffer.getId(), null, null);
+			final List<Deal> deals = getDealsByDealOfferId(dealOffer.getId(), null, false);
 			final Deal[] newDeals = new Deal[deals.size()];
 			int idx = 0;
 

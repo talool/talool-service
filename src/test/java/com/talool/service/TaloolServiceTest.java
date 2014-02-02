@@ -497,7 +497,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				.getId());
 
 		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("title").ascending(true).build();
-		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId(), searchOpts, new String[] { "merchant", "image" });
+		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId(), searchOpts, false);
 
 		// test sort/pagination search options
 		testDealAquireSearchOptions(dealOfferPurchase, dealOffer, dealAcquires);
@@ -820,7 +820,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			assertDeal(newDeal, resultDeal);
 		}
 
-		List<Deal> resultDeals = taloolService.getDealsByDealOfferId(dealOffer.getId(), null, null);
+		List<Deal> resultDeals = taloolService.getDealsByDealOfferId(dealOffer.getId(), null, false);
 
 		Assert.assertEquals(15, resultDeals.size());
 
