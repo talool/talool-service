@@ -130,7 +130,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					: new Search(MerchantImpl.class);
 
 			search.addField("id");
-			search.addFilterEqual("email", email);
+			search.addFilterEqual("email", email.toLowerCase());
 			final UUID id = (UUID) daoDispatcher.searchUnique(search);
 			return id == null ? false : true;
 		}
