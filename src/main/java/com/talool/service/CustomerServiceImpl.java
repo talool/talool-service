@@ -180,8 +180,11 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				LOG.debug("Creating accountType:" + accountType + ": " + account.toString());
 			}
 
+			final CustomerImpl customerImpl = ((CustomerImpl) (account));
 			// set encrypted password
-			((CustomerImpl) (account)).setPassword(password);
+			customerImpl.setPassword(password);
+			customerImpl.setEmail(customerImpl.getEmail().toLowerCase());
+
 			save((CustomerImpl) account);
 			daoDispatcher.flush(CustomerImpl.class);
 			daoDispatcher.refresh((CustomerImpl) account);
@@ -211,7 +214,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		final Search search = new Search(CustomerImpl.class);
 
-		search.addFilterEqual("email", email);
+		search.addFilterEqual("email", email.toLowerCase());
 		try
 		{
 			search.addFilterEqual("password", EncryptService.MD5(password));
@@ -270,7 +273,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			Search search = new Search(CustomerImpl.class);
-			search.addFilterEqual("email", email);
+			search.addFilterEqual("email", email.toLowerCase());
 			customer = (Customer) daoDispatcher.searchUnique(search);
 		}
 		catch (Exception ex)
@@ -1142,15 +1145,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			final Query query = (Query) getCurrentSession().getNamedQuery("getGifts");
 			query.setParameter("customerId", customerId, PostgresUUIDType.INSTANCE);
 			query.setParameterList("giftStatus", giftStatus);
-
 			gifts = query.list();
-
-			// query = (Query) getCurrentSession().getNamedQuery("giftsByEmail");
-			// query.setParameter("customerId", customerId);
-			// query.setParameterList("requestStatus", requestStatus);
-
-			// dealAcquires.addAll(query.list());
-
 		}
 		catch (Exception e)
 		{
@@ -1181,7 +1176,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throws ServiceException
 	{
 		final EmailGift gift = new EmailGiftImpl();
-		gift.setToEmail(email);
+		gift.setToEmail(email.toLowerCase());
 		gift.setReceipientName(receipientName);
 		createGift(owningCustomerId, dealAcquireId, gift);
 
