@@ -97,6 +97,15 @@ ALTER TABLE merchant DROP CONSTRAINT merchant_merchant_name_key;
 
 ALTER TYPE deal_type ADD VALUE 'KIRKE_BOOK' AFTER 'FREE_DEAL';
 
+delete from customer where email='jonesnaoko@gmail.com';
+
+delete from customer where email='nathan.stowe@gmail.com';
+
+delete from customer where email='aundrea.greenhill@gmail.com';
+
+delete from customer where email='kiehl_c@yahoo.com';
+
+delete from customer where email='wolfmlad@msn.com';
 -- 
 CREATE UNIQUE INDEX customer_email_lower_idx ON customer (lower(email));
 
