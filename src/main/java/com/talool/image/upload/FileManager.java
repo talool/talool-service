@@ -46,39 +46,13 @@ public class FileManager
 		return IOUtils.copy(fileIS, fileOS);
 	}
 	
-	public static int save(File image, UUID merchantId, boolean original) throws IOException
+	public static int save(File image, URL imageUrl, UUID merchantId, boolean original) throws IOException
 	{
-		File imageFile = FileNameUtils.getOutputFile(image, merchantId, original);
+		File imageFile = FileNameUtils.getOutputFile(image, imageUrl, merchantId, original);
 		FileOutputStream fileOS = new FileOutputStream(imageFile, false);
 		FileInputStream fileIS = new FileInputStream(image);
 		return IOUtils.copy(fileIS, fileOS);
 	}
-	
-	/**
-	 * 
-	 * @param image
-	 * @param mediaType
-	 * @param merchantId
-	 * @return The output file created
-	 * @throws IOException
-	 */
-	public File process(URL imageUrl, MediaType mediaType, UUID merchantId) throws IOException
-	{
-		// save it to the baseFolder
-		save(imageUrl);
-		
-		// get the file for the saved image
-		File image = FileNameUtils.getFile(imageUrl);
-		
-		// debugging
-		// System.out.println("Saved image from url: "+imageUrl.getProtocol()+"://"+imageUrl.getHost()+imageUrl.getFile());
-		// System.out.println("      image size in bytes: "+image.length());
-		// System.out.println("      image location: "+image.getAbsolutePath());
-		// System.out.println("      ");
-		
-		// process the file
-		return process(image, mediaType, merchantId);
-	}
 
 	/**
 	 * 
@@ -88,22 +62,17 @@ public class FileManager
 	 * @return The output file created
 	 * @throws IOException
 	 */
-	public File process(File image, MediaType mediaType, UUID merchantId) throws IOException
+	public File process(File image, URL imageUrl, MediaType mediaType, UUID merchantId) throws IOException
 	{
 		// stash the original file
-		save(image, merchantId, true);
-
-		// write it to the base folder
-		// TODO the file should have already been saved to the base folder.  need to check website uploads
-		// TODO need to figure out why this class has save methods and FileUploadUtils does too
-		//save(image);
+		save(image, imageUrl, merchantId, true);
 
 		// process the file
 		final AbstractMagick magick = (AbstractMagick)
 				this.magickFactory.getMagickForMediaType(mediaType);
 		magick.setInputFile(FileNameUtils.getFile(image));
 
-		final File transformedOutFile = FileNameUtils.getOutputFile(image, merchantId, false);
+		final File transformedOutFile =  FileNameUtils.getOutputFile(image, imageUrl, merchantId, false);
 		magick.setOutputFile(transformedOutFile);
 
 		magick.process();

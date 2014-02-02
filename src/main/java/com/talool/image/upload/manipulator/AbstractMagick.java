@@ -128,7 +128,7 @@ public abstract class AbstractMagick implements IMagick
 		op.addImage();
 		
 		// execute the operation
-		String filename = FileNameUtils.getPngFileName(getInputFile().getName());
+		String filename = FileNameUtils.getPngFileName(getInputFile(), null);
 		String inputFilePath = getInputFile().getAbsolutePath();
 		StringBuilder sb = new StringBuilder(inputFilePath.substring(0,inputFilePath.lastIndexOf("/")));
 		String tempFilePath = sb.append("/").append(filename).toString();

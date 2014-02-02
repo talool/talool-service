@@ -95,6 +95,8 @@ update deal_offer set geom=ST_GeomFromText('POINT(-105.2797 40.0176)', 4326)
     
 ALTER TABLE merchant DROP CONSTRAINT merchant_merchant_name_key;
 
+ALTER TYPE deal_type ADD VALUE 'KIRKE_BOOK' AFTER 'FREE_DEAL';
+
 -- 
 CREATE UNIQUE INDEX customer_email_lower_idx ON customer (lower(email));
 
