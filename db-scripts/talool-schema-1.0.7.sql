@@ -106,7 +106,9 @@ delete from customer where email='aundrea.greenhill@gmail.com';
 delete from customer where email='kiehl_c@yahoo.com';
 
 delete from customer where email='wolfmlad@msn.com';
--- 
+
+update customer set email=lower(email);
+
 CREATE UNIQUE INDEX customer_email_lower_idx ON customer (lower(email));
 
 COMMIT;
