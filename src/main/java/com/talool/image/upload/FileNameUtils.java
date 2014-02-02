@@ -128,7 +128,7 @@ public class FileNameUtils
 	public static String getPngFileName(File image, URL imageUrl)
 	{
 		final StringBuilder sb = new StringBuilder();
-		String hashImageName = (imageUrl==null) ? getHashedFilename(image):getHashedFilename(image, imageUrl);
+		String hashImageName = (imageUrl==null) ? getHashedFilename(image):getHashedFilename(image.length(), imageUrl);
 		sb.append(prefixUniqueAndClean(hashImageName));
 		return sb.append(".png").toString();
 	}
@@ -156,11 +156,11 @@ public class FileNameUtils
 	 * Gets the filename for saving an image after processing by imagemagick.
 	 * Used for downloaded images.
 	 */
-	public static String getHashedFilename(File savedImage, URL imageUrl)
+	public static String getHashedFilename(long fileSize, URL imageUrl)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(imageUrl.getFile())
-		  .append(savedImage.length());
+		  .append(fileSize);
 		StringBuilder sb2 = new StringBuilder();
 		sb2.append(sb.toString().hashCode());
 		return sb2.toString();
@@ -193,7 +193,13 @@ public class FileNameUtils
 	
 	public static MerchantMedia getExistingMedia(List<MerchantMedia> possibleMatches, File savedImage, URL imageUrl)
 	{
-		String searchString = getHashedFilename(savedImage, imageUrl) + ".png";
+		String searchString = getHashedFilename(savedImage.length(), imageUrl) + ".png";
+		return getExistingMedia(possibleMatches, searchString);
+	}
+	
+	public static MerchantMedia getExistingMedia(List<MerchantMedia> possibleMatches, long fileSize, URL imageUrl)
+	{
+		String searchString = getHashedFilename(fileSize, imageUrl) + ".png";
 		return getExistingMedia(possibleMatches, searchString);
 	}
 }
