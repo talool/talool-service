@@ -85,8 +85,18 @@ public interface MerchantService extends HibernateService
 
 	public Deal getDeal(final UUID dealId) throws ServiceException;
 
-	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts,
-			final String[] eagerlyLoadedProps) throws ServiceException;
+	/**
+	 * Gets all deals by deal offer. If activeDealsOnly=true, expired or inActive
+	 * deals will not be returned.
+	 * 
+	 * @param dealOfferId
+	 * @param searchOpts
+	 * @param eagerlyLoadedProps
+	 * @param activeDealsOnly
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts, boolean activeDealsOnly) throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId) throws ServiceException;
 

@@ -172,6 +172,12 @@ public final class QueryHelper
 			+
 			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId";
 
+	// DEALS_BY_DEAL_OFFER_ID will return dups, need to filter via
+	// setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+	private static final String ACTIVE_DEALS_BY_DEAL_OFFER_ID = "select d from DealImpl as d left join fetch d.image left join fetch d.merchant as merchant "
+			+
+			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId and d.isActive=true and d.expires>now()";
+
 	private static final String MERCHANTS_BY_DEAL_OFFER_ID = "select distinct merchant from MerchantImpl as merchant,DealImpl as dof where dof.dealOffer.id=:dealOfferId and dof.merchant.id=merchant.id";
 
 	public enum QueryType
@@ -220,6 +226,8 @@ public final class QueryHelper
 						.put("merchant.locations.distanceInMeters", "distanceInMeters").build()),
 
 		DealsByDealOfferId(DEALS_BY_DEAL_OFFER_ID, EMPTY_IMMUTABLE_PROPS),
+
+		ActiveDealsByDealOfferId(ACTIVE_DEALS_BY_DEAL_OFFER_ID, EMPTY_IMMUTABLE_PROPS),
 
 		GetMerchantMedias(MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS),
 
