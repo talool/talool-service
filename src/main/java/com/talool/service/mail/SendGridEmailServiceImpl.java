@@ -2,10 +2,13 @@ package com.talool.service.mail;
 
 import java.io.IOException;
 
+import jp.co.flect.sendgrid.SendGridClient;
+import jp.co.flect.sendgrid.SendGridException;
+import jp.co.flect.sendgrid.model.WebMail;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sendgrid.SendGrid;
 import com.talool.core.Customer;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
@@ -46,20 +49,27 @@ public class SendGridEmailServiceImpl implements EmailService {
 		
 		if (ServiceConfig.get().getMailUsername() != null)
 		{
-			SendGrid sendgrid = new SendGrid(ServiceConfig.get().getMailUsername(), ServiceConfig.get().getMailPassword());
-	
-			sendgrid.addTo(recipient);
+			SendGridClient sendgrid = new SendGridClient(ServiceConfig.get().getMailUsername(), ServiceConfig.get().getMailPassword());
+			WebMail mail = new WebMail();
+			mail.setTo(recipient);
 			//sendgrid.addToName("");
-			sendgrid.setFrom(from);
+			mail.setFrom(from);
 			//sendgrid.addFromName("");
-			sendgrid.setSubject(subject);
-			sendgrid.setHtml(messageBody);
+			mail.setSubject(subject);
+			mail.setHtml(messageBody);
 	
-			sendgrid.send();
+			try {
+				sendgrid.mail(mail);
+			} catch (IOException e) {
+				LOG.error("Failed to send email.", e);
+			} catch (SendGridException e) {
+				LOG.error("Failed to send email", e);
+			}
 		}
 		else
 		{
 			// TODO throw a service exception?
+			LOG.error("Failed to send email: not username define in properties file.");
 		}
 	}
 	
@@ -124,10 +134,10 @@ public class SendGridEmailServiceImpl implements EmailService {
 			sendEmail(ServiceConfig.get().getGiftSubj(), gift.getToEmail(), ServiceConfig.get().getMailFrom(),
 					FreemarkerUtil.get().renderGiftEmail(gift));
 
-			if (LOG.isDebugEnabled())
-			{
+			//if (LOG.isDebugEnabled())
+			//{
 				LOG.debug("Gift email successfully sent to " + gift.getToEmail());
-			}
+			//}
 
 		}
 		catch (IOException e)

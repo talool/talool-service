@@ -30,6 +30,11 @@
 			<id>Hibernate Spatial repo</id>
 			<url>http://www.hibernatespatial.org/repository</url>
 		</repository>
+		<repository>
+			<id>flect</id>
+			<name>flect</name>
+			<url>http://flect.github.io/maven-repo/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -39,9 +44,9 @@
 	</pluginRepositories>
 	<dependencies>
 		<dependency>
-		  <groupId>com.sendgrid</groupId>
-		  <artifactId>sendgrid-java</artifactId>
-		  <version>0.1.2</version>
+		  <groupId>jp.co.flect</groupId>
+		  <artifactId>sendgrid4j</artifactId>
+		  <version>0.9.1</version>
 		</dependency>
 		<dependency>
 		  <groupId>com.braintreepayments.gateway</groupId>
