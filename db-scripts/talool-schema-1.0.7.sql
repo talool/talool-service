@@ -90,6 +90,183 @@ update merchant_location set created_by_merchant_account_id=(select merchant_acc
 update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='doug@entertainment.com')
    where merchant_id=(select merchant_id from merchant where merchant_name= '$5 Car Wash');      
    
+<!-- Save Around --> 
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Arby''s');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Arby''s');  
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Bates Troy');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Bates Troy');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Binghamton Mets');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Binghamton Mets');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Binghamton Senators');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Binghamton Senators');
+
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Binghamton Zoo');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Binghamton Zoo');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Blimpie');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Blimpie');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Burger King');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Burger King');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Chuckster''s');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Chuckster''s');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Complete Home Maintenance');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Complete Home Maintenance');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Domino''s Pizza');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Domino''s Pizza');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Elm Tree Golf Course');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Elm Tree Golf Course');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Endwell Greens');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Endwell Greens');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='En-Joie Golf Club');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'En-Joie Golf Club');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Grandview Farms Golf Course');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Grandview Farms Golf Course');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Ground Round Grill & Bar');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Ground Round Grill & Bar');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Manley''s Mighty Mart');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Manley''s Mighty Mart');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='McDonalds');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'McDonalds');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Me-Ma''s Pizzeria');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Me-Ma''s Pizzeria');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Number 5 Restaurant');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Number 5 Restaurant');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Owego Bowl');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Owego Bowl');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Power Of 1 MMA');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Power Of 1 MMA');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Pudgie''s');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Pudgie''s');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Sonic');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Sonic');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Special Effect''s Hair Design');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Special Effect''s Hair Design');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Subway');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Subway');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Trent Patterson''s Training for Life Facility');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Trent Patterson''s Training for Life Facility');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='KFC');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'KFC');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='Tanning Bed');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'Tanning Bed');
+   
+update merchant_location set created_by_merchant_account_id=(select merchant_account_id from merchant_account where email='lynora@savearound.com')
+ where merchant_id=(select merchant_id from merchant where merchant_name='River Run II Golf Links');
+ 
+update merchant_location set created_by_merchant_id=(select merchant_id from merchant_account where email='lynora@savearound.com')
+   where merchant_id=(select merchant_id from merchant where merchant_name= 'River Run II Golf Links');
+   
+   
 update deal_offer set geom=ST_GeomFromText('POINT(-105.2797 40.0176)', 4326) 
   where title='Entertainment Book';
     
