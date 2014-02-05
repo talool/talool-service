@@ -208,6 +208,27 @@ public interface CustomerService extends HibernateService
 			throws ServiceException;
 
 	/**
+	 * Gets all customers matching email expression.
+	 * 
+	 * @param searchOpts
+	 * @param email
+	 * @param calculateTotalResults
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts, final String email, final boolean calculateTotalResults)
+			throws ServiceException;
+
+	/**
+	 * Gets customer summary count matching email expression
+	 * 
+	 * @param email
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getCustomerSummaryCount(final String email) throws ServiceException;
+
+	/**
 	 * Gets all the customers of a publisher. A publishers customers are defined
 	 * by having at least 1 deal offer belonging to the publisher
 	 * 
