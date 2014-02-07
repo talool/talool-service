@@ -35,7 +35,7 @@ public enum ErrorCode
 	ACTIVIATION_CODE_ALREADY_ACTIVATED(3001, "Activiation code already activated"),
 	
 	GEOCODER_ERROR(4001, "We're having trouble getting the lat/long from Google.  Please try again later."),
-	GEOCODER_OVER_QUERY_LIMIT(4002, ""),
+	GEOCODER_OVER_QUERY_LIMIT(4002, "We've exceeded our limit for daily geocoder requests.  Please try again tomorrow."),
 	MERCHANT_LOCATION_GEOMETRY_NULL(4003, "We couldn't locate that address on the map.  Please review the address and try again.");
 	
 
