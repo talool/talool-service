@@ -32,7 +32,12 @@ public enum ErrorCode
 
 	MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found"),
 	ACTIVIATION_CODE_NOT_FOUND(3000, "Activiation code not found"),
-	ACTIVIATION_CODE_ALREADY_ACTIVATED(3001, "Activiation code already activated");
+	ACTIVIATION_CODE_ALREADY_ACTIVATED(3001, "Activiation code already activated"),
+	
+	GEOCODER_ERROR(4001, "We're having trouble getting the lat/long from Google.  Please try again later."),
+	GEOCODER_OVER_QUERY_LIMIT(4002, ""),
+	MERCHANT_LOCATION_GEOMETRY_NULL(4003, "We couldn't locate that address on the map.  Please review the address and try again.");
+	
 
 	private final int code;
 	private final String message;
