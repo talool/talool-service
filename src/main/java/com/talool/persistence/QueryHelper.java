@@ -92,6 +92,21 @@ public final class QueryHelper
 					+
 					"where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id and c.email like :email)";
 
+	private static final String ALL_CUSTOMER_EMAIL_SUMMARY =
+			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
+					+ "c.create_dt as registrationDate,(select count(*) "
+					+ "from deal_acquire as daq,deal as d,deal_offer as dof "
+					+ "where daq.customer_id = c.customer_id "
+					+ "and daq.acquire_status='REDEEMED' and daq.deal_id=d.deal_id and d.deal_offer_id=dof.deal_offer_id"
+					+ ") as redemptions,"
+					+ "(select array_to_string(array(select distinct d.title from deal_offer as d,customer as cust,"
+					+ "deal_offer_purchase as dof WHERE d.deal_offer_id=dof.deal_offer_id and cust.customer_id=c.customer_id and cust.customer_id=dof.customer_id), ', ')) "
+					+ "as commaSeperatedDealOfferTitles from customer as c "
+					+
+					"where c.email like :email";
+
+	private static final String ALL_CUSTOMER_EMAIL_SUMMARY_CNT = "select count(*) as totalResults from customer where email like :email";
+
 	private static final String CUSTOMER_SUMMARY_CNT = "select count(*) as totalResults from customer";
 
 	private static final String PUBLISHER_CUSTOMER_SUMMARY_CNT = "select count(distinct c.customer_id) as totalResults from customer as c, deal_offer_purchase as dop,deal_offer as dof "
@@ -212,6 +227,10 @@ public final class QueryHelper
 		CustomerSummaryCnt(CUSTOMER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 
 		PublisherCustomerSummaryCnt(PUBLISHER_CUSTOMER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+
+		AllCustomerEmailSummaryCnt(ALL_CUSTOMER_EMAIL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+
+		AllCustomerEmailSummary(ALL_CUSTOMER_EMAIL_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
 		PublisherEmailGiftCnt(PUBLISHER_EMAIL_GIFT_CNT, EMPTY_IMMUTABLE_PROPS),
 

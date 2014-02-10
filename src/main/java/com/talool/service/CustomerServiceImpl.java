@@ -1582,13 +1582,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			if (calculateRowSize && summaries != null)
 			{
-
-				newSql = QueryHelper.buildQuery(QueryType.CustomerSummaryCnt, null, null, true);
-
-				query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
-
-				query.addScalar("totalResults", StandardBasicTypes.LONG);
-				totalResults = (Long) query.uniqueResult();
+				totalResults = (Long) getCustomerSummaryCount();
 			}
 
 			paginatedResult = new PaginatedResult<CustomerSummary>(searchOpts, totalResults, summaries);
@@ -1653,11 +1647,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			if (calculateRowSize && summaries != null)
 			{
-				newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummaryCnt, null, null, true);
-				query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
-				query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
-				query.addScalar("totalResults", StandardBasicTypes.LONG);
-				totalResults = (Long) query.uniqueResult();
+				totalResults = (Long) getPublisherCustomerSummaryCount(publisherMerchantId);
 			}
 
 			paginatedResult = new PaginatedResult<CustomerSummary>(searchOpts, totalResults, summaries);
@@ -1701,7 +1691,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			final String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerEmailSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
-			query.setParameter("email", email.replaceAll("[*]", "%"));
+			query.setParameter("email", email.replaceAll("[*]", "%").toLowerCase());
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
 		}
@@ -1740,19 +1730,14 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			cleanEmail = email.replaceAll("[*]", "%");
-			query.setParameter("email", cleanEmail);
+			query.setParameter("email", cleanEmail.toLowerCase());
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<CustomerSummary>) query.list();
 
 			if (calculateRowSize && summaries != null)
 			{
-				newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerEmailSummaryCnt, null, null, true);
-				query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
-				query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
-				query.setParameter("email", cleanEmail);
-				query.addScalar("totalResults", StandardBasicTypes.LONG);
-				totalResults = (Long) query.uniqueResult();
+				totalResults = getPublisherCustomerSummaryEmailCount(publisherMerchantId, cleanEmail);
 			}
 
 			paginatedResult = new PaginatedResult<CustomerSummary>(searchOpts, totalResults, summaries);
@@ -1764,5 +1749,72 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		return paginatedResult;
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts, final String email, final boolean calculateRowSize)
+			throws ServiceException
+	{
+		PaginatedResult<CustomerSummary> paginatedResult = null;
+		List<CustomerSummary> summaries = null;
+		Long totalResults = null;
+		String cleanEmail = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.AllCustomerEmailSummary, null, searchOpts,
+					true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(CustomerSummary.class));
+			query.addScalar("customerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("email", StandardBasicTypes.STRING);
+			query.addScalar("firstName", StandardBasicTypes.STRING);
+			query.addScalar("lastName", StandardBasicTypes.STRING);
+			query.addScalar("redemptions", StandardBasicTypes.INTEGER);
+			query.addScalar("registrationDate", StandardBasicTypes.DATE);
+			query.addScalar("commaSeperatedDealOfferTitles", StandardBasicTypes.STRING);
+
+			cleanEmail = email.replaceAll("[*]", "%");
+			query.setParameter("email", cleanEmail.toLowerCase());
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<CustomerSummary>) query.list();
+
+			if (calculateRowSize && summaries != null)
+			{
+				totalResults = getCustomerSummaryCount(email);
+			}
+
+			paginatedResult = new PaginatedResult<CustomerSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getCustomerSummary with email %s: %s", email, ex.getMessage()), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@Override
+	public long getCustomerSummaryCount(final String email) throws ServiceException
+	{
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.AllCustomerEmailSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("email", email.replaceAll("[*]", "%").toLowerCase());
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getCustomerSummary %s : %s", email, ex.getMessage(), ex));
+		}
+
+		return total == null ? 0 : total;
 	}
 }
