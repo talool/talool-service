@@ -47,35 +47,36 @@ public class SendGridEmailServiceImpl implements EmailService
 	public void sendEmail(String subject, String recipient, String from,
 			String messageBody) throws ServiceException
 	{
+		final String userName = ServiceConfig.get().getMailUsername();
+		final String password = ServiceConfig.get().getMailPassword();
 
-		if (ServiceConfig.get().getMailUsername() != null)
+		if (userName == null || password == null)
 		{
-			SendGridClient sendgrid = new SendGridClient(ServiceConfig.get().getMailUsername(), ServiceConfig.get().getMailPassword());
-			WebMail mail = new WebMail();
-			mail.setTo(recipient);
-			// sendgrid.addToName("");
-			mail.setFrom(from);
-			// sendgrid.addFromName("");
-			mail.setSubject(subject);
-			mail.setHtml(messageBody);
+			throw new ServiceException("Sendgrid user/pass not defined ");
+		}
 
-			try
-			{
-				sendgrid.mail(mail);
-			}
-			catch (IOException e)
-			{
-				throw new ServiceException("Problem sending email: " + e.getLocalizedMessage(), e);
-			}
-			catch (SendGridException e)
-			{
-				throw new ServiceException("Sendgrid exception e: " + e.getLocalizedMessage(), e);
-			}
-		}
-		else
+		final SendGridClient sendgrid = new SendGridClient(ServiceConfig.get().getMailUsername(), ServiceConfig.get().getMailPassword());
+		final WebMail mail = new WebMail();
+		mail.setTo(recipient);
+		// sendgrid.addToName("");
+		mail.setFrom(from);
+		// sendgrid.addFromName("");
+		mail.setSubject(subject);
+		mail.setHtml(messageBody);
+
+		try
 		{
-			throw new ServiceException("Email user/pass props not found");
+			sendgrid.mail(mail);
 		}
+		catch (IOException e)
+		{
+			throw new ServiceException("Failed sending sendgrid email: " + e.getLocalizedMessage(), e);
+		}
+		catch (SendGridException e)
+		{
+			throw new ServiceException("Failed sending sendgrid email - errors : " + e.getLocalizedMessage(), e);
+		}
+
 	}
 
 	@Override
