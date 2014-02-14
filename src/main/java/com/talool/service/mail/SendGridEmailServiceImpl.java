@@ -64,6 +64,9 @@ public class SendGridEmailServiceImpl implements EmailService {
 				LOG.error("Failed to send email.", e);
 			} catch (SendGridException e) {
 				LOG.error("Failed to send email", e);
+			} catch (Exception e)
+			{
+				LOG.error("Third party api is failing, but the email was sent (we think).", e);
 			}
 		}
 		else
