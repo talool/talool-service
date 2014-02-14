@@ -18,18 +18,18 @@ import com.talool.service.ServiceConfig;
 
 import freemarker.template.TemplateException;
 
-public class SendGridEmailServiceImpl implements EmailService {
+public class SendGridEmailServiceImpl implements EmailService
+{
 
 	private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailServiceImpl.class);
 
 	private static SendGridEmailServiceImpl instance;
 
 	private SendGridEmailServiceImpl()
-	{  
+	{
 		/*
-		 * Make sure the SendGrid credentials are set in the Service Config
-		 * u: vince@talool.com
-		 * p: 321Abc990
+		 * Make sure the SendGrid credentials are set in the Service Config u:
+		 * vince@talool.com p: 321Abc990
 		 */
 	}
 
@@ -42,43 +42,46 @@ public class SendGridEmailServiceImpl implements EmailService {
 
 		return instance;
 	}
-	
+
 	@Override
 	public void sendEmail(String subject, String recipient, String from,
-			String messageBody) throws ServiceException {
-		
+			String messageBody) throws ServiceException
+	{
+
 		if (ServiceConfig.get().getMailUsername() != null)
 		{
 			SendGridClient sendgrid = new SendGridClient(ServiceConfig.get().getMailUsername(), ServiceConfig.get().getMailPassword());
 			WebMail mail = new WebMail();
 			mail.setTo(recipient);
-			//sendgrid.addToName("");
+			// sendgrid.addToName("");
 			mail.setFrom(from);
-			//sendgrid.addFromName("");
+			// sendgrid.addFromName("");
 			mail.setSubject(subject);
 			mail.setHtml(messageBody);
-	
-			try {
-				sendgrid.mail(mail);
-			} catch (IOException e) {
-				LOG.error("Failed to send email.", e);
-			} catch (SendGridException e) {
-				LOG.error("Failed to send email", e);
-			} catch (Exception e)
+
+			try
 			{
-				LOG.error("Third party api is failing, but the email was sent (we think).", e);
+				sendgrid.mail(mail);
+			}
+			catch (IOException e)
+			{
+				throw new ServiceException("Problem sending email: " + e.getLocalizedMessage(), e);
+			}
+			catch (SendGridException e)
+			{
+				throw new ServiceException("Sendgrid exception e: " + e.getLocalizedMessage(), e);
 			}
 		}
 		else
 		{
-			// TODO throw a service exception?
-			LOG.error("Failed to send email: not username define in properties file.");
+			throw new ServiceException("Email user/pass props not found");
 		}
 	}
-	
+
 	@Override
 	public void sendCustomerRegistrationEmail(Customer customer)
-			throws ServiceException {
+			throws ServiceException
+	{
 		try
 		{
 			sendEmail(ServiceConfig.get().getRegistrationSubj(), customer.getEmail(), ServiceConfig.get().getMailFrom(),
@@ -105,7 +108,8 @@ public class SendGridEmailServiceImpl implements EmailService {
 
 	@Override
 	public void sendPasswordRecoveryEmail(Customer customer)
-			throws ServiceException {
+			throws ServiceException
+	{
 		try
 		{
 			sendEmail(ServiceConfig.get().getPasswordRecoverySubj(), customer.getEmail(), ServiceConfig.get().getMailFrom(),
@@ -131,16 +135,17 @@ public class SendGridEmailServiceImpl implements EmailService {
 	}
 
 	@Override
-	public void sendGiftEmail(EmailGift gift) throws ServiceException {
+	public void sendGiftEmail(EmailGift gift) throws ServiceException
+	{
 		try
 		{
 			sendEmail(ServiceConfig.get().getGiftSubj(), gift.getToEmail(), ServiceConfig.get().getMailFrom(),
 					FreemarkerUtil.get().renderGiftEmail(gift));
 
-			//if (LOG.isDebugEnabled())
-			//{
-				LOG.debug("Gift email successfully sent to " + gift.getToEmail());
-			//}
+			// if (LOG.isDebugEnabled())
+			// {
+			LOG.debug("Gift email successfully sent to " + gift.getToEmail());
+			// }
 
 		}
 		catch (IOException e)
@@ -154,6 +159,5 @@ public class SendGridEmailServiceImpl implements EmailService {
 			throw new ServiceException(ErrorCode.MAIL_TEMPLATE_NOT_FOUND, e);
 		}
 	}
-	
 
 }
