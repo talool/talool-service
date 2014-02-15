@@ -36,6 +36,118 @@ public final class QueryHelper
 					"and d.deal_offer_id = dof.deal_offer_id and m.merchant_id=d.merchant_id " +
 					"group by dof.deal_offer_id ";
 	// "order by totalMerchants desc";
+	
+	private static final String DEAL_OFFER_SUMMARY =
+			"select o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, o.location_name as location,"
+				+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
+				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+				+ "from deal_offer as o ";
+	
+	private static final String DEAL_OFFER_TITLE_SUMMARY = 
+			"select o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, o.location_name as location,"
+					+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+					+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+					+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+					+ "from deal_offer as o where o.title like :title ";
+	
+	private static final String PUBLISHER_DEAL_OFFER_SUMMARY =
+			"select o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, o.location_name as location,"
+					+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+					+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+					+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+					+ "from deal_offer as o where o.merchant_id=:publisherMerchantId ";
+	
+	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY = 
+			"select o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, o.location_name as location,"
+					+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+					+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+					+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+					+ "from deal_offer as o where o.title like :title and o.merchant_id=:publisherMerchantId";
+	
+	private static final String MERCHANT_SUMMARY_CNT = 
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
+				+ "WHERE m.merchant_id = l.merchant_id AND m.is_discoverable = 't'";
+	
+	private static final String MERCHANT_NAME_SUMMARY_CNT = 
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
+					+ "WHERE m.merchant_id = l.merchant_id AND m.merchant_name LIKE :name AND m.is_discoverable = 't'";
+	
+	private static final String PUBLISHER_MERCHANT_SUMMARY_CNT = 
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
+					+ "WHERE m.merchant_id = l.merchant_id AND l.created_by_merchant_id=:publisherMerchantId AND m.is_discoverable = 't'";
+	
+	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY_CNT = 
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
+					+ "WHERE m.merchant_id = l.merchant_id AND l.created_by_merchant_id=:publisherMerchantId AND m.merchant_name LIKE :name AND m.is_discoverable = 't'";
+	
+	private static final String MERCHANT_SUMMARY =
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
+					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.merchant_image_id) AS imageUrl, "
+					+ "(SELECT count(*) FROM merchant_location AS ml WHERE ml.merchant_id = m.merchant_id) AS locationCount, "
+					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
+					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
+					+ "FROM merchant AS m "
+					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
+	
+	private static final String MERCHANT_NAME_SUMMARY =
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
+					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.merchant_image_id) AS imageUrl, "
+					+ "(SELECT count(*) FROM merchant_location AS ml WHERE ml.merchant_id = m.merchant_id) AS locationCount, "
+					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
+					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
+					+ "FROM merchant AS m "
+					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name LIKE :name ";
+	
+	private static final String PUBLISHER_MERCHANT_SUMMARY = 
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
+					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.merchant_image_id) AS imageUrl, "
+					+ "(SELECT count(*) FROM merchant_location AS ml WHERE ml.merchant_id = m.merchant_id) AS locationCount, "
+					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
+					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
+					+ "FROM merchant AS m "
+					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
+					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
+	
+	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY = 
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
+					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.merchant_image_id) AS imageUrl, "
+					+ "(SELECT count(*) FROM merchant_location AS ml WHERE ml.merchant_id = m.merchant_id) AS locationCount, "
+					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
+					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
+					+ "FROM merchant AS m "
+					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
+					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name LIKE :name ";
 
 	private static final String CUSTOMER_SUMMARY =
 			"select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
@@ -108,12 +220,22 @@ public final class QueryHelper
 	private static final String ALL_CUSTOMER_EMAIL_SUMMARY_CNT = "select count(*) as totalResults from customer where email like :email";
 
 	private static final String CUSTOMER_SUMMARY_CNT = "select count(*) as totalResults from customer";
+	
+	private static final String DEAL_OFFER_SUMMARY_CNT = "select count(*) as totalResults from deal_offer";
 
 	private static final String PUBLISHER_CUSTOMER_SUMMARY_CNT = "select count(distinct c.customer_id) as totalResults from customer as c, deal_offer_purchase as dop,deal_offer as dof "
 			+ "where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id";
 
+	private static final String PUBLISHER_DEAL_OFFER_SUMMARY_CNT = "select count(deal_offer_id) as totalResults from deal_offer "
+			+ "where merchant_id=:publisherMerchantId";
+	
 	private static final String PUBLISHER_CUSTOMER_EMAIL_SUMMARY_CNT = "select count(distinct c.customer_id) as totalResults from customer as c, deal_offer_purchase as dop,deal_offer as dof "
 			+ "where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id and c.email like :email";
+	
+	private static final String DEAL_OFFER_TITLE_SUMMARY_CNT = "select count(*) as totalResults from deal_offer where title like :title";
+	
+	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY_CNT = "select count(*) as totalResults from deal_offer "
+			+ "where merchant_id=:publisherMerchantId and title like :title";
 
 	private static final String ACTIVATION_SUMMARY = "select n1.doid as \"dealOfferId\",n1.title, n1.total as \"totalCodes\", n2.ta as \"totalActivations\" from  "
 			+
@@ -256,7 +378,26 @@ public final class QueryHelper
 				.put("merchant.created", "merchant.createdUpdated.created").
 				put("merchant.updated", "merchant.createdUpdated.updated").build()),
 
-		MerchantAcquiresByCatId(MERCHANT_ACQUIRES_BY_CAT_ID, EMPTY_IMMUTABLE_PROPS);
+		MerchantAcquiresByCatId(MERCHANT_ACQUIRES_BY_CAT_ID, EMPTY_IMMUTABLE_PROPS),
+		
+		DealOfferSummary(DEAL_OFFER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		DealOfferSummaryCnt(DEAL_OFFER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		DealOfferTitleSummaryCnt(DEAL_OFFER_TITLE_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		PublisherDealOfferSummaryCnt(PUBLISHER_DEAL_OFFER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		PublisherDealOfferTitleSummaryCnt(PUBLISHER_DEAL_OFFER_TITLE_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		PublisherDealOfferSummary(PUBLISHER_DEAL_OFFER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		DealOfferTitleSummary(DEAL_OFFER_TITLE_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		PublisherDealOfferTitleSummary(PUBLISHER_DEAL_OFFER_TITLE_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		
+		
+		MerchantSummaryCnt(MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		MerchantNameSummaryCnt(MERCHANT_NAME_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		PublisherMerchantSummaryCnt(PUBLISHER_MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		PublisherMerchantNameSummaryCnt(PUBLISHER_MERCHANT_NAME_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		MerchantSummary(MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		MerchantNameSummary(MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		PublisherMerchantSummary(PUBLISHER_MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		PublisherMerchantNameSummary(PUBLISHER_MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS);
 
 		private String query;
 		private ImmutableMap<String, String> propertyColumnMap;

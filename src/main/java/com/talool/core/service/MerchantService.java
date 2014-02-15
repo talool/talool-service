@@ -20,6 +20,9 @@ import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 import com.talool.service.HibernateService;
 import com.talool.stats.DealOfferMetrics;
+import com.talool.stats.DealOfferSummary;
+import com.talool.stats.MerchantSummary;
+import com.talool.stats.PaginatedResult;
 
 /**
  * r Merchant Service
@@ -154,4 +157,114 @@ public interface MerchantService extends HibernateService
 	public List<Merchant> getMerchantsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOptions) throws ServiceException;
 
 	public List<Merchant> getMerchantsCreatedByMerchant(final UUID merchantId) throws ServiceException;
+	
+	
+	/**
+	 * Gets all deal offers in Talool
+	 * 
+	 * @param searchOpts
+	 * @param calculateTotalResults
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<DealOfferSummary> getDealOfferSummary(final SearchOptions searchOpts, final boolean calculateTotalResults)
+			throws ServiceException;
+
+	/**
+	 * Gets all deal offers matching title expression.
+	 * 
+	 * @param searchOpts
+	 * @param title
+	 * @param calculateTotalResults
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<DealOfferSummary> getDealOfferSummary(final SearchOptions searchOpts, final String title, final boolean calculateTotalResults)
+			throws ServiceException;
+
+	/**
+	 * Gets offer summary count matching title expression
+	 * 
+	 * @param title
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getDealOfferSummaryCount(final String title) throws ServiceException;
+
+	/**
+	 * Gets all the offers of a publisher. A publishers offers are defined
+	 * by a merchant that is the publisher
+	 * 
+	 * @param publisherMerchantId
+	 * @param searchOpts
+	 * @param calculateRowSize
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<DealOfferSummary> getPublisherDealOfferSummary(final UUID publisherMerchantId,
+			final SearchOptions searchOpts, final boolean calculateRowSize) throws ServiceException;
+
+	public PaginatedResult<DealOfferSummary> getPublisherDealOfferSummaryByTitle(final UUID publisherMerchantId,
+			final SearchOptions searchOpts, final String title, final boolean calculateRowSize) throws ServiceException;
+
+	public long getPublisherDealOfferSummaryTitleCount(final UUID publisherMerchantId, final String title) throws ServiceException;
+
+	public long getDealOfferSummaryCount() throws ServiceException;
+
+	public long getPublisherDealOfferSummaryCount(final UUID publisherMerchantId) throws ServiceException;
+
+	
+	/**
+	 * Gets all merchants in Talool
+	 * 
+	 * @param searchOpts
+	 * @param calculateTotalResults
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<MerchantSummary> getMerchantSummary(final SearchOptions searchOpts, final boolean calculateTotalResults)
+			throws ServiceException;
+
+	/**
+	 * Gets all merchants matching name expression.
+	 * 
+	 * @param searchOpts
+	 * @param name
+	 * @param calculateTotalResults
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<MerchantSummary> getMerchantSummary(final SearchOptions searchOpts, final String name, final boolean calculateTotalResults)
+			throws ServiceException;
+
+	/**
+	 * Gets merchant summary count matching name expression
+	 * 
+	 * @param name
+	 * @return
+	 * @throws ServiceException
+	 */
+	public long getMerchantSummaryCount(final String name) throws ServiceException;
+
+	/**
+	 * Gets all the merchants of a publisher. A publishers merchants are defined
+	 * by having a location created by the publisher
+	 * 
+	 * @param publisherMerchantId
+	 * @param searchOpts
+	 * @param calculateRowSize
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<MerchantSummary> getPublisherMerchantSummary(final UUID publisherMerchantId,
+			final SearchOptions searchOpts, final boolean calculateRowSize) throws ServiceException;
+
+	public PaginatedResult<MerchantSummary> getPublisherMerchantSummaryByName(final UUID publisherMerchantId,
+			final SearchOptions searchOpts, final String name, final boolean calculateRowSize) throws ServiceException;
+
+	public long getPublisherMerchantSummaryNameCount(final UUID publisherMerchantId, final String name) throws ServiceException;
+
+	public long getMerchantSummaryCount() throws ServiceException;
+
+	public long getPublisherMerchantSummaryCount(final UUID publisherMerchantId) throws ServiceException;
 }

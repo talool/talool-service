@@ -79,6 +79,10 @@ import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl;
 import com.talool.stats.DealOfferMetadata;
 import com.talool.stats.DealOfferMetrics;
+import com.talool.stats.DealOfferMetrics.MetricType;
+import com.talool.stats.DealOfferSummary;
+import com.talool.stats.MerchantSummary;
+import com.talool.stats.PaginatedResult;
 import com.talool.utils.SpatialUtils;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -1570,5 +1574,667 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return merchants;
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<DealOfferSummary> getDealOfferSummary(
+			SearchOptions searchOpts, boolean calculateTotalResults)
+			throws ServiceException {
+		
+		PaginatedResult<DealOfferSummary> paginatedResult = null;
+		List<DealOfferSummary> summaries = null;
+		Long totalResults = null;
+		
+		try
+		{
+			
+			String newSql = QueryHelper.buildQuery(QueryType.DealOfferSummary, null, searchOpts,
+					true);
+			
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(DealOfferSummary.class));
+			query.addScalar("offerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("title", StandardBasicTypes.STRING);
+			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("location", StandardBasicTypes.STRING);
+			query.addScalar("offerType", StandardBasicTypes.STRING);
+			query.addScalar("price", StandardBasicTypes.DOUBLE);
+			query.addScalar("expires", StandardBasicTypes.DATE);
+			query.addScalar("isActive", StandardBasicTypes.BOOLEAN);
+			query.addScalar("backgroundUrl", StandardBasicTypes.STRING);
+			query.addScalar("iconUrl", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+			
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<DealOfferSummary>) query.list();
+
+			if (calculateTotalResults && summaries != null)
+			{
+				totalResults = (Long) getDealOfferSummaryCount();
+			}
+			
+			// get the metrics out of the cache and put them on the summaries
+			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
+			for (DealOfferSummary dos:summaries)
+			{
+				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
+				if (metrics != null)
+				{
+					Map<String, Long> map = metrics.getLongMetrics();
+					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+					dos.setDealCount(map.get(MetricType.TotalDeals));
+					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+				}
+				
+			}
+
+			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getDealOfferSummary: " + ex.getMessage(), ex);
+		}
+		
+		return paginatedResult;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<DealOfferSummary> getDealOfferSummary(
+			SearchOptions searchOpts, String title,
+			boolean calculateTotalResults) throws ServiceException {
+		
+		PaginatedResult<DealOfferSummary> paginatedResult = null;
+		List<DealOfferSummary> summaries = null;
+		Long totalResults = null;
+		String cleanTitle = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.DealOfferTitleSummary, null, searchOpts,
+					true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(DealOfferSummary.class));
+			query.addScalar("offerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("title", StandardBasicTypes.STRING);
+			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("location", StandardBasicTypes.STRING);
+			query.addScalar("offerType", StandardBasicTypes.STRING);
+			query.addScalar("price", StandardBasicTypes.DOUBLE);
+			query.addScalar("expires", StandardBasicTypes.DATE);
+			query.addScalar("isActive", StandardBasicTypes.BOOLEAN);
+			query.addScalar("backgroundUrl", StandardBasicTypes.STRING);
+			query.addScalar("iconUrl", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+
+			cleanTitle = title.replaceAll("[*]", "%");
+			query.setParameter("title", cleanTitle.toLowerCase());
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<DealOfferSummary>) query.list();
+
+			if (calculateTotalResults && summaries != null)
+			{
+				totalResults = getDealOfferSummaryCount(title);
+			}
+			
+			// get the metrics out of the cache and put them on the summaries
+			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
+			for (DealOfferSummary dos:summaries)
+			{
+				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
+				if (metrics != null)
+				{
+					Map<String, Long> map = metrics.getLongMetrics();
+					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+					dos.setDealCount(map.get(MetricType.TotalDeals));
+					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+				}
+				
+			}
+
+			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealOfferSummary with title %s: %s", title, ex.getMessage()), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<DealOfferSummary> getPublisherDealOfferSummary(
+			UUID publisherMerchantId, SearchOptions searchOpts,
+			boolean calculateRowSize) throws ServiceException {
+		
+		PaginatedResult<DealOfferSummary> paginatedResult = null;
+		List<DealOfferSummary> summaries = null;
+		Long totalResults = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.PublisherDealOfferSummary, null, searchOpts,
+					true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(DealOfferSummary.class));
+			query.addScalar("offerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("title", StandardBasicTypes.STRING);
+			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("location", StandardBasicTypes.STRING);
+			query.addScalar("offerType", StandardBasicTypes.STRING);
+			query.addScalar("price", StandardBasicTypes.DOUBLE);
+			query.addScalar("expires", StandardBasicTypes.DATE);
+			query.addScalar("isActive", StandardBasicTypes.BOOLEAN);
+			query.addScalar("backgroundUrl", StandardBasicTypes.STRING);
+			query.addScalar("iconUrl", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<DealOfferSummary>) query.list();
+
+			if (calculateRowSize && summaries != null)
+			{
+				totalResults = (Long) getPublisherDealOfferSummaryCount(publisherMerchantId);
+			}
+			
+			// get the metrics out of the cache and put them on the summaries
+			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
+			for (DealOfferSummary dos:summaries)
+			{
+				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
+				if (metrics != null)
+				{
+					Map<String, Long> map = metrics.getLongMetrics();
+					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+					dos.setDealCount(map.get(MetricType.TotalDeals));
+					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+				}
+				
+			}
+
+			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherDealOfferSummary: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<DealOfferSummary> getPublisherDealOfferSummaryByTitle(
+			UUID publisherMerchantId, SearchOptions searchOpts, String title,
+			boolean calculateRowSize) throws ServiceException {
+		
+		PaginatedResult<DealOfferSummary> paginatedResult = null;
+		List<DealOfferSummary> summaries = null;
+		Long totalResults = null;
+		String cleanTitle = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.PublisherDealOfferTitleSummary, null, searchOpts,
+					true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(DealOfferSummary.class));
+			query.addScalar("offerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("title", StandardBasicTypes.STRING);
+			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("location", StandardBasicTypes.STRING);
+			query.addScalar("offerType", StandardBasicTypes.STRING);
+			query.addScalar("price", StandardBasicTypes.DOUBLE);
+			query.addScalar("expires", StandardBasicTypes.DATE);
+			query.addScalar("isActive", StandardBasicTypes.BOOLEAN);
+			query.addScalar("backgroundUrl", StandardBasicTypes.STRING);
+			query.addScalar("iconUrl", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			cleanTitle = title.replaceAll("[*]", "%");
+			query.setParameter("title", cleanTitle.toLowerCase());
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<DealOfferSummary>) query.list();
+
+			if (calculateRowSize && summaries != null)
+			{
+				totalResults = getPublisherDealOfferSummaryTitleCount(publisherMerchantId, cleanTitle);
+			}
+			
+			// get the metrics out of the cache and put them on the summaries
+			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
+			for (DealOfferSummary dos:summaries)
+			{
+				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
+				if (metrics != null)
+				{
+					Map<String, Long> map = metrics.getLongMetrics();
+					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+					dos.setDealCount(map.get(MetricType.TotalDeals));
+					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+				}
+				
+			}
+
+			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherDealOfferSummaryByTitle: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+	
+	@Override
+	public long getDealOfferSummaryCount(final String title) throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.DealOfferTitleSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("title", title.replaceAll("[*]", "%").toLowerCase());
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDealOfferSummaryCount %s : %s", title, ex.getMessage(), ex));
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@Override
+	public long getPublisherDealOfferSummaryTitleCount(
+			final UUID publisherMerchantId, final String title) throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherDealOfferTitleSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.setParameter("title", title.replaceAll("[*]", "%").toLowerCase());
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherDealOfferSummaryTitleCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@Override
+	public long getDealOfferSummaryCount() throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.DealOfferSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getDealOfferSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@Override
+	public long getPublisherDealOfferSummaryCount(UUID publisherMerchantId)
+			throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherDealOfferSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherDealOfferSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<MerchantSummary> getMerchantSummary(
+			SearchOptions searchOpts, boolean calculateTotalResults)
+			throws ServiceException {
+		
+		PaginatedResult<MerchantSummary> paginatedResult = null;
+		List<MerchantSummary> summaries = null;
+		Long totalResults = null;
+		
+		try
+		{
+			
+			String newSql = QueryHelper.buildQuery(QueryType.MerchantSummary, null, searchOpts,
+					true);
+			
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("address1", StandardBasicTypes.STRING);
+			query.addScalar("address2", StandardBasicTypes.STRING);
+			query.addScalar("city", StandardBasicTypes.STRING);
+			query.addScalar("state", StandardBasicTypes.STRING);
+			query.addScalar("zip", StandardBasicTypes.STRING);
+			query.addScalar("phone", StandardBasicTypes.STRING);
+			query.addScalar("website", StandardBasicTypes.STRING);
+			query.addScalar("category", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("imageUrl", StandardBasicTypes.STRING);
+			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
+			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<MerchantSummary>) query.list();
+
+			if (calculateTotalResults && summaries != null)
+			{
+				totalResults = (Long) getMerchantSummaryCount();
+			}
+
+			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantSummary: " + ex.getMessage(), ex);
+		}
+		
+		return paginatedResult;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<MerchantSummary> getMerchantSummary(
+			SearchOptions searchOpts, String name, boolean calculateTotalResults)
+			throws ServiceException {
+		
+		PaginatedResult<MerchantSummary> paginatedResult = null;
+		List<MerchantSummary> summaries = null;
+		Long totalResults = null;
+		String cleanName = null;
+		
+		try
+		{
+			
+			String newSql = QueryHelper.buildQuery(QueryType.MerchantNameSummary, null, searchOpts,
+					true);
+			
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("address1", StandardBasicTypes.STRING);
+			query.addScalar("address2", StandardBasicTypes.STRING);
+			query.addScalar("city", StandardBasicTypes.STRING);
+			query.addScalar("state", StandardBasicTypes.STRING);
+			query.addScalar("zip", StandardBasicTypes.STRING);
+			query.addScalar("phone", StandardBasicTypes.STRING);
+			query.addScalar("website", StandardBasicTypes.STRING);
+			query.addScalar("category", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("imageUrl", StandardBasicTypes.STRING);
+			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
+			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+			
+			cleanName = name.replaceAll("[*]", "%");
+			query.setParameter("name", cleanName.toLowerCase());
+			
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<MerchantSummary>) query.list();
+
+			if (calculateTotalResults && summaries != null)
+			{
+				totalResults = (Long) getMerchantSummaryCount(cleanName);
+			}
+
+			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantSummary: " + name +": " + ex.getMessage(), ex);
+		}
+		
+		return paginatedResult;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<MerchantSummary> getPublisherMerchantSummary(
+			UUID publisherMerchantId, SearchOptions searchOpts,
+			boolean calculateTotalResults) throws ServiceException {
+		
+		PaginatedResult<MerchantSummary> paginatedResult = null;
+		List<MerchantSummary> summaries = null;
+		Long totalResults = null;
+		
+		try
+		{
+			
+			String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantSummary, null, searchOpts,
+					true);
+			
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("address1", StandardBasicTypes.STRING);
+			query.addScalar("address2", StandardBasicTypes.STRING);
+			query.addScalar("city", StandardBasicTypes.STRING);
+			query.addScalar("state", StandardBasicTypes.STRING);
+			query.addScalar("zip", StandardBasicTypes.STRING);
+			query.addScalar("phone", StandardBasicTypes.STRING);
+			query.addScalar("website", StandardBasicTypes.STRING);
+			query.addScalar("category", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("imageUrl", StandardBasicTypes.STRING);
+			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
+			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+			
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<MerchantSummary>) query.list();
+
+			if (calculateTotalResults && summaries != null)
+			{
+				totalResults = (Long) getPublisherMerchantSummaryCount(publisherMerchantId);
+			}
+
+			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherMerchantSummary: " + ex.getMessage(), ex);
+		}
+		
+		return paginatedResult;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<MerchantSummary> getPublisherMerchantSummaryByName(
+			UUID publisherMerchantId, SearchOptions searchOpts, String name,
+			boolean calculateRowSize) throws ServiceException {
+		
+		PaginatedResult<MerchantSummary> paginatedResult = null;
+		List<MerchantSummary> summaries = null;
+		Long totalResults = null;
+		String cleanName = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantNameSummary, null, searchOpts,
+					true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("address1", StandardBasicTypes.STRING);
+			query.addScalar("address2", StandardBasicTypes.STRING);
+			query.addScalar("city", StandardBasicTypes.STRING);
+			query.addScalar("state", StandardBasicTypes.STRING);
+			query.addScalar("zip", StandardBasicTypes.STRING);
+			query.addScalar("phone", StandardBasicTypes.STRING);
+			query.addScalar("website", StandardBasicTypes.STRING);
+			query.addScalar("category", StandardBasicTypes.STRING);
+			query.addScalar("logoUrl", StandardBasicTypes.STRING);
+			query.addScalar("imageUrl", StandardBasicTypes.STRING);
+			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
+			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			cleanName = name.replaceAll("[*]", "%");
+			query.setParameter("name", cleanName.toLowerCase());
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<MerchantSummary>) query.list();
+
+			if (calculateRowSize && summaries != null)
+			{
+				totalResults = getPublisherMerchantSummaryNameCount(publisherMerchantId, cleanName);
+			}
+
+			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherMerchantSummaryByName: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+	
+	@Override
+	public long getMerchantSummaryCount() throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+	
+	@Override
+	public long getMerchantSummaryCount(String name) throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantNameSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("name", name.replaceAll("[*]", "%").toLowerCase());
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getMerchantSummaryCount %s : %s", name, ex.getMessage(), ex));
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@Override
+	public long getPublisherMerchantSummaryCount(UUID publisherMerchantId)
+			throws ServiceException {
+		
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherMerchantSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+		
+	}
+	
+	@Override
+	public long getPublisherMerchantSummaryNameCount(UUID publisherMerchantId,
+			String name) throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantNameSummaryCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.setParameter("name", name.replaceAll("[*]", "%").toLowerCase());
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherMerchantSummaryNameCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+	
 
 }
