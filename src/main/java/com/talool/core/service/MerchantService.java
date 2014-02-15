@@ -21,6 +21,7 @@ import com.talool.core.Tag;
 import com.talool.service.HibernateService;
 import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferSummary;
+import com.talool.stats.DealSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
 
@@ -267,4 +268,18 @@ public interface MerchantService extends HibernateService
 	public long getMerchantSummaryCount() throws ServiceException;
 
 	public long getPublisherMerchantSummaryCount(final UUID publisherMerchantId) throws ServiceException;
+	
+	/**
+	 * Gets deals in an offer
+	 * 
+	 * @param dealOfferId
+	 * @param searchOpts
+	 * @param calculateTotalResults
+	 * @return
+	 * @throws ServiceException
+	 */
+	public PaginatedResult<DealSummary> getDealSummary(final UUID dealOfferId, final SearchOptions searchOpts, final boolean calculateTotalResults)
+			throws ServiceException;
+	
+	public long getDealSummaryCount(final UUID dealOfferId) throws ServiceException;
 }
