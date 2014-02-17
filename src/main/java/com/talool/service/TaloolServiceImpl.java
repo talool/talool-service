@@ -1678,7 +1678,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
 
 			cleanTitle = title.replaceAll("[*]", "%");
-			query.setParameter("title", cleanTitle.toLowerCase());
+			query.setParameter("title", cleanTitle);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<DealOfferSummary>) query.list();
@@ -1817,7 +1817,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			cleanTitle = title.replaceAll("[*]", "%");
-			query.setParameter("title", cleanTitle.toLowerCase());
+			query.setParameter("title", cleanTitle);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<DealOfferSummary>) query.list();
@@ -1861,7 +1861,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			final String newSql = QueryHelper.buildQuery(QueryType.DealOfferTitleSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
-			query.setParameter("title", title.replaceAll("[*]", "%").toLowerCase());
+			query.setParameter("title", title.replaceAll("[*]", "%"));
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
 		}
@@ -1883,7 +1883,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			final String newSql = QueryHelper.buildQuery(QueryType.PublisherDealOfferTitleSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
-			query.setParameter("title", title.replaceAll("[*]", "%").toLowerCase());
+			query.setParameter("title", title.replaceAll("[*]", "%"));
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
 		}
@@ -2023,7 +2023,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
 			
 			cleanName = name.replaceAll("[*]", "%");
-			query.setParameter("name", cleanName.toLowerCase());
+			query.setParameter("name", cleanName);
 			
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<MerchantSummary>) query.list();
@@ -2133,7 +2133,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			cleanName = name.replaceAll("[*]", "%");
-			query.setParameter("name", cleanName.toLowerCase());
+			query.setParameter("name", cleanName);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<MerchantSummary>) query.list();
@@ -2180,7 +2180,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			final String newSql = QueryHelper.buildQuery(QueryType.MerchantNameSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
-			query.setParameter("name", name.replaceAll("[*]", "%").toLowerCase());
+			query.setParameter("name", name.replaceAll("[*]", "%"));
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
 		}
@@ -2225,7 +2225,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			final String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantNameSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
-			query.setParameter("name", name.replaceAll("[*]", "%").toLowerCase());
+			query.setParameter("name", name.replaceAll("[*]", "%"));
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
 		}
