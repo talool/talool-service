@@ -47,9 +47,9 @@ public final class QueryHelper
 				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
 				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
 				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom) ";
+				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) ";
 	
 	private static final String DEAL_OFFER_TITLE_SUMMARY = 
 			"select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
@@ -61,9 +61,9 @@ public final class QueryHelper
 				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
 				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
 				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom) "
+				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
 				+ "where o.title like :title ";
 	
 	private static final String PUBLISHER_DEAL_OFFER_SUMMARY =
@@ -76,9 +76,9 @@ public final class QueryHelper
 				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
 				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
 				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom) "
+				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
 				+ "where o.merchant_id=:publisherMerchantId ";
 	
 	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY = 
@@ -91,9 +91,9 @@ public final class QueryHelper
 				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
 				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
 				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom) "
+				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
 				+ "where o.title like :title and o.merchant_id=:publisherMerchantId";
 	
 	private static final String MERCHANT_SUMMARY_CNT = 
@@ -122,8 +122,8 @@ public final class QueryHelper
 					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
 					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
 					+ "FROM merchant AS m "
-					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
-					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
 	
 	private static final String MERCHANT_NAME_SUMMARY =
@@ -136,8 +136,8 @@ public final class QueryHelper
 					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
 					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
 					+ "FROM merchant AS m "
-					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
-					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
 	
 	private static final String PUBLISHER_MERCHANT_SUMMARY = 
@@ -150,8 +150,8 @@ public final class QueryHelper
 					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
 					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
 					+ "FROM merchant AS m "
-					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
-					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
 	
 	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY = 
@@ -164,8 +164,8 @@ public final class QueryHelper
 					+ "(SELECT count(*) FROM deal AS d WHERE d.merchant_id = m.merchant_id) AS dealCount, "
 					+ "(SELECT count(*) FROM merchant_account AS ma WHERE ma.merchant_id = m.merchant_id) AS merchantAccountCount "
 					+ "FROM merchant AS m "
-					+ "JOIN (SELECT merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
-					+ "WHERE (merchant_id, create_dt) IN (SELECT merchant_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
 
 	private static final String CUSTOMER_SUMMARY =
