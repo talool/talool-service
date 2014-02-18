@@ -16,7 +16,11 @@ public final class DealOfferSummary implements Serializable
 	private UUID merchantId;
 	private String title;
 	private String summary;
-	private String location;
+	private String locationName;
+	private String address1;
+	private String address2;
+	private String city;
+	private String state;
 	private String offerType;
 	private Double price;
 	private Date expires;
@@ -42,12 +46,6 @@ public final class DealOfferSummary implements Serializable
 	}
 	public void setTitle(String title) {
 		this.title = title;
-	}
-	public String getLocation() {
-		return location;
-	}
-	public void setLocation(String location) {
-		this.location = location;
 	}
 	public Double getPrice() {
 		return price;
@@ -138,6 +136,36 @@ public final class DealOfferSummary implements Serializable
 	}
 	public void setRedemptionCount(Long redemptionCount) {
 		this.redemptionCount = redemptionCount;
+	}
+	public String getLocationName() {
+		return locationName;
+	}
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
+	}
+	public String getAddress1() {
+		return address1;
+	}
+	public void setAddress1(String address1) {
+		this.address1 = address1;
+	}
+	public String getAddress2() {
+		return address2;
+	}
+	public void setAddress2(String address2) {
+		this.address2 = address2;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
 	}
 	
 	
