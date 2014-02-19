@@ -1626,14 +1626,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
 			for (DealOfferSummary dos:summaries)
 			{
-				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
-				if (metrics != null)
+				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
+				if (meta != null)
 				{
-					Map<String, Long> map = metrics.getLongMetrics();
-					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-					dos.setDealCount(map.get(MetricType.TotalDeals));
-					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					DealOfferMetrics metrics = meta.getDealOfferMetrics();
+					if (metrics != null)
+					{
+						Map<String, Long> map = metrics.getLongMetrics();
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+						dos.setDealCount(map.get(MetricType.TotalDeals));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					}
 				}
 				
 			}
@@ -1700,14 +1704,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
 			for (DealOfferSummary dos:summaries)
 			{
-				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
-				if (metrics != null)
+				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
+				if (meta != null)
 				{
-					Map<String, Long> map = metrics.getLongMetrics();
-					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-					dos.setDealCount(map.get(MetricType.TotalDeals));
-					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					DealOfferMetrics metrics = meta.getDealOfferMetrics();
+					if (metrics != null)
+					{
+						Map<String, Long> map = metrics.getLongMetrics();
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+						dos.setDealCount(map.get(MetricType.TotalDeals));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					}
 				}
 				
 			}
@@ -1772,16 +1780,19 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
 			for (DealOfferSummary dos:summaries)
 			{
-				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
-				if (metrics != null)
+				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
+				if (meta != null)
 				{
-					Map<String, Long> map = metrics.getLongMetrics();
-					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-					dos.setDealCount(map.get(MetricType.TotalDeals));
-					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					DealOfferMetrics metrics = meta.getDealOfferMetrics();
+					if (metrics != null)
+					{
+						Map<String, Long> map = metrics.getLongMetrics();
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+						dos.setDealCount(map.get(MetricType.TotalDeals));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					}
 				}
-				
 			}
 
 			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
@@ -1847,14 +1858,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
 			for (DealOfferSummary dos:summaries)
 			{
-				DealOfferMetrics metrics = cache.getDealOfferMetrics(dos.getOfferId()).getDealOfferMetrics();
-				if (metrics != null)
+				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
+				if (meta != null)
 				{
-					Map<String, Long> map = metrics.getLongMetrics();
-					dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-					dos.setDealCount(map.get(MetricType.TotalDeals));
-					dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-					dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					DealOfferMetrics metrics = meta.getDealOfferMetrics();
+					if (metrics != null)
+					{
+						Map<String, Long> map = metrics.getLongMetrics();
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
+						dos.setDealCount(map.get(MetricType.TotalDeals));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+					}
 				}
 				
 			}
