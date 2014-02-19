@@ -97,20 +97,28 @@ public final class QueryHelper
 				+ "where o.title like :title and o.merchant_id=:publisherMerchantId";
 	
 	private static final String MERCHANT_SUMMARY_CNT = 
-			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
-				+ "WHERE m.merchant_id = l.merchant_id AND m.is_discoverable = 't'";
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
 	
 	private static final String MERCHANT_NAME_SUMMARY_CNT = 
-			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
-					+ "WHERE m.merchant_id = l.merchant_id AND m.merchant_name ILIKE :name AND m.is_discoverable = 't'";
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
 	
 	private static final String PUBLISHER_MERCHANT_SUMMARY_CNT = 
-			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
-					+ "WHERE m.merchant_id = l.merchant_id AND l.created_by_merchant_id=:publisherMerchantId AND m.is_discoverable = 't'";
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
 	
 	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY_CNT = 
-			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m, merchant_location AS l "
-					+ "WHERE m.merchant_id = l.merchant_id AND l.created_by_merchant_id=:publisherMerchantId AND m.merchant_name ILIKE :name AND m.is_discoverable = 't'";
+			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
 	
 	private static final String MERCHANT_SUMMARY =
 			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
