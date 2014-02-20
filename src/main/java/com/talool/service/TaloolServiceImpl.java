@@ -1633,13 +1633,12 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					if (metrics != null)
 					{
 						Map<String, Long> map = metrics.getLongMetrics();
-						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-						dos.setDealCount(map.get(MetricType.TotalDeals));
-						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants.toString()));
+						dos.setDealCount(map.get(MetricType.TotalDeals.toString()));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires.toString()));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions.toString()));
 					}
 				}
-				
 			}
 
 			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
@@ -1711,10 +1710,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					if (metrics != null)
 					{
 						Map<String, Long> map = metrics.getLongMetrics();
-						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-						dos.setDealCount(map.get(MetricType.TotalDeals));
-						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants.toString()));
+						dos.setDealCount(map.get(MetricType.TotalDeals.toString()));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires.toString()));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions.toString()));
 					}
 				}
 				
@@ -1787,10 +1786,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					if (metrics != null)
 					{
 						Map<String, Long> map = metrics.getLongMetrics();
-						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-						dos.setDealCount(map.get(MetricType.TotalDeals));
-						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants.toString()));
+						dos.setDealCount(map.get(MetricType.TotalDeals.toString()));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires.toString()));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions.toString()));
 					}
 				}
 			}
@@ -1865,10 +1864,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					if (metrics != null)
 					{
 						Map<String, Long> map = metrics.getLongMetrics();
-						dos.setMerchantCount(map.get(MetricType.TotalMerchants));
-						dos.setDealCount(map.get(MetricType.TotalDeals));
-						dos.setAcquiresCount(map.get(MetricType.TotalAcquires));
-						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions));
+						dos.setMerchantCount(map.get(MetricType.TotalMerchants.toString()));
+						dos.setDealCount(map.get(MetricType.TotalDeals.toString()));
+						dos.setAcquiresCount(map.get(MetricType.TotalAcquires.toString()));
+						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions.toString()));
 					}
 				}
 				
