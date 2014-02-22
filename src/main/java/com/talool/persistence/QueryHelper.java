@@ -368,6 +368,11 @@ public final class QueryHelper
 	private static final String DEAL_SUMMARY_CNT = 
 			"SELECT count(*) AS totalResults FROM deal AS d WHERE d.deal_offer_id = :offerId";
 	
+	private static final String MOVE_DEALS = 
+			 "UPDATE deal "
+				+ "SET deal_offer_id = :dealOfferId, updated_by_merchant_account_id = :merchantAccountId "
+				+ "WHERE deal_id IN (:dealIds)";
+	
 	public enum QueryType
 	{
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
@@ -451,7 +456,9 @@ public final class QueryHelper
 		PublisherMerchantNameSummary(PUBLISHER_MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS), 
 		
 		DealSummary(DEAL_SUMMARY, EMPTY_IMMUTABLE_PROPS),
-		DealSummaryCnt(DEAL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS);
+		DealSummaryCnt(DEAL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		
+		MoveDeals(MOVE_DEALS, EMPTY_IMMUTABLE_PROPS);
 
 		private String query;
 		private ImmutableMap<String, String> propertyColumnMap;

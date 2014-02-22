@@ -282,4 +282,6 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 	
 	public long getDealSummaryCount(final UUID dealOfferId) throws ServiceException;
+	
+	public void moveDeals(final List<UUID> dealIds, final UUID dealOfferId, final long merchantAccountId) throws ServiceException;
 }

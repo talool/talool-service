@@ -2343,6 +2343,26 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return total == null ? 0 : total;
 	}
+
+	@Override
+	public void moveDeals(final List<UUID> dealIds, final UUID dealOfferId, final long merchantAccountId) throws ServiceException {
+		
+		try
+		{
+			final String queryString = QueryHelper.buildQuery(QueryType.MoveDeals, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(queryString);
+			query.setParameterList("dealIds", dealIds, PostgresUUIDType.INSTANCE);
+			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
+			query.setParameter("merchantAccountId", merchantAccountId, StandardBasicTypes.LONG);
+			int updates = query.executeUpdate();
+			LOG.debug("moved "+updates+" deals");
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem moveDeals: " + ex.getMessage(), ex);
+		}
+		
+	}
 	
 
 }
