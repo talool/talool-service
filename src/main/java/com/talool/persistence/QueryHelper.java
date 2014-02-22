@@ -346,7 +346,7 @@ public final class QueryHelper
 
 	private static final String DEAL_SUMMARY = 
 			"SELECT d.deal_id AS dealId, d.deal_offer_id AS offerId, d.merchant_id AS merchantId, d.title AS title, d.summary AS summary, d.details AS details, "
-				+ "d.expires AS expires, d.is_active AS isActive, "
+				+ "d.expires AS expires, d.is_active AS isActive, l.city AS merchantCity, l.state_province_county AS merchantState, "
 				+ "(SELECT array_to_string(array(SELECT DISTINCT t.name FROM tag AS t, deal_tag AS dt WHERE dt.deal_id = d.deal_id AND dt.tag_id = t.tag_id),', ')) AS tags, "
 				+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = d.image_id) AS imageUrl,"
 				+ "(SELECT m.merchant_name FROM merchant AS m WHERE m.merchant_id = d.merchant_id) AS merchantName,"
@@ -359,7 +359,11 @@ public final class QueryHelper
 				+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND da.acquire_status = 'REDEEMED') AS redemptionCount,"
 				+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND "
 				+ "(da.acquire_status = 'PENDING_ACCEPT_CUSTOMER_SHARE' OR da.acquire_status = 'ACCEPTED_CUSTOMER_SHARE' OR da.acquire_status = 'REJECTED_CUSTOMER_SHARE')) AS giftCount "
-				+ "FROM deal AS d WHERE d.deal_offer_id = :offerId";
+				+ "FROM deal AS d "
+				+ "JOIN (SELECT merchant_location_id, merchant_id, city, state_province_county, create_dt FROM merchant_location ml1 "
+				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+				+ "ON (d.merchant_id = l.merchant_id) "
+				+ "WHERE d.deal_offer_id = :offerId";
 	
 	private static final String DEAL_SUMMARY_CNT = 
 			"SELECT count(*) AS totalResults FROM deal AS d WHERE d.deal_offer_id = :offerId";

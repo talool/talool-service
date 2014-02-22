@@ -23,6 +23,8 @@ public final class DealSummary implements Serializable
 	private Boolean isActive;
 	private UUID merchantId;
 	private String merchantName;
+	private String merchantCity;
+	private String merchantState;
 	private UUID createdByMerchantId;
 	private String createdByMerchantName;
 	private UUID offerId;
@@ -132,6 +134,24 @@ public final class DealSummary implements Serializable
 	}
 	public void setGiftCount(int giftCount) {
 		this.giftCount = giftCount;
+	}
+	public String getMerchantCity() {
+		return merchantCity;
+	}
+	public void setMerchantCity(String merchantCity) {
+		this.merchantCity = merchantCity;
+	}
+	public String getMerchantState() {
+		return merchantState;
+	}
+	public void setMerchantState(String merchantState) {
+		this.merchantState = merchantState;
+	}
+	public int getAcquireCount() {
+		return acquireCount;
+	}
+	public void setAcquireCount(int acquireCount) {
+		this.acquireCount = acquireCount;
 	}
 	
 	

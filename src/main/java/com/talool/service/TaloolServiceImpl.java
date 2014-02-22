@@ -2294,6 +2294,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("tags", StandardBasicTypes.STRING);
 			query.addScalar("imageUrl", StandardBasicTypes.STRING);
 			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("merchantCity", StandardBasicTypes.STRING);
+			query.addScalar("merchantState", StandardBasicTypes.STRING);
 			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
 			query.addScalar("offerTitle", StandardBasicTypes.STRING);
 			query.addScalar("expires", StandardBasicTypes.DATE);
