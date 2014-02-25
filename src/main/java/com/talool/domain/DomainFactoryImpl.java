@@ -143,6 +143,7 @@ final class DomainFactoryImpl implements DomainFactory
 	{
 		DealOffer dealOffer = new DealOfferImpl(merchant, createdByMerchant);
 		dealOffer.setUpdatedByMerchantAccount(createdByMerchant);
+		dealOffer.setActive(false);
 		return dealOffer;
 	}
 
