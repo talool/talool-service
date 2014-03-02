@@ -17,6 +17,25 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="nestedTransactionAllowed" value="true"/>
 	</bean>
+	
+<!-- 	<bean id="jmxExporter"
+        class="org.springframework.jmx.export.MBeanExporter">
+        <property name="beans">
+            <map>
+                <entry key="Hibernate:type=statistics">
+                    <ref local="statisticsBean" />
+                </entry>
+            </map>
+        </property>
+    </bean> 
+
+    <bean id="statisticsBean" class="org.hibernate.jmx.StatisticsService">
+        <property name="statisticsEnabled">
+            <value>true</value>
+        </property>
+        <property name="sessionFactory"><ref local="sessionFactory"/></property>
+    </bean> -->
+	
 
 
 	<tx:annotation-driven order="1" />
@@ -89,8 +108,6 @@
 				<prop key="hibernate.show_sql">${hibernate.show.sql}</prop>
 				<!-- -->
 			
-
-				<prop key="hibernate.generate_statistics">true</prop>
 				<prop key="hibernate.cache.use_structured_entries">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>
 				<prop key="hibernate.cache.use_query_cache">true</prop>

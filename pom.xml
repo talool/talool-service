@@ -55,10 +55,15 @@
 			<version>0.15</version>
 		</dependency>
 		<dependency>
+			<groupId>com.github</groupId>
+			<artifactId>sendgrid-java6</artifactId>
+			<version>0.1.2</version>
+		</dependency>
+		<!-- <dependency>
 			<groupId>jp.co.flect</groupId>
 			<artifactId>sendgrid4j</artifactId>
 			<version>0.9.1</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>com.braintreepayments.gateway</groupId>
 			<artifactId>braintree-java</artifactId>

@@ -40,4 +40,7 @@ public final class ActivityBundle
 	public static final String WELCOME_GIFTS_TITLE = "welcome.gifts.title";
 	public static final String WELCOME_GIFTS_SUBTITLE = "welcome.gifts.subtitle";
 
+	public static final String GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_TITLE = "gift.returned.email.does.not.exist.title";
+	public static final String GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_SUBTITLE = "gift.returned.email.does.not.exist.subtitle";
+
 }

@@ -1580,18 +1580,19 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<DealOfferSummary> getDealOfferSummary(
 			SearchOptions searchOpts, boolean calculateTotalResults)
-			throws ServiceException {
-		
+			throws ServiceException
+	{
+
 		PaginatedResult<DealOfferSummary> paginatedResult = null;
 		List<DealOfferSummary> summaries = null;
 		Long totalResults = null;
-		
+
 		try
 		{
-			
+
 			String newSql = QueryHelper.buildQuery(QueryType.DealOfferSummary, null, searchOpts,
 					true);
-			
+
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(DealOfferSummary.class));
 			query.addScalar("offerId", PostgresUUIDType.INSTANCE);
@@ -1612,7 +1613,6 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("logoUrl", StandardBasicTypes.STRING);
 			query.addScalar("merchantName", StandardBasicTypes.STRING);
 			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
-			
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<DealOfferSummary>) query.list();
@@ -1621,10 +1621,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				totalResults = (Long) getDealOfferSummaryCount();
 			}
-			
+
 			// get the metrics out of the cache and put them on the summaries
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
-			for (DealOfferSummary dos:summaries)
+			for (DealOfferSummary dos : summaries)
 			{
 				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
 				if (meta != null)
@@ -1647,7 +1647,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem getDealOfferSummary: " + ex.getMessage(), ex);
 		}
-		
+
 		return paginatedResult;
 	}
 
@@ -1655,8 +1655,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<DealOfferSummary> getDealOfferSummary(
 			SearchOptions searchOpts, String title,
-			boolean calculateTotalResults) throws ServiceException {
-		
+			boolean calculateTotalResults) throws ServiceException
+	{
+
 		PaginatedResult<DealOfferSummary> paginatedResult = null;
 		List<DealOfferSummary> summaries = null;
 		Long totalResults = null;
@@ -1698,10 +1699,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				totalResults = getDealOfferSummaryCount(title);
 			}
-			
+
 			// get the metrics out of the cache and put them on the summaries
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
-			for (DealOfferSummary dos:summaries)
+			for (DealOfferSummary dos : summaries)
 			{
 				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
 				if (meta != null)
@@ -1716,7 +1717,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions.toString()));
 					}
 				}
-				
+
 			}
 
 			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
@@ -1733,8 +1734,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<DealOfferSummary> getPublisherDealOfferSummary(
 			UUID publisherMerchantId, SearchOptions searchOpts,
-			boolean calculateRowSize) throws ServiceException {
-		
+			boolean calculateRowSize) throws ServiceException
+	{
+
 		PaginatedResult<DealOfferSummary> paginatedResult = null;
 		List<DealOfferSummary> summaries = null;
 		Long totalResults = null;
@@ -1774,10 +1776,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				totalResults = (Long) getPublisherDealOfferSummaryCount(publisherMerchantId);
 			}
-			
+
 			// get the metrics out of the cache and put them on the summaries
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
-			for (DealOfferSummary dos:summaries)
+			for (DealOfferSummary dos : summaries)
 			{
 				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
 				if (meta != null)
@@ -1808,8 +1810,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<DealOfferSummary> getPublisherDealOfferSummaryByTitle(
 			UUID publisherMerchantId, SearchOptions searchOpts, String title,
-			boolean calculateRowSize) throws ServiceException {
-		
+			boolean calculateRowSize) throws ServiceException
+	{
+
 		PaginatedResult<DealOfferSummary> paginatedResult = null;
 		List<DealOfferSummary> summaries = null;
 		Long totalResults = null;
@@ -1852,10 +1855,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				totalResults = getPublisherDealOfferSummaryTitleCount(publisherMerchantId, cleanTitle);
 			}
-			
+
 			// get the metrics out of the cache and put them on the summaries
 			DealOfferMetadataCache cache = DealOfferMetadataCache.get();
-			for (DealOfferSummary dos:summaries)
+			for (DealOfferSummary dos : summaries)
 			{
 				DealOfferMetadata meta = cache.getDealOfferMetrics(dos.getOfferId());
 				if (meta != null)
@@ -1870,7 +1873,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 						dos.setRedemptionCount(map.get(MetricType.TotalRedemptions.toString()));
 					}
 				}
-				
+
 			}
 
 			paginatedResult = new PaginatedResult<DealOfferSummary>(searchOpts, totalResults, summaries);
@@ -1882,9 +1885,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return paginatedResult;
 	}
-	
+
 	@Override
-	public long getDealOfferSummaryCount(final String title) throws ServiceException {
+	public long getDealOfferSummaryCount(final String title) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -1905,7 +1909,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@Override
 	public long getPublisherDealOfferSummaryTitleCount(
-			final UUID publisherMerchantId, final String title) throws ServiceException {
+			final UUID publisherMerchantId, final String title) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -1926,7 +1931,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getDealOfferSummaryCount() throws ServiceException {
+	public long getDealOfferSummaryCount() throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -1946,7 +1952,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@Override
 	public long getPublisherDealOfferSummaryCount(UUID publisherMerchantId)
-			throws ServiceException {
+			throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -1969,18 +1976,19 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<MerchantSummary> getMerchantSummary(
 			SearchOptions searchOpts, boolean calculateTotalResults)
-			throws ServiceException {
-		
+			throws ServiceException
+	{
+
 		PaginatedResult<MerchantSummary> paginatedResult = null;
 		List<MerchantSummary> summaries = null;
 		Long totalResults = null;
-		
+
 		try
 		{
-			
+
 			String newSql = QueryHelper.buildQuery(QueryType.MerchantSummary, null, searchOpts,
 					true);
-			
+
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
@@ -2013,7 +2021,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem getMerchantSummary: " + ex.getMessage(), ex);
 		}
-		
+
 		return paginatedResult;
 	}
 
@@ -2021,19 +2029,20 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<MerchantSummary> getMerchantSummary(
 			SearchOptions searchOpts, String name, boolean calculateTotalResults)
-			throws ServiceException {
-		
+			throws ServiceException
+	{
+
 		PaginatedResult<MerchantSummary> paginatedResult = null;
 		List<MerchantSummary> summaries = null;
 		Long totalResults = null;
 		String cleanName = null;
-		
+
 		try
 		{
-			
+
 			String newSql = QueryHelper.buildQuery(QueryType.MerchantNameSummary, null, searchOpts,
 					true);
-			
+
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
@@ -2051,10 +2060,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
 			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
 			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
-			
+
 			cleanName = name.replaceAll("[*]", "%");
 			query.setParameter("name", cleanName);
-			
+
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<MerchantSummary>) query.list();
 
@@ -2067,9 +2076,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem getMerchantSummary: " + name +": " + ex.getMessage(), ex);
+			throw new ServiceException("Problem getMerchantSummary: " + name + ": " + ex.getMessage(), ex);
 		}
-		
+
 		return paginatedResult;
 	}
 
@@ -2077,18 +2086,19 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<MerchantSummary> getPublisherMerchantSummary(
 			UUID publisherMerchantId, SearchOptions searchOpts,
-			boolean calculateTotalResults) throws ServiceException {
-		
+			boolean calculateTotalResults) throws ServiceException
+	{
+
 		PaginatedResult<MerchantSummary> paginatedResult = null;
 		List<MerchantSummary> summaries = null;
 		Long totalResults = null;
-		
+
 		try
 		{
-			
+
 			String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantSummary, null, searchOpts,
 					true);
-			
+
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
@@ -2106,7 +2116,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
 			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
 			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
-			
+
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
@@ -2123,7 +2133,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem getPublisherMerchantSummary: " + ex.getMessage(), ex);
 		}
-		
+
 		return paginatedResult;
 	}
 
@@ -2131,8 +2141,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<MerchantSummary> getPublisherMerchantSummaryByName(
 			UUID publisherMerchantId, SearchOptions searchOpts, String name,
-			boolean calculateRowSize) throws ServiceException {
-		
+			boolean calculateRowSize) throws ServiceException
+	{
+
 		PaginatedResult<MerchantSummary> paginatedResult = null;
 		List<MerchantSummary> summaries = null;
 		Long totalResults = null;
@@ -2182,9 +2193,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return paginatedResult;
 	}
-	
+
 	@Override
-	public long getMerchantSummaryCount() throws ServiceException {
+	public long getMerchantSummaryCount() throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -2201,9 +2213,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return total == null ? 0 : total;
 	}
-	
+
 	@Override
-	public long getMerchantSummaryCount(String name) throws ServiceException {
+	public long getMerchantSummaryCount(String name) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -2224,8 +2237,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@Override
 	public long getPublisherMerchantSummaryCount(UUID publisherMerchantId)
-			throws ServiceException {
-		
+			throws ServiceException
+	{
+
 		Long total = null;
 
 		try
@@ -2242,12 +2256,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 		return total == null ? 0 : total;
-		
+
 	}
-	
+
 	@Override
 	public long getPublisherMerchantSummaryNameCount(UUID publisherMerchantId,
-			String name) throws ServiceException {
+			String name) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -2271,17 +2286,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@Override
 	public PaginatedResult<DealSummary> getDealSummary(UUID dealOfferId,
 			SearchOptions searchOpts, boolean calculateTotalResults)
-			throws ServiceException {
+			throws ServiceException
+	{
 		PaginatedResult<DealSummary> paginatedResult = null;
 		List<DealSummary> summaries = null;
 		Long totalResults = null;
-		
+
 		try
 		{
-			
+
 			String newSql = QueryHelper.buildQuery(QueryType.DealSummary, null, searchOpts,
 					true);
-			
+
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(DealSummary.class));
 			query.addScalar("dealId", PostgresUUIDType.INSTANCE);
@@ -2305,7 +2321,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("giftCount", StandardBasicTypes.INTEGER);
 
 			query.setParameter("offerId", dealOfferId, PostgresUUIDType.INSTANCE);
-			
+
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<DealSummary>) query.list();
 
@@ -2320,12 +2336,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem getDealSummary: " + ex.getMessage(), ex);
 		}
-		
+
 		return paginatedResult;
 	}
 
 	@Override
-	public long getDealSummaryCount(UUID dealOfferId) throws ServiceException {
+	public long getDealSummaryCount(UUID dealOfferId) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -2345,8 +2362,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public void moveDeals(final List<UUID> dealIds, final UUID dealOfferId, final long merchantAccountId) throws ServiceException {
-		
+	public void moveDeals(final List<UUID> dealIds, final UUID dealOfferId, final long merchantAccountId) throws ServiceException
+	{
+
 		try
 		{
 			final String queryString = QueryHelper.buildQuery(QueryType.MoveDeals, null, null, true);
@@ -2355,14 +2373,52 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
 			query.setParameter("merchantAccountId", merchantAccountId, StandardBasicTypes.LONG);
 			int updates = query.executeUpdate();
-			LOG.debug("moved "+updates+" deals");
+
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug("moved " + updates + " deals");
+			}
+
 		}
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem moveDeals: " + ex.getMessage(), ex);
 		}
-		
-	}
-	
 
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void setIsCustomerEmailValid(final String email, final boolean isValid) throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory.getCurrentSession().getNamedQuery("updateCustomerEmailValid");
+			query.setParameter("isValid", isValid);
+			query.setParameter("email", email);
+			query.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem updating customer isValidEmail: " + ex.getMessage(), ex);
+		}
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void setIsMerchantEmailValid(final String email, final boolean isValid) throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory.getCurrentSession().getNamedQuery("updateMerchantEmailValid");
+			query.setParameter("isValid", isValid);
+			query.setParameter("email", email);
+			query.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem updating merchantLocation isValidEmail: " + ex.getMessage(), ex);
+		}
+	}
 }

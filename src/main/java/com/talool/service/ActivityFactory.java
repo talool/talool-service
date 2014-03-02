@@ -123,6 +123,30 @@ public final class ActivityFactory
 
 	}
 
+	public static Activity createGiftReturnNotExistentEmail(final Gift gift) throws TException
+	{
+		final Activity activity = domainFactory.newActivity(ActivityEvent.EMAIL_RECV_GIFT, gift.getFromCustomer().getId());
+		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.EMAIL_RECV_GIFT);
+
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_TITLE, gift.getDealAcquire().getDeal().getTitle());
+
+		tActivity.setTitle(title);
+
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
+				ActivityBundle.GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_SUBTITLE, ((EmailGift) gift).getToEmail());
+
+		tActivity.setSubtitle(title);
+
+		final ActivityLink_t link = new ActivityLink_t(LinkType.GIFT, gift.getId().toString());
+		tActivity.setActivityLink(link);
+
+		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
+
+		return activity;
+
+	}
+
 	public static Activity createFriendAcceptGift(final Gift gift) throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_ACCEPT, gift.getFromCustomer().getId());

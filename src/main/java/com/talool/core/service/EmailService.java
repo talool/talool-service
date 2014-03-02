@@ -2,6 +2,7 @@ package com.talool.core.service;
 
 import com.talool.core.Customer;
 import com.talool.core.gift.EmailGift;
+import com.talool.service.mail.EmailRequestParams;
 
 /**
  * Talool Email Service
@@ -11,13 +12,10 @@ import com.talool.core.gift.EmailGift;
  */
 public interface EmailService
 {
-	public void sendCustomerRegistrationEmail(final Customer customer) throws ServiceException;
-	
-	public void sendPasswordRecoveryEmail(final Customer customer) throws ServiceException;
+	public void sendCustomerRegistrationEmail(final EmailRequestParams<Customer> emailRequestParams) throws ServiceException;
 
-	public void sendGiftEmail(final EmailGift gift) throws ServiceException;
+	public void sendPasswordRecoveryEmail(final EmailRequestParams<Customer> emailRequestParams) throws ServiceException;
 
-	public void sendEmail(final String subject, final String recipient, final String from, final String messageBody)
-			throws ServiceException;
+	public void sendGiftEmail(final EmailRequestParams<EmailGift> emailRequestParams) throws ServiceException;
 
 }

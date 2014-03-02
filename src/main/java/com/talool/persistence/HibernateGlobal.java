@@ -11,6 +11,14 @@ import org.hibernate.annotations.TypeDefs;
 @MappedSuperclass
 @NamedQueries({
 		@NamedQuery(
+				name = "updateCustomerEmailValid",
+				query = "update CustomerImpl set isValidEmail=:isValid where email=:email"),
+
+		@NamedQuery(
+				name = "updateMerchantEmailValid",
+				query = "update MerchantLocationImpl set isValidEmail=:isValid where email=:email"),
+
+		@NamedQuery(
 				name = "allRelatedDeals",
 				query = "select distinct d from DealImpl d " +
 						"where d.merchant.id=:merchantId OR " +

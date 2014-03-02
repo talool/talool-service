@@ -85,6 +85,9 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "country", unique = false, length = 3)
 	private String country;
 
+	@Column(name = "valid_email")
+	private Boolean isValidEmail;
+
 	@Type(type = "geomType")
 	@Column(name = "geom", nullable = true)
 	private com.vividsolutions.jts.geom.Geometry geometry;
@@ -387,5 +390,17 @@ public class MerchantLocationImpl implements MerchantLocation
 	public UUID getCreatedByMerchantId()
 	{
 		return createdByMerchantId;
+	}
+
+	@Override
+	public boolean isEmailValid()
+	{
+		return (isValidEmail == null || isValidEmail == true) ? true : false;
+	}
+
+	@Override
+	public void setIsEmailValid(boolean isValid)
+	{
+		this.isValidEmail = isValid;
 	}
 }

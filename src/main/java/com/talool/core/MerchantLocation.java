@@ -74,4 +74,16 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 	public Merchant getCreatedByMerchant();
 
 	public UUID getCreatedByMerchantId();
+
+	/**
+	 * Returns true if the email has no known associated issues determined from
+	 * MTA agents. For example, if the email address bounced false would be
+	 * returned. Othwerwise it is believed to be avalid address
+	 * 
+	 * @return
+	 */
+	public boolean isEmailValid();
+
+	public void setIsEmailValid(final boolean isValid);
+
 }

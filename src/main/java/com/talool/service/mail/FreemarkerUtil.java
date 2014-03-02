@@ -25,6 +25,11 @@ public final class FreemarkerUtil
 
 	private static FreemarkerUtil instance;
 
+	public enum TemplateType
+	{
+		Registration, Gift, ResetPassword
+	}
+
 	private FreemarkerUtil() throws IOException
 	{
 		if (ServiceConfig.get().getTemplateDir().startsWith("classpath"))

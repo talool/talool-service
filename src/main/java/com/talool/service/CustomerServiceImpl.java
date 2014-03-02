@@ -74,6 +74,7 @@ import com.talool.payment.TransactionResult;
 import com.talool.payment.braintree.BraintreeUtil;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
+import com.talool.service.mail.EmailRequestParams;
 import com.talool.stats.CustomerSummary;
 import com.talool.stats.PaginatedResult;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -114,7 +115,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		createAccount(AccountType.CUS, customer, password);
 
-		ServiceFactory.get().getEmailService().sendCustomerRegistrationEmail(customer);
+		// We are not sending registration emails in order to avoid 3rd-part email
+		// costs
+
+		// ServiceFactory.get().getEmailService().
+		// sendCustomerRegistrationEmail(new EmailRequestParams<Customer>(customer,
+		// true));
 
 		final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
 		final List<Activity> activities = new ArrayList<Activity>();
@@ -1186,7 +1192,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			{
 				LOG.info("Sending gift email to " + email);
 			}
-			ServiceFactory.get().getEmailService().sendGiftEmail(gift);
+
+			ServiceFactory.get().getEmailService().
+					sendGiftEmail(new EmailRequestParams<EmailGift>(gift));
+
 		}
 
 		return gift.getId();
@@ -1340,7 +1349,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			daoDispatcher.save(customer);
 
-			ServiceFactory.get().getEmailService().sendPasswordRecoveryEmail(customer);
+			ServiceFactory.get().getEmailService().
+					sendPasswordRecoveryEmail(new EmailRequestParams<Customer>(customer));
+
 		}
 		catch (Exception e)
 		{
@@ -1816,5 +1827,27 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		return total == null ? 0 : total;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void giveGiftBackToGiver(final UUID giftId, final String reason) throws ServiceException
+	{
+		Activity activity = null;
+		final Gift gift = getGift(giftId);
+		gift.setGiftStatus(GiftStatus.INVALIDATED);
+		gift.getDealAcquire().setAcquireStatus(AcquireStatus.REJECTED_CUSTOMER_SHARE);
+		daoDispatcher.save(gift);
+
+		try
+		{
+			activity = ActivityFactory.createGiftReturnNotExistentEmail(gift);
+			ServiceFactory.get().getActivityService().save(activity);
+		}
+		catch (TException e)
+		{
+			LOG.error("Problem creating activity :" + e.getLocalizedMessage(), e);
+		}
+
 	}
 }

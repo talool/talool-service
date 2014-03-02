@@ -250,4 +250,12 @@ public interface CustomerService extends HibernateService
 
 	public long getPublisherCustomerSummaryCount(final UUID publisherMerchantId) throws ServiceException;
 
+	/**
+	 * Gives the gift back to the giver with the given reason code
+	 * 
+	 * @param giftId
+	 * @throws ServiceException
+	 */
+	public void giveGiftBackToGiver(final UUID giftId, final String reason) throws ServiceException;
+
 }

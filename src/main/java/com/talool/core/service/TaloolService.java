@@ -79,4 +79,8 @@ public interface TaloolService extends MerchantService, HibernateService
 	 */
 	public DealOffer deepCopyDealOffer(final UUID dealOfferId) throws ServiceException;
 
+	public void setIsCustomerEmailValid(final String email, boolean isValid) throws ServiceException;
+
+	public void setIsMerchantEmailValid(final String email, boolean isValid) throws ServiceException;
+
 }

@@ -73,6 +73,9 @@ public class CustomerImpl implements Customer
 	@Column(name = "reset_pw_expires")
 	private Date resetPassordExpires;
 
+	@Column(name = "valid_email")
+	private Boolean isValidEmail;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = CustomerSocialAccountImpl.class, orphanRemoval = true)
 	@MapKey(name = "socialNetwork")
 	@JoinColumn(name = "customer_id")
@@ -268,6 +271,18 @@ public class CustomerImpl implements Customer
 	public Date getResetPasswordExpires()
 	{
 		return resetPassordExpires;
+	}
+
+	@Override
+	public boolean isEmailValid()
+	{
+		return (isValidEmail == null || isValidEmail == true) ? true : false;
+	}
+
+	@Override
+	public void setIsEmailValid(boolean isValid)
+	{
+		this.isValidEmail = isValid;
 	}
 
 }
