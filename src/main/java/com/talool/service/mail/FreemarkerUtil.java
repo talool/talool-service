@@ -27,7 +27,7 @@ public final class FreemarkerUtil
 
 	public enum TemplateType
 	{
-		Registration, Gift, ResetPassword
+		Registration, Gift, ResetPassword, Feedback
 	}
 
 	private FreemarkerUtil() throws IOException

@@ -61,7 +61,7 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "email", unique = true, nullable = true, length = 64)
 	private String email;
 
-	@Column(name = "website_url", unique = false, nullable = true, length = 128)
+	@Column(name = "website_url", unique = false, nullable = true, length = 256)
 	private String websiteUrl;
 
 	@Column(name = "phone", unique = true, nullable = true, length = 48)

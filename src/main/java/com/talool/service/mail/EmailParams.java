@@ -8,9 +8,20 @@ package com.talool.service.mail;
  */
 public class EmailParams
 {
+
 	private String subject;
 	private String recipient;
 	private String from;
+	private String body;
+
+	public EmailParams(String subject, String recipient, String from, String body)
+	{
+		super();
+		this.subject = subject;
+		this.recipient = recipient;
+		this.from = from;
+		this.body = body;
+	}
 
 	public EmailParams(String subject, String recipient, String from)
 	{
@@ -35,4 +46,8 @@ public class EmailParams
 		return from;
 	}
 
+	public String getBody()
+	{
+		return body;
+	}
 }

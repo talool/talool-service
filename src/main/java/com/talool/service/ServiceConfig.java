@@ -30,18 +30,22 @@ public class ServiceConfig extends PropertiesConfiguration
 	private static final String GIFT_SUBJECT = "gift.subject";
 	private static final String GIFT_LINK = "gift.link";
 	private static final String CONSUMERS_LINK = "consumers.link";
+	private static final String GIFT_RETURNED_LINK = "gift.returned.link";
+
 	private static final String TAG_CACHE_REFRESH_IN_SECS = "tag.cache.refresh.in.secs";
 
 	private static final String BRAINTREE_SANDBOX_ENABLED = "braintree.sandbox.enabled";
 	private static final String BRAINTREE_MERCHANT_ID = "braintree.merchant.id";
 	private static final String BRAINTREE_PUBLIC_KEY = "braintree.public.key";
 	private static final String BRAINTREE_PRIVATE_KEY = "braintree.private.key";
-	
+
 	private static final String UPLOAD_DIR = "upload.dir";
 	private static final String STATIC_LOGO_BASE_URL = "static.logo.base.url";
 	private static final String IMAGE_MAGICK_PATH = "image.magick.path";
-	//private static final String UPLOAD_LOGO_MAX_SIZE_BYTES = "upload.logo.max.size.bytes";
-	//private static final Integer DEFAULT_UPLOAD_LOGO_MAX_SIZE_BYTES = 10240;
+
+	// private static final String UPLOAD_LOGO_MAX_SIZE_BYTES =
+	// "upload.logo.max.size.bytes";
+	// private static final Integer DEFAULT_UPLOAD_LOGO_MAX_SIZE_BYTES = 10240;
 
 	private ServiceConfig(String file) throws ConfigurationException
 	{
@@ -57,6 +61,11 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getBraintreePublicKey()
 	{
 		return getString(BRAINTREE_PUBLIC_KEY);
+	}
+
+	public String getGiftReturnedLink()
+	{
+		return getString(GIFT_RETURNED_LINK);
 	}
 
 	public String getBraintreeMerchantId()
@@ -168,7 +177,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	{
 		return getString(STATIC_LOGO_BASE_URL);
 	}
-	
+
 	public String getUploadDir()
 	{
 		return getString(UPLOAD_DIR);

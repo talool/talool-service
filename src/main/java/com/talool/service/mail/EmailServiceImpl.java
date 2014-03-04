@@ -190,22 +190,28 @@ public class EmailServiceImpl implements EmailService
 	@Override
 	public void sendCustomerRegistrationEmail(EmailRequestParams<Customer> emailRequestParams) throws ServiceException
 	{
-		// TODO Auto-generated method stub
+		throw new ServiceException("UNSUPPORTED FUNCTION");
 
 	}
 
 	@Override
 	public void sendPasswordRecoveryEmail(EmailRequestParams<Customer> emailRequestParams) throws ServiceException
 	{
-		// TODO Auto-generated method stub
+		throw new ServiceException("UNSUPPORTED FUNCTION");
 
 	}
 
 	@Override
 	public void sendGiftEmail(EmailRequestParams<EmailGift> emailRequestParams) throws ServiceException
 	{
-		// TODO Auto-generated method stub
+		throw new ServiceException("UNSUPPORTED FUNCTION");
 
+	}
+
+	@Override
+	public void sendEmail(EmailRequest<?> emailRequest) throws ServiceException
+	{
+		throw new ServiceException("UNSUPPORTED FUNCTION");
 	}
 
 }

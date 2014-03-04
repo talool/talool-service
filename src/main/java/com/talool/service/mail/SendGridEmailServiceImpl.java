@@ -2,12 +2,9 @@ package com.talool.service.mail;
 
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,45 +32,6 @@ public class SendGridEmailServiceImpl implements EmailService
 	private static final Logger LOG = LoggerFactory.getLogger(SendGridEmailServiceImpl.class);
 	private static SendGridEmailServiceImpl instance;
 
-	private class SendGridParams<T>
-	{
-		EmailParams emailParams;
-		String category;
-		TemplateType templateType;
-		T entity;
-		List<SimpleEntry<String, Integer>> uniqueIntVals;
-		List<SimpleEntry<String, String>> uniqueStringVals;
-
-		public SendGridParams addUniqueArg(String key, String val)
-		{
-			if (uniqueStringVals == null)
-			{
-				uniqueStringVals = new ArrayList<SimpleEntry<String, String>>();
-			}
-			uniqueStringVals.add(new SimpleEntry<String, String>(key, val));
-			return this;
-		}
-
-		public SendGridParams addUniqueArg(String key, Integer val)
-		{
-			if (uniqueIntVals == null)
-			{
-				uniqueIntVals = new ArrayList<SimpleEntry<String, Integer>>();
-			}
-			uniqueIntVals.add(new SimpleEntry<String, Integer>(key, val));
-			return this;
-		}
-
-	}
-
-	@SuppressWarnings("unused")
-	private class MailResult
-	{
-		boolean success = false;
-
-		long totalTimeInMillis;
-	}
-
 	private SendGridEmailServiceImpl()
 	{}
 
@@ -87,14 +45,9 @@ public class SendGridEmailServiceImpl implements EmailService
 		return instance;
 	}
 
-	public MailResult sendEmail(final SendGridParams<?> sendGridParams) throws ServiceException
+	public void sendEmail(final EmailRequest<?> sendGridParams) throws ServiceException
 	{
-
 		String renderedBody = null;
-		final MailResult mailResult = new MailResult();
-
-		final StopWatch watch = new StopWatch();
-		watch.start();
 
 		final String userName = ServiceConfig.get().getMailUsername();
 		final String password = ServiceConfig.get().getMailPassword();
@@ -104,18 +57,14 @@ public class SendGridEmailServiceImpl implements EmailService
 			throw new ServiceException("Sendgrid user/pass not defined ");
 		}
 
-		if (LOG.isDebugEnabled())
-		{
-			LOG.debug("Sending email " + sendGridParams.emailParams.toString());
-		}
-
 		try
 		{
-			renderedBody = getRenderedEmailBody(sendGridParams.templateType, sendGridParams.entity);
+			renderedBody = sendGridParams.getEmailParams().getBody() == null ? getRenderedEmailBody(sendGridParams.getTemplateType(),
+					sendGridParams.getEntity()) : sendGridParams.getEmailParams().getBody();
 		}
 		catch (IOException e)
 		{
-			new ServiceException("Problem with freemarker template " + sendGridParams.templateType + " :" + e.getLocalizedMessage(), e);
+			new ServiceException("Problem with freemarker template " + sendGridParams.getTemplateType() + " :" + e.getLocalizedMessage(), e);
 		}
 		catch (TemplateException e)
 		{
@@ -124,28 +73,28 @@ public class SendGridEmailServiceImpl implements EmailService
 
 		final SendgridClient sendgrid = new SendgridClient(userName, password);
 
-		sendgrid.addTo(sendGridParams.emailParams.getRecipient());
-		sendgrid.setFrom(sendGridParams.emailParams.getFrom());
-		sendgrid.setSubject(sendGridParams.emailParams.getSubject());
+		sendgrid.addTo(sendGridParams.getEmailParams().getRecipient());
+		sendgrid.setFrom(sendGridParams.getEmailParams().getFrom());
+		sendgrid.setSubject(sendGridParams.getEmailParams().getSubject());
 
 		sendgrid.setHtml(renderedBody);
 
-		if (sendGridParams.category != null)
+		if (sendGridParams.getCategory() != null)
 		{
-			sendgrid.setCategory(sendGridParams.category);
+			sendgrid.setCategory(sendGridParams.getCategory());
 		}
 
-		if (CollectionUtils.isNotEmpty(sendGridParams.uniqueStringVals))
+		if (CollectionUtils.isNotEmpty(sendGridParams.getUniqueStringVals()))
 		{
-			for (SimpleEntry<String, String> keyVal : sendGridParams.uniqueStringVals)
+			for (SimpleEntry<String, String> keyVal : sendGridParams.getUniqueStringVals())
 			{
 				sendgrid.addUniqueArgument(keyVal.getKey(), keyVal.getValue());
 			}
 		}
 
-		if (CollectionUtils.isNotEmpty(sendGridParams.uniqueIntVals))
+		if (CollectionUtils.isNotEmpty(sendGridParams.getUniqueIntVals()))
 		{
-			for (SimpleEntry<String, Integer> keyVal : sendGridParams.uniqueIntVals)
+			for (SimpleEntry<String, Integer> keyVal : sendGridParams.getUniqueIntVals())
 			{
 				sendgrid.addUniqueArgument(keyVal.getKey(), keyVal.getValue());
 			}
@@ -153,26 +102,24 @@ public class SendGridEmailServiceImpl implements EmailService
 
 		try
 		{
-			sendgrid.buildSmtpApiHeader().send();
+			sendgrid.buildSmtpApiHeader().sendMail();
+
 			if (LOG.isDebugEnabled())
 			{
-				LOG.debug("Success sending " + sendGridParams.templateType + ", " + sendGridParams.emailParams.getRecipient());
+				LOG.debug(String.format("Success sending email from: %s to: %s subj: %s",
+						sendGridParams.getEmailParams().getFrom(), sendGridParams.getEmailParams().getRecipient(), sendGridParams.getEmailParams().getSubject()));
 			}
-			mailResult.success = true;
+
+		}
+		catch (ServiceException e)
+		{
+			throw e;
 		}
 		catch (Exception e)
 		{
-			throw new ServiceException("Email failed " + sendGridParams.templateType + ", " + sendGridParams.emailParams.getRecipient() + ": "
-					+ e.getLocalizedMessage(),
-					e);
+			throw new ServiceException(String.format("Failed sending email from: %s to: %s subj: %s", sendGridParams.getEmailParams().getRecipient(),
+					sendGridParams.getEmailParams().getFrom(), sendGridParams.getEmailParams().getSubject()), e);
 		}
-		finally
-		{
-			watch.stop();
-			mailResult.totalTimeInMillis = watch.getTime();
-		}
-
-		return mailResult;
 
 	}
 
@@ -184,10 +131,10 @@ public class SendGridEmailServiceImpl implements EmailService
 		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getRegistrationSubj(),
 				emailRequestParams.getEntity().getEmail(), ServiceConfig.get().getMailFrom());
 
-		final SendGridParams<Customer> sendGridParams = new SendGridParams<Customer>();
-		sendGridParams.emailParams = emailParams;
-		sendGridParams.category = EmailCategory.Registration.toString();
-		sendGridParams.templateType = TemplateType.Registration;
+		final EmailRequest<Customer> sendGridParams = new EmailRequest<Customer>();
+		sendGridParams.setEmailParams(emailParams);
+		sendGridParams.setCategory(EmailCategory.Registration.toString());
+		sendGridParams.setTemplateType(TemplateType.Registration);
 
 		sendEmail(sendGridParams);
 
@@ -202,11 +149,11 @@ public class SendGridEmailServiceImpl implements EmailService
 		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getPasswordRecoverySubj(),
 				customer.getEmail(), ServiceConfig.get().getMailFrom());
 
-		final SendGridParams<Customer> sendGridParams = new SendGridParams<Customer>();
-		sendGridParams.category = EmailCategory.PasswordRecovery.toString();
-		sendGridParams.emailParams = emailParams;
-		sendGridParams.entity = customer;
-		sendGridParams.templateType = TemplateType.ResetPassword;
+		final EmailRequest<Customer> sendGridParams = new EmailRequest<Customer>();
+		sendGridParams.setCategory(EmailCategory.PasswordRecovery.toString());
+		sendGridParams.setEmailParams(emailParams);
+		sendGridParams.setEntity(customer);
+		sendGridParams.setTemplateType(TemplateType.ResetPassword);
 
 		sendEmail(sendGridParams);
 
@@ -249,11 +196,11 @@ public class SendGridEmailServiceImpl implements EmailService
 		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getRegistrationSubj(),
 				emailRequestParams.getEntity().getToEmail(), ServiceConfig.get().getMailFrom());
 
-		final SendGridParams<EmailGift> sendGridParams = new SendGridParams<EmailGift>();
-		sendGridParams.emailParams = emailParams;
-		sendGridParams.category = EmailCategory.Gift.toString();
-		sendGridParams.templateType = TemplateType.Gift;
-		sendGridParams.entity = emailRequestParams.getEntity();
+		final EmailRequest<EmailGift> sendGridParams = new EmailRequest<EmailGift>();
+		sendGridParams.setEmailParams(emailParams);
+		sendGridParams.setCategory(EmailCategory.Gift.toString());
+		sendGridParams.setTemplateType(TemplateType.Gift);
+		sendGridParams.setEntity(emailRequestParams.getEntity());
 		sendGridParams.addUniqueArg("emailGiftId", emailRequestParams.getEntity().getId().toString());
 
 		sendEmail(sendGridParams);
