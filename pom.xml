@@ -20,21 +20,55 @@
 	</properties>
 	<repositories>
 		<repository>
+			<id>talool-maven-thirdparty</id>
+			<url>http://maven.talool.com:8081/nexus/content/repositories/thirdparty/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>talool-maven-release</id>
 			<url>http://maven.talool.com:8081/nexus/content/repositories/releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>OSGEO GeoTools repo</id>
 			<url>http://download.osgeo.org/webdav/geotools</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>Hibernate Spatial repo</id>
 			<url>http://www.hibernatespatial.org/repository</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>flect</id>
 			<name>flect</name>
 			<url>http://flect.github.io/maven-repo/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
@@ -59,11 +93,8 @@
 			<artifactId>sendgrid-java6</artifactId>
 			<version>0.1.2</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>jp.co.flect</groupId>
-			<artifactId>sendgrid4j</artifactId>
-			<version>0.9.1</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>jp.co.flect</groupId> <artifactId>sendgrid4j</artifactId> 
+			<version>0.9.1</version> </dependency> -->
 		<dependency>
 			<groupId>com.braintreepayments.gateway</groupId>
 			<artifactId>braintree-java</artifactId>
