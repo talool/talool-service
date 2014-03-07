@@ -1,6 +1,7 @@
 package com.talool.domain;
 
 import java.util.Date;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -216,6 +217,16 @@ public class DealOfferImpl implements DealOffer
 		newDealOffer.setSummary(this.summary);
 		newDealOffer.setTitle(this.title);
 		newDealOffer.setUpdatedByMerchantAccount(this.updatedByMerchantAccount);
+
+		Properties properties = getProperties();
+		Properties propsNew = new Properties();
+		for (Entry<String, String> entry : properties.getAllProperties().entrySet())
+		{
+			propsNew.createOrReplace(entry.getKey(), entry.getValue());
+
+		}
+
+		newDealOffer.properties = propsNew;
 
 		return newDealOffer;
 	}
