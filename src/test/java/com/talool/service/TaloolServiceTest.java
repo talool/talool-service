@@ -132,7 +132,6 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Boulder_CO = domainFactory.newLocation(-105.281686, 40.017663);
 	}
 
-	@Test
 	public void testDealOfferProperties() throws ServiceException
 	{
 
