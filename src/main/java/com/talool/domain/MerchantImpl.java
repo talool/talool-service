@@ -105,6 +105,9 @@ public class MerchantImpl implements Merchant
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
+	@Embedded
+	private Properties properties;
+
 	public UUID getId()
 	{
 		return id;
@@ -304,5 +307,11 @@ public class MerchantImpl implements Merchant
 	public void setIsDiscoverable(boolean isDiscoverable)
 	{
 		this.isDiscoverable = isDiscoverable;
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		return properties;
 	}
 }

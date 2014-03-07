@@ -119,6 +119,9 @@ public class MerchantLocationImpl implements MerchantLocation
 	@Column(name = "created_by_merchant_id", insertable = false, updatable = false)
 	private UUID createdByMerchantId;
 
+	@Embedded
+	private Properties properties;
+
 	public Long getId()
 	{
 		return id;
@@ -402,5 +405,11 @@ public class MerchantLocationImpl implements MerchantLocation
 	public void setIsEmailValid(boolean isValid)
 	{
 		this.isValidEmail = isValid;
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		return properties;
 	}
 }

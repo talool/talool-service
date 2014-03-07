@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
+import com.talool.domain.Properties;
+
 /**
  * Merchant interface
  * 
@@ -57,5 +59,7 @@ public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
 	public boolean isDiscoverable();
 
 	public void setIsDiscoverable(boolean isDiscoverable);
+
+	public Properties getProperties();
 
 }

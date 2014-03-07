@@ -1,21 +1,33 @@
 
 create extension HSTORE;
 
-alter table deal_offer add column properties HSTORE;
+ALTER TABLE deal_offer add column properties HSTORE;
 
 CREATE INDEX deal_offer_properties_idx ON deal_offer USING BTREE (properties);
 
 CREATE INDEX deal_offer_properties_gist_idx ON deal_offer USING GIST (properties);
 
-alter table merchant add column properties HSTORE;
+ALTER TABLE merchant add column properties HSTORE;
 
-alter table merchant_account add column properties HSTORE;
+CREATE INDEX merchant_properties_gist_idx ON merchant USING GIST (properties);
+
+CREATE INDEX merchant_properties_idx ON merchant USING BTREE (properties);
+
+ALTER TABLE merchant_account add column properties HSTORE;
+
+CREATE INDEX merchant_account_properties_gist_idx ON merchant_account USING GIST (properties);
+
+CREATE INDEX merchant_account_properties_idx ON merchant_account USING BTREE (properties);
+
+ALTER TABLE merchant_location add column properties HSTORE;
+
+CREATE INDEX merchant_location_properties_gist_idx ON merchant_location USING GIST (properties);
+
+CREATE INDEX merchant_location_properties_idx ON merchant_location USING BTREE (properties);
 
 
 
 -- http://www.youlikeprogramming.com/2011/11/working-with-the-hstore-data-type-in-postgresql-9-0/
-
-https://github.com/jamesward/spring_hibernate_hstore_demo
 
 -- Setting values
 UPDATE deal_offer SET properties = '"zone"=>"7748","subscription"=>"true","rank"=>"148","sold_last_year"="78412"'::hstore;

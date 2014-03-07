@@ -2475,24 +2475,23 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				case DealOffer:
 					query = sessionFactory.getCurrentSession()
 							.createSQLQuery("update properties set properties=:properties where deal_offer_id=:id");
-					// query.setPar("properties", (Object) properties.getAllProperties(),
-					// HstoreUserType.class);
 
 					break;
 
 				case Merchant:
 					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("select distinct skeys( properties ) as keys from merchant");
+							.createSQLQuery("update properties set properties=:properties where merchant_id=:id");
+
 					break;
 
 				case MerchantLocation:
 					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
+							.createSQLQuery("update properties set properties=:properties where merchant_location_id=:id");
 					break;
 
 				case MerchantAccount:
 					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_account");
+							.createSQLQuery("update properties set properties=:properties where merchant_account_id=:id");
 					break;
 			}
 

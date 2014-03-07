@@ -157,6 +157,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			System.out.println(entry.getKey() + " -> " + entry.getValue());
 		}
 
+		properties.getAsFloat("velocity");
 		properties = dealOffer.getProperties();
 		properties.remove("position");
 

@@ -3,6 +3,7 @@ package com.talool.core;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.talool.domain.Properties;
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface MerchantLocation extends Identifiable, Serializable, TimeAware
@@ -85,5 +86,7 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware
 	public boolean isEmailValid();
 
 	public void setIsEmailValid(final boolean isValid);
+
+	public Properties getProperties();
 
 }
