@@ -24,6 +24,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 import com.talool.core.DealOffer;
 import com.talool.core.DealType;
@@ -31,18 +32,24 @@ import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantMedia;
 import com.talool.persistence.GenericEnumUserType;
+import com.talool.persistence.HstoreUserType;
 
 /**
  * DealOffer Impl
  * 
  * TODO Create Money object and replace price
  * 
+ * 
  * @author clintz
  * 
  */
 @Entity
 @Table(name = "deal_offer", catalog = "public")
-@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.core.DealType") })
+@TypeDefs({
+		@TypeDef(name = "dealType", typeClass = GenericEnumUserType.class, parameters =
+		{ @Parameter(name = "enumClass", value = "com.talool.core.DealType") }),
+		@TypeDef(name = "hstore", typeClass = HstoreUserType.class)
+})
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DealOfferImpl implements DealOffer
 {
@@ -113,6 +120,9 @@ public class DealOfferImpl implements DealOffer
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
+
+	@Embedded
+	private Properties properties;
 
 	public DealOfferImpl()
 	{}
@@ -417,6 +427,12 @@ public class DealOfferImpl implements DealOffer
 	public MerchantMedia getDealOfferIcon()
 	{
 		return dealOfferIcon;
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		return properties;
 	}
 
 }

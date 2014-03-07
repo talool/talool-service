@@ -14,6 +14,7 @@ import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.Tag;
 import com.talool.core.social.SocialNetwork;
+import com.talool.domain.Properties;
 import com.talool.service.HibernateService;
 
 /**
@@ -82,5 +83,21 @@ public interface TaloolService extends MerchantService, HibernateService
 	public void setIsCustomerEmailValid(final String email, boolean isValid) throws ServiceException;
 
 	public void setIsMerchantEmailValid(final String email, boolean isValid) throws ServiceException;
+
+	public enum PropertySupportedEntity
+	{
+		DealOffer, Merchant, MerchantLocation
+	};
+
+	/**
+	 * Gets the unique property keys for the dealOffers
+	 * 
+	 * @param entityInterfaceClass
+	 * @return
+	 * @throws ServiceException
+	 */
+	public List<String> getUniqueProperyKeys(final PropertySupportedEntity entity) throws ServiceException;
+
+	public void saveProperties(final PropertySupportedEntity entity, final UUID entityId, final Properties properties) throws ServiceException;
 
 }

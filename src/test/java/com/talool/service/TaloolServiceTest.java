@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -57,6 +58,7 @@ import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.MerchantMediaImpl;
+import com.talool.domain.Properties;
 import com.talool.stats.CustomerSummary;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.DealAcquireComparator;
@@ -128,6 +130,39 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		domainFactory = FactoryManager.get().getDomainFactory();
 		Binghamton_NY = domainFactory.newLocation(-75.98, 42.23);
 		Boulder_CO = domainFactory.newLocation(-105.281686, 40.017663);
+	}
+
+	@Test
+	public void testDealOfferProperties() throws ServiceException
+	{
+
+		DealOffer dealOffer = taloolService.getDealOffer(UUID.fromString("4d54d8ef-febb-4719-b9f0-a73578a41803"));
+		Properties properties = dealOffer.getProperties();
+
+		if (properties == null)
+		{
+			properties = new Properties();
+		}
+
+		properties.createOrReplace("last", "lintz" + System.currentTimeMillis());
+		properties.createOrReplace("first", "chris" + System.currentTimeMillis());
+		properties.createOrReplace("position", 3);
+		properties.createOrReplace("velocity", 3.3191);
+
+		taloolService.save(dealOffer);
+
+		dealOffer = taloolService.getDealOffer(UUID.fromString("4d54d8ef-febb-4719-b9f0-a73578a41803"));
+
+		for (Entry<String, String> entry : properties.getAllProperties().entrySet())
+		{
+			System.out.println(entry.getKey() + " -> " + entry.getValue());
+		}
+
+		properties = dealOffer.getProperties();
+		properties.remove("position");
+
+		taloolService.save(dealOffer);
+
 	}
 
 	@Test

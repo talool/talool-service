@@ -72,6 +72,7 @@ import com.talool.domain.MerchantAccountImpl;
 import com.talool.domain.MerchantIdentityImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantLocationImpl;
+import com.talool.domain.Properties;
 import com.talool.domain.TagImpl;
 import com.talool.domain.social.SocialNetworkImpl;
 import com.talool.persistence.QueryHelper;
@@ -2420,5 +2421,77 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem updating merchantLocation isValidEmail: " + ex.getMessage(), ex);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getUniqueProperyKeys(final PropertySupportedEntity entity) throws ServiceException
+	{
+		SQLQuery query = null;
+
+		try
+		{
+			switch (entity)
+			{
+				case DealOffer:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("select distinct skeys( properties ) as keys from deal_offer");
+					break;
+
+				case Merchant:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("select distinct skeys( properties ) as keys from merchant");
+					break;
+
+				case MerchantLocation:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
+					break;
+			}
+
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void saveProperties(final PropertySupportedEntity entity, final UUID entityId, final Properties properties) throws ServiceException
+	{
+		SQLQuery query = null;
+
+		try
+		{
+			switch (entity)
+			{
+				case DealOffer:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("update properties set properties=:properties where deal_offer_id=:id");
+					// query.setPar("properties", (Object) properties.getAllProperties(),
+					// HstoreUserType.class);
+
+					break;
+
+				case Merchant:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("select distinct skeys( properties ) as keys from merchant");
+					break;
+
+				case MerchantLocation:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
+					break;
+			}
+
+			query.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
+		}
+
 	}
 }
