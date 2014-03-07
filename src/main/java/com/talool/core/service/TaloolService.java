@@ -86,7 +86,7 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public enum PropertySupportedEntity
 	{
-		DealOffer, Merchant, MerchantLocation
+		DealOffer, Merchant, MerchantAccount, MerchantLocation
 	};
 
 	/**

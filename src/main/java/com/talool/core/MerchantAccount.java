@@ -2,6 +2,8 @@ package com.talool.core;
 
 import java.io.Serializable;
 
+import com.talool.domain.Properties;
+
 /**
  * 
  * @author clintz
@@ -26,5 +28,7 @@ public interface MerchantAccount extends Identifiable, Serializable, TimeAware
 	public boolean allowDealCreation();
 
 	public void setAllowDealCreation(boolean allowDealCreation);
+
+	public Properties getProperties();
 
 }

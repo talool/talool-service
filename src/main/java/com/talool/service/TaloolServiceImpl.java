@@ -2443,6 +2443,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 							.createSQLQuery("select distinct skeys( properties ) as keys from merchant");
 					break;
 
+				case MerchantAccount:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_account");
+					break;
+
 				case MerchantLocation:
 					query = sessionFactory.getCurrentSession()
 							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
@@ -2483,6 +2488,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				case MerchantLocation:
 					query = sessionFactory.getCurrentSession()
 							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
+					break;
+
+				case MerchantAccount:
+					query = sessionFactory.getCurrentSession()
+							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_account");
 					break;
 			}
 

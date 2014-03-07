@@ -59,6 +59,9 @@ public class MerchantAccountImpl implements MerchantAccount
 	private boolean allowDealCreation;
 
 	@Embedded
+	private Properties properties;
+
+	@Embedded
 	private CreatedUpdated createdUpdated;
 
 	public MerchantAccountImpl()
@@ -192,6 +195,12 @@ public class MerchantAccountImpl implements MerchantAccount
 	public String toString()
 	{
 		return ReflectionToStringBuilder.toString(this);
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		return properties;
 	}
 
 }
