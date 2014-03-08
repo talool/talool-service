@@ -701,9 +701,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			daoDispatcher.save(favMerchant);
 		}
+		catch (ConstraintViolationException ce)
+		{
+			LOG.warn(String.format("favorite merch was out-of-sync customerId '%s' and merchant '%s'", customerId, merchantId));
+		}
 		catch (Exception e)
 		{
-			throw new ServiceException(String.format("There was a problem adding favorite merchant: customerId %s merchantId %s",
+			throw new ServiceException(String.format("There was a problem adding favorite merch: customerId %s merchantId %s",
 					customerId, merchantId));
 		}
 
