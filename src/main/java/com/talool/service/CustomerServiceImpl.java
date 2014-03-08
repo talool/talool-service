@@ -700,6 +700,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			daoDispatcher.save(favMerchant);
+			getCurrentSession().flush();
 		}
 		catch (ConstraintViolationException ce)
 		{
