@@ -36,90 +36,90 @@ public final class QueryHelper
 					"and d.deal_offer_id = dof.deal_offer_id and m.merchant_id=d.merchant_id " +
 					"group by dof.deal_offer_id ";
 	// "order by totalMerchants desc";
-	
+
 	private static final String DEAL_OFFER_SUMMARY =
 			"select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
-				+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
-				+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
-				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
-				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
-				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) ";
-	
-	private static final String DEAL_OFFER_TITLE_SUMMARY = 
+					+ "o.deal_type as offerType, o.price as price,o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
+					+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+					+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+					+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+					+ "from deal_offer as o "
+					+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) ";
+
+	private static final String DEAL_OFFER_TITLE_SUMMARY =
 			"select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
-				+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
-				+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
-				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
-				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
-				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
-				+ "where o.title like :title ";
-	
+					+ "o.deal_type as offerType, o.price as price, o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
+					+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+					+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+					+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+					+ "from deal_offer as o "
+					+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
+					+ "where o.title like :title ";
+
 	private static final String PUBLISHER_DEAL_OFFER_SUMMARY =
 			"select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
-				+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
-				+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
-				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
-				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
-				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
-				+ "where o.merchant_id=:publisherMerchantId ";
-	
-	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY = 
+					+ "o.deal_type as offerType, o.price as price, o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
+					+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+					+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+					+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+					+ "from deal_offer as o "
+					+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
+					+ "where o.merchant_id=:publisherMerchantId ";
+
+	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY =
 			"select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
-				+ "o.deal_type as offerType, o.price as price, o.expires as expires, o.is_active as isActive,"
-				+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
-				+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
-				+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
-				+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
-				+ "from deal_offer as o "
-				+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
-				+ "where o.title like :title and o.merchant_id=:publisherMerchantId";
-	
-	private static final String MERCHANT_SUMMARY_CNT = 
+					+ "o.deal_type as offerType, o.price as price, o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
+					+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_icon_id) as iconUrl,"
+					+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_logo_id) as logoUrl,"
+					+ "(select merchant_name from merchant as m where m.merchant_id = o.merchant_id) as merchantName,"
+					+ "(select m.merchant_name from merchant as m, merchant_account as ma where m.merchant_id = ma.merchant_id and ma.merchant_account_id = o.created_by_merchant_account_id) as createdByMerchantName "
+					+ "from deal_offer as o "
+					+ "LEFT JOIN (SELECT merchant_location_id, merchant_id, merchant_location_name, address1, address2, city, state_province_county, geom, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
+					+ "where o.title like :title and o.merchant_id=:publisherMerchantId";
+
+	private static final String MERCHANT_SUMMARY_CNT =
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
-	
-	private static final String MERCHANT_NAME_SUMMARY_CNT = 
+
+	private static final String MERCHANT_NAME_SUMMARY_CNT =
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
-	
-	private static final String PUBLISHER_MERCHANT_SUMMARY_CNT = 
+
+	private static final String PUBLISHER_MERCHANT_SUMMARY_CNT =
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
-	
-	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY_CNT = 
+
+	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY_CNT =
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
-	
+
 	private static final String MERCHANT_SUMMARY =
 			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
@@ -133,7 +133,7 @@ public final class QueryHelper
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
-	
+
 	private static final String MERCHANT_NAME_SUMMARY =
 			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
@@ -147,8 +147,8 @@ public final class QueryHelper
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
-	
-	private static final String PUBLISHER_MERCHANT_SUMMARY = 
+
+	private static final String PUBLISHER_MERCHANT_SUMMARY =
 			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
 					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
@@ -161,8 +161,8 @@ public final class QueryHelper
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
-	
-	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY = 
+
+	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY =
 			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
 					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
@@ -247,7 +247,7 @@ public final class QueryHelper
 	private static final String ALL_CUSTOMER_EMAIL_SUMMARY_CNT = "select count(*) as totalResults from customer where email like :email";
 
 	private static final String CUSTOMER_SUMMARY_CNT = "select count(*) as totalResults from customer";
-	
+
 	private static final String DEAL_OFFER_SUMMARY_CNT = "select count(*) as totalResults from deal_offer";
 
 	private static final String PUBLISHER_CUSTOMER_SUMMARY_CNT = "select count(distinct c.customer_id) as totalResults from customer as c, deal_offer_purchase as dop,deal_offer as dof "
@@ -255,12 +255,12 @@ public final class QueryHelper
 
 	private static final String PUBLISHER_DEAL_OFFER_SUMMARY_CNT = "select count(deal_offer_id) as totalResults from deal_offer "
 			+ "where merchant_id=:publisherMerchantId";
-	
+
 	private static final String PUBLISHER_CUSTOMER_EMAIL_SUMMARY_CNT = "select count(distinct c.customer_id) as totalResults from customer as c, deal_offer_purchase as dop,deal_offer as dof "
 			+ "where dop.deal_offer_id=dof.deal_offer_id and dof.merchant_id=:publisherMerchantId and c.customer_id=dop.customer_id and c.email like :email";
-	
+
 	private static final String DEAL_OFFER_TITLE_SUMMARY_CNT = "select count(*) as totalResults from deal_offer where title like :title";
-	
+
 	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY_CNT = "select count(*) as totalResults from deal_offer "
 			+ "where merchant_id=:publisherMerchantId and title like :title";
 
@@ -281,16 +281,15 @@ public final class QueryHelper
 					+ "and mloc.merchant_id=merchant.merchant_id and merchant.category_id=cat.category_id and merchant.is_discoverable=${isDiscoverable}";
 
 	public static final String ACTIVE_DEAL_OFFER_IDS_WITHIN_METERS =
-			"select dof.deal_offer_id as dealOfferId," +
-					"ST_Distance( dof.geom, '${point}',true) as distanceInMeters " +
-					"from public.deal_offer as dof " +
-					"where ST_DWithin(dof.geom,'${point}',${distanceInMeters},true) and " +
-					"dof.is_active=true and (expires is null OR expires>now())";
+			"select dof.deal_offer_id as dealOfferId,"
+					+ "ST_Distance( dof.geom, '${point}',true) as distanceInMeters "
+					+ "from public.deal_offer as dof "
+					+ "where dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true)";
 
 	public static final String ACTIVE_DEAL_OFFER_IDS =
 			"select deal_offer_id as dealOfferId " +
 					"from public.deal_offer " +
-					"where is_active=true and (expires is null OR expires>now())";
+					"where is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt";
 
 	public static final String DEAL_ACQUIRES =
 			"select distinct dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d " +
@@ -340,39 +339,39 @@ public final class QueryHelper
 	// setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 	private static final String ACTIVE_DEALS_BY_DEAL_OFFER_ID = "select d from DealImpl as d left join fetch d.image left join fetch d.merchant as merchant "
 			+
-			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId and d.isActive=true and d.expires>now()";
+			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId and d.isActive=true and d.expires>now() at time zone 'utc'";
 
 	private static final String MERCHANTS_BY_DEAL_OFFER_ID = "select distinct merchant from MerchantImpl as merchant,DealImpl as dof where dof.dealOffer.id=:dealOfferId and dof.merchant.id=merchant.id";
 
-	private static final String DEAL_SUMMARY = 
+	private static final String DEAL_SUMMARY =
 			"SELECT d.deal_id AS dealId, d.deal_offer_id AS offerId, d.merchant_id AS merchantId, d.title AS title, d.summary AS summary, d.details AS details, "
-				+ "d.expires AS expires, d.is_active AS isActive, l.city AS merchantCity, l.state_province_county AS merchantState, "
-				+ "(SELECT array_to_string(array(SELECT DISTINCT t.name FROM tag AS t, deal_tag AS dt WHERE dt.deal_id = d.deal_id AND dt.tag_id = t.tag_id),', ')) AS tags, "
-				+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = d.image_id) AS imageUrl,"
-				+ "(SELECT m.merchant_name FROM merchant AS m WHERE m.merchant_id = d.merchant_id) AS merchantName,"
-				+ "(SELECT m.merchant_name FROM merchant AS m, merchant_account AS ma "
-				+ "WHERE ma.merchant_id = m.merchant_id AND ma.merchant_account_id = d.created_by_merchant_account_id) AS createdByMerchantName,"
-				+ "(SELECT m.merchant_id FROM merchant AS m, merchant_account AS ma "
-				+ "WHERE ma.merchant_id = m.merchant_id AND ma.merchant_account_id = d.created_by_merchant_account_id) AS createdByMerchantId,"
-				+ "(SELECT o.title FROM deal_offer AS o WHERE o.deal_offer_id = d.deal_offer_id) AS offerTitle,"
-				+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id) AS acquireCount,"
-				+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND da.acquire_status = 'REDEEMED') AS redemptionCount,"
-				+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND "
-				+ "(da.acquire_status = 'PENDING_ACCEPT_CUSTOMER_SHARE' OR da.acquire_status = 'ACCEPTED_CUSTOMER_SHARE' OR da.acquire_status = 'REJECTED_CUSTOMER_SHARE')) AS giftCount "
-				+ "FROM deal AS d "
-				+ "JOIN (SELECT merchant_location_id, merchant_id, city, state_province_county, create_dt FROM merchant_location ml1 "
-				+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-				+ "ON (d.merchant_id = l.merchant_id) "
-				+ "WHERE d.deal_offer_id = :offerId";
-	
-	private static final String DEAL_SUMMARY_CNT = 
+					+ "d.expires AS expires, d.is_active AS isActive, l.city AS merchantCity, l.state_province_county AS merchantState, "
+					+ "(SELECT array_to_string(array(SELECT DISTINCT t.name FROM tag AS t, deal_tag AS dt WHERE dt.deal_id = d.deal_id AND dt.tag_id = t.tag_id),', ')) AS tags, "
+					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = d.image_id) AS imageUrl,"
+					+ "(SELECT m.merchant_name FROM merchant AS m WHERE m.merchant_id = d.merchant_id) AS merchantName,"
+					+ "(SELECT m.merchant_name FROM merchant AS m, merchant_account AS ma "
+					+ "WHERE ma.merchant_id = m.merchant_id AND ma.merchant_account_id = d.created_by_merchant_account_id) AS createdByMerchantName,"
+					+ "(SELECT m.merchant_id FROM merchant AS m, merchant_account AS ma "
+					+ "WHERE ma.merchant_id = m.merchant_id AND ma.merchant_account_id = d.created_by_merchant_account_id) AS createdByMerchantId,"
+					+ "(SELECT o.title FROM deal_offer AS o WHERE o.deal_offer_id = d.deal_offer_id) AS offerTitle,"
+					+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id) AS acquireCount,"
+					+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND da.acquire_status = 'REDEEMED') AS redemptionCount,"
+					+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND "
+					+ "(da.acquire_status = 'PENDING_ACCEPT_CUSTOMER_SHARE' OR da.acquire_status = 'ACCEPTED_CUSTOMER_SHARE' OR da.acquire_status = 'REJECTED_CUSTOMER_SHARE')) AS giftCount "
+					+ "FROM deal AS d "
+					+ "JOIN (SELECT merchant_location_id, merchant_id, city, state_province_county, create_dt FROM merchant_location ml1 "
+					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+					+ "ON (d.merchant_id = l.merchant_id) "
+					+ "WHERE d.deal_offer_id = :offerId";
+
+	private static final String DEAL_SUMMARY_CNT =
 			"SELECT count(*) AS totalResults FROM deal AS d WHERE d.deal_offer_id = :offerId";
-	
-	private static final String MOVE_DEALS = 
-			 "UPDATE deal "
-				+ "SET deal_offer_id = :dealOfferId, updated_by_merchant_account_id = :merchantAccountId "
-				+ "WHERE deal_id IN (:dealIds)";
-	
+
+	private static final String MOVE_DEALS =
+			"UPDATE deal "
+					+ "SET deal_offer_id = :dealOfferId, updated_by_merchant_account_id = :merchantAccountId "
+					+ "WHERE deal_id IN (:dealIds)";
+
 	public enum QueryType
 	{
 		MerchantsWithinMeters(MERCHANTS_WITHIN_METERS,
@@ -435,7 +434,7 @@ public final class QueryHelper
 				put("merchant.updated", "merchant.createdUpdated.updated").build()),
 
 		MerchantAcquiresByCatId(MERCHANT_ACQUIRES_BY_CAT_ID, EMPTY_IMMUTABLE_PROPS),
-		
+
 		DealOfferSummary(DEAL_OFFER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		DealOfferSummaryCnt(DEAL_OFFER_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 		DealOfferTitleSummaryCnt(DEAL_OFFER_TITLE_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
@@ -444,8 +443,7 @@ public final class QueryHelper
 		PublisherDealOfferSummary(PUBLISHER_DEAL_OFFER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		DealOfferTitleSummary(DEAL_OFFER_TITLE_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		PublisherDealOfferTitleSummary(PUBLISHER_DEAL_OFFER_TITLE_SUMMARY, EMPTY_IMMUTABLE_PROPS),
-		
-		
+
 		MerchantSummaryCnt(MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 		MerchantNameSummaryCnt(MERCHANT_NAME_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 		PublisherMerchantSummaryCnt(PUBLISHER_MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
@@ -453,11 +451,11 @@ public final class QueryHelper
 		MerchantSummary(MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		MerchantNameSummary(MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		PublisherMerchantSummary(PUBLISHER_MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS),
-		PublisherMerchantNameSummary(PUBLISHER_MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS), 
-		
+		PublisherMerchantNameSummary(PUBLISHER_MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+
 		DealSummary(DEAL_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		DealSummaryCnt(DEAL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
-		
+
 		MoveDeals(MOVE_DEALS, EMPTY_IMMUTABLE_PROPS);
 
 		private String query;

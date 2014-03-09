@@ -1607,13 +1607,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("state", StandardBasicTypes.STRING);
 			query.addScalar("offerType", StandardBasicTypes.STRING);
 			query.addScalar("price", StandardBasicTypes.DOUBLE);
-			query.addScalar("expires", StandardBasicTypes.DATE);
 			query.addScalar("isActive", StandardBasicTypes.BOOLEAN);
 			query.addScalar("backgroundUrl", StandardBasicTypes.STRING);
 			query.addScalar("iconUrl", StandardBasicTypes.STRING);
 			query.addScalar("logoUrl", StandardBasicTypes.STRING);
 			query.addScalar("merchantName", StandardBasicTypes.STRING);
 			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+			query.addScalar("scheduledStartDate", StandardBasicTypes.DATE);
+			query.addScalar("scheduledEndDate", StandardBasicTypes.DATE);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<DealOfferSummary>) query.list();
@@ -1689,6 +1690,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("logoUrl", StandardBasicTypes.STRING);
 			query.addScalar("merchantName", StandardBasicTypes.STRING);
 			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+			query.addScalar("scheduledStartDate", StandardBasicTypes.DATE);
+			query.addScalar("scheduledEndDate", StandardBasicTypes.DATE);
 
 			cleanTitle = title.replaceAll("[*]", "%");
 			query.setParameter("title", cleanTitle);
@@ -1760,13 +1763,15 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("state", StandardBasicTypes.STRING);
 			query.addScalar("offerType", StandardBasicTypes.STRING);
 			query.addScalar("price", StandardBasicTypes.DOUBLE);
-			query.addScalar("expires", StandardBasicTypes.DATE);
 			query.addScalar("isActive", StandardBasicTypes.BOOLEAN);
 			query.addScalar("backgroundUrl", StandardBasicTypes.STRING);
 			query.addScalar("iconUrl", StandardBasicTypes.STRING);
 			query.addScalar("logoUrl", StandardBasicTypes.STRING);
 			query.addScalar("merchantName", StandardBasicTypes.STRING);
 			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+
+			query.addScalar("scheduledStartDate", StandardBasicTypes.DATE);
+			query.addScalar("scheduledEndDate", StandardBasicTypes.DATE);
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 
@@ -1844,6 +1849,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("logoUrl", StandardBasicTypes.STRING);
 			query.addScalar("merchantName", StandardBasicTypes.STRING);
 			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+
+			query.addScalar("scheduledStartDate", StandardBasicTypes.DATE);
+			query.addScalar("scheduledEndDate", StandardBasicTypes.DATE);
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			cleanTitle = title.replaceAll("[*]", "%");

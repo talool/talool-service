@@ -25,6 +25,17 @@ CREATE INDEX merchant_location_properties_gist_idx ON merchant_location USING GI
 
 CREATE INDEX merchant_location_properties_idx ON merchant_location USING BTREE (properties);
 
+-- scheduling a deal changes
+ALTER TABLE deal_offer add column scheduled_start_dt timestamp without time zone;
+
+ALTER TABLE deal_offer add column scheduled_end_dt timestamp without time zone;
+
+UPDATE deal_offer set scheduled_end_dt=expires;
+
+UPDATE deal_offer set scheduled_start_dt=create_dt;
+
+UPDATE deal_offer set scheduled_end_dt = '2016-12-31 00:00:00' where scheduled_end_dt is null;
+
 
 
 -- http://www.youlikeprogramming.com/2011/11/working-with-the-hstore-data-type-in-postgresql-9-0/

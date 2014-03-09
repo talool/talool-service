@@ -64,13 +64,9 @@ public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
 
 	public MerchantMedia getDealOfferIcon();
 
-	public void setExpires(Date expires);
-
 	public void setPrice(Float price);
 
 	public Float getPrice();
-
-	public Date getExpires();
 
 	public boolean isActive();
 
@@ -81,4 +77,41 @@ public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
 	public void setGeometry(Geometry geometry);
 
 	public Properties getProperties();
+
+	/**
+	 * Gets the start date of a published scheduling
+	 * 
+	 * @return
+	 */
+	public Date getScheduledStartDate();
+
+	/**
+	 * Gets the end date of a published scheduling
+	 * 
+	 * @return
+	 */
+	public Date getScheduledEndDate();
+
+	/**
+	 * Sets the scheduled start date
+	 * 
+	 * @param date
+	 */
+	public void setScheduledStartDate(final Date date);
+
+	/**
+	 * Sets the scheduled end date
+	 * 
+	 * @param date
+	 */
+	public void setScheduledEndDate(final Date date);
+
+	/**
+	 * Returns true of the Deal offer is within the scheduled time (start/end
+	 * date) false otherwise.
+	 * 
+	 * @return
+	 */
+	public boolean isCurrentlyScheduled();
+
 }

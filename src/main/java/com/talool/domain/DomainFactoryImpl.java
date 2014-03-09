@@ -190,7 +190,6 @@ final class DomainFactoryImpl implements DomainFactory
 					// DealOffer
 					DealOffer dealOffer = offers.get(0);
 					deal.setDealOffer(dealOffer);
-					deal.setExpires(dealOffer.getExpires());
 				}
 
 			}

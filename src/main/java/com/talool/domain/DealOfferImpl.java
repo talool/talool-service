@@ -1,5 +1,6 @@
 package com.talool.domain;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -125,6 +126,12 @@ public class DealOfferImpl implements DealOffer
 	@Embedded
 	private Properties properties;
 
+	@Column(name = "scheduled_start_dt", nullable = true)
+	private Date scheduledStartDate;
+
+	@Column(name = "scheduled_end_dt", nullable = true)
+	private Date scheduledEndDate;
+
 	public DealOfferImpl()
 	{}
 
@@ -177,19 +184,6 @@ public class DealOfferImpl implements DealOffer
 	}
 
 	@Override
-	public void setExpires(Date expires)
-	{
-		this.expires = expires;
-
-	}
-
-	@Override
-	public Date getExpires()
-	{
-		return expires;
-	}
-
-	@Override
 	public boolean isActive()
 	{
 		return isActive;
@@ -210,7 +204,10 @@ public class DealOfferImpl implements DealOffer
 		newDealOffer.setDealOfferIcon(this.dealOfferIcon);
 		newDealOffer.setDealOfferLogo(this.dealOfferLogo);
 		newDealOffer.setDealType(this.dealType);
-		newDealOffer.setExpires(this.expires);
+
+		newDealOffer.setScheduledStartDate(this.scheduledStartDate);
+		newDealOffer.setScheduledEndDate(this.scheduledEndDate);
+
 		newDealOffer.setGeometry(this.geometry);
 		newDealOffer.setLocationName(this.locationName);
 		newDealOffer.setPrice(this.price);
@@ -444,6 +441,43 @@ public class DealOfferImpl implements DealOffer
 	public Properties getProperties()
 	{
 		return properties;
+	}
+
+	@Override
+	public Date getScheduledStartDate()
+	{
+		return scheduledStartDate;
+	}
+
+	@Override
+	public Date getScheduledEndDate()
+	{
+		return scheduledEndDate;
+	}
+
+	@Override
+	public void setScheduledStartDate(Date date)
+	{
+		this.scheduledStartDate = date;
+
+	}
+
+	@Override
+	public void setScheduledEndDate(Date date)
+	{
+		this.scheduledEndDate = date;
+	}
+
+	@Override
+	public boolean isCurrentlyScheduled()
+	{
+		if (scheduledStartDate != null && scheduledEndDate != null)
+		{
+			final long now = Calendar.getInstance().getTime().getTime();
+			return (now >= scheduledStartDate.getTime()) && (now < scheduledStartDate.getTime());
+		}
+
+		return false;
 	}
 
 }
