@@ -31,6 +31,7 @@ import com.talool.service.EncryptService;
  */
 @Entity
 @Table(name = "merchant_account", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class MerchantAccountImpl implements MerchantAccount
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantAccountImpl.class);
