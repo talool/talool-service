@@ -339,7 +339,7 @@ public final class QueryHelper
 	// setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 	private static final String ACTIVE_DEALS_BY_DEAL_OFFER_ID = "select d from DealImpl as d left join fetch d.image left join fetch d.merchant as merchant "
 			+
-			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId and d.isActive=true and d.expires>now() at time zone 'utc'";
+			"left join fetch merchant.locations where d.dealOffer.id=:dealOfferId and d.isActive=true and d.expires>:expiresDate";
 
 	private static final String MERCHANTS_BY_DEAL_OFFER_ID = "select distinct merchant from MerchantImpl as merchant,DealImpl as dof where dof.dealOffer.id=:dealOfferId and dof.merchant.id=merchant.id";
 

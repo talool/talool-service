@@ -1,6 +1,7 @@
 package com.talool.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -424,9 +425,15 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			final String newSql = activeDealsOnly ? QueryHelper.buildQuery(QueryType.ActiveDealsByDealOfferId, null, searchOpts) : QueryHelper.buildQuery(
 					QueryType.DealsByDealOfferId, null, searchOpts);
+
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
+
+			if (activeDealsOnly)
+			{
+				query.setParameter("expiresDate", new Date(), StandardBasicTypes.DATE);
+			}
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 
