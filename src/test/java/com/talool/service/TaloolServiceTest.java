@@ -134,6 +134,13 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void testDealOfferProperties() throws ServiceException
 	{
 
+		List<? extends DealOffer> dealOffs = taloolService.<DealOffer> getEntityByProperty(DealOffer.class, "fundraising_book", "true");
+
+		for (DealOffer dof : dealOffs)
+		{
+			System.out.println(dof.getProperties().getAsString("fundraising_book"));
+		}
+
 		DealOffer dealOffer = taloolService.getDealOffer(UUID.fromString("4d54d8ef-febb-4719-b9f0-a73578a41803"));
 		Properties properties = dealOffer.getProperties();
 

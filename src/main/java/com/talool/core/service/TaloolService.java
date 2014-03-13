@@ -100,4 +100,28 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public void saveProperties(final PropertySupportedEntity entity, final UUID entityId, final Properties properties) throws ServiceException;
 
+	/**
+	 * Gets all entity objects that match the property key/value
+	 * 
+	 * @param type
+	 * @param propertykey
+	 * @param propertyValue
+	 * @return
+	 * @throws ServiceException
+	 */
+	public <T> List<? extends T> getEntityByProperty(final Class<T> type, final String propertykey, final String propertyValue)
+
+			throws ServiceException;
+
+	/**
+	 * Gets all entity objects that match the every property key/value in the map
+	 * 
+	 * @param type
+	 * @param properties
+	 * @return
+	 * @throws ServiceException
+	 */
+	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final Map<String, String> properties)
+
+			throws ServiceException;
 }

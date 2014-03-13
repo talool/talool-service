@@ -27,8 +27,8 @@ public class Properties implements Serializable
 	private static final long serialVersionUID = -4835611475842607243L;
 
 	@Type(type = "hstore")
-	@Column(columnDefinition = "hstore")
-	public Map<String, String> properties = new HashMap<String, String>();
+	@Column(name = "properties", columnDefinition = "hstore")
+	private Map<String, String> properties = new HashMap<String, String>();
 
 	public Map<String, String> getAllProperties()
 	{

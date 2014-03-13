@@ -60,7 +60,7 @@ public class MerchantAccountImpl implements MerchantAccount
 	private boolean allowDealCreation;
 
 	@Embedded
-	private Properties properties;
+	private Properties props;
 
 	@Embedded
 	private CreatedUpdated createdUpdated;
@@ -201,7 +201,7 @@ public class MerchantAccountImpl implements MerchantAccount
 	@Override
 	public Properties getProperties()
 	{
-		return properties;
+		return props;
 	}
 
 }

@@ -9,11 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
+import org.hibernate.type.CustomType;
 import org.hibernate.usertype.UserType;
 
 // courtesy of: http://backtothefront.net/2011/storing-sets-keyvalue-pairs-single-db-column-hibernate-postgresql-hstore-type/
 public class HstoreUserType implements UserType
 {
+	public final static CustomType TYPE = new CustomType(new HstoreUserType());
 
 	public Object assemble(Serializable cached, Object owner)
 			throws HibernateException

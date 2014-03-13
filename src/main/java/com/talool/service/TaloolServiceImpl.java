@@ -76,6 +76,7 @@ import com.talool.domain.MerchantLocationImpl;
 import com.talool.domain.Properties;
 import com.talool.domain.TagImpl;
 import com.talool.domain.social.SocialNetworkImpl;
+import com.talool.persistence.HstoreUserType;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl;
@@ -2517,5 +2518,58 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
 		}
 
+	}
+
+	@Override
+	public <T> List<? extends T> getEntityByProperty(Class<T> type, String propKey, String propVal) throws ServiceException
+	{
+		final Map<String, String> props = new HashMap<String, String>();
+		props.put(propKey, propVal);
+		return getEntityByProperties(type, props);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final Map<String, String> properties) throws ServiceException
+	{
+		List<T> entityList = null;
+		Query query = null;
+
+		try
+		{
+			if (type.equals(DealOffer.class))
+			{
+				query = getCurrentSession().createQuery("from DealOfferImpl where props = :props");
+			}
+			else if (type.equals(Merchant.class))
+			{
+				query = getCurrentSession().createQuery("from MerchantImpl where props = :props");
+			}
+			else if (type.equals(MerchantAccount.class))
+			{
+				query = getCurrentSession().createQuery("from MerchantAccountImpl where props = :props");
+			}
+			else if (type.equals(MerchantLocation.class))
+			{
+				query = getCurrentSession().createQuery("from MerchantLocationImpl where props = :props");
+			}
+			else
+			{
+				throw new ServiceException("Unsupported entity class " + type.getClass().getSimpleName());
+			}
+
+			query.setParameter("props", properties, HstoreUserType.TYPE);
+			entityList = query.list();
+		}
+		catch (ServiceException se)
+		{
+			throw se;
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ex.getLocalizedMessage(), ex);
+		}
+
+		return entityList;
 	}
 }

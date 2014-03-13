@@ -100,9 +100,6 @@ public class DealOfferImpl implements DealOffer
 	@Column(name = "code", unique = false, nullable = true, length = 128)
 	private String code;
 
-	@Column(name = "expires", unique = false, nullable = true)
-	private Date expires;
-
 	@Column(name = "is_active", unique = false, nullable = true)
 	private boolean isActive = true;
 
@@ -124,7 +121,7 @@ public class DealOfferImpl implements DealOffer
 	private CreatedUpdated createdUpdated;
 
 	@Embedded
-	private Properties properties;
+	private Properties props;
 
 	@Column(name = "scheduled_start_dt", nullable = true)
 	private Date scheduledStartDate;
@@ -223,7 +220,7 @@ public class DealOfferImpl implements DealOffer
 
 		}
 
-		newDealOffer.properties = propsNew;
+		newDealOffer.props = propsNew;
 
 		return newDealOffer;
 	}
@@ -440,7 +437,7 @@ public class DealOfferImpl implements DealOffer
 	@Override
 	public Properties getProperties()
 	{
-		return properties;
+		return props;
 	}
 
 	@Override
