@@ -138,11 +138,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		PropertyCriteria criteria = new PropertyCriteria();
 
 		// only searches in deals that have properties
-		criteria.setFilters(Filter.keyDoesNotExists("fundraising_book"));
+		criteria.setFilters(Filter.keyDoesNotExist("fundraising_book"));
 
 		// Returns entities where the key doesn't exist. Entities with null
 		// properties will be returned
-		criteria.setFilters(Filter.keyDoesNotExistsOrPropertiesNull("fundraising_book"));
+		criteria.setFilters(Filter.keyDoesNotExistOrPropertiesNull("fundraising_book"));
 
 		criteria.setFilters(Filter.and(Filter.equal("fundraising_book", true)));
 		// criteria.setFilters(Filter.equal("publisher", true));

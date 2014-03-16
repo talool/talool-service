@@ -101,7 +101,7 @@ public class PropertyCriteria
 		 * @param key
 		 * @return
 		 */
-		public static Filter keyDoesNotExists(String key)
+		public static Filter keyDoesNotExist(String key)
 		{
 			return new Filter(key, null, Type.KeyDoesNotExist);
 		}
@@ -113,7 +113,7 @@ public class PropertyCriteria
 		 * @param key
 		 * @return
 		 */
-		public static Filter keyDoesNotExistsOrPropertiesNull(final String key)
+		public static Filter keyDoesNotExistOrPropertiesNull(final String key)
 		{
 			return new Filter(key, null, Type.KeyDoesNotExistOrPropertiesNull);
 		}
