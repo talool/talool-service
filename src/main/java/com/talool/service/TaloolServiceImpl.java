@@ -74,9 +74,9 @@ import com.talool.domain.MerchantIdentityImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantLocationImpl;
 import com.talool.domain.Properties;
+import com.talool.domain.PropertyCriteria;
 import com.talool.domain.TagImpl;
 import com.talool.domain.social.SocialNetworkImpl;
-import com.talool.persistence.HstoreUserType;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl;
@@ -115,6 +115,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		SocialNetwork snet;
 		try
 		{
+
 			final Search search = new Search(SocialNetworkImpl.class);
 			search.addFilterEqual("name", name.toString());
 			snet = (SocialNetwork) daoDispatcher.searchUnique(search);
@@ -2525,40 +2526,46 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	{
 		final Map<String, String> props = new HashMap<String, String>();
 		props.put(propKey, propVal);
-		return getEntityByProperties(type, props);
+		return getEntityByProperties(type, null);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final Map<String, String> properties) throws ServiceException
+	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria) throws ServiceException
 	{
 		List<T> entityList = null;
 		Query query = null;
+		String queryStr = null;
 
 		try
 		{
 			if (type.equals(DealOffer.class))
 			{
-				query = getCurrentSession().createQuery("from DealOfferImpl where props = :props");
+				queryStr = "from DealOfferImpl as d left join fetch d.merchant as merchant left join fetch merchant.locations where ";
+				queryStr += propertyCriteria.buildFilterClause("d.props");
 			}
 			else if (type.equals(Merchant.class))
 			{
-				query = getCurrentSession().createQuery("from MerchantImpl where props = :props");
+				queryStr = "from MerchantImpl as m where ";
+				queryStr += propertyCriteria.buildFilterClause("m.props");
 			}
 			else if (type.equals(MerchantAccount.class))
 			{
-				query = getCurrentSession().createQuery("from MerchantAccountImpl where props = :props");
+				queryStr = "from MerchantAccountImpl as ma where ";
+				queryStr += propertyCriteria.buildFilterClause("ma.props");
 			}
 			else if (type.equals(MerchantLocation.class))
 			{
-				query = getCurrentSession().createQuery("from MerchantLocationImpl where props = :props");
+				queryStr = "from MerchantLocationImpl as ml where ";
+				queryStr += propertyCriteria.buildFilterClause("ml.props");
 			}
 			else
 			{
 				throw new ServiceException("Unsupported entity class " + type.getClass().getSimpleName());
 			}
 
-			query.setParameter("props", properties, HstoreUserType.TYPE);
+			query = getCurrentSession().createQuery(queryStr);
+			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			entityList = query.list();
 		}
 		catch (ServiceException se)
@@ -2571,5 +2578,32 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 		return entityList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOffer> getPublisherDealOffers(final UUID publisherId, final PropertyCriteria propertyCriteria) throws ServiceException
+	{
+		List<DealOffer> entityList = null;
+		Query query = null;
+		String queryStr = null;
+
+		try
+		{
+			queryStr = "from DealOfferImpl as d left join fetch d.merchant as merchant left join fetch merchant.locations where merchant.id=:merchantId and ";
+			queryStr += propertyCriteria.buildFilterClause("d.props");
+
+			query = getCurrentSession().createQuery(queryStr);
+			query.setParameter("merchantId", publisherId, PostgresUUIDType.INSTANCE);
+			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			entityList = query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ex.getLocalizedMessage(), ex);
+		}
+
+		return entityList;
+
 	}
 }

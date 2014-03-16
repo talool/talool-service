@@ -15,6 +15,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.Tag;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.Properties;
+import com.talool.domain.PropertyCriteria;
 import com.talool.service.HibernateService;
 
 /**
@@ -121,7 +122,6 @@ public interface TaloolService extends MerchantService, HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final Map<String, String> properties)
+	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria) throws ServiceException;
 
-			throws ServiceException;
 }

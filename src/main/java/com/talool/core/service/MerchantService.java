@@ -18,6 +18,7 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
+import com.talool.domain.PropertyCriteria;
 import com.talool.service.HibernateService;
 import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferSummary;
@@ -158,8 +159,7 @@ public interface MerchantService extends HibernateService
 	public List<Merchant> getMerchantsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOptions) throws ServiceException;
 
 	public List<Merchant> getMerchantsCreatedByMerchant(final UUID merchantId) throws ServiceException;
-	
-	
+
 	/**
 	 * Gets all deal offers in Talool
 	 * 
@@ -193,8 +193,8 @@ public interface MerchantService extends HibernateService
 	public long getDealOfferSummaryCount(final String title) throws ServiceException;
 
 	/**
-	 * Gets all the offers of a publisher. A publishers offers are defined
-	 * by a merchant that is the publisher
+	 * Gets all the offers of a publisher. A publishers offers are defined by a
+	 * merchant that is the publisher
 	 * 
 	 * @param publisherMerchantId
 	 * @param searchOpts
@@ -214,7 +214,6 @@ public interface MerchantService extends HibernateService
 
 	public long getPublisherDealOfferSummaryCount(final UUID publisherMerchantId) throws ServiceException;
 
-	
 	/**
 	 * Gets all merchants in Talool
 	 * 
@@ -268,7 +267,7 @@ public interface MerchantService extends HibernateService
 	public long getMerchantSummaryCount() throws ServiceException;
 
 	public long getPublisherMerchantSummaryCount(final UUID publisherMerchantId) throws ServiceException;
-	
+
 	/**
 	 * Gets deals in an offer
 	 * 
@@ -280,8 +279,10 @@ public interface MerchantService extends HibernateService
 	 */
 	public PaginatedResult<DealSummary> getDealSummary(final UUID dealOfferId, final SearchOptions searchOpts, final boolean calculateTotalResults)
 			throws ServiceException;
-	
+
 	public long getDealSummaryCount(final UUID dealOfferId) throws ServiceException;
-	
+
 	public void moveDeals(final List<UUID> dealIds, final UUID dealOfferId, final long merchantAccountId) throws ServiceException;
+
+	public List<DealOffer> getPublisherDealOffers(final UUID publisherId, final PropertyCriteria propertyCriteria) throws ServiceException;
 }

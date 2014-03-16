@@ -58,6 +58,8 @@ import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.MerchantMediaImpl;
 import com.talool.domain.Properties;
+import com.talool.domain.PropertyCriteria;
+import com.talool.domain.PropertyCriteria.Filter;
 import com.talool.stats.CustomerSummary;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.DealAcquireComparator;
@@ -133,6 +135,24 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	public void testDealOfferProperties() throws ServiceException
 	{
+		PropertyCriteria criteria = new PropertyCriteria();
+
+		// only searches in deals that have properties
+		criteria.setFilters(Filter.keyDoesNotExists("fundraising_book"));
+
+		// Returns entities where the key doesn't exist. Entities with null
+		// properties will be returned
+		criteria.setFilters(Filter.keyDoesNotExistsOrPropertiesNull("fundraising_book"));
+
+		criteria.setFilters(Filter.and(Filter.equal("fundraising_book", true)));
+		// criteria.setFilters(Filter.equal("publisher", true));
+
+		// List<? extends Merchant> publishers = taloolService.<Merchant>
+		// getEntityByProperties(Merchant.class, criteria);
+
+		taloolService.getPublisherDealOffers(UUID.fromString("be8ea75d-361e-4e97-b4d3-0c0390862e50"), criteria);
+
+		List<? extends DealOffer> dealOffs2 = taloolService.<DealOffer> getEntityByProperties(DealOffer.class, criteria);
 
 		List<? extends DealOffer> dealOffs = taloolService.<DealOffer> getEntityByProperty(DealOffer.class, "fundraising_book", "true");
 
