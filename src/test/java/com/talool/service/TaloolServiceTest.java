@@ -44,6 +44,7 @@ import com.talool.core.Location;
 import com.talool.core.MediaType;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantCodeGroup;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.SearchOptions;
@@ -131,6 +132,52 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		domainFactory = FactoryManager.get().getDomainFactory();
 		Binghamton_NY = domainFactory.newLocation(-75.98, 42.23);
 		Boulder_CO = domainFactory.newLocation(-105.281686, 40.017663);
+	}
+
+	// @Test
+	public void testMerchantCodes() throws ServiceException
+	{
+
+		MerchantAccount merchantAccount = taloolService.authenticateMerchantAccount("chris@talool.com", "pass123");
+		Merchant publisher = taloolService.getMerchantByName("SaveAround").get(0);
+
+		UUID paybackBookId = UUID.fromString("4d54d8ef-febb-4719-b9f0-a73578a41803");
+		System.out.println(taloolService.isMerchantCodeValid("2KAKNTG", paybackBookId));
+
+		final MerchantLocation schoolLocation = domainFactory.newMerchantLocation();
+		schoolLocation.setAddress1("1771 Frontag Rd");
+		schoolLocation.setCreatedByMerchantAccount(merchantAccount);
+		schoolLocation.setCity("Monument");
+		schoolLocation.setStateProvinceCounty("CO");
+		schoolLocation.setZip("80132");
+		schoolLocation.setCountry("US");
+		schoolLocation.setPhone("781-818-1212");
+		schoolLocation.setWebsiteUrl("http://school.com");
+		schoolLocation.setEmail("someone@gmail.com");
+		// add the merchant as a school
+		Merchant school = domainFactory.newMerchant(true);
+		school.setName("Lewis Palmer HS");
+		school.setIsDiscoverable(false);
+
+		school.getProperties().createOrReplace("fundraiser", true);
+		school.addLocation(schoolLocation);
+
+		taloolService.save(school);
+
+		// create 100 codes for the school, track the merchantAcccount and publisher
+		MerchantCodeGroup merchantCodeGrp = taloolService.createMerchantCodeGroup(school.getId(),
+				merchantAccount.getId(), publisher.getId(),
+				"Lewis Palmer School codes", "first set of notes", (short) 100);
+
+		// grab a Save around dealOffer, only a code generated above will work for
+		// this publisher, yet book agnostic
+		List<DealOffer> saveAroundDealOffers =
+				taloolService.getDealOffersByMerchantId(publisher.getId());
+
+		// Any save around deal offer will be valid
+		String aCodeToTest = merchantCodeGrp.getCodes().iterator().next().getCode();
+		System.out.println(taloolService.isMerchantCodeValid(aCodeToTest, saveAroundDealOffers.get(0).getId()));
+
 	}
 
 	public void testDealOfferProperties() throws ServiceException

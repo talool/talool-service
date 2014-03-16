@@ -1,6 +1,7 @@
 package com.talool.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +52,7 @@ import com.talool.core.Location;
 import com.talool.core.MediaType;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantCodeGroup;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
@@ -70,6 +72,8 @@ import com.talool.domain.DealImpl;
 import com.talool.domain.DealOfferImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.MerchantAccountImpl;
+import com.talool.domain.MerchantCodeGroupImpl;
+import com.talool.domain.MerchantCodeImpl;
 import com.talool.domain.MerchantIdentityImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantLocationImpl;
@@ -2604,6 +2608,78 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 		return entityList;
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public MerchantCodeGroup createMerchantCodeGroup(final UUID merchantId, final Long createdByMerchantAccountId,
+			final UUID publisherId, final String codeGroupTitle, final String codeGroupNotes,
+			final short totalCodes) throws ServiceException
+	{
+		MerchantCodeGroupImpl mcg = null;
+
+		try
+		{
+			mcg = new MerchantCodeGroupImpl();
+			mcg.setMerchantId(merchantId);
+			mcg.setCreatedBymerchantAccountId(createdByMerchantAccountId);
+			mcg.setPublisherId(publisherId);
+			mcg.setCodeGroupNodes(codeGroupNotes);
+			mcg.setCodeGroupTitle(codeGroupTitle);
+			mcg.setTotalCodes(totalCodes);
+			mcg.setCreated(Calendar.getInstance().getTime());
+
+			MerchantCodeImpl mcode = null;
+
+			for (int i = 0; i < totalCodes; i++)
+			{
+				mcode = new MerchantCodeImpl();
+				mcode.setCode(activiationCodeStrategy.generateCode());
+				mcode.setMerchantCodeGroup(mcg);
+				mcg.getCodes().add(mcode);
+			}
+
+			daoDispatcher.save(mcg);
+			getCurrentSession().flush();
+
+			// no need to refresh objects, we have what we want.
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ex.getLocalizedMessage(), ex);
+		}
+
+		return mcg;
+
+	}
+
+	@Override
+	public boolean isMerchantCodeValid(final String code, final UUID dealOfferId) throws ServiceException
+	{
+		boolean isValid = false;
+
+		try
+		{
+			SQLQuery query = getCurrentSession().createSQLQuery(
+					"select mc.merchant_code_id from deal_offer as dof,merchant_code_group as mcg,merchant_code as mc where dof.deal_offer_id=:dealOfferId and "
+							+
+							"dof.merchant_id=mcg.publisher_id and mc.merchant_code_group_id=mcg.merchant_code_group_id and mc.code=:code");
+
+			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
+			query.setParameter("code", code);
+
+			Object codeId = query.uniqueResult();
+			isValid = codeId != null ? true : false;
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ex.getLocalizedMessage(), ex);
+		}
+
+		return isValid;
 
 	}
 }

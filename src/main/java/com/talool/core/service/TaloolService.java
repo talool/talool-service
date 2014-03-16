@@ -12,6 +12,7 @@ import com.talool.core.CategoryTag;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
+import com.talool.core.MerchantCodeGroup;
 import com.talool.core.Tag;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.Properties;
@@ -123,5 +124,22 @@ public interface TaloolService extends MerchantService, HibernateService
 	 * @throws ServiceException
 	 */
 	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria) throws ServiceException;
+
+	/**
+	 * Creates a group of merchant codes
+	 * 
+	 * @param merchantId
+	 * @param createdByMerchantAccountId
+	 * @param codeGroupTitle
+	 * @param codeGroupNotes
+	 * @param totalCodes
+	 * @return
+	 * @throws ServiceExeption
+	 */
+	public MerchantCodeGroup createMerchantCodeGroup(final UUID merchantId, final Long createdByMerchantAccountId,
+			final UUID publisherId, final String codeGroupTitle, final String codeGroupNotes, final short totalCodes)
+			throws ServiceException;
+
+	public boolean isMerchantCodeValid(final String code, final UUID dealOfferId) throws ServiceException;
 
 }

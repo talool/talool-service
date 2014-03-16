@@ -106,7 +106,7 @@ public class MerchantImpl implements Merchant
 	private CreatedUpdated createdUpdated;
 
 	@Embedded
-	private Properties props;
+	private Properties props = new Properties();
 
 	public UUID getId()
 	{
