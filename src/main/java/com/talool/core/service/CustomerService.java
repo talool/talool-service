@@ -182,6 +182,16 @@ public interface CustomerService extends HibernateService
 	public void activateCode(final UUID customerId, final UUID dealOfferid, final String code) throws ServiceException;
 
 	/**
+	 * Checks whether a book (activation code) is a valid code
+	 * 
+	 * @param code
+	 * @param dealOfferid
+	 * @return
+	 * @throws ServiceException
+	 */
+	public boolean isActivationCodeValid(final String code, final UUID dealOfferid) throws ServiceException;
+
+	/**
 	 * Creates a password reset code and a password reset expires. These are saved
 	 * on the customer (getPasswordResetCode, getPasswordResetExpires)
 	 * 

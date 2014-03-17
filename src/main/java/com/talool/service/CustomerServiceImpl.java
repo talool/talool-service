@@ -1855,4 +1855,28 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 	}
+
+	@Override
+	public boolean isActivationCodeValid(final String code, final UUID dealOfferid) throws ServiceException
+	{
+		ActivationCode activationCode = null;
+		Search search = null;
+
+		try
+		{
+			final String uCode = code.toUpperCase();
+			search = new Search(ActivationCodeImpl.class);
+			search.addFilterEqual("dealOfferId", dealOfferid);
+			search.addFilterEqual("code", uCode);
+			activationCode = (ActivationCodeImpl) daoDispatcher.searchUnique(search);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ErrorCode.MERCHANT_CODE_IS_NOT_VALID);
+		}
+
+		return activationCode == null ? false : true;
+
+	}
 }

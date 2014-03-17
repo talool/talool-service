@@ -138,11 +138,19 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void testMerchantCodes() throws ServiceException
 	{
 
+		UUID paybackBookId = UUID.fromString("4d54d8ef-febb-4719-b9f0-a73578a41803");
+		try
+		{
+			System.out.println(taloolService.isMerchantCodeValid("2KAKNTG", paybackBookId));
+
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
+
 		MerchantAccount merchantAccount = taloolService.authenticateMerchantAccount("chris@talool.com", "pass123");
 		Merchant publisher = taloolService.getMerchantByName("SaveAround").get(0);
-
-		UUID paybackBookId = UUID.fromString("4d54d8ef-febb-4719-b9f0-a73578a41803");
-		System.out.println(taloolService.isMerchantCodeValid("2KAKNTG", paybackBookId));
 
 		final MerchantLocation schoolLocation = domainFactory.newMerchantLocation();
 		schoolLocation.setAddress1("1771 Frontag Rd");
