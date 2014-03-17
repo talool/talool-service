@@ -211,6 +211,45 @@ public class PropertyCriteria
 		return sb.toString();
 
 	}
+	
+	// TODO another quick hack to make the a property search work for MerchantSummary objects
+	public String buildRawFilterClause(final String propertyColumnName)
+	{
+		final StringBuilder sb = new StringBuilder();
+
+		for (Filter filter : filters)
+		{
+			sb.append(" AND ");
+			
+			switch (filter.type)
+			{
+				case ValueEqual:
+					sb.append(propertyColumnName)
+					  .append("->'")
+					  .append(filter.key)
+					  .append("'='")
+					  .append(filter.val)
+					  .append("' ");
+					break;
+				case KeyDoesNotExistOrPropertiesNull:
+					sb.append("(")
+					  .append(propertyColumnName)
+					  .append(" is null OR exist(")
+					  .append(propertyColumnName)
+					  .append(", '")
+					  .append(filter.key)
+					  .append("')=false) ");
+					break;
+				default:
+					break;
+			}
+			
+
+		}
+
+		return sb.toString();
+
+	}
 
 	public static void main(String args[])
 	{

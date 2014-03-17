@@ -27,6 +27,7 @@ public final class MerchantSummary implements Serializable
 	private int locationCount;
 	private int dealCount;
 	private int merchantAccountCount;
+	private String properties;
 	
 	public UUID getMerchantId() {
 		return merchantId;
@@ -115,8 +116,11 @@ public final class MerchantSummary implements Serializable
 	public String getImageUrl() {
 		return imageUrl;
 	}
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
+	public String getProperties() {
+		return properties;
+	}
+	public void setProperties(String properties) {
+		this.properties = properties;
 	}
 
 	

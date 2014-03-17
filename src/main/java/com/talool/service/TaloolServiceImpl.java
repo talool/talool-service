@@ -1997,7 +1997,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@SuppressWarnings("unchecked")
 	@Override
 	public PaginatedResult<MerchantSummary> getMerchantSummary(
-			SearchOptions searchOpts, boolean calculateTotalResults)
+			SearchOptions searchOpts, final PropertyCriteria propertyCriteria, boolean calculateTotalResults)
 			throws ServiceException
 	{
 
@@ -2008,8 +2008,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 
-			String newSql = QueryHelper.buildQuery(QueryType.MerchantSummary, null, searchOpts,
-					true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantSummary, propertyCriteria, searchOpts);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
@@ -2028,13 +2027,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
 			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
 			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<MerchantSummary>) query.list();
 
 			if (calculateTotalResults && summaries != null)
 			{
-				totalResults = (Long) getMerchantSummaryCount();
+				totalResults = (Long) getMerchantSummaryCount(propertyCriteria);
 			}
 
 			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
@@ -2050,7 +2050,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@SuppressWarnings("unchecked")
 	@Override
 	public PaginatedResult<MerchantSummary> getMerchantSummary(
-			SearchOptions searchOpts, String name, boolean calculateTotalResults)
+			SearchOptions searchOpts, String name, final PropertyCriteria propertyCriteria, boolean calculateTotalResults)
 			throws ServiceException
 	{
 
@@ -2062,8 +2062,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 
-			String newSql = QueryHelper.buildQuery(QueryType.MerchantNameSummary, null, searchOpts,
-					true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantNameSummary, propertyCriteria, searchOpts);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
@@ -2082,6 +2081,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
 			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
 			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 
 			cleanName = name.replaceAll("[*]", "%");
 			query.setParameter("name", cleanName);
@@ -2091,7 +2091,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			if (calculateTotalResults && summaries != null)
 			{
-				totalResults = (Long) getMerchantSummaryCount(cleanName);
+				totalResults = (Long) getMerchantSummaryCount(cleanName, propertyCriteria);
 			}
 
 			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
@@ -2107,7 +2107,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@SuppressWarnings("unchecked")
 	@Override
 	public PaginatedResult<MerchantSummary> getPublisherMerchantSummary(
-			UUID publisherMerchantId, SearchOptions searchOpts,
+			UUID publisherMerchantId, SearchOptions searchOpts, final PropertyCriteria propertyCriteria,
 			boolean calculateTotalResults) throws ServiceException
 	{
 
@@ -2118,8 +2118,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 
-			String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantSummary, null, searchOpts,
-					true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantSummary, propertyCriteria, searchOpts);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
@@ -2138,15 +2137,16 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
 			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
 			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
-
+			
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<MerchantSummary>) query.list();
 
 			if (calculateTotalResults && summaries != null)
 			{
-				totalResults = (Long) getPublisherMerchantSummaryCount(publisherMerchantId);
+				totalResults = (Long) getPublisherMerchantSummaryCount(publisherMerchantId, propertyCriteria);
 			}
 
 			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
@@ -2162,7 +2162,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@SuppressWarnings("unchecked")
 	@Override
 	public PaginatedResult<MerchantSummary> getPublisherMerchantSummaryByName(
-			UUID publisherMerchantId, SearchOptions searchOpts, String name,
+			UUID publisherMerchantId, SearchOptions searchOpts, String name, final PropertyCriteria propertyCriteria,
 			boolean calculateRowSize) throws ServiceException
 	{
 
@@ -2173,8 +2173,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		try
 		{
-			String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantNameSummary, null, searchOpts,
-					true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantNameSummary, propertyCriteria, searchOpts);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantSummary.class));
@@ -2193,6 +2192,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("locationCount", StandardBasicTypes.INTEGER);
 			query.addScalar("dealCount", StandardBasicTypes.INTEGER);
 			query.addScalar("merchantAccountCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			cleanName = name.replaceAll("[*]", "%");
@@ -2203,7 +2203,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			if (calculateRowSize && summaries != null)
 			{
-				totalResults = getPublisherMerchantSummaryNameCount(publisherMerchantId, cleanName);
+				totalResults = getPublisherMerchantSummaryNameCount(publisherMerchantId, cleanName, propertyCriteria);
 			}
 
 			paginatedResult = new PaginatedResult<MerchantSummary>(searchOpts, totalResults, summaries);
@@ -2217,13 +2217,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getMerchantSummaryCount() throws ServiceException
+	public long getMerchantSummaryCount(final PropertyCriteria propertyCriteria) throws ServiceException
 	{
 		Long total = null;
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.MerchantSummaryCnt, null, null, true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantSummaryCnt, propertyCriteria, null);
+			
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
@@ -2237,13 +2238,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getMerchantSummaryCount(String name) throws ServiceException
+	public long getMerchantSummaryCount(String name, final PropertyCriteria propertyCriteria) throws ServiceException
 	{
 		Long total = null;
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.MerchantNameSummaryCnt, null, null, true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantNameSummaryCnt, propertyCriteria, null);
+			if (propertyCriteria != null) 
+			{
+				newSql += propertyCriteria.buildRawFilterClause("m.properties");
+			}
+			
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("name", name.replaceAll("[*]", "%"));
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
@@ -2258,7 +2264,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getPublisherMerchantSummaryCount(UUID publisherMerchantId)
+	public long getPublisherMerchantSummaryCount(UUID publisherMerchantId, final PropertyCriteria propertyCriteria)
 			throws ServiceException
 	{
 
@@ -2266,7 +2272,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantSummaryCnt, null, null, true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantSummaryCnt, propertyCriteria, null);
+			
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
@@ -2283,13 +2290,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@Override
 	public long getPublisherMerchantSummaryNameCount(UUID publisherMerchantId,
-			String name) throws ServiceException
+			String name, final PropertyCriteria propertyCriteria) throws ServiceException
 	{
 		Long total = null;
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.PublisherMerchantNameSummaryCnt, null, null, true);
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantNameSummaryCnt, propertyCriteria, null);
+			
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			query.setParameter("name", name.replaceAll("[*]", "%"));

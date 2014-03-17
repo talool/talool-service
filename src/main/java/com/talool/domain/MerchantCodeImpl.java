@@ -1,5 +1,6 @@
 package com.talool.domain;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -29,8 +30,10 @@ import com.talool.core.MerchantCodeGroup;
 @Entity
 @Table(name = "merchant_code", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
-public class MerchantCodeImpl implements MerchantCode
+public class MerchantCodeImpl implements MerchantCode, Serializable
 {
+	private static final long serialVersionUID = 5247181811745759596L;
+
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantCodeImpl.class);
 
 	@Id

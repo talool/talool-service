@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.Sort;
 import com.talool.core.SearchOptions;
+import com.talool.domain.PropertyCriteria;
 
 /**
  * Query Helper for HQL and native SQL
@@ -100,7 +101,7 @@ public final class QueryHelper
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' ";
 
 	private static final String MERCHANT_NAME_SUMMARY_CNT =
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
@@ -112,7 +113,7 @@ public final class QueryHelper
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' ";
 
 	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY_CNT =
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
@@ -121,7 +122,7 @@ public final class QueryHelper
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
 
 	private static final String MERCHANT_SUMMARY =
-			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name,  %#m.properties AS properties, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
 					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
 					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
@@ -132,10 +133,10 @@ public final class QueryHelper
 					+ "FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' ";
 
 	private static final String MERCHANT_NAME_SUMMARY =
-			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name,  %#m.properties AS properties, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
 					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
 					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
@@ -149,7 +150,7 @@ public final class QueryHelper
 					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
 
 	private static final String PUBLISHER_MERCHANT_SUMMARY =
-			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name,  %#m.properties AS properties, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
 					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
 					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
@@ -160,10 +161,10 @@ public final class QueryHelper
 					+ "FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
 					+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
-					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't'";
+					+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' ";
 
 	private static final String PUBLISHER_MERCHANT_NAME_SUMMARY =
-			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, "
+			"SELECT m.merchant_id AS merchantId, m.merchant_name AS name, %#m.properties AS properties, "
 					+ "l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, l.zip AS zip, l.phone AS phone, l.website_url AS website, "
 					+ "(SELECT category_name FROM category AS c WHERE c.category_id = m.category_id) AS category, "
 					+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = l.logo_url_id) AS logoUrl, "
@@ -622,5 +623,54 @@ public final class QueryHelper
 			final SearchOptions searchOpts)
 	{
 		return buildQuery(queryType, params, searchOpts, false);
+	}
+	
+	// TODO: this is just a quick hack to get property filters into the MerchantSummary queries
+	public static String buildPropertyQuery(final QueryType queryType, final PropertyCriteria propertyCriteria,
+			final SearchOptions searchOpts)
+	{
+		if (propertyCriteria == null && searchOpts == null)
+		{
+			return queryType.getQuery();
+		}
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append(queryType.getQuery());
+		
+		if (propertyCriteria != null)
+		{
+			sb.append(propertyCriteria.buildRawFilterClause("m.properties"));
+		}
+
+		if (searchOpts !=null)
+		{
+			if (searchOpts.getSortProperty() != null)
+			{
+				String sortProp = queryType.getPropertyColumnMap().get(searchOpts.getSortProperty());
+				if (sortProp == null)
+				{
+					// try and use what is passed in
+					sortProp = searchOpts.getSortProperty();
+				}
+	
+				// only build sorts if the property is part of the column map!
+				if (sortProp != null)
+				{
+					sb.append(ORDER_BY).append(sortProp);
+	
+					if (searchOpts.isAscending())
+					{
+						sb.append(ASC);
+					}
+					else
+					{
+						sb.append(DESC);
+					}
+				}
+	
+			}
+
+		}
+		return sb.toString();
 	}
 }

@@ -77,6 +77,8 @@ import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.service.mail.EmailRequestParams;
 import com.talool.stats.CustomerSummary;
 import com.talool.stats.PaginatedResult;
+import com.timgroup.statsd.NonBlockingStatsDClient;
+import com.timgroup.statsd.StatsDClient;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -93,6 +95,8 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class CustomerServiceImpl extends AbstractHibernateService implements CustomerService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CustomerServiceImpl.class);
+	
+	private static final StatsDClient statsd = new NonBlockingStatsDClient("talool", "graphite.talool.com", 8125);
 
 	private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
 
@@ -168,6 +172,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			LOG.error("Problem saving activities for new user " + customer.getEmail());
 		}
+		
+		statsd.incrementCounter("registration");
 
 	}
 	private static class GiftOwnership
@@ -420,6 +426,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.setParameter("redemptionCode", redemptionCode);
 			query.setParameter("redemptionDate", Calendar.getInstance().getTime());
 			query.executeUpdate();
+			
+			statsd.incrementCounter("redemption");
 		}
 		catch (ConstraintViolationException ce)
 		{
@@ -435,7 +443,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem redeeming deal: " + e.getLocalizedMessage(), e);
 			throw new ServiceException("Problem in redeemDeal with dealAcquireId " + dealAcquireId, e);
 		}
-
+		
 		return redemptionCode;
 
 	}
@@ -712,6 +720,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					customerId, merchantId));
 		}
 
+		statsd.incrementCounter("favorite");
+		
 	}
 
 	@Override
@@ -782,6 +792,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					customer.getId(), dealOffer.getId()), ex);
 		}
 
+		statsd.incrementCounter("purchase");
 	}
 
 	@Override
@@ -921,6 +932,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException("Problem in createGift: " + ex.getLocalizedMessage(), ex);
 		}
 
+		statsd.incrementCounter("gift");
+		
 	}
 
 	@Override
@@ -1332,6 +1345,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			createDealOfferPurchase(customerId, dealOfferId);
 
 			ServiceFactory.get().getActivityService().save(act);
+			
+			statsd.incrementCounter("activate_code");
 		}
 		catch (ServiceException se)
 		{
