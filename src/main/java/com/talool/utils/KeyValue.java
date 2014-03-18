@@ -13,7 +13,9 @@ public class KeyValue implements Serializable
 	public static final String fundraiser = "fundraiser";
 	public static final String fundraisingBook = "fundraising_book";
 	public static final String publisher = "publisher";
+	public static final String fundraisingPublisher = "fundraising_publisher";
 	public static final String analytics = "analytics";
+	public static final String percentage = "percentage";
 	
 	public String key;
 	public String value;

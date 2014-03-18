@@ -213,42 +213,74 @@ public class PropertyCriteria
 	}
 	
 	// TODO another quick hack to make the a property search work for MerchantSummary objects
-	public String buildRawFilterClause(final String propertyColumnName)
+	private String buildRawFilterClause(final Filter filter, final String propertyColumnName)
 	{
 		final StringBuilder sb = new StringBuilder();
 
-		for (Filter filter : filters)
+		switch (filter.type)
 		{
-			sb.append(" AND ");
-			
-			switch (filter.type)
-			{
-				case ValueEqual:
-					sb.append(propertyColumnName)
-					  .append("->'")
-					  .append(filter.key)
-					  .append("'='")
-					  .append(filter.val)
-					  .append("' ");
-					break;
-				case KeyDoesNotExistOrPropertiesNull:
-					sb.append("(")
-					  .append(propertyColumnName)
-					  .append(" is null OR exist(")
-					  .append(propertyColumnName)
-					  .append(", '")
-					  .append(filter.key)
-					  .append("')=false) ");
-					break;
-				default:
-					break;
-			}
-			
+			case AND:
+				if (CollectionUtils.isNotEmpty(filter.groupedFilters))
+				{
+					sb.append(" ");
 
+					if (filter.groupedFilters.size() == 1)
+					{
+						sb.append(buildRawFilterClause(filter.groupedFilters.get(0), propertyColumnName));
+						sb.append(" ");
+					}
+					else
+					{
+						for (Filter f : filter.groupedFilters)
+						{
+							if (sb.toString().equals(" "))
+							{
+								sb.append(buildRawFilterClause(f, propertyColumnName));
+							}
+							else
+							{
+								sb.append(filter.type.toString()).append(" ").append(buildRawFilterClause(f, propertyColumnName));
+							}
+
+						}
+					}
+				}
+				break;
+			case ValueEqual:
+				sb.append(" AND ")
+				  .append(propertyColumnName)
+				  .append("->'")
+				  .append(filter.key)
+				  .append("'='")
+				  .append(filter.val)
+				  .append("' ");
+				break;
+			case KeyDoesNotExistOrPropertiesNull:
+				sb.append(" AND ")
+				  .append("(")
+				  .append(propertyColumnName)
+				  .append(" is null OR exist(")
+				  .append(propertyColumnName)
+				  .append(", '")
+				  .append(filter.key)
+				  .append("')=false) ");
+				break;
+			default:
+				break;
 		}
 
 		return sb.toString();
-
+	}
+	
+	// TODO another quick hack to make the a property search work for MerchantSummary objects
+	public String buildRawFilterClause(final String propertyColumnName)
+	{
+		final StringBuilder sb = new StringBuilder();
+		for (Filter filter : filters)
+		{
+			sb.append(buildRawFilterClause(filter, propertyColumnName));
+		}
+		return sb.toString();
 	}
 
 	public static void main(String args[])
