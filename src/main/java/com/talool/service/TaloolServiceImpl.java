@@ -2690,4 +2690,34 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		return isValid;
 
 	}
+	
+	@Override
+	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException
+	{
+		if (code==null) return null;
+		
+		Merchant fundraiser = null;
+		try
+		{
+			SQLQuery query = getCurrentSession().createSQLQuery(
+					"SELECT mcg.merchant_id AS id FROM merchant_code_group AS mcg, merchant_code AS mc "
+					+ "WHERE mc.merchant_code_group_id=mcg.merchant_code_group_id AND mc.code=:code");
+
+			query.setParameter("code", code);
+			query.addScalar("id", PostgresUUIDType.INSTANCE);
+			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			Object merchantId = query.uniqueResult();
+			UUID mId = (UUID)merchantId;
+			if (mId !=null)
+			{
+				fundraiser = getMerchantById(mId);
+			}
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ex.getLocalizedMessage(), ex);
+		}
+		return fundraiser;
+	}
 }

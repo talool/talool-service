@@ -286,4 +286,6 @@ public interface MerchantService extends HibernateService
 	public void moveDeals(final List<UUID> dealIds, final UUID dealOfferId, final long merchantAccountId) throws ServiceException;
 
 	public List<DealOffer> getPublisherDealOffers(final UUID publisherId, final PropertyCriteria propertyCriteria) throws ServiceException;
+	
+	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException;
 }
