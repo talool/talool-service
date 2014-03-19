@@ -1,6 +1,7 @@
 package com.talool.core.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.talool.core.Customer;
@@ -201,10 +202,10 @@ public interface CustomerService extends HibernateService
 	public void createPasswordReset(final Customer customer) throws ServiceException;
 
 	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId,
-			final PaymentDetail paymentDetail) throws ServiceException, NotFoundException;
+			final PaymentDetail paymentDetail, final Map<String, String> paymentProperties) throws ServiceException, NotFoundException;
 
 	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId,
-			final String paymentCode) throws ServiceException, NotFoundException;
+			final String paymentCode, final Map<String, String> paymentProperties) throws ServiceException, NotFoundException;
 
 	/**
 	 * Gets all customers in Talool

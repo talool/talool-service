@@ -2140,7 +2140,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("properties", StandardBasicTypes.STRING);
 
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
-			
+
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			summaries = (List<MerchantSummary>) query.list();
 
@@ -2224,7 +2224,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantSummaryCnt, propertyCriteria, null);
-			
+
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
 			total = (Long) query.uniqueResult();
@@ -2245,11 +2245,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantNameSummaryCnt, propertyCriteria, null);
-			if (propertyCriteria != null) 
+			if (propertyCriteria != null)
 			{
 				newSql += propertyCriteria.buildRawFilterClause("m.properties");
 			}
-			
+
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("name", name.replaceAll("[*]", "%"));
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
@@ -2273,7 +2273,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantSummaryCnt, propertyCriteria, null);
-			
+
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
@@ -2297,7 +2297,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		try
 		{
 			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantNameSummaryCnt, propertyCriteria, null);
-			
+
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			query.setParameter("name", name.replaceAll("[*]", "%"));
@@ -2690,25 +2690,26 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		return isValid;
 
 	}
-	
+
 	@Override
 	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException
 	{
-		if (code==null) return null;
-		
+		if (code == null)
+			return null;
+
 		Merchant fundraiser = null;
 		try
 		{
 			SQLQuery query = getCurrentSession().createSQLQuery(
 					"SELECT mcg.merchant_id AS id FROM merchant_code_group AS mcg, merchant_code AS mc "
-					+ "WHERE mc.merchant_code_group_id=mcg.merchant_code_group_id AND mc.code=:code");
+							+ "WHERE mc.merchant_code_group_id=mcg.merchant_code_group_id AND mc.code=:code");
 
 			query.setParameter("code", code);
 			query.addScalar("id", PostgresUUIDType.INSTANCE);
 			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			Object merchantId = query.uniqueResult();
-			UUID mId = (UUID)merchantId;
-			if (mId !=null)
+			UUID mId = (UUID) merchantId;
+			if (mId != null)
 			{
 				fundraiser = getMerchantById(mId);
 			}
@@ -2720,4 +2721,5 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 		return fundraiser;
 	}
+
 }

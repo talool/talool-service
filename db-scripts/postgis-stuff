@@ -34,19 +34,20 @@ UPDATE merchant SET geom = 'SRID=4326;POINT(87.6500 41.8500)' where merchant_id=
 UPDATE merchant SET geom = 'SRID=4326;POINT(94.5783 39.0997)' where merchant_location_id=2;
 
 
+-- closet merchant locations to denver
 select
         merchant.merchant_id as merchantId,
         merchant.merchant_name as name,
         ST_Distance( mloc.geom,
         'SRID=4326;POINT(-105.27 40.015)',
-        true) as distanceInMiles 
+        true) as distanceInMeters 
     FROM
         public.merchant as merchant,
         public.merchant_location as mloc 
     where
          mloc.merchant_id=merchant.merchant_id 
          and merchant.is_discoverable=true
-   order by distanceInMeters desc;
+   order by distanceInMeters asc;
    
 
 SELECT ST_Distance( ST_GeographyFromText('POINT(-121.7422651 45.3044605)'), ST_GeographyFromText('POINT(-105.2700 40.0150)') ); -- Vancouver/Boulder

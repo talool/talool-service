@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -27,9 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
+import com.talool.api.thrift.CoreConstants;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
 import com.talool.core.ActivationCode;
@@ -95,7 +98,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class CustomerServiceImpl extends AbstractHibernateService implements CustomerService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CustomerServiceImpl.class);
-	
+
 	private static final StatsDClient statsd = new NonBlockingStatsDClient("talool", "graphite.talool.com", 8125);
 
 	private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
@@ -172,7 +175,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			LOG.error("Problem saving activities for new user " + customer.getEmail());
 		}
-		
+
 		statsd.incrementCounter("registration");
 
 	}
@@ -426,7 +429,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.setParameter("redemptionCode", redemptionCode);
 			query.setParameter("redemptionDate", Calendar.getInstance().getTime());
 			query.executeUpdate();
-			
+
 			statsd.incrementCounter("redemption");
 		}
 		catch (ConstraintViolationException ce)
@@ -443,7 +446,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem redeeming deal: " + e.getLocalizedMessage(), e);
 			throw new ServiceException("Problem in redeemDeal with dealAcquireId " + dealAcquireId, e);
 		}
-		
+
 		return redemptionCode;
 
 	}
@@ -721,7 +724,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		statsd.incrementCounter("favorite");
-		
+
 	}
 
 	@Override
@@ -776,7 +779,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Transactional(propagation = Propagation.NESTED)
-	public void createDealOfferPurchase(final Customer customer, final DealOffer dealOffer, final TransactionResult transactionResult)
+	public DealOfferPurchase createDealOfferPurchase(final Customer customer, final DealOffer dealOffer, final TransactionResult transactionResult)
 			throws ServiceException
 	{
 		try
@@ -785,6 +788,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			purchase.setPaymentProcessor(transactionResult.getPaymentProcessor());
 			purchase.setProcessorTransactionId(transactionResult.getTransactionId());
 			daoDispatcher.save(purchase);
+			statsd.incrementCounter("purchase");
+			return purchase;
 		}
 		catch (Exception ex)
 		{
@@ -792,7 +797,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					customer.getId(), dealOffer.getId()), ex);
 		}
 
-		statsd.incrementCounter("purchase");
 	}
 
 	@Override
@@ -933,7 +937,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		statsd.incrementCounter("gift");
-		
+
 	}
 
 	@Override
@@ -1345,7 +1349,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			createDealOfferPurchase(customerId, dealOfferId);
 
 			ServiceFactory.get().getActivityService().save(act);
-			
+
 			statsd.incrementCounter("activate_code");
 		}
 		catch (ServiceException se)
@@ -1385,7 +1389,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	/**
 	 * TODO Test rollback on failures, VOID charge
 	 */
-	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId, final PaymentDetail paymentDetail)
+	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId, final PaymentDetail paymentDetail,
+			final Map<String, String> paymentProperties)
 			throws ServiceException, NotFoundException
 	{
 		DealOffer dealOffer = null;
@@ -1481,10 +1486,43 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	}
 
+	/**
+	 * Updates a merchant code with the dealOfferPurchaseId only if the given
+	 * MerchantCode does not already have a dealOfferPurchaseId
+	 * 
+	 * @param code
+	 * @param dealOfferId
+	 * @param dealOfferPurchaseId
+	 * @throws ServiceException
+	 */
+	@Transactional(propagation = Propagation.NESTED)
+	private void stampMerchantCodePurchase(final String code, final UUID dealOfferId, final UUID dealOfferPurchaseId) throws ServiceException
+	{
+		try
+		{
+			final Query query = getCurrentSession().
+					createQuery("update MerchantCodeImpl set dealOfferPurchaseId=:dealOfferPurchaseId where dealOfferId=:dealOfferId and code=:code and dealOfferPurchaseId is null");
+			int updates = query.executeUpdate();
+			if (updates == 0)
+			{
+				throw new ServiceException("Did not update merchantcode with dealOfferPurchaseId");
+			}
+		}
+		catch (ServiceException e)
+		{
+			throw e;
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(e.getLocalizedMessage(), e);
+		}
+
+	}
+
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId, final String paymentCode) throws ServiceException,
-			NotFoundException
+	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId, final String paymentCode,
+			final Map<String, String> paymentProperties) throws ServiceException, NotFoundException
 	{
 		DealOffer dealOffer = null;
 		Customer customer = null;
@@ -1526,12 +1564,25 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			try
 			{
-				createDealOfferPurchase(customer, dealOffer, transactionResult);
+				final DealOfferPurchase dop = createDealOfferPurchase(customer, dealOffer, transactionResult);
 				getCurrentSession().flush();
 				if (LOG.isDebugEnabled())
 				{
 					LOG.debug("processing braintree for " + customer.getEmail() + " " + transactionResult.getTransactionId());
 				}
+
+				final Optional<Map<String, String>> possibleProps = Optional.of(paymentProperties);
+				if (possibleProps.isPresent())
+				{
+					// update merchant code
+					final String codeType = possibleProps.get().get(CoreConstants.CODE_TYPE);
+					if (StringUtils.equals(codeType, CoreConstants.MERCHANT_CODE))
+					{
+
+					}
+
+				}
+
 			}
 			catch (ServiceException e)
 			{
