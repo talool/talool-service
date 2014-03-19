@@ -16,7 +16,7 @@ import com.talool.domain.MerchantCodeImpl;
  */
 public interface MerchantCodeGroup extends Identifiable
 {
-	public UUID getMerchantId();
+	public Merchant getMerchant();
 
 	public Long getCreatedByMerchantAccountId();
 

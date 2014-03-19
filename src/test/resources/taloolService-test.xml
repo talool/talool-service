@@ -13,7 +13,7 @@
             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
 	<import resource="./taloolCommon-test.xml" />
-	<import resource="./dataSource-test.xml"/>
+	<import resource="./dataSourceLocal-test.xml"/>
 	<import resource="./taloolHibernateContext-test.xml" />
 	<import resource="./taloolMailService-test.xml"/>
 

@@ -13,6 +13,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -21,6 +23,7 @@ import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.talool.core.Merchant;
 import com.talool.core.MerchantCode;
 import com.talool.core.MerchantCodeGroup;
 
@@ -44,9 +47,9 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 	@Column(name = "merchant_code_group_id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "merchant_id", nullable = false)
-	@Type(type = "pg-uuid")
-	private UUID merchantId;
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = MerchantImpl.class)
+	@JoinColumn(name = "merchant_id")
+	private Merchant merchant;
 
 	@Column(name = "created_by_merchant_account_id", nullable = false)
 	private Long createdBymerchantAccountId;
@@ -70,16 +73,15 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "merchantCodeGroup", targetEntity = MerchantCodeImpl.class)
 	private Set<MerchantCode> codes = new HashSet<MerchantCode>();
 
+	public MerchantCodeGroupImpl(final Merchant merchant)
+	{
+		this.merchant = merchant;
+	}
+
 	@Override
 	public Long getId()
 	{
 		return id;
-	}
-
-	@Override
-	public UUID getMerchantId()
-	{
-		return merchantId;
 	}
 
 	@Override
@@ -115,11 +117,6 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 	public void setId(Long id)
 	{
 		this.id = id;
-	}
-
-	public void setMerchantId(UUID merchantId)
-	{
-		this.merchantId = merchantId;
 	}
 
 	public void setCodeGroupTitle(String codeGroupTitle)
@@ -172,6 +169,12 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 	public void setPublisherId(final UUID publisherId)
 	{
 		this.publisherId = publisherId;
+	}
+
+	@Override
+	public Merchant getMerchant()
+	{
+		return merchant;
 	}
 
 }

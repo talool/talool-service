@@ -137,6 +137,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	// @Test
 	public void testMerchantCodes() throws ServiceException
 	{
+		Merchant merchant = taloolService.getFundraiserByTrackingCode("5OMSNHR");
 
 		UUID paybackBookId = UUID.fromString("4d54d8ef-febb-4719-b9f0-a73578a41803");
 		try
@@ -164,7 +165,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		schoolLocation.setEmail("someone@gmail.com");
 		// add the merchant as a school
 		Merchant school = domainFactory.newMerchant(true);
-		school.setName("Lewis Palmer HS");
+		school.setName("Lewis Palmer Middle School");
 		school.setIsDiscoverable(false);
 
 		school.getProperties().createOrReplace("fundraiser", true);
@@ -173,7 +174,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		taloolService.save(school);
 
 		// create 100 codes for the school, track the merchantAcccount and publisher
-		MerchantCodeGroup merchantCodeGrp = taloolService.createMerchantCodeGroup(school.getId(),
+		MerchantCodeGroup merchantCodeGrp = taloolService.createMerchantCodeGroup(school,
 				merchantAccount.getId(), publisher.getId(),
 				"Lewis Palmer School codes", "first set of notes", (short) 100);
 
