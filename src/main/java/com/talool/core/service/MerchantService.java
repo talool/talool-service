@@ -25,7 +25,6 @@ import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
-import com.talool.utils.KeyValue;
 
 /**
  * r Merchant Service
@@ -137,8 +136,20 @@ public interface MerchantService extends HibernateService
 	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final MediaType[] mediaTypes,
 			final SearchOptions searchOptions)
 			throws ServiceException;
+	
+	public MerchantMedia getMerchantMediaById(final UUID mediaId) throws ServiceException;
+	
+	public List<MerchantLocation> getMerchantLocationsUsingMedia(final UUID mediaId, final MediaType mediaType) throws ServiceException;
+	
+	public List<DealOffer> getDealOffersUsingMedia(final UUID mediaId, final MediaType mediaType) throws ServiceException;
+	
+	public List<Deal> getDealsUsingMedia(final UUID mediaId) throws ServiceException;
 
 	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException;
+	
+	public void deleteMerchantMedia(final UUID mediaId) throws ServiceException;
+	
+	public void replaceMerchantMedia(final UUID mediaId, final UUID replacementMediaId, final MediaType mediaType) throws ServiceException;
 
 	/**
 	 * Gets active and non-expired DealOffer summaries within maxMiles of a

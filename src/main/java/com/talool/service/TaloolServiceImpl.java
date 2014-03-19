@@ -77,6 +77,7 @@ import com.talool.domain.MerchantCodeImpl;
 import com.talool.domain.MerchantIdentityImpl;
 import com.talool.domain.MerchantImpl;
 import com.talool.domain.MerchantLocationImpl;
+import com.talool.domain.MerchantMediaImpl;
 import com.talool.domain.Properties;
 import com.talool.domain.PropertyCriteria;
 import com.talool.domain.TagImpl;
@@ -2717,6 +2718,167 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throw new ServiceException(ex.getLocalizedMessage(), ex);
 		}
 		return fundraiser;
+	}
+
+
+	@Override
+	public MerchantMedia getMerchantMediaById(UUID mediaId)
+			throws ServiceException {
+		try
+		{
+			return daoDispatcher.find(MerchantMediaImpl.class, mediaId);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem in getMerchantMediaById " + mediaId, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantLocation> getMerchantLocationsUsingMedia(UUID mediaId, MediaType mediaType)
+			throws ServiceException {
+		List<MerchantLocation> locations = null;
+
+		try
+		{
+			final Search search = new Search(MerchantLocationImpl.class);
+			if (mediaType.equals(MediaType.MERCHANT_IMAGE))
+			{
+				search.addFilterEqual("merchantImage.id", mediaId);
+			}
+			else if (mediaType.equals(MediaType.MERCHANT_LOGO))
+			{
+				search.addFilterEqual("logo.id", mediaId);
+			}
+			else
+			{
+				return new ArrayList<MerchantLocation>();
+			}
+			
+			locations = daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantLocationsUsingMedia", ex);
+		}
+		
+		return locations;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOffer> getDealOffersUsingMedia(UUID mediaId, MediaType mediaType)
+			throws ServiceException {
+		List<DealOffer> offers = null;
+
+		try
+		{
+			final Search search = new Search(DealOfferImpl.class);
+			if (mediaType.equals(MediaType.DEAL_OFFER_LOGO))
+			{
+				search.addFilterEqual("dealOfferLogo.id", mediaId);
+			}
+			else if (mediaType.equals(MediaType.DEAL_OFFER_BACKGROUND_IMAGE))
+			{
+				search.addFilterEqual("dealOfferBackground.id", mediaId);
+			}
+			else if (mediaType.equals(MediaType.DEAL_OFFER_MERCHANT_LOGO))
+			{
+				search.addFilterEqual("dealOfferIcon.id", mediaId);
+			}
+			else
+			{
+				return new ArrayList<DealOffer>();
+			}
+			offers = daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getDealOffersUsingMedia", ex);
+		}
+		
+		return offers;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Deal> getDealsUsingMedia(UUID mediaId) throws ServiceException {
+		List<Deal> deals = null;
+
+		try
+		{
+			final Search search = new Search(DealImpl.class);
+			search.addFilterEqual("image.id", mediaId);
+			deals = daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantLocationsUsingMedia", ex);
+		}
+		
+		return deals;
+	}
+
+	@Override
+	public void deleteMerchantMedia(UUID mediaId) throws ServiceException {
+		// Leave media on the server, but delete the record
+		try
+		{
+			final Query query = getCurrentSession().createQuery("delete from MerchantMediaImpl where id=:mediaId").
+					setParameter("mediaId", mediaId);
+
+			query.executeUpdate();
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem deleteing mediaId " + mediaId, e);
+		}
+	}
+
+	@Override
+	public void replaceMerchantMedia(UUID mediaId, UUID replacementMediaId, MediaType mediaType)
+			throws ServiceException {
+		List<SQLQuery> updates = new ArrayList<SQLQuery>();
+		if (mediaType.equals(MediaType.DEAL_IMAGE) || mediaType.equals(MediaType.MERCHANT_IMAGE))
+		{
+			updates.add(getCurrentSession().createSQLQuery(
+					"UPDATE merchant_location SET merchant_image_id=:replaceId WHERE merchant_image_id=:mediaId"));
+			updates.add(getCurrentSession().createSQLQuery(
+					"UPDATE deal SET image_id=:replaceId WHERE image_id=:mediaId"));
+		}
+		else if (mediaType.equals(MediaType.DEAL_OFFER_LOGO) || mediaType.equals(MediaType.MERCHANT_LOGO))
+		{
+			updates.add(getCurrentSession().createSQLQuery(
+					"UPDATE merchant_location SET logo_url_id=:replaceId WHERE logo_url_id=:mediaId"));
+			updates.add(getCurrentSession().createSQLQuery(
+					"UPDATE deal_offer SET deal_offer_logo_id=:replaceId WHERE deal_offer_logo_id=:mediaId"));
+		}
+		else if (mediaType.equals(MediaType.DEAL_OFFER_BACKGROUND_IMAGE))
+		{
+			updates.add(getCurrentSession().createSQLQuery(
+					"UPDATE deal_offer SET deal_offer_background_id =:replaceId WHERE deal_offer_background_id =:mediaId"));
+		}
+		else if (mediaType.equals(MediaType.DEAL_OFFER_MERCHANT_LOGO))
+		{
+			updates.add(getCurrentSession().createSQLQuery(
+					"UPDATE deal_offer SET deal_offer_icon_id =:replaceId WHERE deal_offer_icon_id =:mediaId"));
+		}
+		
+		try
+		{
+			for (SQLQuery update:updates)
+			{
+				update.setParameter("mediaId", mediaId, PostgresUUIDType.INSTANCE);
+				update.setParameter("replaceId", replacementMediaId, PostgresUUIDType.INSTANCE);
+				update.executeUpdate();
+			}
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem replacing mediaId " + mediaId, e);
+		}
+		
 	}
 
 }
