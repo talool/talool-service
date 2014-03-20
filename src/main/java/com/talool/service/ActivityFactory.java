@@ -125,8 +125,8 @@ public final class ActivityFactory
 
 	public static Activity createGiftReturnNotExistentEmail(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.WELCOME, gift.getFromCustomer().getId());
-		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.WELCOME);
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REJECT, gift.getFromCustomer().getId());
+		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_REJECT);
 
 		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
 				ActivityBundle.GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_TITLE, gift.getDealAcquire().getDeal().getTitle());

@@ -5,9 +5,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,11 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
 import com.googlecode.genericdao.search.Search;
-import com.talool.api.thrift.CoreConstants;
 import com.talool.core.AccountType;
 import com.talool.core.AcquireStatus;
 import com.talool.core.ActivationCode;
@@ -1432,8 +1432,16 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			try
 			{
-				createDealOfferPurchase(customer, dealOffer, transactionResult);
+				final DealOfferPurchase dop = createDealOfferPurchase(customer, dealOffer, transactionResult);
 				getCurrentSession().flush();
+				// save any props
+				if (MapUtils.isNotEmpty(paymentProperties))
+				{
+					for (Entry<String, String> entry : paymentProperties.entrySet())
+					{
+						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
+					}
+				}
 			}
 			catch (ServiceException e)
 			{
@@ -1483,39 +1491,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		LOG.error(String.format("Payment transaction roll back of transactionId '%s' success %s ", transactionResult.getTransactionId(),
 				voidedTrans.isSuccess()));
-
-	}
-
-	/**
-	 * Updates a merchant code with the dealOfferPurchaseId only if the given
-	 * MerchantCode does not already have a dealOfferPurchaseId
-	 * 
-	 * @param code
-	 * @param dealOfferId
-	 * @param dealOfferPurchaseId
-	 * @throws ServiceException
-	 */
-	@Transactional(propagation = Propagation.NESTED)
-	private void stampMerchantCodePurchase(final String code, final UUID dealOfferId, final UUID dealOfferPurchaseId) throws ServiceException
-	{
-		try
-		{
-			final Query query = getCurrentSession().
-					createQuery("update MerchantCodeImpl set dealOfferPurchaseId=:dealOfferPurchaseId where dealOfferId=:dealOfferId and code=:code and dealOfferPurchaseId is null");
-			int updates = query.executeUpdate();
-			if (updates == 0)
-			{
-				throw new ServiceException("Did not update merchantcode with dealOfferPurchaseId");
-			}
-		}
-		catch (ServiceException e)
-		{
-			throw e;
-		}
-		catch (Exception e)
-		{
-			throw new ServiceException(e.getLocalizedMessage(), e);
-		}
 
 	}
 
@@ -1571,16 +1546,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					LOG.debug("processing braintree for " + customer.getEmail() + " " + transactionResult.getTransactionId());
 				}
 
-				final Optional<Map<String, String>> possibleProps = Optional.of(paymentProperties);
-				if (possibleProps.isPresent())
+				// save any props
+				if (MapUtils.isNotEmpty(paymentProperties))
 				{
-					// update merchant code
-					final String codeType = possibleProps.get().get(CoreConstants.CODE_TYPE);
-					if (StringUtils.equals(codeType, CoreConstants.MERCHANT_CODE))
+					for (Entry<String, String> entry : paymentProperties.entrySet())
 					{
-
+						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
-
 				}
 
 			}
