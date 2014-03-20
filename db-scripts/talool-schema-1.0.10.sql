@@ -6,6 +6,12 @@ drop table property_type;
 -- create HSTORE / props
 create extension HSTORE;
 
+ALTER TABLE deal_offer_purchase add column properties HSTORE;
+
+CREATE INDEX deal_offer_purchase_properties_idx ON deal_offer_purchase USING BTREE (properties);
+
+CREATE INDEX deal_offer_purchase_propertie_gist_idx ON deal_offer_purchase USING GIST (properties);
+
 ALTER TABLE deal_offer add column properties HSTORE;
 
 CREATE INDEX deal_offer_properties_idx ON deal_offer USING BTREE (properties);

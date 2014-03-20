@@ -67,6 +67,9 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	@Column(name = "processor_transaction_id", unique = true, nullable = true, length = 32)
 	private String processorTransactionId;
 
+	@Embedded
+	private Properties props = new Properties();
+
 	public DealOfferPurchaseImpl()
 	{}
 
@@ -175,6 +178,12 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	public void setPaymentProcessor(PaymentProcessor paymentProcessor)
 	{
 		this.paymentProcessor = paymentProcessor;
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		return props;
 	}
 
 }

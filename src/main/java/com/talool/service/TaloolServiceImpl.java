@@ -2676,7 +2676,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 							"dof.merchant_id=mcg.publisher_id and mc.merchant_code_group_id=mcg.merchant_code_group_id and mc.code=:code");
 
 			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
-			query.setParameter("code", code);
+			query.setParameter("code", code.toUpperCase());
 
 			Object codeId = query.uniqueResult();
 			isValid = codeId != null ? true : false;

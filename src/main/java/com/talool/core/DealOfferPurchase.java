@@ -3,6 +3,7 @@ package com.talool.core;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.talool.domain.Properties;
 import com.talool.payment.PaymentProcessor;
 
 /**
@@ -29,5 +30,7 @@ public interface DealOfferPurchase extends IdentifiableUUID, Serializable
 	public PaymentProcessor getPaymentProcessor();
 
 	public void setPaymentProcessor(PaymentProcessor paymentProcessor);
+
+	public Properties getProperties();
 
 }
