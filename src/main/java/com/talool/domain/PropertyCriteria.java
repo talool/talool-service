@@ -231,11 +231,13 @@ public class PropertyCriteria
 					}
 					else
 					{
+						boolean firstFilter = true;
 						for (Filter f : filter.groupedFilters)
 						{
-							if (sb.toString().equals(" "))
+							if (firstFilter)
 							{
 								sb.append(buildRawFilterClause(f, propertyColumnName));
+								firstFilter = false;
 							}
 							else
 							{
@@ -247,8 +249,7 @@ public class PropertyCriteria
 				}
 				break;
 			case ValueEqual:
-				sb.append(" AND ")
-				  .append(propertyColumnName)
+				sb.append(propertyColumnName)
 				  .append("->'")
 				  .append(filter.key)
 				  .append("'='")
@@ -256,8 +257,7 @@ public class PropertyCriteria
 				  .append("' ");
 				break;
 			case KeyDoesNotExistOrPropertiesNull:
-				sb.append(" AND ")
-				  .append("(")
+				sb.append("(")
 				  .append(propertyColumnName)
 				  .append(" is null OR exist(")
 				  .append(propertyColumnName)
@@ -275,12 +275,12 @@ public class PropertyCriteria
 	// TODO another quick hack to make the a property search work for MerchantSummary objects
 	public String buildRawFilterClause(final String propertyColumnName)
 	{
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder(" AND (");
 		for (Filter filter : filters)
 		{
 			sb.append(buildRawFilterClause(filter, propertyColumnName));
 		}
-		return sb.toString();
+		return sb.append(") ").toString();
 	}
 
 	public static void main(String args[])
