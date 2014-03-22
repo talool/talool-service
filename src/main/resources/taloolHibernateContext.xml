@@ -67,6 +67,7 @@
 	
 	<bean id="redemptionCodeStrategyImpl" class="com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl">
 	 <constructor-arg value="6"/>
+	  <constructor-arg> <null /></constructor-arg>
 	</bean>
 	
 	<bean id="customerServiceImpl" class="com.talool.service.CustomerServiceImpl">
