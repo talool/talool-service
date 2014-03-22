@@ -12,7 +12,7 @@ import com.talool.domain.Properties;
  * @author clintz
  * 
  */
-public interface Merchant extends IdentifiableUUID, Serializable, TimeAware
+public interface Merchant extends IdentifiableUUID, Serializable, TimeAware, PropertyEntity
 {
 	public String getName();
 

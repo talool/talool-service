@@ -134,7 +134,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Boulder_CO = domainFactory.newLocation(-105.281686, 40.017663);
 	}
 
-	// @Test
+	@Test
 	public void testMerchantCodes() throws ServiceException
 	{
 		Merchant merchant = taloolService.getFundraiserByTrackingCode("5OMSNHR");
@@ -152,6 +152,15 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 		MerchantAccount merchantAccount = taloolService.authenticateMerchantAccount("chris@talool.com", "pass123");
 		Merchant publisher = taloolService.getMerchantByName("SaveAround").get(0);
+
+		for (Entry<String, String> entry : publisher.getProperties().getAllProperties().entrySet())
+		{
+			System.out.println(entry.toString());
+		}
+
+		publisher.getProperties().createOrReplace("chris.new.prop2", System.currentTimeMillis());
+
+		taloolService.merge(publisher);
 
 		final MerchantLocation schoolLocation = domainFactory.newMerchantLocation();
 		schoolLocation.setAddress1("1771 Frontag Rd");

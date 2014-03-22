@@ -56,6 +56,7 @@ import com.talool.core.MerchantCodeGroup;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
+import com.talool.core.PropertyEntity;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
 import com.talool.core.purchase.UniqueCodeStrategy;
@@ -82,6 +83,7 @@ import com.talool.domain.Properties;
 import com.talool.domain.PropertyCriteria;
 import com.talool.domain.TagImpl;
 import com.talool.domain.social.SocialNetworkImpl;
+import com.talool.persistence.HstoreUserType;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.purchase.DealUniqueConfirmationCodeStrategyImpl;
@@ -2453,89 +2455,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> getUniqueProperyKeys(final PropertySupportedEntity entity) throws ServiceException
-	{
-		SQLQuery query = null;
-
-		try
-		{
-			switch (entity)
-			{
-				case DealOffer:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("select distinct skeys( properties ) as keys from deal_offer");
-					break;
-
-				case Merchant:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("select distinct skeys( properties ) as keys from merchant");
-					break;
-
-				case MerchantAccount:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_account");
-					break;
-
-				case MerchantLocation:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
-					break;
-			}
-
-			return query.list();
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
-		}
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.NESTED)
-	public void saveProperties(final PropertySupportedEntity entity, final UUID entityId, final Properties properties) throws ServiceException
-	{
-		SQLQuery query = null;
-
-		try
-		{
-			switch (entity)
-			{
-				case DealOffer:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("update properties set properties=:properties where deal_offer_id=:id");
-
-					break;
-
-				case Merchant:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("update properties set properties=:properties where merchant_id=:id");
-
-					break;
-
-				case MerchantLocation:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("update properties set properties=:properties where merchant_location_id=:id");
-					break;
-
-				case MerchantAccount:
-					query = sessionFactory.getCurrentSession()
-							.createSQLQuery("update properties set properties=:properties where merchant_account_id=:id");
-					break;
-			}
-
-			query.executeUpdate();
-		}
-		catch (Exception ex)
-		{
-			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
-		}
-
-	}
-
-	@Override
-	public <T> List<? extends T> getEntityByProperty(Class<T> type, String propKey, String propVal) throws ServiceException
+	public <T extends PropertyEntity> List<? extends T> getEntityByProperty(Class<T> type, String propKey, String propVal) throws ServiceException
 	{
 		final Map<String, String> props = new HashMap<String, String>();
 		props.put(propKey, propVal);
@@ -2544,7 +2465,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria) throws ServiceException
+	public <T extends PropertyEntity> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria)
+			throws ServiceException
 	{
 		List<T> entityList = null;
 		Query query = null;
@@ -2720,10 +2642,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		return fundraiser;
 	}
 
-
 	@Override
 	public MerchantMedia getMerchantMediaById(UUID mediaId)
-			throws ServiceException {
+			throws ServiceException
+	{
 		try
 		{
 			return daoDispatcher.find(MerchantMediaImpl.class, mediaId);
@@ -2737,7 +2659,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<MerchantLocation> getMerchantLocationsUsingMedia(UUID mediaId, MediaType mediaType)
-			throws ServiceException {
+			throws ServiceException
+	{
 		List<MerchantLocation> locations = null;
 
 		try
@@ -2755,21 +2678,22 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				return new ArrayList<MerchantLocation>();
 			}
-			
+
 			locations = daoDispatcher.search(search);
 		}
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem getMerchantLocationsUsingMedia", ex);
 		}
-		
+
 		return locations;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<DealOffer> getDealOffersUsingMedia(UUID mediaId, MediaType mediaType)
-			throws ServiceException {
+			throws ServiceException
+	{
 		List<DealOffer> offers = null;
 
 		try
@@ -2797,13 +2721,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem getDealOffersUsingMedia", ex);
 		}
-		
+
 		return offers;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Deal> getDealsUsingMedia(UUID mediaId) throws ServiceException {
+	public List<Deal> getDealsUsingMedia(UUID mediaId) throws ServiceException
+	{
 		List<Deal> deals = null;
 
 		try
@@ -2816,12 +2741,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem getMerchantLocationsUsingMedia", ex);
 		}
-		
+
 		return deals;
 	}
 
 	@Override
-	public void deleteMerchantMedia(UUID mediaId) throws ServiceException {
+	public void deleteMerchantMedia(UUID mediaId) throws ServiceException
+	{
 		// Leave media on the server, but delete the record
 		try
 		{
@@ -2838,7 +2764,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@Override
 	public void replaceMerchantMedia(UUID mediaId, UUID replacementMediaId, MediaType mediaType)
-			throws ServiceException {
+			throws ServiceException
+	{
 		List<SQLQuery> updates = new ArrayList<SQLQuery>();
 		if (mediaType.equals(MediaType.DEAL_IMAGE) || mediaType.equals(MediaType.MERCHANT_IMAGE))
 		{
@@ -2864,10 +2791,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			updates.add(getCurrentSession().createSQLQuery(
 					"UPDATE deal_offer SET deal_offer_icon_id =:replaceId WHERE deal_offer_icon_id =:mediaId"));
 		}
-		
+
 		try
 		{
-			for (SQLQuery update:updates)
+			for (SQLQuery update : updates)
 			{
 				update.setParameter("mediaId", mediaId, PostgresUUIDType.INSTANCE);
 				update.setParameter("replaceId", replacementMediaId, PostgresUUIDType.INSTANCE);
@@ -2878,7 +2805,90 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem replacing mediaId " + mediaId, e);
 		}
-		
+
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public <T extends PropertyEntity> void saveProperties(final T entity, final Properties properties) throws ServiceException
+	{
+		Query query = null;
+
+		try
+		{
+			if (entity instanceof DealOffer)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createQuery("update DealOfferImpl set props=:properties where id=:id");
+				query.setParameter("id", ((DealOffer) entity).getId(), PostgresUUIDType.INSTANCE);
+			}
+			else if (entity instanceof Merchant)
+			{
+				query = sessionFactory.getCurrentSession()
+						// JUST PLAYING WITH VERSIONING - version is not ready yet
+						.createQuery("update MerchantImpl set props=:properties where id=:id");
+				query.setParameter("id", ((Merchant) entity).getId(), PostgresUUIDType.INSTANCE);
+				// query.setParameter("version", ((MerchantImpl) entity).getVersion());
+
+			}
+			else if (entity instanceof MerchantLocation)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createQuery("update MerchantLocationImpl set props=:properties where id=:id");
+				query.setParameter("id", ((MerchantLocation) entity).getId());
+			}
+			else if (entity instanceof MerchantAccount)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createQuery("update MerchantAccountImpl set props=:properties where id=:id");
+				query.setParameter("id", ((MerchantAccount) entity).getId());
+			}
+
+			query.setParameter("properties", properties.getAllProperties(), HstoreUserType.TYPE);
+
+			query.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getUniqueProperyKeys(Class<? extends PropertyEntity> entity) throws ServiceException
+	{
+		SQLQuery query = null;
+
+		try
+		{
+			if (entity == DealOffer.class)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createSQLQuery("select distinct skeys( properties ) as keys from deal_offer");
+			}
+			else if (entity == Merchant.class)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createSQLQuery("select distinct skeys( properties ) as keys from merchant");
+			}
+			else if (entity == MerchantAccount.class)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createSQLQuery("select distinct skeys( properties ) as keys from merchant_account");
+			}
+			else if (entity == MerchantLocation.class)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
+			}
+
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
+		}
+	}
 }

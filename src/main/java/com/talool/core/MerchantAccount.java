@@ -9,7 +9,7 @@ import com.talool.domain.Properties;
  * @author clintz
  * 
  */
-public interface MerchantAccount extends Identifiable, Serializable, TimeAware
+public interface MerchantAccount extends Identifiable, Serializable, TimeAware, PropertyEntity
 {
 	public Merchant getMerchant();
 

@@ -14,6 +14,7 @@ import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantCodeGroup;
+import com.talool.core.PropertyEntity;
 import com.talool.core.Tag;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.Properties;
@@ -87,21 +88,14 @@ public interface TaloolService extends MerchantService, HibernateService
 
 	public void setIsMerchantEmailValid(final String email, boolean isValid) throws ServiceException;
 
-	public enum PropertySupportedEntity
-	{
-		DealOffer, Merchant, MerchantAccount, MerchantLocation
-	};
-
 	/**
-	 * Gets the unique property keys for the dealOffers
+	 * Gets the unique property keys
 	 * 
 	 * @param entityInterfaceClass
 	 * @return
 	 * @throws ServiceException
 	 */
-	public List<String> getUniqueProperyKeys(final PropertySupportedEntity entity) throws ServiceException;
-
-	public void saveProperties(final PropertySupportedEntity entity, final UUID entityId, final Properties properties) throws ServiceException;
+	public List<String> getUniqueProperyKeys(final Class<? extends PropertyEntity> entity) throws ServiceException;
 
 	/**
 	 * Gets all entity objects that match the property key/value
@@ -112,7 +106,7 @@ public interface TaloolService extends MerchantService, HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public <T> List<? extends T> getEntityByProperty(final Class<T> type, final String propertykey, final String propertyValue)
+	public <T extends PropertyEntity> List<? extends T> getEntityByProperty(final Class<T> type, final String propertykey, final String propertyValue)
 
 			throws ServiceException;
 
@@ -124,7 +118,8 @@ public interface TaloolService extends MerchantService, HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public <T> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria) throws ServiceException;
+	public <T extends PropertyEntity> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria)
+			throws ServiceException;
 
 	/**
 	 * Creates a group of merchant codes
@@ -142,5 +137,7 @@ public interface TaloolService extends MerchantService, HibernateService
 			throws ServiceException;
 
 	public boolean isMerchantCodeValid(final String code, final UUID dealOfferId) throws ServiceException;
+
+	public <T extends PropertyEntity> void saveProperties(final T entity, final Properties properties) throws ServiceException;
 
 }

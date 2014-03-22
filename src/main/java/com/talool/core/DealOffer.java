@@ -12,7 +12,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author clintz
  * 
  */
-public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware
+public interface DealOffer extends IdentifiableUUID, Serializable, TimeAware, PropertyEntity
 {
 	public MerchantAccount getCreatedByMerchantAccount();
 

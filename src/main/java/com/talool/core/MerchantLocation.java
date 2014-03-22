@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.talool.domain.Properties;
 import com.vividsolutions.jts.geom.Geometry;
 
-public interface MerchantLocation extends Identifiable, Serializable, TimeAware
+public interface MerchantLocation extends Identifiable, Serializable, TimeAware, PropertyEntity
 {
 	public Merchant getMerchant();
 

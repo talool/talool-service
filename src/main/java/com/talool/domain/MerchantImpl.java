@@ -108,6 +108,9 @@ public class MerchantImpl implements Merchant
 	@Embedded
 	private Properties props = new Properties();
 
+	// @Version
+	// private Long version;
+
 	public UUID getId()
 	{
 		return id;
@@ -314,4 +317,10 @@ public class MerchantImpl implements Merchant
 	{
 		return props;
 	}
+
+	// public Long getVersion()
+	// {
+	// return version;
+	// }
+
 }
