@@ -2,6 +2,8 @@ package com.talool.purchase;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.RandomStringUtils;
 
@@ -30,25 +32,58 @@ public class DealUniqueConfirmationCodeStrategyImpl implements UniqueCodeStrateg
 {
 	private int codeLength = 6;
 
-	private static final char[] SYMBOLS = new char[36];
+	private char[] ignoredChars;
 
-	static
+	private final char[] symbols;
+
+	public DealUniqueConfirmationCodeStrategyImpl(final int codeLength, final char... ignoredChars)
 	{
+		final Set<Character> ignoredSet = new HashSet<Character>();
+		this.ignoredChars = ignoredChars;
+		int totalChars = 0;
+		int charIdx = 0;
+
+		if (ignoredChars != null)
+		{
+			for (char chr : ignoredChars)
+			{
+				ignoredSet.add(chr);
+			}
+			totalChars = 36 - ignoredChars.length;
+
+		}
+		else
+		{
+			totalChars = 36;
+		}
+
+		this.symbols = new char[totalChars];
+
 		for (int idx = 0; idx < 10; ++idx)
 		{
-			SYMBOLS[idx] = (char) ('0' + idx);
+			char chr = (char) ('0' + idx);
+			if (ignoredSet.contains(chr))
+			{
+				continue;
+			}
+			else
+			{
+				symbols[charIdx++] = chr;
+			}
 		}
 
 		for (int idx = 10; idx < 36; ++idx)
 		{
-			SYMBOLS[idx] = (char) ('A' + idx - 10);
+			char chr = (char) ('A' + idx - 10);
+			if (ignoredSet.contains(chr))
+			{
+				continue;
+			}
+			else
+			{
+				symbols[charIdx++] = chr;
+			}
 		}
-
-	}
-
-	public DealUniqueConfirmationCodeStrategyImpl(final int codeLength)
-	{
-		this.codeLength = codeLength;
 	}
 
 	@Override
@@ -57,7 +92,7 @@ public class DealUniqueConfirmationCodeStrategyImpl implements UniqueCodeStrateg
 		String code = null;
 		try
 		{
-			code = RandomStringUtils.random(codeLength, 0, SYMBOLS.length - 1, true, true, SYMBOLS,
+			code = RandomStringUtils.random(codeLength, 0, symbols.length - 1, true, true, symbols,
 					SecureRandom.getInstance("SHA1PRNG"));
 		}
 		catch (NoSuchAlgorithmException e)
@@ -73,4 +108,24 @@ public class DealUniqueConfirmationCodeStrategyImpl implements UniqueCodeStrateg
 		return codeLength;
 	}
 
+	public char[] getSymbols()
+	{
+		return symbols;
+	}
+
+	public static void main(String args[])
+	{
+		DealUniqueConfirmationCodeStrategyImpl codeGen = new DealUniqueConfirmationCodeStrategyImpl(7, 'O', '0', 'M', 'A', 'B', 'C');
+
+		for (char c : codeGen.getSymbols())
+		{
+			System.out.println(c + ",");
+		}
+
+		for (int i = 0; i < 100; i++)
+		{
+			System.out.println(codeGen.generateCode());
+		}
+
+	}
 }

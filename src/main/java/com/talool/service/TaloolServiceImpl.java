@@ -111,7 +111,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
 	public static final float MILES_TO_METERS = 1609.34f;
 
-	private UniqueCodeStrategy activiationCodeStrategy = new DealUniqueConfirmationCodeStrategyImpl(7);
+	private UniqueCodeStrategy activiationCodeStrategy = new DealUniqueConfirmationCodeStrategyImpl(7, '0', 'O');
 
 	public TaloolServiceImpl()
 	{}
