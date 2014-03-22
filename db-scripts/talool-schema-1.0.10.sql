@@ -3,8 +3,6 @@
 drop table merchant_property;
 drop table property_type;
 
-ALTER TABLE merchant add column bigint version;
-
 -- create HSTORE / props
 create extension HSTORE;
 
