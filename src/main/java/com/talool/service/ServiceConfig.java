@@ -42,6 +42,8 @@ public class ServiceConfig extends PropertiesConfiguration
 	private static final String UPLOAD_DIR = "upload.dir";
 	private static final String STATIC_LOGO_BASE_URL = "static.logo.base.url";
 	private static final String IMAGE_MAGICK_PATH = "image.magick.path";
+	
+	private static final String STATSD_ENVIRONMENT_IS_PRODUCTION = "statsd.environment.is.production";
 
 	// private static final String UPLOAD_LOGO_MAX_SIZE_BYTES =
 	// "upload.logo.max.size.bytes";
@@ -186,6 +188,11 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getImageMagickPath()
 	{
 		return getString(IMAGE_MAGICK_PATH);
+	}
+	
+	public boolean isStatsDEnvironmentProduction()
+	{
+		return getBoolean(STATSD_ENVIRONMENT_IS_PRODUCTION);
 	}
 
 	public static synchronized ServiceConfig createInstance(final String propertyFile)

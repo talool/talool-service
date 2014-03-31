@@ -95,6 +95,7 @@ import com.talool.stats.DealSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.SpatialUtils;
+import com.talool.utils.TaloolStatsDClient;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -371,6 +372,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.setParameter("merchantId", merchantId);
 			query.setParameter("email", email);
 			query.setParameter("pass", md5pass);
+			
+			TaloolStatsDClient.get().count("authenticate", "merchant", null);
+			
 			return (MerchantAccount) query.uniqueResult();
 		}
 		catch (Exception ex)
@@ -778,6 +782,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				if (accounts.get(0).getPassword().equals(EncryptService.MD5(password)))
 				{
+					TaloolStatsDClient.get().count("authenticate", "merchant", null);
 					return accounts.get(0);
 				}
 			}
@@ -2602,6 +2607,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			Object codeId = query.uniqueResult();
 			isValid = codeId != null ? true : false;
+			
+			TaloolStatsDClient.get().count("validate_code", "merchant_code", dealOfferId.toString());
 
 		}
 		catch (Exception ex)
