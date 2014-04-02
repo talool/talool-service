@@ -246,6 +246,8 @@ select add_category_tag('Food','BBQ');
 select add_category_tag('Food','Family Dining');
 select add_category_tag('Food','Fast Food');
 select add_category_tag('Food','Fine Dining');
+select add_category_tag('Food','Casual Dining');
+select add_category_tag('Food','Pub');
 select add_category_tag('Food','Snack Shop');
 select add_category_tag('Food','Donut');
 select add_category_tag('Food','Bakery');
@@ -370,6 +372,8 @@ select add_category_tag('Fun','Sporting Events');
 select add_category_tag('Fun','Water Sports');
 select add_category_tag('Fun','Zoo');
 select add_category_tag('Fun','Aquarium');
+select add_category_tag('Fun','Tours');
+select add_category_tag('Fun','Lessons');
 			
 select add_category_tag('Nightlife','Brewery');
 select add_category_tag('Nightlife','Wine');
