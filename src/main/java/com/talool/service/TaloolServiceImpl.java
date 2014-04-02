@@ -2753,6 +2753,22 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
+	public void deleteMerchantLocation(final Long id) throws ServiceException
+	{
+		try
+		{
+			final Query query = getCurrentSession().createQuery("delete from MerchantLocationImpl where id=:locId").
+					setParameter("locId", id);
+
+			query.executeUpdate();
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem deleteing locationId " + id, e);
+		}
+	}
+	
+	@Override
 	public void deleteMerchantMedia(UUID mediaId) throws ServiceException
 	{
 		// Leave media on the server, but delete the record

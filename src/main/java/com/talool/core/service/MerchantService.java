@@ -53,6 +53,8 @@ public interface MerchantService extends HibernateService
 			final String password) throws ServiceException;
 
 	public void deleteMerchant(final String id) throws ServiceException;
+	
+	public void deleteMerchantLocation(final Long id) throws ServiceException;
 
 	public Merchant getMerchantById(final UUID id) throws ServiceException;
 
