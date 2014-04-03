@@ -110,6 +110,9 @@ public class DealImpl implements Deal
 	@Embedded
 	private CreatedUpdated createdUpdated;
 
+	@Embedded
+	private Properties props;
+
 	public DealImpl(MerchantAccount createdByMerchantAccount)
 	{
 		this.createdByMerchantAccount = createdByMerchantAccount;
@@ -409,5 +412,11 @@ public class DealImpl implements Deal
 	public UUID getDealOfferId()
 	{
 		return dealOfferId;
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		return props;
 	}
 }

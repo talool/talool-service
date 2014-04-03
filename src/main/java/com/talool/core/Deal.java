@@ -12,7 +12,7 @@ import java.util.UUID;
  * @author clintz
  * 
  */
-public interface Deal extends IdentifiableUUID, Serializable, TimeAware
+public interface Deal extends IdentifiableUUID, Serializable, TimeAware, PropertyEntity
 {
 	public DealOffer getDealOffer();
 
