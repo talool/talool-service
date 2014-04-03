@@ -1,5 +1,11 @@
 package com.talool.utils;
 
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.talool.service.ServiceConfig;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 
@@ -8,6 +14,8 @@ public class TaloolStatsDClient {
 
 	private static NonBlockingStatsDClient client;
 	private static TaloolStatsDClient instance;
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TaloolStatsDClient.class);
 
 	private TaloolStatsDClient() 
 	{	
@@ -32,9 +40,9 @@ public class TaloolStatsDClient {
 	 * @param String object - something like the offer id or the deal id
 	 * 
 	 * Tracking string format is something like this...
-	 * talool.<env>.apps.<app>.<whitelabel>.users.<user>.actions.<action>.<subaction>.<object>
+	 * talool.<env>.apps.<app>.<whitelabel>.<platform>.users.<user>.actions.<action>.<subaction>.<object>
 	 */
-	public void count(String action, String subaction, String object)
+	public void count(String action, String subaction, String object, Map<String, String> requestHeaders)
 	{
 		if (action == null) return;
 		
@@ -49,15 +57,38 @@ public class TaloolStatsDClient {
 		} 
 		sb.append(".apps");
 		
-		boolean hasHeaders = false;
-		if (hasHeaders)
-		{
-			// TODO parse the headers to get the app and white label id and user id.  
-			// Chris will put this in thread local
-			//sb.append(".<app>.<whitelabel>.<user>");
+		if (requestHeaders != null)
+		{	
+			String ua = requestHeaders.get("user-agent");
+			String app = "mobile"; // this is the only one we have, but there could be more in the future
+			String platform = null;
+			if (ua != null)
+			{
+				platform = (StringUtils.contains(ua, "iPhone"))?"iphone":"android";
+			}
+			
+			String whitelabelId = requestHeaders.get("white-label-id");
+			String userId = requestHeaders.get("user-id");
+			
+			sb.append(".").append(app);
+			if (whitelabelId != null)
+			{
+				sb.append(".").append(whitelabelId);
+			}
+			if (platform != null)
+			{
+				sb.append(".").append(platform);
+			}
+			sb.append(".users");
+			if (userId != null)
+			{
+				sb.append(".").append(userId);
+			}
+			
 		}
 		else
 		{
+			LOG.debug("no headers in thread local");
 			sb.append(".mobile.users");
 		}
 		
@@ -73,6 +104,7 @@ public class TaloolStatsDClient {
 			sb.append(".").append(object);
 		}
 		
+		LOG.info("count: "+sb.toString());
 		client.incrementCounter(sb.toString());
 	}
 }

@@ -175,7 +175,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem saving activities for new user " + customer.getEmail());
 		}
 
-		TaloolStatsDClient.get().count("registration", null, null);
+		TaloolStatsDClient.get().count("registration", null, null, requestHeaders.get());
 
 	}
 	private static class GiftOwnership
@@ -247,7 +247,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException("Problem authenticating", ex);
 		}
 
-		TaloolStatsDClient.get().count("authenticate", "user", null);
+		TaloolStatsDClient.get().count("authenticate", "user", null, requestHeaders.get());
 		
 		return (Customer) daoDispatcher.searchUnique(search);
 
@@ -462,7 +462,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			dealId = getDealAcquire(dealAcquireId).getDeal().getId().toString();
 		}
 		catch(Exception e) {}
-		TaloolStatsDClient.get().count("redemption", null, dealId);
+		TaloolStatsDClient.get().count("redemption", null, dealId, requestHeaders.get());
 					
 		return redemptionCode;
 
@@ -740,7 +740,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					customerId, merchantId));
 		}
 
-		TaloolStatsDClient.get().count("favorite", "add", merchantId.toString());
+		TaloolStatsDClient.get().count("favorite", "add", merchantId.toString(), requestHeaders.get());
 
 	}
 
@@ -770,7 +770,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					customerId, merchantId));
 		}
 		
-		TaloolStatsDClient.get().count("favorite", "remove", merchantId.toString());
+		TaloolStatsDClient.get().count("favorite", "remove", merchantId.toString(), requestHeaders.get());
 
 	}
 
@@ -956,7 +956,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		String subaction = (gift instanceof FaceBookGift) ? "facebook":"email";
-		TaloolStatsDClient.get().count("gift", subaction, gift.getDealAcquire().getDeal().getId().toString());
+		TaloolStatsDClient.get().count("gift", subaction, gift.getDealAcquire().getDeal().getId().toString(), requestHeaders.get());
 
 	}
 
@@ -1059,7 +1059,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					receipientCustomerId.toString(), giftId), e);
 		}
 		
-		TaloolStatsDClient.get().count("gift", "accept", giftOwnership.gift.getDealAcquire().getDeal().getId().toString());
+		TaloolStatsDClient.get().count("gift", "accept", giftOwnership.gift.getDealAcquire().getDeal().getId().toString(), requestHeaders.get());
 
 		return dac;
 
@@ -1133,7 +1133,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem finding/persisting closedState on activity: " + e.getLocalizedMessage());
 		}
 
-		TaloolStatsDClient.get().count("gift", "reject", giftOwnership.gift.getDealAcquire().getDeal().getId().toString());
+		TaloolStatsDClient.get().count("gift", "reject", giftOwnership.gift.getDealAcquire().getDeal().getId().toString(), requestHeaders.get());
 	}
 
 	@Override
@@ -1373,7 +1373,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			ServiceFactory.get().getActivityService().save(act);
 
-			TaloolStatsDClient.get().count("purchase", "activate_code", dealOfferId.toString());
+			TaloolStatsDClient.get().count("purchase", "activate_code", dealOfferId.toString(), requestHeaders.get());
 		}
 		catch (ServiceException se)
 		{
@@ -1405,7 +1405,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException("Problem creating password reset for email " + customer.getEmail(), e);
 		}
 
-		TaloolStatsDClient.get().count("password", "create_reset", null);
+		TaloolStatsDClient.get().count("password", "create_reset", null, requestHeaders.get());
 	}
 
 	@Override
@@ -1466,7 +1466,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
 				}
-				TaloolStatsDClient.get().count("purchase", "credit_card", dealOfferId.toString());
+				TaloolStatsDClient.get().count("purchase", "credit_card", dealOfferId.toString(), requestHeaders.get());
 			}
 			catch (ServiceException e)
 			{
@@ -1580,7 +1580,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					}
 				}
 				
-				TaloolStatsDClient.get().count("purchase", "credit_card_code", dealOfferId.toString());
+				TaloolStatsDClient.get().count("purchase", "credit_card_code", dealOfferId.toString(), requestHeaders.get());
 
 			}
 			catch (ServiceException e)
@@ -1935,7 +1935,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			search.addFilterEqual("code", uCode);
 			activationCode = (ActivationCodeImpl) daoDispatcher.searchUnique(search);
 
-			TaloolStatsDClient.get().count("validate_code", "activation_code", dealOfferid.toString());
+			TaloolStatsDClient.get().count("validate_code", "activation_code", dealOfferid.toString(), requestHeaders.get());
 		}
 		catch (Exception ex)
 		{

@@ -376,7 +376,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.setParameter("email", email);
 			query.setParameter("pass", md5pass);
 			
-			TaloolStatsDClient.get().count("authenticate", "merchant", null);
+			TaloolStatsDClient.get().count("authenticate", "merchant", null, requestHeaders.get());
 			
 			return (MerchantAccount) query.uniqueResult();
 		}
@@ -785,7 +785,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				if (accounts.get(0).getPassword().equals(EncryptService.MD5(password)))
 				{
-					TaloolStatsDClient.get().count("authenticate", "merchant", null);
+					TaloolStatsDClient.get().count("authenticate", "merchant", null, requestHeaders.get());
 					return accounts.get(0);
 				}
 			}
@@ -2611,7 +2611,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			Object codeId = query.uniqueResult();
 			isValid = codeId != null ? true : false;
 			
-			TaloolStatsDClient.get().count("validate_code", "merchant_code", dealOfferId.toString());
+			TaloolStatsDClient.get().count("validate_code", "merchant_code", dealOfferId.toString(), requestHeaders.get());
 
 		}
 		catch (Exception ex)
