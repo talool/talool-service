@@ -109,7 +109,10 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class TaloolServiceImpl extends AbstractHibernateService implements TaloolService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(TaloolServiceImpl.class);
+
 	public static final float MILES_TO_METERS = 1609.34f;
+
+	private static final ThreadLocal<Map<String, String>> requestHeaders = new ThreadLocal<Map<String, String>>();
 
 	private UniqueCodeStrategy activiationCodeStrategy = new DealUniqueConfirmationCodeStrategyImpl(7, '0', 'O');
 
@@ -2890,5 +2893,12 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("Problem getUniqueProperyKeys for " + entity, ex);
 		}
+	}
+
+	@Override
+	public void setRequestHeaders(final Map<String, String> headers)
+	{
+		requestHeaders.set(headers);
+
 	}
 }

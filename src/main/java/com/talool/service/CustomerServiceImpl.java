@@ -103,6 +103,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
 
+	private static final ThreadLocal<Map<String, String>> requestHeaders = new ThreadLocal<Map<String, String>>();
+
 	private UniqueCodeStrategy redemptionCodeStrategy;
 
 	@Override
@@ -228,6 +230,15 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throws ServiceException
 	{
 		final Search search = new Search(CustomerImpl.class);
+
+		if (requestHeaders.get() != null)
+		{
+			for (Entry<String, String> entry : requestHeaders.get().entrySet())
+			{
+				LOG.info("Got header: " + entry.getKey() + " with value: " + entry.getValue());
+			}
+
+		}
 
 		search.addFilterEqual("email", email.toLowerCase());
 		try
@@ -1916,5 +1927,11 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		return activationCode == null ? false : true;
 
+	}
+
+	@Override
+	public void setRequestHeaders(final Map<String, String> headers)
+	{
+		requestHeaders.set(headers);
 	}
 }

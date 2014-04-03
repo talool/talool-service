@@ -28,7 +28,7 @@ import com.talool.stats.PaginatedResult;
  * @author clintz
  * 
  */
-public interface CustomerService extends HibernateService
+public interface CustomerService extends HibernateService, RequestHeaderSupport
 {
 	public void createAccount(final Customer customer, final String password) throws ServiceException;
 

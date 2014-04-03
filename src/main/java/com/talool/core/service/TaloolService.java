@@ -25,7 +25,7 @@ import com.talool.service.HibernateService;
  * 
  * @author clintz
  */
-public interface TaloolService extends MerchantService, HibernateService
+public interface TaloolService extends MerchantService, HibernateService, RequestHeaderSupport
 {
 	public SocialNetwork getSocialNetwork(final SocialNetwork.NetworkName name) throws ServiceException;
 
