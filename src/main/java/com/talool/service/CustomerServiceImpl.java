@@ -80,8 +80,7 @@ import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.service.mail.EmailRequestParams;
 import com.talool.stats.CustomerSummary;
 import com.talool.stats.PaginatedResult;
-import com.timgroup.statsd.NonBlockingStatsDClient;
-import com.timgroup.statsd.StatsDClient;
+import com.talool.utils.TaloolStatsDClient;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -98,8 +97,6 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class CustomerServiceImpl extends AbstractHibernateService implements CustomerService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(CustomerServiceImpl.class);
-
-	private static final StatsDClient statsd = new NonBlockingStatsDClient("talool", "graphite.talool.com", 8125);
 
 	private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
 
@@ -178,7 +175,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem saving activities for new user " + customer.getEmail());
 		}
 
-		statsd.incrementCounter("registration");
+		TaloolStatsDClient.get().count("registration", null, null);
 
 	}
 	private static class GiftOwnership
@@ -250,6 +247,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException("Problem authenticating", ex);
 		}
 
+		TaloolStatsDClient.get().count("authenticate", "user", null);
+		
 		return (Customer) daoDispatcher.searchUnique(search);
 
 	}
@@ -440,8 +439,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.setParameter("redemptionCode", redemptionCode);
 			query.setParameter("redemptionDate", Calendar.getInstance().getTime());
 			query.executeUpdate();
-
-			statsd.incrementCounter("redemption");
 		}
 		catch (ConstraintViolationException ce)
 		{
@@ -458,6 +455,15 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException("Problem in redeemDeal with dealAcquireId " + dealAcquireId, e);
 		}
 
+		// get the deal id for tracking, cuz the deal acquire id is kinda meaningless
+		String dealId = null;
+		try 
+		{
+			dealId = getDealAcquire(dealAcquireId).getDeal().getId().toString();
+		}
+		catch(Exception e) {}
+		TaloolStatsDClient.get().count("redemption", null, dealId);
+					
 		return redemptionCode;
 
 	}
@@ -734,7 +740,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 					customerId, merchantId));
 		}
 
-		statsd.incrementCounter("favorite");
+		TaloolStatsDClient.get().count("favorite", "add", merchantId.toString());
 
 	}
 
@@ -763,6 +769,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException(String.format("There was a problem removing favorite merchant: customerId %s merchantId %s",
 					customerId, merchantId));
 		}
+		
+		TaloolStatsDClient.get().count("favorite", "remove", merchantId.toString());
 
 	}
 
@@ -799,7 +807,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			purchase.setPaymentProcessor(transactionResult.getPaymentProcessor());
 			purchase.setProcessorTransactionId(transactionResult.getTransactionId());
 			daoDispatcher.save(purchase);
-			statsd.incrementCounter("purchase");
+			
 			return purchase;
 		}
 		catch (Exception ex)
@@ -947,7 +955,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException("Problem in createGift: " + ex.getLocalizedMessage(), ex);
 		}
 
-		statsd.incrementCounter("gift");
+		String subaction = (gift instanceof FaceBookGift) ? "facebook":"email";
+		TaloolStatsDClient.get().count("gift", subaction, gift.getDealAcquire().getDeal().getId().toString());
 
 	}
 
@@ -1049,6 +1058,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error(String.format("Problem finding/persisting closedState on activity. receipCustomerId %s giftId %s",
 					receipientCustomerId.toString(), giftId), e);
 		}
+		
+		TaloolStatsDClient.get().count("gift", "accept", giftOwnership.gift.getDealAcquire().getDeal().getId().toString());
 
 		return dac;
 
@@ -1122,6 +1133,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem finding/persisting closedState on activity: " + e.getLocalizedMessage());
 		}
 
+		TaloolStatsDClient.get().count("gift", "reject", giftOwnership.gift.getDealAcquire().getDeal().getId().toString());
 	}
 
 	@Override
@@ -1361,7 +1373,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			ServiceFactory.get().getActivityService().save(act);
 
-			statsd.incrementCounter("activate_code");
+			TaloolStatsDClient.get().count("purchase", "activate_code", dealOfferId.toString());
 		}
 		catch (ServiceException se)
 		{
@@ -1393,6 +1405,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			throw new ServiceException("Problem creating password reset for email " + customer.getEmail(), e);
 		}
 
+		TaloolStatsDClient.get().count("password", "create_reset", null);
 	}
 
 	@Override
@@ -1453,6 +1466,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
 				}
+				TaloolStatsDClient.get().count("purchase", "credit_card", dealOfferId.toString());
 			}
 			catch (ServiceException e)
 			{
@@ -1565,6 +1579,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
 				}
+				
+				TaloolStatsDClient.get().count("purchase", "credit_card_code", dealOfferId.toString());
 
 			}
 			catch (ServiceException e)
@@ -1919,6 +1935,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			search.addFilterEqual("code", uCode);
 			activationCode = (ActivationCodeImpl) daoDispatcher.searchUnique(search);
 
+			TaloolStatsDClient.get().count("validate_code", "activation_code", dealOfferid.toString());
 		}
 		catch (Exception ex)
 		{
