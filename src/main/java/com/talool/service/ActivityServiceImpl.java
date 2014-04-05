@@ -1,6 +1,7 @@
 package com.talool.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ import com.talool.core.service.ActivityService;
 import com.talool.core.service.ServiceException;
 import com.talool.domain.activity.ActivityImpl;
 import com.talool.persistence.QueryHelper;
+import com.talool.utils.GraphiteConstants.Action;
+import com.talool.utils.TaloolStatsDClient;
 
 /**
  * Hibernate implementation of an ActivityService
@@ -31,6 +34,7 @@ import com.talool.persistence.QueryHelper;
 public class ActivityServiceImpl extends AbstractHibernateService implements ActivityService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ActivityServiceImpl.class);
+	private static final ThreadLocal<Map<String, String>> requestHeaders = new ThreadLocal<Map<String, String>>();
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
@@ -58,7 +62,9 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 
 			QueryHelper.applySearchOptions(searchOpts, search);
 			search.addSort(Sort.asc("activityEvent"));
-
+			
+			TaloolStatsDClient.get().count(Action.get_activities, null, null, requestHeaders.get());
+			
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -96,7 +102,10 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 			search.addFilterEqual("id", actionId);
 			Activity activity = (Activity) daoDispatcher.searchUnique(search);
 			ActivityFactory.setActionTaken(activity, true);
+			
 			save(activity);
+			
+			TaloolStatsDClient.get().count(Action.activity_action_taken, null, null, requestHeaders.get());
 		}
 		catch (Exception ex)
 		{

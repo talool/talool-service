@@ -94,6 +94,8 @@ import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
+import com.talool.utils.GraphiteConstants.Action;
+import com.talool.utils.GraphiteConstants.SubAction;
 import com.talool.utils.SpatialUtils;
 import com.talool.utils.TaloolStatsDClient;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -376,7 +378,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.setParameter("email", email);
 			query.setParameter("pass", md5pass);
 			
-			TaloolStatsDClient.get().count("authenticate", "merchant", null, requestHeaders.get());
+			TaloolStatsDClient.get().count(Action.authenticate, SubAction.merchant, null, requestHeaders.get());
 			
 			return (MerchantAccount) query.uniqueResult();
 		}
@@ -785,7 +787,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				if (accounts.get(0).getPassword().equals(EncryptService.MD5(password)))
 				{
-					TaloolStatsDClient.get().count("authenticate", "merchant", null, requestHeaders.get());
+					TaloolStatsDClient.get().count(Action.authenticate, SubAction.merchant, null, requestHeaders.get());
 					return accounts.get(0);
 				}
 			}
@@ -2611,7 +2613,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			Object codeId = query.uniqueResult();
 			isValid = codeId != null ? true : false;
 			
-			TaloolStatsDClient.get().count("validate_code", "merchant_code", dealOfferId.toString(), requestHeaders.get());
+			TaloolStatsDClient.get().count(Action.validate_code, SubAction.merchant_code, dealOfferId, requestHeaders.get());
 
 		}
 		catch (Exception ex)

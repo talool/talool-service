@@ -1,12 +1,19 @@
 package com.talool.utils;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.service.ServiceConfig;
+import com.talool.utils.GraphiteConstants.Action;
+import com.talool.utils.GraphiteConstants.Apps;
+import com.talool.utils.GraphiteConstants.DeviceType;
+import com.talool.utils.GraphiteConstants.Environment;
+import com.talool.utils.GraphiteConstants.SubAction;
+import com.talool.utils.GraphiteConstants.WhiteLabel;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 
 
@@ -42,67 +49,42 @@ public class TaloolStatsDClient {
 	 * Tracking string format is something like this...
 	 * talool.<env>.apps.<app>.<whitelabel>.<platform>.users.<user>.actions.<action>.<subaction>.<object>
 	 */
-	public void count(String action, String subaction, String object, Map<String, String> requestHeaders)
+	public void count(Action action, SubAction subaction, UUID object, Map<String, String> requestHeaders)
 	{
 		if (action == null) return;
+
+		// Set some default values
+		String env = (ServiceConfig.get().isStatsDEnvironmentProduction())?Environment.production.toString():Environment.development.toString();
+		String app = Apps.mobile.toString(); // this is the only one we have, but there could be more in the future
+		String whitelabelId = WhiteLabel.core.toString();
+		String platform = GraphiteConstants.any;
+		String userId = GraphiteConstants.any;
+		String subactionString = (subaction==null) ?GraphiteConstants.any:subaction.toString();
+		String objString = (object==null) ? GraphiteConstants.any:object.toString();
 		
-		StringBuilder sb = new StringBuilder();
-		if (ServiceConfig.get().isStatsDEnvironmentProduction())
-		{
-			sb.append("production");
-		}
-		else
-		{
-			sb.append("development");
-		} 
-		sb.append(".apps");
-		
+		// Try to get specific values from the headers
 		if (requestHeaders != null)
 		{	
 			String ua = requestHeaders.get("user-agent");
-			String app = "mobile"; // this is the only one we have, but there could be more in the future
-			String platform = null;
 			if (ua != null)
 			{
-				platform = (StringUtils.contains(ua, "iPhone"))?"iphone":"android";
+				platform = (StringUtils.contains(ua, "iPhone"))?DeviceType.iphone.toString():DeviceType.android.toString();
 			}
 			
-			String whitelabelId = requestHeaders.get("white-label-id");
-			String userId = requestHeaders.get("user-id");
-			
-			sb.append(".").append(app);
-			if (whitelabelId != null)
-			{
-				sb.append(".").append(whitelabelId);
-			}
-			if (platform != null)
-			{
-				sb.append(".").append(platform);
-			}
-			sb.append(".users");
-			if (userId != null)
-			{
-				sb.append(".").append(userId);
-			}
-			
+			// TODO get the whitelabelid and userid
+			//whitelabelId = requestHeaders.get("white-label-id");
+			//userId = requestHeaders.get("user-id");
 		}
 		else
 		{
 			LOG.debug("no headers in thread local");
-			sb.append(".mobile.users");
 		}
 		
-		sb.append(".actions.").append(action);
-		
-		if (subaction != null)
-		{
-			sb.append(".").append(subaction); 
-		}
-		
-		if (object != null)
-		{
-			sb.append(".").append(object);
-		}
+		// Build the key
+		StringBuilder sb = new StringBuilder(env);
+		sb.append(".apps").append(".").append(app).append(".").append(whitelabelId).append(".").append(platform)
+		  .append(".users").append(".").append(userId)
+		  .append(".actions.").append(action).append(".").append(subactionString).append(".").append(objString);
 		
 		LOG.info("count: "+sb.toString());
 		client.incrementCounter(sb.toString());
