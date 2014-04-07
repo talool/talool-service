@@ -83,8 +83,8 @@ public class TaloolStatsDClient {
 		// Build the key
 		StringBuilder sb = new StringBuilder(env);
 		sb.append(".apps").append(".").append(app).append(".").append(whitelabelId).append(".").append(platform)
-		  .append(".users").append(".").append(userId)
-		  .append(".actions.").append(action).append(".").append(subactionString).append(".").append(objString);
+		  .append(".actions.").append(action).append(".").append(subactionString).append(".").append(objString)
+		  .append(".users").append(".").append(userId);
 		
 		LOG.info("count: "+sb.toString());
 		client.incrementCounter(sb.toString());
