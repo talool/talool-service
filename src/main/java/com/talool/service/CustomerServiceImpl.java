@@ -82,6 +82,7 @@ import com.talool.stats.CustomerSummary;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.GraphiteConstants.Action;
 import com.talool.utils.GraphiteConstants.SubAction;
+import com.talool.utils.KeyValue;
 import com.talool.utils.TaloolStatsDClient;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -1488,6 +1489,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
 				}
+				if (paymentProperties.containsKey(KeyValue.merchantCode))
+				{
+					String merchantCode = paymentProperties.get(KeyValue.merchantCode);
+					Merchant fundraiser = ServiceFactory.get().getTaloolService().getFundraiserByTrackingCode(merchantCode);
+					TaloolStatsDClient.get().count(Action.fundraiser_purchase, SubAction.credit_card, fundraiser.getId(), requestHeaders.get());
+				}
 				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card, dealOfferId, requestHeaders.get());
 			}
 			catch (ServiceException e)
@@ -1601,7 +1608,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
 				}
-				
+				if (paymentProperties.containsKey(KeyValue.merchantCode))
+				{
+					String merchantCode = paymentProperties.get(KeyValue.merchantCode);
+					Merchant fundraiser = ServiceFactory.get().getTaloolService().getFundraiserByTrackingCode(merchantCode);
+					TaloolStatsDClient.get().count(Action.fundraiser_purchase, SubAction.credit_card, fundraiser.getId(), requestHeaders.get());
+				}
 				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card_code, dealOfferId, requestHeaders.get());
 
 			}

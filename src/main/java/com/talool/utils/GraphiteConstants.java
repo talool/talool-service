@@ -7,7 +7,7 @@ public class GraphiteConstants {
 	public enum Action {
 		activity_action_taken, get_activities, authenticate, validate_code, get_deal_acquires, registration,
 		redemption,  get_merchant_acquires, get_merchants, favorite, get_favorites, gift, get_gifts,
-		purchase, password
+		purchase, password, fundraiser_purchase
 	}
 	
 	public enum SubAction {
