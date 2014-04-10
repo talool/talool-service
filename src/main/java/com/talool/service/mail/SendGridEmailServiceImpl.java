@@ -181,7 +181,7 @@ public class SendGridEmailServiceImpl implements EmailService
 				break;
 
 			case ResetPassword:
-				emailBody = FreemarkerUtil.get().renderRegistrationEmail((Customer) obj);
+				emailBody = FreemarkerUtil.get().renderPasswordRecoveryEmail((Customer) obj);
 				break;
 
 		}
@@ -193,7 +193,7 @@ public class SendGridEmailServiceImpl implements EmailService
 	@Override
 	public void sendGiftEmail(final EmailRequestParams<EmailGift> emailRequestParams) throws ServiceException
 	{
-		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getRegistrationSubj(),
+		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getGiftSubj(),
 				emailRequestParams.getEntity().getToEmail(), ServiceConfig.get().getMailFrom());
 
 		final EmailRequest<EmailGift> sendGridParams = new EmailRequest<EmailGift>();
