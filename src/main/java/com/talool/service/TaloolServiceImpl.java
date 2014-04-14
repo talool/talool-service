@@ -1207,6 +1207,52 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					"Problem getMerchantMedias merchantId %s", merchantId, merchantId), ex);
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantMedia> getStockMedias(final UUID merchantId, final Set<Tag> tags,
+			final SearchOptions searchOptions) throws ServiceException
+	{
+		MediaType[] mediaTypes = new MediaType[]{MediaType.DEAL_IMAGE,MediaType.MERCHANT_IMAGE};
+		List<String> tagNames = new ArrayList<String>();
+		for (Tag t:tags)
+		{
+			tagNames.add(t.getName());
+		}
+		try
+		{
+			
+			if (tags.isEmpty())
+			{
+				final String newSql = QueryHelper.buildQuery(QueryType.GetStockMediaWithoutTags, null, searchOptions,
+						true);
+				
+				final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
+				query.setParameter("merchantId", merchantId);
+				query.setParameterList("mediaTypes", mediaTypes);
+				QueryHelper.applyOffsetLimit(query, searchOptions);
+				return query.list();
+			}
+			else
+			{
+				final String newSql = QueryHelper.buildQuery(QueryType.GetStockMediaByTags, null, searchOptions,
+						true);
+
+				final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
+				query.setParameter("merchantId", merchantId);
+				query.setParameterList("mediaTypes", mediaTypes);
+				query.setParameterList("tags", tagNames);
+				QueryHelper.applyOffsetLimit(query, searchOptions);
+				return query.list();
+			}
+			
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format(
+					"Problem getStockMedias merchantId %s", merchantId, merchantId), ex);
+		}
+	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)

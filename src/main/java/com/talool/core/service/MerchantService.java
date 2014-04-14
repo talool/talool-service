@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.talool.core.Category;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
@@ -136,6 +137,10 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final MediaType[] mediaTypes,
+			final SearchOptions searchOptions)
+			throws ServiceException;
+	
+	public List<MerchantMedia> getStockMedias(final UUID merchantId, final Set<Tag> tags,
 			final SearchOptions searchOptions)
 			throws ServiceException;
 	

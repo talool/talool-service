@@ -325,6 +325,16 @@ public final class QueryHelper
 
 	private static final String MERCHANT_MEDIAS =
 			"from MerchantMediaImpl as merchantMedia where merchantMedia.merchantId=:merchantId and merchantMedia.mediaType in (:mediaTypes)";
+	
+	private static final String STOCK_MEDIA_BY_TAGS =
+			"select distinct merchantMedia from MerchantMediaImpl as merchantMedia join merchantMedia.tags t " +
+			"where merchantMedia.merchantId=:merchantId and merchantMedia.mediaType in (:mediaTypes) " +
+			"and t.name in (:tags)";
+	
+	private static final String STOCK_MEDIA_WITHOUT_TAGS =
+			"select distinct merchantMedia from MerchantMediaImpl as merchantMedia left join merchantMedia.tags t " +
+			"where merchantMedia.merchantId=:merchantId and merchantMedia.mediaType in (:mediaTypes) " +
+			"group by merchantMedia having count(t)=0";
 
 	private static final String FAVORITE_MERCHANTS = "select merchant from MerchantImpl as merchant, FavoriteMerchantImpl as f " +
 			"left join fetch merchant.locations " +
@@ -427,6 +437,10 @@ public final class QueryHelper
 		ActiveDealsByDealOfferId(ACTIVE_DEALS_BY_DEAL_OFFER_ID, EMPTY_IMMUTABLE_PROPS),
 
 		GetMerchantMedias(MERCHANT_MEDIAS, EMPTY_IMMUTABLE_PROPS),
+		
+		GetStockMediaByTags(STOCK_MEDIA_BY_TAGS, EMPTY_IMMUTABLE_PROPS),
+		
+		GetStockMediaWithoutTags(STOCK_MEDIA_WITHOUT_TAGS, EMPTY_IMMUTABLE_PROPS),
 
 		ActivationSummary(ACTIVATION_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
