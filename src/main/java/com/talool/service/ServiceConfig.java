@@ -26,6 +26,8 @@ public class ServiceConfig extends PropertiesConfiguration
 	private static final String PW_RECOVERY_TEMPLATE = "pwrecovery.template";
 	private static final String PW_RECOVERY_SUBJ = "pwrecovery.subject";
 	private static final String PW_RECOVERY_LINK = "pwrecovery.link";
+	private static final String FUNDRAISER_TEMPLATE = "fundraiser.template";
+	private static final String INSTALL_LINK = "install.link";
 	private static final String GIFT_TEMPLATE = "gift.template";
 	private static final String GIFT_SUBJECT = "gift.subject";
 	private static final String GIFT_LINK = "gift.link";
@@ -153,6 +155,16 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getPasswordRecoveryLink()
 	{
 		return getString(PW_RECOVERY_LINK);
+	}
+	
+	public String getFundraiserTemplate()
+	{
+		return getString(FUNDRAISER_TEMPLATE);
+	}
+	
+	public String getInstallLink()
+	{
+		return getString(INSTALL_LINK);
 	}
 
 	public String getGiftTemplate()
