@@ -13,6 +13,7 @@ import com.talool.api.thrift.ActivityEvent_t;
 import com.talool.api.thrift.ActivityLink_t;
 import com.talool.api.thrift.Activity_t;
 import com.talool.api.thrift.LinkType;
+import com.talool.api.thrift.PropertyConstants;
 import com.talool.bundles.ActivityBundle;
 import com.talool.bundles.BundleType;
 import com.talool.bundles.BundleUtil;
@@ -37,24 +38,21 @@ import com.talool.thrift.ThriftUtil;
  */
 public final class ActivityFactory
 {
-	private static final transient DomainFactory domainFactory = FactoryManager.get()
-			.getDomainFactory();
+	private static final transient DomainFactory domainFactory = FactoryManager.get().getDomainFactory();
 
 	public static final Factory PROTOCOL_FACTORY = new TBinaryProtocol.Factory();
 
-	public static Activity createPurchase(final DealOffer dealOffer, final UUID customerUuid)
-			throws TException
+	public static Activity createPurchase(final DealOffer dealOffer, final UUID customerUuid) throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.PURCHASE, customerUuid);
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.PURCHASE);
 
-		final String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.PURCHASED_DEAL_OFFER_TITLE, dealOffer.getTitle());
+		final String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.PURCHASED_DEAL_OFFER_TITLE,
+				dealOffer.getTitle());
 
 		tActivity.setTitle(title);
 
-		final ActivityLink_t link = new ActivityLink_t(LinkType.DEAL_OFFER, dealOffer.getId()
-				.toString());
+		final ActivityLink_t link = new ActivityLink_t(LinkType.DEAL_OFFER, dealOffer.getId().toString());
 		tActivity.setActivityLink(link);
 
 		activity.setActivityData(com.talool.thrift.ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
@@ -62,27 +60,25 @@ public final class ActivityFactory
 		return activity;
 	}
 
-	public static Activity createFundraiserSupport(final DealOfferPurchase dop,
-			final Merchant fundraiser) throws TException
+	public static Activity createFundraiserSupport(final DealOfferPurchase dop, final Merchant fundraiser) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FUNDRAISER_SUPPORT, dop
-				.getCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FUNDRAISER_SUPPORT, dop.getCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FUNDRAISER_SUPPORT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FUNDRAISER_SUPPORT_TITLE, fundraiser.getName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FUNDRAISER_SUPPORT_TITLE,
+				fundraiser.getName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FUNDRAISER_SUPPORT_SUBTITLE, dop.getDealOffer().getTitle());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FUNDRAISER_SUPPORT_SUBTITLE, dop.getDealOffer()
+				.getTitle());
 
 		tActivity.setSubtitle(title);
 
 		final ActivityLink_t link = new ActivityLink_t(LinkType.EMAIL, dop.getId().toString());
 
 		final Map<String, String> props = new HashMap<String, String>();
-		props.put("templateId", ActivityEmailTemplateType.BasicFundRaiser.getTemplateIdAsString());
+		props.put(PropertyConstants.TEMPLATE_ID, ActivityEmailTemplateType.BasicFundRaiser.getTemplateIdAsString());
 		link.setProperties(props);
 
 		tActivity.setActivityLink(link);
@@ -92,19 +88,18 @@ public final class ActivityFactory
 		return activity;
 	}
 
-	public static Activity createActivatedByCode(final DealOffer dealOffer, final UUID customerUuid,
-			final String code) throws TException
+	public static Activity createActivatedByCode(final DealOffer dealOffer, final UUID customerUuid, final String code)
+			throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.PURCHASE, customerUuid);
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.PURCHASE);
 
-		final String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.ACTIVATED_DEAL_OFFER_TITLE, dealOffer.getTitle(), code.toUpperCase());
+		final String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.ACTIVATED_DEAL_OFFER_TITLE,
+				dealOffer.getTitle(), code.toUpperCase());
 
 		tActivity.setTitle(title);
 
-		final ActivityLink_t link = new ActivityLink_t(LinkType.DEAL_OFFER, dealOffer.getId()
-				.toString());
+		final ActivityLink_t link = new ActivityLink_t(LinkType.DEAL_OFFER, dealOffer.getId().toString());
 		tActivity.setActivityLink(link);
 
 		activity.setActivityData(com.talool.thrift.ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
@@ -114,23 +109,21 @@ public final class ActivityFactory
 
 	public static Activity createFriendGiftReedem(final DealAcquire dealAcquire) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REDEEM,
-				dealAcquire.getGift().getFromCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REDEEM, dealAcquire.getGift().getFromCustomer()
+				.getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_REDEEM);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_REDEEMED_DEAL_TITLE, dealAcquire.getCustomer().getFullName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_REDEEMED_DEAL_TITLE, dealAcquire
+				.getCustomer().getFullName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_REDEEMED_DEAL_SUBTITLE, dealAcquire.getDeal().getTitle(), dealAcquire
-						.getDeal().getMerchant().getName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_REDEEMED_DEAL_SUBTITLE, dealAcquire.getDeal()
+				.getTitle(), dealAcquire.getDeal().getMerchant().getName());
 
 		tActivity.setSubtitle(title);
 
-		ActivityLink_t link = new ActivityLink_t(LinkType.DEAL, dealAcquire.getDeal().getId()
-				.toString());
+		ActivityLink_t link = new ActivityLink_t(LinkType.DEAL, dealAcquire.getDeal().getId().toString());
 		tActivity.setActivityLink(link);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
@@ -141,18 +134,16 @@ public final class ActivityFactory
 
 	public static Activity createFriendRejectGift(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REJECT, gift
-				.getFromCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REJECT, gift.getFromCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_REJECT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_REJECTED_DEAL_TITLE, gift.getReceipientName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_REJECTED_DEAL_TITLE,
+				gift.getReceipientName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_REJECTED_DEAL_SUBTITLE, gift.getDealAcquire().getDeal().getTitle(),
-				gift.getDealAcquire().getDeal().getMerchant().getName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_REJECTED_DEAL_SUBTITLE, gift.getDealAcquire()
+				.getDeal().getTitle(), gift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setSubtitle(title);
 
@@ -164,25 +155,20 @@ public final class ActivityFactory
 
 	public static Activity createGiftReturnNotExistentEmail(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REJECT, gift
-				.getFromCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_REJECT, gift.getFromCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_REJECT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_TITLE, gift.getDealAcquire().getDeal()
-						.getTitle());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_TITLE,
+				gift.getDealAcquire().getDeal().getTitle());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil
-				.render(BundleType.ACTIVITY, Locale.ENGLISH,
-						ActivityBundle.GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_SUBTITLE,
-						((EmailGift) gift).getToEmail());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.GIFT_RETURNED_EMAIL_DOES_NOT_EXIST_SUBTITLE,
+				((EmailGift) gift).getToEmail());
 
 		tActivity.setSubtitle(title);
 
-		final ActivityLink_t link = new ActivityLink_t(LinkType.EXTERNAL, ServiceConfig.get()
-				.getGiftReturnedLink());
+		final ActivityLink_t link = new ActivityLink_t(LinkType.EXTERNAL, ServiceConfig.get().getGiftReturnedLink());
 		tActivity.setActivityLink(link);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
@@ -193,18 +179,16 @@ public final class ActivityFactory
 
 	public static Activity createFriendAcceptGift(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_ACCEPT, gift
-				.getFromCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_ACCEPT, gift.getFromCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_ACCEPT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_ACCEPTED_DEAL_TITLE, gift.getReceipientName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_ACCEPTED_DEAL_TITLE,
+				gift.getReceipientName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_ACCEPTED_DEAL_SUBTITLE, gift.getDealAcquire().getDeal().getTitle(),
-				gift.getDealAcquire().getDeal().getMerchant().getName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_ACCEPTED_DEAL_SUBTITLE, gift.getDealAcquire()
+				.getDeal().getTitle(), gift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setSubtitle(title);
 
@@ -219,14 +203,13 @@ public final class ActivityFactory
 		final Activity activity = domainFactory.newActivity(ActivityEvent.REJECT_GIFT, customerUuid);
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.REJECT_GIFT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.REJECTED_GIFT_TITLE, gift.getDealAcquire().getDeal().getTitle(), gift
-						.getDealAcquire().getDeal().getMerchant().getName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.REJECTED_GIFT_TITLE, gift.getDealAcquire()
+				.getDeal().getTitle(), gift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.REJECTED_GIFT_SUBTITLE, gift.getFromCustomer().getFullName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.REJECTED_GIFT_SUBTITLE, gift.getFromCustomer()
+				.getFullName());
 
 		tActivity.setSubtitle(title);
 
@@ -236,8 +219,7 @@ public final class ActivityFactory
 
 	}
 
-	public static Activity createWelcome(final UUID customerUuid, final int giftCount)
-			throws TException
+	public static Activity createWelcome(final UUID customerUuid, final int giftCount) throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.WELCOME, customerUuid);
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.WELCOME);
@@ -251,8 +233,7 @@ public final class ActivityFactory
 
 		tActivity.setSubtitle(title);
 
-		final ActivityLink_t link = new ActivityLink_t(LinkType.EXTERNAL, ServiceConfig.get()
-				.getConsumersLink());
+		final ActivityLink_t link = new ActivityLink_t(LinkType.EXTERNAL, ServiceConfig.get().getConsumersLink());
 		tActivity.setActivityLink(link);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
@@ -286,19 +267,16 @@ public final class ActivityFactory
 	public static Activity createEmailSendGift(final Gift gift) throws TException
 	{
 		final EmailGift emailGift = (EmailGift) gift;
-		final Activity activity = domainFactory.newActivity(ActivityEvent.EMAIL_SEND_GIFT, emailGift
-				.getFromCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.EMAIL_SEND_GIFT, emailGift.getFromCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.EMAIL_SEND_GIFT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.SENT_EMAIL_GIFT_TITLE, emailGift.getDealAcquire().getDeal().getTitle(),
-				emailGift.getDealAcquire().getDeal().getMerchant().getName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.SENT_EMAIL_GIFT_TITLE, emailGift
+				.getDealAcquire().getDeal().getTitle(), emailGift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.SENT_EMAIL_GIFT_SUBTITLE, emailGift.getReceipientName(),
-				emailGift.getToEmail());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.SENT_EMAIL_GIFT_SUBTITLE,
+				emailGift.getReceipientName(), emailGift.getToEmail());
 
 		tActivity.setSubtitle(title);
 
@@ -310,18 +288,16 @@ public final class ActivityFactory
 
 	public static Activity createFacebookSendGift(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FACEBOOK_SEND_GIFT, gift
-				.getFromCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FACEBOOK_SEND_GIFT, gift.getFromCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FACEBOOK_SEND_GIFT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.SENT_FACEBOOK_GIFT_TITLE, gift.getDealAcquire().getDeal().getTitle(), gift
-						.getDealAcquire().getDeal().getMerchant().getName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.SENT_FACEBOOK_GIFT_TITLE, gift
+				.getDealAcquire().getDeal().getTitle(), gift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.SENT_FACEBOOK_GIFT_SUBTITLE, gift.getReceipientName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.SENT_FACEBOOK_GIFT_SUBTITLE,
+				gift.getReceipientName());
 
 		tActivity.setSubtitle(title);
 
@@ -341,18 +317,16 @@ public final class ActivityFactory
 
 	public static Activity createFacebookRecvGift(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FACEBOOK_RECV_GIFT, gift
-				.getToCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FACEBOOK_RECV_GIFT, gift.getToCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FACEBOOK_RECV_GIFT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.RECV_FACEBOOK_GIFT_TITLE, gift.getDealAcquire().getDeal().getTitle(), gift
-						.getDealAcquire().getDeal().getMerchant().getName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.RECV_FACEBOOK_GIFT_TITLE, gift
+				.getDealAcquire().getDeal().getTitle(), gift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.RECV_FACEBOOK_GIFT_SUBTITLE, gift.getFromCustomer().getFullName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.RECV_FACEBOOK_GIFT_SUBTITLE, gift.getFromCustomer()
+				.getFullName());
 
 		tActivity.setSubtitle(title);
 
@@ -372,8 +346,7 @@ public final class ActivityFactory
 	 * @return
 	 * @throws TException
 	 */
-	public static void setActionTaken(final Activity activity, final boolean actionTaken)
-			throws TException
+	public static void setActionTaken(final Activity activity, final boolean actionTaken) throws TException
 	{
 		final Activity_t tActivity = new Activity_t();
 
@@ -387,18 +360,16 @@ public final class ActivityFactory
 
 	public static Activity createEmailRecvGift(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.EMAIL_RECV_GIFT, gift
-				.getToCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.EMAIL_RECV_GIFT, gift.getToCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.EMAIL_RECV_GIFT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.RECV_EMAIL_GIFT_TITLE, gift.getDealAcquire().getDeal().getTitle(), gift
-						.getDealAcquire().getDeal().getMerchant().getName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.RECV_EMAIL_GIFT_TITLE, gift.getDealAcquire()
+				.getDeal().getTitle(), gift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.RECV_EMAIL_GIFT_SUBTITLE, gift.getFromCustomer().getFullName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.RECV_EMAIL_GIFT_SUBTITLE, gift.getFromCustomer()
+				.getFullName());
 
 		tActivity.setSubtitle(title);
 
@@ -413,17 +384,15 @@ public final class ActivityFactory
 
 	public static Activity createFriendAccept(final Gift gift) throws TException
 	{
-		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_ACCEPT, gift
-				.getFromCustomer().getId());
+		final Activity activity = domainFactory.newActivity(ActivityEvent.FRIEND_GIFT_ACCEPT, gift.getFromCustomer().getId());
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.FRIEND_GIFT_ACCEPT);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_ACCEPTED_DEAL_TITLE, gift.getReceipientName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_ACCEPTED_DEAL_TITLE,
+				gift.getReceipientName());
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.FRIEND_ACCEPTED_DEAL_SUBTITLE, gift.getDealAcquire().getDeal().getTitle(),
-				gift.getDealAcquire().getDeal().getMerchant().getName());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FRIEND_ACCEPTED_DEAL_SUBTITLE, gift.getDealAcquire()
+				.getDeal().getTitle(), gift.getDealAcquire().getDeal().getMerchant().getName());
 
 		tActivity.setSubtitle(title);
 
@@ -433,29 +402,25 @@ public final class ActivityFactory
 
 	}
 
-	public static Activity createRedeem(final DealAcquire dealAcquire, final UUID customerUuid)
-			throws TException
+	public static Activity createRedeem(final DealAcquire dealAcquire, final UUID customerUuid) throws TException
 	{
 		final Activity activity = domainFactory.newActivity(ActivityEvent.REDEEM, customerUuid);
 		final Activity_t tActivity = createBaseActivity_t(ActivityEvent_t.REDEEM);
 
-		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-				ActivityBundle.REDEEMED_DEAL_TITLE, dealAcquire.getDeal().getTitle(), dealAcquire.getDeal()
-						.getMerchant().getName());
+		String title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.REDEEMED_DEAL_TITLE, dealAcquire.getDeal()
+				.getTitle(), dealAcquire.getDeal().getMerchant().getName());
 
 		tActivity.setTitle(title);
 
 		if (dealAcquire.getGiftId() != null)
 		{
-			title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH,
-					ActivityBundle.REDEEMED_DEAL_SUBTITLE, dealAcquire.getGift().getFromCustomer()
-							.getFullName());
+			title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.REDEEMED_DEAL_SUBTITLE, dealAcquire.getGift()
+					.getFromCustomer().getFullName());
 
 			tActivity.setSubtitle(title);
 		}
 
-		final ActivityLink_t link = new ActivityLink_t(LinkType.DEAL, dealAcquire.getDeal().getId()
-				.toString());
+		final ActivityLink_t link = new ActivityLink_t(LinkType.DEAL, dealAcquire.getDeal().getId().toString());
 		tActivity.setActivityLink(link);
 
 		activity.setActivityData(ThriftUtil.serialize(tActivity, PROTOCOL_FACTORY));
