@@ -140,8 +140,7 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 			return false;
 		}
 
-		return new EqualsBuilder().append(getDealOffer(), other.getDealOffer())
-				.append(getCustomer(), other.getCustomer()).isEquals();
+		return new EqualsBuilder().append(getDealOffer(), other.getDealOffer()).append(getCustomer(), other.getCustomer()).isEquals();
 	}
 
 	@Override
@@ -184,6 +183,17 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	public Properties getProperties()
 	{
 		return props;
+	}
+
+	@Override
+	public String getPropertyValue(String key)
+	{
+		if (props != null)
+		{
+			return props.getAsString(key);
+		}
+
+		return null;
 	}
 
 }

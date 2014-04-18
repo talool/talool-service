@@ -26,7 +26,8 @@ public enum ActivityEvent
 	FRIEND_GIFT_REDEEM((short) 11, "friend redeemed gift"),
 	MERCHANT_REACH((short) 12, "merchant message"),
 	TALOOL_REACH((short) 13, "Talool message"),
-	AD((short) 14, "Ad");
+	AD((short) 14, "Ad"),
+	FUNDRAISER_SUPPORT((short) 15, "Fundraiser messaging");
 
 	private short id;
 	private String description;

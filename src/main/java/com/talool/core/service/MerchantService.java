@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.talool.core.Category;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
@@ -47,14 +46,13 @@ public interface MerchantService extends HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public MerchantAccount authenticateMerchantAccount(final String email, final String password)
+	public MerchantAccount authenticateMerchantAccount(final String email, final String password) throws ServiceException;
+
+	public MerchantAccount authenticateMerchantAccount(final UUID merchantId, final String email, final String password)
 			throws ServiceException;
 
-	public MerchantAccount authenticateMerchantAccount(final UUID merchantId, final String email,
-			final String password) throws ServiceException;
-
 	public void deleteMerchant(final String id) throws ServiceException;
-	
+
 	public void deleteMerchantLocation(final Long id) throws ServiceException;
 
 	public Merchant getMerchantById(final UUID id) throws ServiceException;
@@ -63,8 +61,7 @@ public interface MerchantService extends HibernateService
 
 	public void save(final Merchant merchant) throws ServiceException;
 
-	public List<Deal> getMerchantDeals(final UUID merchantId, final Boolean isActive)
-			throws ServiceException;
+	public List<Deal> getMerchantDeals(final UUID merchantId, final Boolean isActive) throws ServiceException;
 
 	@Deprecated
 	public List<Merchant> getMerchants() throws ServiceException;
@@ -104,9 +101,12 @@ public interface MerchantService extends HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts, boolean activeDealsOnly) throws ServiceException;
+	public List<Deal> getDealsByDealOfferId(final UUID dealOfferId, final SearchOptions searchOpts, boolean activeDealsOnly)
+			throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId) throws ServiceException;
+
+	public DealOfferPurchase getDealOfferPurchase(final UUID dealOfferPurchaseId) throws ServiceException;
 
 	public void save(final DealOfferPurchase dealOfferPurchase) throws ServiceException;
 
@@ -122,13 +122,11 @@ public interface MerchantService extends HibernateService
 
 	public MerchantAccount getMerchantAccountById(final Long merchantAccountId) throws ServiceException;
 
-	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId)
-			throws ServiceException;
+	public List<MerchantIdentity> getAuthorizedMerchantIdentities(final Long merchantAccountId) throws ServiceException;
 
 	public List<Deal> getAllRelatedDealsForMerchantId(final UUID merchantId) throws ServiceException;
 
-	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final UUID merchantId)
-			throws ServiceException;
+	public List<DealOffer> getAllRelatedDealsOffersForMerchantId(final UUID merchantId) throws ServiceException;
 
 	public List<Merchant> getMerchantsWithin(final Location location, final int maxMiles, final SearchOptions searchOptions)
 			throws ServiceException;
@@ -136,27 +134,26 @@ public interface MerchantService extends HibernateService
 	public List<Merchant> getMerchantsWithin2(final Location location, final int maxMiles, final SearchOptions searchOptions)
 			throws ServiceException;
 
-	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final MediaType[] mediaTypes,
-			final SearchOptions searchOptions)
+	public List<MerchantMedia> getMerchantMedias(final UUID merchantId, final MediaType[] mediaTypes, final SearchOptions searchOptions)
 			throws ServiceException;
-	
-	public List<MerchantMedia> getStockMedias(final UUID merchantId, final Set<Tag> tags,
-			final SearchOptions searchOptions)
+
+	public List<MerchantMedia> getStockMedias(final UUID merchantId, final Set<Tag> tags, final SearchOptions searchOptions)
 			throws ServiceException;
-	
+
 	public MerchantMedia getMerchantMediaById(final UUID mediaId) throws ServiceException;
-	
+
 	public List<MerchantLocation> getMerchantLocationsUsingMedia(final UUID mediaId, final MediaType mediaType) throws ServiceException;
-	
+
 	public List<DealOffer> getDealOffersUsingMedia(final UUID mediaId, final MediaType mediaType) throws ServiceException;
-	
+
 	public List<Deal> getDealsUsingMedia(final UUID mediaId) throws ServiceException;
 
 	public void saveMerchantMedia(final MerchantMedia merchantMedia) throws ServiceException;
-	
+
 	public void deleteMerchantMedia(final UUID mediaId) throws ServiceException;
-	
-	public void replaceMerchantMedia(final UUID mediaId, final UUID replacementMediaId, final MediaType mediaType) throws ServiceException;
+
+	public void replaceMerchantMedia(final UUID mediaId, final UUID replacementMediaId, final MediaType mediaType)
+			throws ServiceException;
 
 	/**
 	 * Gets active and non-expired DealOffer summaries within maxMiles of a
@@ -199,8 +196,8 @@ public interface MerchantService extends HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public PaginatedResult<DealOfferSummary> getDealOfferSummary(final SearchOptions searchOpts, final String title, final boolean calculateTotalResults)
-			throws ServiceException;
+	public PaginatedResult<DealOfferSummary> getDealOfferSummary(final SearchOptions searchOpts, final String title,
+			final boolean calculateTotalResults) throws ServiceException;
 
 	/**
 	 * Gets offer summary count matching title expression
@@ -241,8 +238,8 @@ public interface MerchantService extends HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public PaginatedResult<MerchantSummary> getMerchantSummary(final SearchOptions searchOpts, final PropertyCriteria propertyCriteria, final boolean calculateTotalResults)
-			throws ServiceException;
+	public PaginatedResult<MerchantSummary> getMerchantSummary(final SearchOptions searchOpts, final PropertyCriteria propertyCriteria,
+			final boolean calculateTotalResults) throws ServiceException;
 
 	/**
 	 * Gets all merchants matching name expression.
@@ -253,8 +250,8 @@ public interface MerchantService extends HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public PaginatedResult<MerchantSummary> getMerchantSummary(final SearchOptions searchOpts, final String name, final PropertyCriteria propertyCriteria, final boolean calculateTotalResults)
-			throws ServiceException;
+	public PaginatedResult<MerchantSummary> getMerchantSummary(final SearchOptions searchOpts, final String name,
+			final PropertyCriteria propertyCriteria, final boolean calculateTotalResults) throws ServiceException;
 
 	/**
 	 * Gets merchant summary count matching name expression
@@ -275,17 +272,20 @@ public interface MerchantService extends HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public PaginatedResult<MerchantSummary> getPublisherMerchantSummary(final UUID publisherMerchantId,
-			final SearchOptions searchOpts, final PropertyCriteria propertyCriteria, final boolean calculateRowSize) throws ServiceException;
+	public PaginatedResult<MerchantSummary> getPublisherMerchantSummary(final UUID publisherMerchantId, final SearchOptions searchOpts,
+			final PropertyCriteria propertyCriteria, final boolean calculateRowSize) throws ServiceException;
 
 	public PaginatedResult<MerchantSummary> getPublisherMerchantSummaryByName(final UUID publisherMerchantId,
-			final SearchOptions searchOpts, final String name, final PropertyCriteria propertyCriteria, final boolean calculateRowSize) throws ServiceException;
+			final SearchOptions searchOpts, final String name, final PropertyCriteria propertyCriteria, final boolean calculateRowSize)
+			throws ServiceException;
 
-	public long getPublisherMerchantSummaryNameCount(final UUID publisherMerchantId, final String name, final PropertyCriteria propertyCriteria) throws ServiceException;
+	public long getPublisherMerchantSummaryNameCount(final UUID publisherMerchantId, final String name,
+			final PropertyCriteria propertyCriteria) throws ServiceException;
 
 	public long getMerchantSummaryCount(final PropertyCriteria propertyCriteria) throws ServiceException;
 
-	public long getPublisherMerchantSummaryCount(final UUID publisherMerchantId, final PropertyCriteria propertyCriteria) throws ServiceException;
+	public long getPublisherMerchantSummaryCount(final UUID publisherMerchantId, final PropertyCriteria propertyCriteria)
+			throws ServiceException;
 
 	/**
 	 * Gets deals in an offer
@@ -296,14 +296,15 @@ public interface MerchantService extends HibernateService
 	 * @return
 	 * @throws ServiceException
 	 */
-	public PaginatedResult<DealSummary> getDealSummary(final UUID dealOfferId, final SearchOptions searchOpts, final boolean calculateTotalResults)
-			throws ServiceException;
+	public PaginatedResult<DealSummary> getDealSummary(final UUID dealOfferId, final SearchOptions searchOpts,
+			final boolean calculateTotalResults) throws ServiceException;
 
 	public long getDealSummaryCount(final UUID dealOfferId) throws ServiceException;
 
 	public void moveDeals(final List<UUID> dealIds, final UUID dealOfferId, final long merchantAccountId) throws ServiceException;
 
-	public List<DealOffer> getPublisherDealOffers(final UUID publisherId, final PropertyCriteria propertyCriteria) throws ServiceException;
-	
+	public List<DealOffer> getPublisherDealOffers(final UUID publisherId, final PropertyCriteria propertyCriteria)
+			throws ServiceException;
+
 	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException;
 }

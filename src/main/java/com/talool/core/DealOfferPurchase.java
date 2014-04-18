@@ -33,4 +33,6 @@ public interface DealOfferPurchase extends IdentifiableUUID, Serializable
 
 	public Properties getProperties();
 
+	public String getPropertyValue(final String key);
+
 }
