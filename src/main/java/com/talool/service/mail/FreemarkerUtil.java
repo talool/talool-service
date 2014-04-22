@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.talool.core.Customer;
-import com.talool.core.DealOffer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.gift.Gift;
 import com.talool.service.ServiceConfig;
@@ -40,8 +40,7 @@ public final class FreemarkerUtil
 		}
 		else
 		{
-			freemarkerConfig
-					.setDirectoryForTemplateLoading(new File(ServiceConfig.get().getTemplateDir()));
+			freemarkerConfig.setDirectoryForTemplateLoading(new File(ServiceConfig.get().getTemplateDir()));
 		}
 
 	};
@@ -116,24 +115,42 @@ public final class FreemarkerUtil
 		return stringWriter.toString();
 
 	}
-	
-	public String renderFundraiserEmail(final DealOffer offer, final Merchant fundraiser, final String code) throws IOException, TemplateException
+
+	/**
+	 * Gets the EmailMessage (subject/to) for fundraiser emails as seen in a
+	 * customer's activity feed
+	 * 
+	 * @param offer
+	 * @param fundraiser
+	 * @param code
+	 * @return EmailMessage
+	 * @throws IOException
+	 * @throws TemplateException
+	 * 
+	 * @TODO generate subjects and bodies via a message strategy
+	 */
+	public EmailMessage renderFundraiserEmail(final DealOfferPurchase dealOfferPurchase, final Merchant fundraiser, final String code)
+			throws IOException, TemplateException
 	{
+		final StringBuilder sb = new StringBuilder();
+
 		final Template template = freemarkerConfig.getTemplate(ServiceConfig.get().getFundraiserTemplate());
-		
+
 		// Build the data-model
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("offerTitle", offer.getTitle());
+		final Map<String, Object> data = new HashMap<String, Object>();
+		data.put("offerTitle", dealOfferPurchase.getDealOffer().getTitle());
 		data.put("fundraiserName", fundraiser.getName());
-		data.put("offerSummary", offer.getSummary());
+		data.put("offerSummary", dealOfferPurchase.getDealOffer().getSummary());
 		data.put("installLink", ServiceConfig.get().getInstallLink());
 		data.put("code", code);
 
-		StringWriter stringWriter = new StringWriter();
+		final StringWriter stringWriter = new StringWriter();
 		template.process(data, stringWriter);
 
-		return stringWriter.toString();
+		sb.append(dealOfferPurchase.getCustomer().getFirstName()).append(" would love your support for ").append(fundraiser.getName())
+				.append("!");
+
+		return new EmailMessage(sb.toString(), stringWriter.toString());
 
 	}
-
 }
