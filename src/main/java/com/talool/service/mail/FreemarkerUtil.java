@@ -27,6 +27,8 @@ public final class FreemarkerUtil
 
 	private static FreemarkerUtil instance;
 
+	private static final String FUNDRAISER_NAME = "@fundraiser";
+
 	public enum TemplateType
 	{
 		Registration, Gift, ResetPassword, Feedback, Fundraiser
@@ -147,8 +149,7 @@ public final class FreemarkerUtil
 		final StringWriter stringWriter = new StringWriter();
 		template.process(data, stringWriter);
 
-		sb.append(dealOfferPurchase.getCustomer().getFirstName()).append(" would love your support for ").append(fundraiser.getName())
-				.append("!");
+		sb.append(ServiceConfig.get().getAndReplace(ServiceConfig.FUNDRAISER_SUBJECT, FUNDRAISER_NAME, fundraiser.getName()));
 
 		return new EmailMessage(sb.toString(), stringWriter.toString());
 

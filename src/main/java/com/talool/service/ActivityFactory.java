@@ -70,8 +70,7 @@ public final class ActivityFactory
 
 		tActivity.setTitle(title);
 
-		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FUNDRAISER_SUPPORT_SUBTITLE, dop.getDealOffer()
-				.getTitle());
+		title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.FUNDRAISER_SUPPORT_SUBTITLE);
 
 		tActivity.setSubtitle(title);
 
