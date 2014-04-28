@@ -26,7 +26,7 @@ public class TaloolStatsDClient {
 
 	private TaloolStatsDClient() 
 	{	
-		client = new NonBlockingStatsDClient("talool", "carb.talool.com", 8125);
+		client = new NonBlockingStatsDClient("talool", "graphite.talool.com", 8125);
 	}
 	
 	public static TaloolStatsDClient get()
