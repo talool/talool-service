@@ -13,10 +13,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.googlecode.genericdao.search.Search;
+import com.talool.core.DealAcquire;
 import com.talool.core.service.AnalyticService;
 import com.talool.core.service.CustomerService;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
+import com.talool.domain.DealAcquireImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 
@@ -296,6 +299,25 @@ public class AnalyticServiceImpl extends AbstractHibernateService implements Ana
 		}
 
 		return rr;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquire> getRecentRedemptions() throws ServiceException
+	{
+		try
+		{
+
+			final Search search = new Search(DealAcquireImpl.class);
+			search.addFilterNotNull("redemptionDate");
+			search.addSortDesc("redemptionDate");
+			search.setMaxResults(50);
+			return (List<DealAcquire>) daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getRecentRedemptions", ex);
+		}
 	}
 
 	@Override

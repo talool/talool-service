@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.talool.core.DealAcquire;
 import com.talool.service.HibernateService;
 
 /**
@@ -115,6 +116,8 @@ public interface AnalyticService extends HibernateService
 	public List<AvailableDeal> getAvailableDeals(UUID merchantId) throws ServiceException;
 
 	public List<RecentRedemption> getRecentRedemptions(UUID merchantId) throws ServiceException;
+	
+	public List<DealAcquire> getRecentRedemptions() throws ServiceException;
 
 	public List<ActiveUser> getActiveUsers(UUID merchantId) throws ServiceException;
 
