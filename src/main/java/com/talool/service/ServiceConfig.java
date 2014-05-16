@@ -35,6 +35,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String GIFT_LINK = "gift.link";
 	public static final String CONSUMERS_LINK = "consumers.link";
 	public static final String GIFT_RETURNED_LINK = "gift.returned.link";
+	public static final String TALOOL_PUBLISHER_MERCHANT_ACCOUNT_ID = "talool.publisher.merchantaccount.id";
 
 	public static final String FUNDRAISER_SUBJECT = "fundraiser.subject";
 
@@ -224,6 +225,11 @@ public class ServiceConfig extends PropertiesConfiguration
 	public boolean isStatsDEnvironmentProduction()
 	{
 		return getBoolean(STATSD_ENVIRONMENT_IS_PRODUCTION);
+	}
+	
+	public long getTaloolPublisherMerchantAccountId()
+	{
+		return getLong(TALOOL_PUBLISHER_MERCHANT_ACCOUNT_ID);
 	}
 
 	public String getAndReplace(final String key, final String propertyKey, final String propertyVal)
