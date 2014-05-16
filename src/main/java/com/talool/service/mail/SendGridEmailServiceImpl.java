@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
+import com.talool.core.MerchantAccount;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
 import com.talool.core.service.ServiceException;
@@ -183,6 +184,10 @@ public class SendGridEmailServiceImpl implements EmailService
 			case ResetPassword:
 				emailBody = FreemarkerUtil.get().renderPasswordRecoveryEmail((Customer) obj);
 				break;
+				
+			case MerchantRegistration:
+				emailBody = FreemarkerUtil.get().renderMerchantRegistrationEmail((MerchantAccount) obj);
+				break;
 
 		}
 
@@ -205,6 +210,21 @@ public class SendGridEmailServiceImpl implements EmailService
 
 		sendEmail(sendGridParams);
 
+	}
+	
+	@Override
+	public void sendMerchantAccountEmail( EmailRequestParams<MerchantAccount> emailRequestParams) throws ServiceException 
+	{
+		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getMerchantRegistrationSubj(),
+				emailRequestParams.getEntity().getEmail(), ServiceConfig.get().getMailFrom());
+		
+		final EmailRequest<MerchantAccount> sendGridParams = new EmailRequest<MerchantAccount>();
+		sendGridParams.setEmailParams(emailParams);
+		sendGridParams.setCategory(EmailCategory.Merchant.toString());
+		sendGridParams.setTemplateType(TemplateType.MerchantRegistration);
+		sendGridParams.setEntity(emailRequestParams.getEntity());
+
+		sendEmail(sendGridParams);
 	}
 
 	public static void main(String args[])

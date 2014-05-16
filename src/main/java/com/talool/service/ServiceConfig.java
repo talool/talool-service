@@ -23,6 +23,8 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String TEMPLATE_DIR = "template.dir";
 	public static final String REGISTRATION_TEMPLATE = "registration.template";
 	public static final String REGISTRATION_SUBJ = "registration.subject";
+	public static final String MERCHANT_REGISTRATION_TEMPLATE = "registration.merchant.template";
+	public static final String MERCHANT_REGISTRATION_SUBJ = "registration.merchant.subject";
 	public static final String PW_RECOVERY_TEMPLATE = "pwrecovery.template";
 	public static final String PW_RECOVERY_SUBJ = "pwrecovery.subject";
 	public static final String PW_RECOVERY_LINK = "pwrecovery.link";
@@ -147,6 +149,16 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getRegistrationSubj()
 	{
 		return getString(REGISTRATION_SUBJ);
+	}
+	
+	public String getMerchantRegistrationTemplate()
+	{
+		return getString(MERCHANT_REGISTRATION_TEMPLATE);
+	}
+
+	public String getMerchantRegistrationSubj()
+	{
+		return getString(MERCHANT_REGISTRATION_SUBJ);
 	}
 
 	public String getPasswordRecoveryTemplate()

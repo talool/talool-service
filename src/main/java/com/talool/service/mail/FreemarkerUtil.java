@@ -9,6 +9,7 @@ import java.util.Map;
 import com.talool.core.Customer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
+import com.talool.core.MerchantAccount;
 import com.talool.core.gift.Gift;
 import com.talool.service.ServiceConfig;
 
@@ -31,7 +32,7 @@ public final class FreemarkerUtil
 
 	public enum TemplateType
 	{
-		Registration, Gift, ResetPassword, Feedback, Fundraiser
+		Registration, Gift, ResetPassword, Feedback, Fundraiser, MerchantRegistration
 	}
 
 	private FreemarkerUtil() throws IOException
@@ -70,6 +71,21 @@ public final class FreemarkerUtil
 		// Build the data-model
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("email", customer.getEmail());
+
+		StringWriter stringWriter = new StringWriter();
+		template.process(data, stringWriter);
+
+		return stringWriter.toString();
+
+	}
+	
+	public String renderMerchantRegistrationEmail(final MerchantAccount account) throws IOException, TemplateException
+	{
+		final Template template = freemarkerConfig.getTemplate(ServiceConfig.get().getMerchantRegistrationTemplate());
+
+		// Build the data-model
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("email", account.getEmail());
 
 		StringWriter stringWriter = new StringWriter();
 		template.process(data, stringWriter);

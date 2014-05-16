@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
+import com.talool.core.MerchantAccount;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
 import com.talool.core.service.ServiceException;
@@ -20,6 +21,7 @@ import com.talool.service.ServiceConfig;
  */
 public class EmailServiceImpl implements EmailService
 {
+
 	private static final Logger LOG = LoggerFactory.getLogger(EmailServiceImpl.class);
 
 	private static EmailServiceImpl instance;
@@ -206,6 +208,13 @@ public class EmailServiceImpl implements EmailService
 	{
 		throw new ServiceException("UNSUPPORTED FUNCTION");
 
+	}
+	
+	@Override
+	public void sendMerchantAccountEmail( EmailRequestParams<MerchantAccount> emailRequestParams) throws ServiceException 
+	{
+		throw new ServiceException("UNSUPPORTED FUNCTION");
+		
 	}
 
 	@Override

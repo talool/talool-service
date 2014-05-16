@@ -19,6 +19,10 @@ public class KeyValue implements Serializable
 	public static final String dealValue = "deal_value";
 	public static final String dealRating = "deal_rating";
 	public static final String merchantCode = "merchant_code";
+	public static final String merchantTermsAcceptedV1 = "merchant_tos_v1_accepted";
+	public static final String fundraiserTermsAcceptedV1 = "fundraiser_tos_v1_accepted";
+	public static final String publisherTermsAcceptedV1 = "publisher_tos_v1_accepted";
+	public static final String merchantAgreementAcceptedV1 = "merchant_agreement_v1_accepted";
 	
 	public String key;
 	public String value;
