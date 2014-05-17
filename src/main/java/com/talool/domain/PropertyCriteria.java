@@ -263,7 +263,12 @@ public class PropertyCriteria
 				  .append(propertyColumnName)
 				  .append(", '")
 				  .append(filter.key)
-				  .append("')=false) ");
+				  .append("')=false OR ")
+				  .append(propertyColumnName)
+				  .append("->'")
+				  .append(filter.key)
+				  .append("'='false') ")
+				  ;
 				break;
 			default:
 				break;
