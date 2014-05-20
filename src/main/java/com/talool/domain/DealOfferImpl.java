@@ -437,6 +437,10 @@ public class DealOfferImpl implements DealOffer
 	@Override
 	public Properties getProperties()
 	{
+		if (props == null)
+		{
+			props = new Properties();
+		}
 		return props;
 	}
 
