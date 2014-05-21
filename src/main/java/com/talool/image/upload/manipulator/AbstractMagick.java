@@ -25,7 +25,7 @@ public abstract class AbstractMagick implements IMagick
 	protected static final int maxLogoHeight = 40;
 	
 	private static final String baseUploadDir = ServiceConfig.get().getUploadDir();
-	private static final String gradientFileName = "grayGradient3.png";
+	private static final String gradientFileName = "grayGradient4.png";
 
 	static
 	{
@@ -98,6 +98,7 @@ public abstract class AbstractMagick implements IMagick
 		File gradient = new File(gradientPath);
 		if (!gradient.exists())
 		{
+			LOG.error("The PGN gradient is missing.  Need to create it.");
 			// create this file if it doesn't exist
 			ConvertCmd cmd = new ConvertCmd();
 			IMOperation op = new IMOperation();
@@ -107,6 +108,7 @@ public abstract class AbstractMagick implements IMagick
 			{
 				// execute the operation
 				cmd.run(op);
+				LOG.error("The PGN gradient has been created.");
 			}
 			catch (Exception e)
 			{

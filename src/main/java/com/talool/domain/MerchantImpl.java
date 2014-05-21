@@ -315,6 +315,10 @@ public class MerchantImpl implements Merchant
 	@Override
 	public Properties getProperties()
 	{
+		if (props == null)
+		{
+			props = new Properties();
+		}
 		return props;
 	}
 
