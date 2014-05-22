@@ -32,4 +32,11 @@ public class BraintreeTest
 		Assert.assertEquals(BraintreeUtil.COMPANY_PREFIX_DESCRIPTOR + "LONGHOUSE COUN", BraintreeUtil.get().createDescriptor(dof));
 
 	}
+
+	@Test
+	public void testOnBoardMerchant()
+	{
+		BraintreeUtil.get().onboardSubMerchant();
+	}
+
 }

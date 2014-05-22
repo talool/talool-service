@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Environment;
+import com.braintreegateway.MerchantAccount;
+import com.braintreegateway.MerchantAccountRequest;
 import com.braintreegateway.Result;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
@@ -60,21 +62,16 @@ public class BraintreeUtil
 
 	private void initGateway()
 	{
-		gateway = new BraintreeGateway(
-				ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX : Environment.PRODUCTION,
-				ServiceConfig.get().getBraintreeMerchantId(),
-				ServiceConfig.get().getBraintreePublicKey(),
-				ServiceConfig.get().getBraintreePrivateKey()
-				);
+		gateway = new BraintreeGateway(ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX : Environment.PRODUCTION,
+				ServiceConfig.get().getBraintreeMerchantId(), ServiceConfig.get().getBraintreePublicKey(), ServiceConfig.get()
+						.getBraintreePrivateKey());
 	}
 
 	public String getDebugString()
 	{
-		return String.format("Merchant Id: %s,  Public Key: %s, Private Key: %s, Env: %s",
-				ServiceConfig.get().getBraintreeMerchantId(),
-				ServiceConfig.get().getBraintreePublicKey(),
-				ServiceConfig.get().getBraintreePrivateKey(),
-				ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX.toString() : Environment.PRODUCTION.toString());
+		return String.format("Merchant Id: %s,  Public Key: %s, Private Key: %s, Env: %s", ServiceConfig.get().getBraintreeMerchantId(),
+				ServiceConfig.get().getBraintreePublicKey(), ServiceConfig.get().getBraintreePrivateKey(), ServiceConfig.get()
+						.isBraintreeSandboxEnabled() ? Environment.SANDBOX.toString() : Environment.PRODUCTION.toString());
 	}
 
 	/**
@@ -145,8 +142,8 @@ public class BraintreeUtil
 		return transResult;
 	}
 
-	public TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer,
-			final String paymentCode) throws ProcessorException
+	public TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer, final String paymentCode)
+			throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
@@ -154,12 +151,8 @@ public class BraintreeUtil
 
 		try
 		{
-			transRequest = new TransactionRequest()
-					.venmoSdkPaymentMethodCode(paymentCode)
-					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
-					.descriptor()
-					.name(createDescriptor(dealOffer))
-					.done()
+			transRequest = new TransactionRequest().venmoSdkPaymentMethodCode(paymentCode)
+					.amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).descriptor().name(createDescriptor(dealOffer)).done()
 					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
 
 			result = gateway.transaction().sale(transRequest);
@@ -176,8 +169,8 @@ public class BraintreeUtil
 
 	}
 
-	public TransactionResult processCard(final Customer customer, final DealOffer dealOffer,
-			final PaymentDetail paymentDetail) throws ProcessorException
+	public TransactionResult processCard(final Customer customer, final DealOffer dealOffer, final PaymentDetail paymentDetail)
+			throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
@@ -188,22 +181,10 @@ public class BraintreeUtil
 			final String venmoSession = paymentDetail.getPaymentMetadata().get(VENMO_SDK_SESSION);
 			final Card card = paymentDetail.getCard();
 
-			transRequest = new TransactionRequest()
-					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
-					.creditCard()
-					.number(card.getAccountnumber())
-					.expirationMonth(card.getExpirationMonth())
-					.expirationYear(card.getExpirationYear())
-					.cvv(card.getSecurityCode())
-					.done()
-					.options()
-					.venmoSdkSession(venmoSession)
-					.submitForSettlement(true)
-					.storeInVault(paymentDetail.isSaveCard())
-					.done()
-					.descriptor()
-					.name(createDescriptor(dealOffer))
-					.done()
+			transRequest = new TransactionRequest().amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).creditCard()
+					.number(card.getAccountnumber()).expirationMonth(card.getExpirationMonth()).expirationYear(card.getExpirationYear())
+					.cvv(card.getSecurityCode()).done().options().venmoSdkSession(venmoSession).submitForSettlement(true)
+					.storeInVault(paymentDetail.isSaveCard()).done().descriptor().name(createDescriptor(dealOffer)).done()
 					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
 
 			result = gateway.transaction().sale(transRequest);
@@ -220,4 +201,32 @@ public class BraintreeUtil
 
 	}
 
+	// https://www.braintreepayments.com/docs/java/merchant_accounts/create
+	public void onboardSubMerchant()
+	{
+		String masterMerchantAccountId = ServiceConfig.get().getString("braintree.master.merchant.account.id");
+
+		MerchantAccountRequest request = new MerchantAccountRequest().individual().firstName("Jane").lastName("Doe")
+				.email("jane@14ladders.com").phone("5553334444").dateOfBirth("1981-11-19").ssn("456-45-4567").address()
+				.streetAddress("111 Main St").locality("Chicago").region("IL").postalCode("60622").done().done().business()
+				.legalName("Jane's Ladders").dbaName("Jane's Ladders").taxId("98-7654321").address().streetAddress("111 Main St")
+				.locality("Chicago").region("IL").postalCode("60622").done().done().funding()
+				.destination(MerchantAccount.FundingDestination.BANK).email("funding@blueladders.com").mobilePhone("3037777777")
+				.accountNumber("1123581321").routingNumber("071101307").done().tosAccepted(true)
+				.masterMerchantAccountId(masterMerchantAccountId).id("blue_ladders_store");
+
+		Result<MerchantAccount> result = gateway.merchantAccount().create(request);
+
+		MerchantAccount ma = result.getTarget();
+		LOG.info(ma.getStatus().toString()); // should be PENDING
+
+	}
+
+	public void pay()
+	{
+		TransactionRequest request = new TransactionRequest().amount(new BigDecimal("100.00")).merchantAccountId("blue_ladders_store")
+				.creditCard().number("5105105105105100").expirationDate("05/2020").done().options().submitForSettlement().holdInEscrow()
+				.done().serviceFeeAmount(new BigDecimal("10.00")).done();
+
+	}
 }
