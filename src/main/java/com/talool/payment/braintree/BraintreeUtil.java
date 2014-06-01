@@ -13,6 +13,7 @@ import com.braintreegateway.MerchantAccountRequest;
 import com.braintreegateway.Result;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
+import com.braintreegateway.WebhookNotification;
 import com.talool.core.Customer;
 import com.talool.core.DealOffer;
 import com.talool.core.service.ProcessorException;
@@ -206,6 +207,7 @@ public class BraintreeUtil
 	{
 		String masterMerchantAccountId = ServiceConfig.get().getString("braintree.master.merchant.account.id");
 
+		// all are required except for id, phone, ssn,
 		MerchantAccountRequest request = new MerchantAccountRequest().individual().firstName("Jane").lastName("Doe")
 				.email("jane@14ladders.com").phone("5553334444").dateOfBirth("1981-11-19").ssn("456-45-4567").address()
 				.streetAddress("111 Main St").locality("Chicago").region("IL").postalCode("60622").done().done().business()
@@ -225,8 +227,19 @@ public class BraintreeUtil
 	public void pay()
 	{
 		TransactionRequest request = new TransactionRequest().amount(new BigDecimal("100.00")).merchantAccountId("blue_ladders_store")
-				.creditCard().number("5105105105105100").expirationDate("05/2020").done().options().submitForSettlement().holdInEscrow()
-				.done().serviceFeeAmount(new BigDecimal("10.00")).done();
+				.creditCard().number("5105105105105100").expirationDate("05/2020").done().options().submitForSettlement(true)
+				.holdInEscrow(false).done().serviceFeeAmount(new BigDecimal("10.00"));
 
+	}
+
+	public String verifyWebhook(final String challenge)
+	{
+		return gateway.webhookNotification().verify(challenge);
+	}
+
+	public WebhookNotification parseWebhookNotification(final String btSignatureParam, final String btPayloadParam)
+	{
+		WebhookNotification webhookNotification = gateway.webhookNotification().parse(btSignatureParam, btPayloadParam);
+		return webhookNotification;
 	}
 }

@@ -29,8 +29,7 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 {
 	public SocialNetwork getSocialNetwork(final SocialNetwork.NetworkName name) throws ServiceException;
 
-	public boolean emailExists(final AccountType accountType, final String email)
-			throws ServiceException;
+	public boolean emailExists(final AccountType accountType, final String email) throws ServiceException;
 
 	public Tag getTag(String tagName) throws ServiceException;
 
@@ -52,13 +51,11 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 
 	public void save(final Tag category) throws ServiceException;
 
-	public CategoryTag createCategoryTag(final String categoryName, final String tagName)
-			throws ServiceException;
+	public CategoryTag createCategoryTag(final String categoryName, final String tagName) throws ServiceException;
 
 	public Long sizeOfCollection(final Object collection) throws ServiceException;
 
-	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId, final boolean chronological)
-			throws ServiceException;
+	public List<DealAcquireHistory> getDealAcquireHistory(final UUID dealAcquireId, final boolean chronological) throws ServiceException;
 
 	public List<DealAcquireHistory> getDealAcquireHistoryByGiftId(final UUID giftId, final boolean chronological)
 			throws ServiceException;
@@ -106,9 +103,10 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 	 * @return
 	 * @throws ServiceException
 	 */
-	public <T extends PropertyEntity> List<? extends T> getEntityByProperty(final Class<T> type, final String propertykey, final String propertyValue)
+	public <T extends PropertyEntity> List<? extends T> getEntityByProperty(final Class<T> type, final String propertykey,
+			final String propertyValue)
 
-			throws ServiceException;
+	throws ServiceException;
 
 	/**
 	 * Gets all entity objects that match the every property key/value in the map
@@ -118,8 +116,8 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 	 * @return
 	 * @throws ServiceException
 	 */
-	public <T extends PropertyEntity> List<? extends T> getEntityByProperties(final Class<T> type, final PropertyCriteria propertyCriteria)
-			throws ServiceException;
+	public <T extends PropertyEntity> List<? extends T> getEntityByProperties(final Class<T> type,
+			final PropertyCriteria propertyCriteria) throws ServiceException;
 
 	/**
 	 * Creates a group of merchant codes
@@ -140,4 +138,5 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 
 	public <T extends PropertyEntity> void saveProperties(final T entity, final Properties properties) throws ServiceException;
 
+	public void processBraintreeNotification(final String btSignatureParam, final String btPayloadParam) throws ServiceException;
 }

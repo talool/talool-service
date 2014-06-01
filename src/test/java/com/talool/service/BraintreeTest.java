@@ -2,12 +2,14 @@ package com.talool.service;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.talool.core.DealOffer;
 import com.talool.domain.DealOfferImpl;
 import com.talool.payment.braintree.BraintreeUtil;
 
+@Ignore
 public class BraintreeTest
 {
 
