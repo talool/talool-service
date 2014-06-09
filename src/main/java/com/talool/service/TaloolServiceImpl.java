@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -30,6 +31,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.braintreegateway.MerchantAccount.Status;
+import com.braintreegateway.ValidationError;
+import com.braintreegateway.ValidationErrors;
+import com.braintreegateway.WebhookNotification;
 import com.google.common.collect.ImmutableMap;
 import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
@@ -83,6 +88,7 @@ import com.talool.domain.Properties;
 import com.talool.domain.PropertyCriteria;
 import com.talool.domain.TagImpl;
 import com.talool.domain.social.SocialNetworkImpl;
+import com.talool.payment.braintree.BraintreeUtil;
 import com.talool.persistence.HstoreUserType;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
@@ -96,6 +102,7 @@ import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.GraphiteConstants.Action;
 import com.talool.utils.GraphiteConstants.SubAction;
+import com.talool.utils.KeyValue;
 import com.talool.utils.SpatialUtils;
 import com.talool.utils.TaloolStatsDClient;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -2444,7 +2451,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	{
 		final Map<String, String> props = new HashMap<String, String>();
 		props.put(propKey, propVal);
-		return getEntityByProperties(type, null);
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(propKey, propVal));
+		return getEntityByProperties(type, criteria);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -2905,5 +2914,98 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 		return dop;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void processBraintreeNotification(final String btSignatureParam, final String btPayloadParam) throws ServiceException
+	{
+		if (StringUtils.isEmpty(btSignatureParam) || StringUtils.isEmpty(btPayloadParam))
+		{
+			throw new ServiceException(ErrorCode.BRAINTREE_INVALID_WEBHOOK_PARAMS);
+		}
+
+		try
+		{
+			final WebhookNotification webhookNotification = BraintreeUtil.get().parseWebhookNotification(btSignatureParam, btPayloadParam);
+
+			final Status status = webhookNotification.getMerchantAccount().getStatus();
+			List<? extends Merchant> merchants = null;
+
+			// we need to sleep a bit of the merchant is not found - rare case of
+			// Braintree faster than our own updates (seen in development environment)
+			for (int i = 0; i < 3; i++)
+			{
+				merchants = getEntityByProperty(Merchant.class, KeyValue.braintreeSubmerchantId, webhookNotification.getMerchantAccount()
+						.getId());
+
+				if (CollectionUtils.isNotEmpty(merchants))
+				{
+					break;
+				}
+				else
+				{
+					try
+					{
+						Thread.sleep(1000);
+					}
+					catch (Exception ex)
+					{}
+
+				}
+			}
+
+			if (CollectionUtils.isEmpty(merchants))
+			{
+				throw new ServiceException(ErrorCode.BRAINTREE_SUBMERCHANT_ID_MISSING);
+			}
+
+			final Merchant fundraiser = merchants.get(0);
+
+			fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatus, status.toString());
+			fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatusTimestamp,
+					webhookNotification.getTimestamp().getTime().getTime());
+
+			switch (webhookNotification.getKind())
+			{
+				case SUB_MERCHANT_ACCOUNT_APPROVED:
+					if (LOG.isDebugEnabled())
+					{
+						LOG.debug(String.format("Braintree submerchant '%s' approved with status '%s'", fundraiser.getName(), status.toString()));
+					}
+					save(fundraiser);
+					break;
+
+				case SUB_MERCHANT_ACCOUNT_DECLINED:
+					if (LOG.isDebugEnabled())
+					{
+						LOG.debug(String.format("Braintree submerchant '%s' declined with status '%s'", fundraiser.getName(), status.toString()));
+					}
+
+					final StringBuilder sb = new StringBuilder();
+					final ValidationErrors errors = webhookNotification.getErrors();
+					for (ValidationError error : errors.getAllDeepValidationErrors())
+					{
+						sb.append(error.getMessage()).append(";");
+					}
+					fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatusMessage, sb.toString());
+					save(fundraiser);
+					break;
+
+				default:
+
+					LOG.warn("Unsupported Braintree Webhook: " + webhookNotification.getKind());
+			}
+
+		}
+		catch (ServiceException e)
+		{
+			throw e;
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException(e);
+		}
+
 	}
 }

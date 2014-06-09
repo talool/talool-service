@@ -40,14 +40,16 @@ public class Properties implements Serializable
 		return properties.get(key);
 	}
 
-	public int getAsInt(final String key)
+	public Integer getAsInt(final String key)
 	{
-		return Integer.valueOf(properties.get(key));
+		String val = properties.get(key);
+		return val == null ? null : Integer.valueOf(properties.get(key));
 	}
 
-	public float getAsFloat(final String key)
+	public Float getAsFloat(final String key)
 	{
-		return Float.valueOf(properties.get(key));
+		String val = properties.get(key);
+		return val == null ? null : Float.valueOf(val);
 	}
 
 	public boolean getAsBool(final String key)
@@ -55,14 +57,22 @@ public class Properties implements Serializable
 		return Boolean.valueOf(properties.get(key));
 	}
 
-	public boolean getAsDouble(final String key)
+	public Double getAsDouble(final String key)
 	{
-		return Boolean.valueOf(properties.get(key));
+		String val = properties.get(key);
+		return val == null ? null : Double.valueOf(val);
 	}
 
-	public short getAsShort(final String key)
+	public Long getAsLong(final String key)
 	{
-		return Short.valueOf(properties.get(key));
+		String val = properties.get(key);
+		return val == null ? null : Long.valueOf(val);
+	}
+
+	public Short getAsShort(final String key)
+	{
+		String val = properties.get(key);
+		return val == null ? null : Short.valueOf(val);
 	}
 
 	public void createOrReplace(final String key, final int value)
@@ -76,6 +86,11 @@ public class Properties implements Serializable
 	}
 
 	public void createOrReplace(final String key, final float value)
+	{
+		properties.put(key, String.valueOf(value));
+	}
+
+	public void createOrReplace(final String key, final long value)
 	{
 		properties.put(key, String.valueOf(value));
 	}

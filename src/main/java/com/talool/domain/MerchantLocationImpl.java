@@ -283,21 +283,17 @@ public class MerchantLocationImpl implements MerchantLocation
 			return false;
 		}
 
-		return new EqualsBuilder().append(getMerchant(), other.getMerchant())
-				.append(getLocationName(), other.getLocationName())
-				.append(getAddress1(), other.getAddress1()).append(getAddress2(), other.getAddress2())
-				.append(getCity(), other.getCity()).append(getStateProvinceCounty(), other.getStateProvinceCounty())
-				.append(getCountry(), other.getCountry()).append(getZip(), other.getZip()).isEquals();
+		return new EqualsBuilder().append(getMerchant(), other.getMerchant()).append(getLocationName(), other.getLocationName())
+				.append(getAddress1(), other.getAddress1()).append(getAddress2(), other.getAddress2()).append(getCity(), other.getCity())
+				.append(getStateProvinceCounty(), other.getStateProvinceCounty()).append(getCountry(), other.getCountry())
+				.append(getZip(), other.getZip()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getMerchant()).append(getLocationName()).
-				append(getAddress1()).append(getAddress2()).
-				append(getCity()).append(getStateProvinceCounty()).
-				append(getCountry()).append(getZip()).
-				hashCode();
+		return new HashCodeBuilder(17, 37).append(getMerchant()).append(getLocationName()).append(getAddress1()).append(getAddress2())
+				.append(getCity()).append(getStateProvinceCounty()).append(getCountry()).append(getZip()).hashCode();
 	}
 
 	@Override
@@ -411,5 +407,17 @@ public class MerchantLocationImpl implements MerchantLocation
 	public Properties getProperties()
 	{
 		return properties;
+	}
+
+	@Override
+	public String getNiceStreetAddress()
+	{
+		if (address1 == null)
+		{
+			return null;
+		}
+
+		return address2 == null ? address1 : address1 + " " + address2;
+
 	}
 }

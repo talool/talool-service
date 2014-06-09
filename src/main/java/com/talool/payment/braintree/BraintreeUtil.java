@@ -1,6 +1,7 @@
 package com.talool.payment.braintree;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -8,16 +9,21 @@ import org.slf4j.LoggerFactory;
 
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Environment;
+import com.braintreegateway.MerchantAccount;
+import com.braintreegateway.MerchantAccountRequest;
 import com.braintreegateway.Result;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
+import com.braintreegateway.WebhookNotification;
 import com.talool.core.Customer;
 import com.talool.core.DealOffer;
+import com.talool.core.Merchant;
 import com.talool.core.service.ProcessorException;
 import com.talool.payment.Card;
 import com.talool.payment.PaymentDetail;
 import com.talool.payment.TransactionResult;
 import com.talool.service.ServiceConfig;
+import com.talool.utils.KeyValue;
 
 /**
  * Braintree Utils
@@ -60,21 +66,16 @@ public class BraintreeUtil
 
 	private void initGateway()
 	{
-		gateway = new BraintreeGateway(
-				ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX : Environment.PRODUCTION,
-				ServiceConfig.get().getBraintreeMerchantId(),
-				ServiceConfig.get().getBraintreePublicKey(),
-				ServiceConfig.get().getBraintreePrivateKey()
-				);
+		gateway = new BraintreeGateway(ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX : Environment.PRODUCTION,
+				ServiceConfig.get().getBraintreeMerchantId(), ServiceConfig.get().getBraintreePublicKey(), ServiceConfig.get()
+						.getBraintreePrivateKey());
 	}
 
 	public String getDebugString()
 	{
-		return String.format("Merchant Id: %s,  Public Key: %s, Private Key: %s, Env: %s",
-				ServiceConfig.get().getBraintreeMerchantId(),
-				ServiceConfig.get().getBraintreePublicKey(),
-				ServiceConfig.get().getBraintreePrivateKey(),
-				ServiceConfig.get().isBraintreeSandboxEnabled() ? Environment.SANDBOX.toString() : Environment.PRODUCTION.toString());
+		return String.format("Merchant Id: %s,  Public Key: %s, Private Key: %s, Env: %s", ServiceConfig.get().getBraintreeMerchantId(),
+				ServiceConfig.get().getBraintreePublicKey(), ServiceConfig.get().getBraintreePrivateKey(), ServiceConfig.get()
+						.isBraintreeSandboxEnabled() ? Environment.SANDBOX.toString() : Environment.PRODUCTION.toString());
 	}
 
 	/**
@@ -145,8 +146,8 @@ public class BraintreeUtil
 		return transResult;
 	}
 
-	public TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer,
-			final String paymentCode) throws ProcessorException
+	public TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer, final String paymentCode,
+			final Merchant fundraiser) throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
@@ -154,13 +155,14 @@ public class BraintreeUtil
 
 		try
 		{
-			transRequest = new TransactionRequest()
-					.venmoSdkPaymentMethodCode(paymentCode)
-					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
-					.descriptor()
-					.name(createDescriptor(dealOffer))
-					.done()
-					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
+			transRequest = new TransactionRequest().venmoSdkPaymentMethodCode(paymentCode)
+					.amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).descriptor().name(createDescriptor(dealOffer)).done()
+					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options().submitForSettlement(true).done();
+
+			if (fundraiser != null)
+			{
+				decorateFundraiserTransaction(transRequest, fundraiser, dealOffer);
+			}
 
 			result = gateway.transaction().sale(transRequest);
 
@@ -176,8 +178,8 @@ public class BraintreeUtil
 
 	}
 
-	public TransactionResult processCard(final Customer customer, final DealOffer dealOffer,
-			final PaymentDetail paymentDetail) throws ProcessorException
+	public TransactionResult processCard(final Customer customer, final DealOffer dealOffer, final PaymentDetail paymentDetail,
+			Merchant fundraiser) throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
@@ -188,23 +190,16 @@ public class BraintreeUtil
 			final String venmoSession = paymentDetail.getPaymentMetadata().get(VENMO_SDK_SESSION);
 			final Card card = paymentDetail.getCard();
 
-			transRequest = new TransactionRequest()
-					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
-					.creditCard()
-					.number(card.getAccountnumber())
-					.expirationMonth(card.getExpirationMonth())
-					.expirationYear(card.getExpirationYear())
-					.cvv(card.getSecurityCode())
-					.done()
-					.options()
-					.venmoSdkSession(venmoSession)
-					.submitForSettlement(true)
-					.storeInVault(paymentDetail.isSaveCard())
-					.done()
-					.descriptor()
-					.name(createDescriptor(dealOffer))
-					.done()
+			transRequest = new TransactionRequest().amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).creditCard()
+					.number(card.getAccountnumber()).expirationMonth(card.getExpirationMonth()).expirationYear(card.getExpirationYear())
+					.cvv(card.getSecurityCode()).done().options().venmoSdkSession(venmoSession).submitForSettlement(true)
+					.storeInVault(paymentDetail.isSaveCard()).done().descriptor().name(createDescriptor(dealOffer)).done()
 					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
+
+			if (fundraiser != null)
+			{
+				decorateFundraiserTransaction(transRequest, fundraiser, dealOffer);
+			}
 
 			result = gateway.transaction().sale(transRequest);
 
@@ -220,4 +215,81 @@ public class BraintreeUtil
 
 	}
 
+	private void decorateFundraiserTransaction(final TransactionRequest transRequest, final Merchant fundraiser,
+			final DealOffer dealOffer)
+	{
+		String merchantAccountId = null;
+		BigDecimal serviceFee = null;
+
+		if (fundraiser != null)
+		{
+			merchantAccountId = fundraiser.getProperties().getAsString(KeyValue.braintreeSubmerchantId);
+			Float percentToMerchant = fundraiser.getProperties().getAsFloat(KeyValue.percentage);
+			if (merchantAccountId == null || percentToMerchant == null)
+			{
+				LOG.error(String.format(
+						"Fundraiser %s and merchantId %s is missing the braintreeSubmerchantId or percent. Skipping Braintree serviceFee",
+						fundraiser.getName(), fundraiser.getId()));
+			}
+			else
+			{
+				serviceFee = calculateServiceFee(percentToMerchant, dealOffer.getPrice());
+				transRequest.merchantAccountId(merchantAccountId).serviceFeeAmount(serviceFee);
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug(String.format("Braintree: fundraiser %s cost %s percentToMerchant %s serviceFee %s ", fundraiser.getName(),
+							dealOffer.getPrice(), percentToMerchant, serviceFee));
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * Calculates the serviceFee kept by Talool based on the percent owed to the
+	 * merchant and the purchase price
+	 * 
+	 * @param percent
+	 * @param price
+	 * @return
+	 */
+	public BigDecimal calculateServiceFee(final Float percentToMerchant, final Float purchasePrice)
+	{
+		return new BigDecimal(((100 - percentToMerchant) / 100) * purchasePrice).setScale(2, RoundingMode.HALF_EVEN);
+	}
+
+	// https://www.braintreepayments.com/docs/java/merchant_accounts/create
+	public Result<MerchantAccount> onboardSubMerchant(final MerchantAccountRequest request)
+	{
+		return gateway.merchantAccount().create(request);
+	}
+
+	public void pay()
+	{
+		TransactionRequest request = new TransactionRequest().amount(new BigDecimal("100.00")).merchantAccountId("blue_ladders_store")
+				.creditCard().number("5105105105105100").expirationDate("05/2020").done().options().submitForSettlement(true)
+				.holdInEscrow(false).done().serviceFeeAmount(new BigDecimal("10.00"));
+
+	}
+
+	public String verifyWebhook(final String challenge)
+	{
+		return gateway.webhookNotification().verify(challenge);
+	}
+
+	public MerchantAccount findMerchantAccount(final String merchantAccountId)
+	{
+		return gateway.merchantAccount().find(merchantAccountId);
+	}
+
+	public Result<MerchantAccount> updateMerchantAccount(final String merchantAccountId, final MerchantAccountRequest request)
+	{
+		return gateway.merchantAccount().update(merchantAccountId, request);
+	}
+
+	public WebhookNotification parseWebhookNotification(final String btSignatureParam, final String btPayloadParam)
+	{
+		WebhookNotification webhookNotification = gateway.webhookNotification().parse(btSignatureParam, btPayloadParam);
+		return webhookNotification;
+	}
 }
