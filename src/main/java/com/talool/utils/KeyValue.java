@@ -25,11 +25,11 @@ public class KeyValue implements Serializable
 	public static final String merchantAgreementAcceptedV1 = "merchant_agreement_v1_accepted";
 
 	// braintree stuff
-	public static final String braintreeSubmerchantStatus = "bt.submerch.status";
-	public static final String braintreeSubmerchantStatusTimestamp = "bt.submerch.status.ts";
-	public static final String braintreeSubmerchantStatusMessage = "bt.submerch.status.msg";
+	public static final String braintreeSubmerchantId = "bt_submerch_id";
+	public static final String braintreeSubmerchantStatus = "bt_submerch_status";
+	public static final String braintreeSubmerchantStatusTimestamp = "bt_submerch_status_ts";
+	public static final String braintreeSubmerchantStatusMessage = "bt_submerch_status_msg";
 	// the percentage promised to the fundraiser
-	public static final String fundraiserTransactionPercent = "fundraiser.trans.percent";
 
 	public String key;
 	public String value;

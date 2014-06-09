@@ -31,7 +31,7 @@ public enum ErrorCode
 
 	MERCHANT_CODE_IS_NOT_VALID(4004, "Code is not valid"),
 
-	BRAINTREE_INVALID_WEBHOOK_PARAMS(5000, "Invalid Webhook Params");
+	BRAINTREE_INVALID_WEBHOOK_PARAMS(5000, "Invalid Webhook Params"), BRAINTREE_SUBMERCHANT_ID_MISSING(5001, "Sub Merchant ID missing");
 
 	private final int code;
 	private final String message;

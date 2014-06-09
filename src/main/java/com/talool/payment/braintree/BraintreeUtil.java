@@ -203,25 +203,9 @@ public class BraintreeUtil
 	}
 
 	// https://www.braintreepayments.com/docs/java/merchant_accounts/create
-	public void onboardSubMerchant()
+	public Result<MerchantAccount> onboardSubMerchant(final MerchantAccountRequest request)
 	{
-		String masterMerchantAccountId = ServiceConfig.get().getString("braintree.master.merchant.account.id");
-
-		// all are required except for id, phone, ssn,
-		MerchantAccountRequest request = new MerchantAccountRequest().individual().firstName("Jane").lastName("Doe")
-				.email("jane@14ladders.com").phone("5553334444").dateOfBirth("1981-11-19").ssn("456-45-4567").address()
-				.streetAddress("111 Main St").locality("Chicago").region("IL").postalCode("60622").done().done().business()
-				.legalName("Jane's Ladders").dbaName("Jane's Ladders").taxId("98-7654321").address().streetAddress("111 Main St")
-				.locality("Chicago").region("IL").postalCode("60622").done().done().funding()
-				.destination(MerchantAccount.FundingDestination.BANK).email("funding@blueladders.com").mobilePhone("3037777777")
-				.accountNumber("1123581321").routingNumber("071101307").done().tosAccepted(true)
-				.masterMerchantAccountId(masterMerchantAccountId).id("blue_ladders_store");
-
-		Result<MerchantAccount> result = gateway.merchantAccount().create(request);
-
-		MerchantAccount ma = result.getTarget();
-		LOG.info(ma.getStatus().toString()); // should be PENDING
-
+		return gateway.merchantAccount().create(request);
 	}
 
 	public void pay()
@@ -235,6 +219,16 @@ public class BraintreeUtil
 	public String verifyWebhook(final String challenge)
 	{
 		return gateway.webhookNotification().verify(challenge);
+	}
+
+	public MerchantAccount findMerchantAccount(final String merchantAccountId)
+	{
+		return gateway.merchantAccount().find(merchantAccountId);
+	}
+
+	public Result<MerchantAccount> updateMerchantAccount(final String merchantAccountId, final MerchantAccountRequest request)
+	{
+		return gateway.merchantAccount().update(merchantAccountId, request);
 	}
 
 	public WebhookNotification parseWebhookNotification(final String btSignatureParam, final String btPayloadParam)

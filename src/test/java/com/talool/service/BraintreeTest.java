@@ -35,10 +35,9 @@ public class BraintreeTest
 
 	}
 
-	@Test
 	public void testOnBoardMerchant()
 	{
-		BraintreeUtil.get().onboardSubMerchant();
+
 	}
 
 }

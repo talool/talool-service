@@ -2451,7 +2451,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	{
 		final Map<String, String> props = new HashMap<String, String>();
 		props.put(propKey, propVal);
-		return getEntityByProperties(type, null);
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(propKey, propVal));
+		return getEntityByProperties(type, criteria);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -2928,11 +2930,41 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			final WebhookNotification webhookNotification = BraintreeUtil.get().parseWebhookNotification(btSignatureParam, btPayloadParam);
 
 			final Status status = webhookNotification.getMerchantAccount().getStatus();
-			final Merchant fundraiser = getMerchantById(UUID.fromString(webhookNotification.getMerchantAccount().getId()));
+			List<? extends Merchant> merchants = null;
+
+			// we need to sleep a bit of the merchant is not found - rare case of
+			// Braintree faster than our own updates (seen in development environment)
+			for (int i = 0; i < 3; i++)
+			{
+				merchants = getEntityByProperty(Merchant.class, KeyValue.braintreeSubmerchantId, webhookNotification.getMerchantAccount()
+						.getId());
+
+				if (CollectionUtils.isNotEmpty(merchants))
+				{
+					break;
+				}
+				else
+				{
+					try
+					{
+						Thread.sleep(1000);
+					}
+					catch (Exception ex)
+					{}
+
+				}
+			}
+
+			if (CollectionUtils.isEmpty(merchants))
+			{
+				throw new ServiceException(ErrorCode.BRAINTREE_SUBMERCHANT_ID_MISSING);
+			}
+
+			final Merchant fundraiser = merchants.get(0);
 
 			fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatus, status.toString());
 			fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatusTimestamp,
-					webhookNotification.getTimestamp().getTimeInMillis());
+					webhookNotification.getTimestamp().getTime().getTime());
 
 			switch (webhookNotification.getKind())
 			{

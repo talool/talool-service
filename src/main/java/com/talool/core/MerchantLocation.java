@@ -38,6 +38,14 @@ public interface MerchantLocation extends Identifiable, Serializable, TimeAware,
 
 	public String getAddress1();
 
+	/**
+	 * Returns a nice street address comprising of address1 and address2 taking
+	 * into account null addresses
+	 * 
+	 * @return
+	 */
+	public String getNiceStreetAddress();
+
 	public void setAddress1(String address1);
 
 	public String getAddress2();

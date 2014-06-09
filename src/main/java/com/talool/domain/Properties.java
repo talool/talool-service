@@ -63,6 +63,12 @@ public class Properties implements Serializable
 		return val == null ? null : Double.valueOf(val);
 	}
 
+	public Long getAsLong(final String key)
+	{
+		String val = properties.get(key);
+		return val == null ? null : Long.valueOf(val);
+	}
+
 	public Short getAsShort(final String key)
 	{
 		String val = properties.get(key);
@@ -80,6 +86,11 @@ public class Properties implements Serializable
 	}
 
 	public void createOrReplace(final String key, final float value)
+	{
+		properties.put(key, String.valueOf(value));
+	}
+
+	public void createOrReplace(final String key, final long value)
 	{
 		properties.put(key, String.valueOf(value));
 	}
