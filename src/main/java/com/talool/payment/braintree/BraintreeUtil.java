@@ -157,7 +157,7 @@ public class BraintreeUtil
 		{
 			transRequest = new TransactionRequest().venmoSdkPaymentMethodCode(paymentCode)
 					.amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).descriptor().name(createDescriptor(dealOffer)).done()
-					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
+					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options().submitForSettlement(true).done();
 
 			if (fundraiser != null)
 			{
