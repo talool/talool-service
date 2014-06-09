@@ -23,7 +23,14 @@ public class KeyValue implements Serializable
 	public static final String fundraiserTermsAcceptedV1 = "fundraiser_tos_v1_accepted";
 	public static final String publisherTermsAcceptedV1 = "publisher_tos_v1_accepted";
 	public static final String merchantAgreementAcceptedV1 = "merchant_agreement_v1_accepted";
-	
+
+	// braintree stuff
+	public static final String braintreeSubmerchantId = "bt_submerch_id";
+	public static final String braintreeSubmerchantStatus = "bt_submerch_status";
+	public static final String braintreeSubmerchantStatusTimestamp = "bt_submerch_status_ts";
+	public static final String braintreeSubmerchantStatusMessage = "bt_submerch_status_msg";
+	// the percentage promised to the fundraiser
+
 	public String key;
 	public String value;
 
@@ -32,7 +39,7 @@ public class KeyValue implements Serializable
 		this.key = key;
 		this.value = value;
 	}
-	
+
 	public static List<KeyValue> getKeyValues(Properties props)
 	{
 		List<KeyValue> keyVals = new ArrayList<KeyValue>();

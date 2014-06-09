@@ -45,6 +45,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String BRAINTREE_MERCHANT_ID = "braintree.merchant.id";
 	public static final String BRAINTREE_PUBLIC_KEY = "braintree.public.key";
 	public static final String BRAINTREE_PRIVATE_KEY = "braintree.private.key";
+	public static final String BRAINTREE_MASTER_MERCHANT_ID = "braintree.master.merchant.account.id";
 
 	public static final String UPLOAD_DIR = "upload.dir";
 	public static final String STATIC_LOGO_BASE_URL = "static.logo.base.url";
@@ -70,6 +71,11 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getFundraiserSubject()
 	{
 		return getString(FUNDRAISER_SUBJECT);
+	}
+
+	public String getBraintreeMasterMerchantId()
+	{
+		return getString(BRAINTREE_MASTER_MERCHANT_ID);
 	}
 
 	public String getBraintreePublicKey()
@@ -151,7 +157,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	{
 		return getString(REGISTRATION_SUBJ);
 	}
-	
+
 	public String getMerchantRegistrationTemplate()
 	{
 		return getString(MERCHANT_REGISTRATION_TEMPLATE);
@@ -226,7 +232,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	{
 		return getBoolean(STATSD_ENVIRONMENT_IS_PRODUCTION);
 	}
-	
+
 	public long getTaloolPublisherMerchantAccountId()
 	{
 		return getLong(TALOOL_PUBLISHER_MERCHANT_ACCOUNT_ID);

@@ -107,7 +107,7 @@
 		<dependency>
 			<groupId>com.braintreepayments.gateway</groupId>
 			<artifactId>braintree-java</artifactId>
-			<version>2.24.0</version>
+			<version>2.29.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.talool</groupId>

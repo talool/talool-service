@@ -177,8 +177,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			ServiceFactory.get().getActivityService().save(activities);
 			if (LOG.isDebugEnabled())
 			{
-				LOG.debug(String.format("Sending %d gift activities for new customer %s %s", gifts.size(),
-						customer.getEmail(), customer.getId()));
+				LOG.debug(String.format("Sending %d gift activities for new customer %s %s", gifts.size(), customer.getEmail(),
+						customer.getId()));
 			}
 		}
 		catch (Exception e)
@@ -195,8 +195,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		Customer receivingCustomer;
 	}
 
-	private void createAccount(final AccountType accountType, final IdentifiableUUID account,
-			final String password) throws ServiceException
+	private void createAccount(final AccountType accountType, final IdentifiableUUID account, final String password)
+			throws ServiceException
 	{
 		try
 		{
@@ -234,8 +234,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public Customer authenticateCustomer(final String email, final String password)
-			throws ServiceException
+	public Customer authenticateCustomer(final String email, final String password) throws ServiceException
 	{
 		final Search search = new Search(CustomerImpl.class);
 
@@ -297,8 +296,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public Customer getCustomerByEmail(final String email) throws ServiceException,
-			InvalidInputException
+	public Customer getCustomerByEmail(final String email) throws ServiceException, InvalidInputException
 	{
 		Customer customer = null;
 
@@ -347,8 +345,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		catch (Exception ex)
 		{
 			throw new ServiceException(String.format(
-					"Problem saving relationship fromCustomer '%s' toCustomer '%s' "
-							+ relationship.getFromCustomer(), relationship.getToCustomer(), ex));
+					"Problem saving relationship fromCustomer '%s' toCustomer '%s' " + relationship.getFromCustomer(),
+					relationship.getToCustomer(), ex));
 		}
 
 	}
@@ -359,10 +357,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			final Query query = sessionFactory
-					.getCurrentSession()
-					.createQuery(
-							"from CustomerImpl c, RelationshipImpl r where c.id=r.customer.id and r.friend.id=:customerId");
+			final Query query = sessionFactory.getCurrentSession().createQuery(
+					"from CustomerImpl c, RelationshipImpl r where c.id=r.customer.id and r.friend.id=:customerId");
 
 			query.setParameter("customerId", id);
 			return query.list();
@@ -387,8 +383,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	 */
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public String redeemDeal(final UUID dealAcquireId, final UUID customerId, final Location location)
-			throws ServiceException
+	public String redeemDeal(final UUID dealAcquireId, final UUID customerId, final Location location) throws ServiceException
 	{
 		String redemptionCode = null;
 		Query query = null;
@@ -405,8 +400,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			if (!owningCustomer.equals(customerId))
 			{
-				throw new ServiceException(ErrorCode.CUSTOMER_DOES_NOT_OWN_DEAL,
-						"Customer does not own deal");
+				throw new ServiceException(ErrorCode.CUSTOMER_DOES_NOT_OWN_DEAL, "Customer does not own deal");
 			}
 
 			if (AcquireStatus.REDEEMED == acquireStatus)
@@ -414,16 +408,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				throw new ServiceException("Cannot redeem already redeemed deal " + dealAcquireId);
 			}
 
-			if (!AcquireStatus.ACCEPTED_CUSTOMER_SHARE.equals(acquireStatus)
-					&& !AcquireStatus.REJECTED_CUSTOMER_SHARE.equals(acquireStatus) &&
+			if (!AcquireStatus.ACCEPTED_CUSTOMER_SHARE.equals(acquireStatus) && !AcquireStatus.REJECTED_CUSTOMER_SHARE.equals(acquireStatus)
+					&&
 
-					!AcquireStatus.ACCEPTED_MERCHANT_SHARE.equals(acquireStatus)
-					&& !AcquireStatus.PURCHASED.equals(acquireStatus))
+					!AcquireStatus.ACCEPTED_MERCHANT_SHARE.equals(acquireStatus) && !AcquireStatus.PURCHASED.equals(acquireStatus))
 			{
-				throw new ServiceException(String.format(
-						"AcquireStatus %s is not in proper state to redeem for dealAcquireId %s",
-						acquireStatus, dealAcquireId)
-						+ dealAcquireId);
+				throw new ServiceException(String.format("AcquireStatus %s is not in proper state to redeem for dealAcquireId %s",
+						acquireStatus, dealAcquireId) + dealAcquireId);
 			}
 
 		}
@@ -444,12 +435,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			query.setParameter("dealAcquireStatus", AcquireStatus.REDEEMED);
 			query.setParameter("dealAcquireId", dealAcquireId);
 
-			final GeometryFactory factory = new GeometryFactory(new PrecisionModel(
-					PrecisionModel.FLOATING), 4326);
+			final GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
 
-			final Point point = (location == null || location.getLatitude() == null || location
-					.getLongitude() == null) ? null : factory.createPoint(new Coordinate(location
-					.getLongitude(), location.getLatitude()));
+			final Point point = (location == null || location.getLatitude() == null || location.getLongitude() == null) ? null : factory
+					.createPoint(new Coordinate(location.getLongitude(), location.getLatitude()));
 
 			query.setParameter("redeemedAtGeometry", point, GeometryUserType.TYPE);
 			query.setParameter("redemptionCode", redemptionCode);
@@ -520,8 +509,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId,
-			final SearchOptions searchOpts) throws ServiceException
+	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId, final SearchOptions searchOpts)
+			throws ServiceException
 	{
 		try
 		{
@@ -538,41 +527,36 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format(
-					"Problem getDealAcquires customerId %s merchantId %s", customerId, merchantId), ex);
+			throw new ServiceException(String.format("Problem getDealAcquires customerId %s merchantId %s", customerId, merchantId), ex);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts)
-			throws ServiceException
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts) throws ServiceException
 	{
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquires, null, searchOpts,
-					true);
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquires, null, searchOpts, true);
 
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setParameter("customerId", customerId);
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 
-			TaloolStatsDClient.get()
-					.count(Action.get_merchant_acquires, null, null, requestHeaders.get());
+			TaloolStatsDClient.get().count(Action.get_merchant_acquires, null, null, requestHeaders.get());
 
 			return query.list();
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s",
-					customerId), ex);
+			throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s", customerId), ex);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts,
-			final Location location) throws ServiceException
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final SearchOptions searchOpts, final Location location)
+			throws ServiceException
 	{
 		if (location == null)
 		{
@@ -583,15 +567,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			final org.postgis.Point point = new org.postgis.Point(location.getLongitude(),
-					location.getLatitude());
+			final org.postgis.Point point = new org.postgis.Point(location.getLongitude(), location.getLatitude());
 			point.setSrid(4326);
 
-			final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder()
-					.put("point", point.toString()).build();
+			final ImmutableMap<String, Object> params = ImmutableMap.<String, Object> builder().put("point", point.toString()).build();
 
-			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquiresLocation, params,
-					searchOpts, true);
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquiresLocation, params, searchOpts, true);
 
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 
@@ -639,8 +620,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId)
-			throws ServiceException
+	public List<DealAcquire> getDealAcquiresByCustomerId(final UUID customerId) throws ServiceException
 	{
 		try
 		{
@@ -653,8 +633,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(
-					String.format("Problem getDealAcquiresByCustomerId %s", customerId), ex);
+			throw new ServiceException(String.format("Problem getDealAcquiresByCustomerId %s", customerId), ex);
 		}
 	}
 
@@ -682,10 +661,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		try
 		{
-			final Query query = sessionFactory
-					.getCurrentSession()
-					.createQuery(
-							"from MerchantDealImpl md, DealBookPurchaseImpl dbp where dbp.merchantId=md.id and dbp.customerId=:customerId");
+			final Query query = sessionFactory.getCurrentSession().createQuery(
+					"from MerchantDealImpl md, DealBookPurchaseImpl dbp where dbp.merchantId=md.id and dbp.customerId=:customerId");
 
 			query.setParameter("customerId", accountId);
 			return query.list();
@@ -699,8 +676,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId)
-			throws ServiceException
+	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId) throws ServiceException
 	{
 		try
 		{
@@ -710,8 +686,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getDealBookPurchasesByCustomerId %s",
-					customerId), ex);
+			throw new ServiceException(String.format("Problem getDealBookPurchasesByCustomerId %s", customerId), ex);
 		}
 	}
 
@@ -736,8 +711,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getMerchantsByCustomerId %s", customerId),
-					ex);
+			throw new ServiceException(String.format("Problem getMerchantsByCustomerId %s", customerId), ex);
 		}
 	}
 
@@ -753,8 +727,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void addFavoriteMerchant(final UUID customerId, final UUID merchantId)
-			throws ServiceException
+	public void addFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException
 	{
 		final FavoriteMerchant favMerchant = new FavoriteMerchantImpl(customerId, merchantId);
 
@@ -765,30 +738,26 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (ConstraintViolationException ce)
 		{
-			LOG.warn(String.format("favorite merch was out-of-sync customerId '%s' and merchant '%s'",
-					customerId, merchantId));
+			LOG.warn(String.format("favorite merch was out-of-sync customerId '%s' and merchant '%s'", customerId, merchantId));
 		}
 		catch (Exception e)
 		{
-			throw new ServiceException(String.format(
-					"There was a problem adding favorite merch: customerId %s merchantId %s", customerId,
+			throw new ServiceException(String.format("There was a problem adding favorite merch: customerId %s merchantId %s", customerId,
 					merchantId));
 		}
 
-		TaloolStatsDClient.get()
-				.count(Action.favorite, SubAction.add, merchantId, requestHeaders.get());
+		TaloolStatsDClient.get().count(Action.favorite, SubAction.add, merchantId, requestHeaders.get());
 
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void removeFavoriteMerchant(final UUID customerId, final UUID merchantId)
-			throws ServiceException
+	public void removeFavoriteMerchant(final UUID customerId, final UUID merchantId) throws ServiceException
 	{
 		try
 		{
-			final Search search = new Search(FavoriteMerchantImpl.class).addFilterEqual("customerId",
-					customerId).addFilterEqual("merchantId", merchantId);
+			final Search search = new Search(FavoriteMerchantImpl.class).addFilterEqual("customerId", customerId).addFilterEqual(
+					"merchantId", merchantId);
 			final FavoriteMerchant favMerchant = (FavoriteMerchant) daoDispatcher.searchUnique(search);
 			if (favMerchant != null)
 			{
@@ -796,33 +765,27 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			}
 			else
 			{
-				LOG.warn(String.format(
-						"Ignoring remove of favorite merchant (not found) customerId %s merchantId %s",
-						customerId, merchantId));
+				LOG.warn(String.format("Ignoring remove of favorite merchant (not found) customerId %s merchantId %s", customerId, merchantId));
 			}
 
 		}
 		catch (Exception e)
 		{
-			throw new ServiceException(String.format(
-					"There was a problem removing favorite merchant: customerId %s merchantId %s",
+			throw new ServiceException(String.format("There was a problem removing favorite merchant: customerId %s merchantId %s",
 					customerId, merchantId));
 		}
 
-		TaloolStatsDClient.get().count(Action.favorite, SubAction.remove, merchantId,
-				requestHeaders.get());
+		TaloolStatsDClient.get().count(Action.favorite, SubAction.remove, merchantId, requestHeaders.get());
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Merchant> getFavoriteMerchants(final UUID customerId, final SearchOptions searchOpts)
-			throws ServiceException
+	public List<Merchant> getFavoriteMerchants(final UUID customerId, final SearchOptions searchOpts) throws ServiceException
 	{
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.FavoriteMerchants, null, searchOpts,
-					true);
+			final String newSql = QueryHelper.buildQuery(QueryType.FavoriteMerchants, null, searchOpts, true);
 
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setParameter("customerId", customerId);
@@ -835,15 +798,14 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException("Problem getting favorite merchant for customerId " + customerId,
-					ex);
+			throw new ServiceException("Problem getting favorite merchant for customerId " + customerId, ex);
 		}
 
 	}
 
 	@Transactional(propagation = Propagation.NESTED)
-	public DealOfferPurchase createDealOfferPurchase(final Customer customer,
-			final DealOffer dealOffer, final TransactionResult transactionResult) throws ServiceException
+	public DealOfferPurchase createDealOfferPurchase(final Customer customer, final DealOffer dealOffer,
+			final TransactionResult transactionResult) throws ServiceException
 	{
 		try
 		{
@@ -856,8 +818,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format(
-					"Problem creating dealOfferPurchase customerId %s dealOfferId %s", customer.getId(),
+			throw new ServiceException(String.format("Problem creating dealOfferPurchase customerId %s dealOfferId %s", customer.getId(),
 					dealOffer.getId()), ex);
 		}
 
@@ -865,14 +826,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public void createDealOfferPurchase(final UUID customerId, final UUID dealOfferId)
-			throws ServiceException
+	public void createDealOfferPurchase(final UUID customerId, final UUID dealOfferId) throws ServiceException
 	{
 		try
 		{
-			final SQLQuery query = getCurrentSession()
-					.createSQLQuery(
-							"insert into public.deal_offer_purchase (customer_id,deal_offer_id) values (:customerId,:dealOfferId)");
+			final SQLQuery query = getCurrentSession().createSQLQuery(
+					"insert into public.deal_offer_purchase (customer_id,deal_offer_id) values (:customerId,:dealOfferId)");
 
 			query.setParameter("customerId", customerId, PostgresUUIDType.INSTANCE);
 			query.setParameter("dealOfferId", dealOfferId, PostgresUUIDType.INSTANCE);
@@ -881,8 +840,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format(
-					"Problem creating dealOfferPurchase customerId %s dealOfferId %s", customerId,
+			throw new ServiceException(String.format("Problem creating dealOfferPurchase customerId %s dealOfferId %s", customerId,
 					dealOfferId), ex);
 		}
 
@@ -890,34 +848,30 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Merchant> getMerchantAcquires(final UUID customerId, final Integer categoryId,
-			final SearchOptions searchOpts) throws ServiceException
+	public List<Merchant> getMerchantAcquires(final UUID customerId, final Integer categoryId, final SearchOptions searchOpts)
+			throws ServiceException
 	{
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquiresByCatId, null,
-					searchOpts, true);
+			final String newSql = QueryHelper.buildQuery(QueryType.MerchantAcquiresByCatId, null, searchOpts, true);
 
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setParameter("customerId", customerId);
 			query.setParameter("categoryId", categoryId);
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 
-			TaloolStatsDClient.get()
-					.count(Action.get_merchant_acquires, null, null, requestHeaders.get());
+			TaloolStatsDClient.get().count(Action.get_merchant_acquires, null, null, requestHeaders.get());
 
 			return query.list();
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format(
-					"Problem getMerchantAcquires customerId %s categoryId %s", customerId, categoryId, ex));
+			throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s categoryId %s", customerId, categoryId, ex));
 		}
 	}
 
 	@Transactional(propagation = Propagation.NESTED)
-	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift gift)
-			throws ServiceException
+	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift gift) throws ServiceException
 	{
 		final DealAcquire dac = getDealAcquire(dealAcquireId);
 		Customer toCust = null;
@@ -926,8 +880,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		if (!dac.getCustomer().getId().equals(owningCustomerId))
 		{
-			throw new ServiceException(ErrorCode.CUSTOMER_DOES_NOT_OWN_DEAL, "dealAcquireId: "
-					+ dac.getId() + ", badCustomerId: " + dac.getCustomer().getId());
+			throw new ServiceException(ErrorCode.CUSTOMER_DOES_NOT_OWN_DEAL, "dealAcquireId: " + dac.getId() + ", badCustomerId: "
+					+ dac.getCustomer().getId());
 		}
 
 		final AcquireStatus currentAcquireStatus = dac.getAcquireStatus();
@@ -938,14 +892,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		// Can only gift a deal that is in a valid state!
-		if (currentAcquireStatus != AcquireStatus.ACCEPTED_CUSTOMER_SHARE
-				&& currentAcquireStatus != AcquireStatus.ACCEPTED_MERCHANT_SHARE
+		if (currentAcquireStatus != AcquireStatus.ACCEPTED_CUSTOMER_SHARE && currentAcquireStatus != AcquireStatus.ACCEPTED_MERCHANT_SHARE
 				&& currentAcquireStatus != AcquireStatus.REJECTED_CUSTOMER_SHARE
-				&& currentAcquireStatus != AcquireStatus.REJECTED_MERCHANT_SHARE
-				&& currentAcquireStatus != AcquireStatus.PURCHASED)
+				&& currentAcquireStatus != AcquireStatus.REJECTED_MERCHANT_SHARE && currentAcquireStatus != AcquireStatus.PURCHASED)
 		{
-			throw new ServiceException(ErrorCode.GIFTING_NOT_ALLOWED, String.format(
-					"acquireStatus %s for dealAcquireId %s", currentAcquireStatus, dac.getId()));
+			throw new ServiceException(ErrorCode.GIFTING_NOT_ALLOWED, String.format("acquireStatus %s for dealAcquireId %s",
+					currentAcquireStatus, dac.getId()));
 		}
 
 		try
@@ -1008,8 +960,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 
 		SubAction subaction = (gift instanceof FaceBookGift) ? SubAction.facebook : SubAction.email;
-		TaloolStatsDClient.get().count(Action.gift, subaction, gift.getDealAcquire().getDeal().getId(),
-				requestHeaders.get());
+		TaloolStatsDClient.get().count(Action.gift, subaction, gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
 
 	}
 
@@ -1026,8 +977,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 	}
 
-	private GiftOwnership validateGiftOwnership(final UUID giftRequestId, final UUID customerId)
-			throws ServiceException
+	private GiftOwnership validateGiftOwnership(final UUID giftRequestId, final UUID customerId) throws ServiceException
 	{
 		final Gift giftRequest = daoDispatcher.find(GiftImpl.class, giftRequestId);
 		if (giftRequest == null)
@@ -1051,25 +1001,19 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			if (!((EmailGiftImpl) giftRequest).getToEmail().equals(receivingCustomer.getEmail()))
 			{
-				throw new ServiceException(String.format(
-						"receivingCustomerId %s with email %s not the gift receiver for giftRequestId %s",
+				throw new ServiceException(String.format("receivingCustomerId %s with email %s not the gift receiver for giftRequestId %s",
 						receivingCustomer.getId(), receivingCustomer.getEmail(), receivingCustomer));
 			}
 		}
 		else if (giftRequest instanceof FacebookGiftImpl)
 		{
-			final SocialNetwork facebook = ServiceFactory.get().getTaloolService()
-					.getSocialNetwork(SocialNetwork.NetworkName.Facebook);
+			final SocialNetwork facebook = ServiceFactory.get().getTaloolService().getSocialNetwork(SocialNetwork.NetworkName.Facebook);
 
-			if (!((FacebookGiftImpl) giftRequest).getToFacebookId().equals(
-					receivingCustomer.getSocialAccounts().get(facebook).getLoginId()))
+			if (!((FacebookGiftImpl) giftRequest).getToFacebookId().equals(receivingCustomer.getSocialAccounts().get(facebook).getLoginId()))
 			{
-				throw new ServiceException(
-						String
-								.format(
-										"receivingCustomerId %s with facebookId %s is not the gift receiver for giftRequestId %s",
-										receivingCustomer.getId(), receivingCustomer.getSocialAccounts().get(facebook)
-												.getLoginId(), receivingCustomer));
+				throw new ServiceException(String.format(
+						"receivingCustomerId %s with facebookId %s is not the gift receiver for giftRequestId %s", receivingCustomer.getId(),
+						receivingCustomer.getSocialAccounts().get(facebook).getLoginId(), receivingCustomer));
 			}
 
 		}
@@ -1079,8 +1023,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
-	public DealAcquire acceptGift(final UUID giftId, final UUID receipientCustomerId)
-			throws ServiceException
+	public DealAcquire acceptGift(final UUID giftId, final UUID receipientCustomerId) throws ServiceException
 	{
 		final GiftOwnership giftOwnership = validateGiftOwnership(giftId, receipientCustomerId);
 
@@ -1113,13 +1056,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception e)
 		{
-			LOG.error(String.format(
-					"Problem finding/persisting closedState on activity. receipCustomerId %s giftId %s",
-					receipientCustomerId.toString(), giftId), e);
+			LOG.error(
+					String.format("Problem finding/persisting closedState on activity. receipCustomerId %s giftId %s",
+							receipientCustomerId.toString(), giftId), e);
 		}
 
-		TaloolStatsDClient.get().count(Action.gift, SubAction.accept,
-				giftOwnership.gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
+		TaloolStatsDClient.get().count(Action.gift, SubAction.accept, giftOwnership.gift.getDealAcquire().getDeal().getId(),
+				requestHeaders.get());
 
 		return dac;
 
@@ -1147,8 +1090,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
-	public void rejectGift(final UUID giftRequestId, final UUID receipientCustomerId)
-			throws ServiceException
+	public void rejectGift(final UUID giftRequestId, final UUID receipientCustomerId) throws ServiceException
 	{
 		final GiftOwnership giftOwnership = validateGiftOwnership(giftRequestId, receipientCustomerId);
 
@@ -1194,8 +1136,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			LOG.error("Problem finding/persisting closedState on activity: " + e.getLocalizedMessage());
 		}
 
-		TaloolStatsDClient.get().count(Action.gift, SubAction.reject,
-				giftOwnership.gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
+		TaloolStatsDClient.get().count(Action.gift, SubAction.reject, giftOwnership.gift.getDealAcquire().getDeal().getId(),
+				requestHeaders.get());
 	}
 
 	@Override
@@ -1214,8 +1156,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public void removeSocialAccount(final UUID customerId, final SocialNetwork socialNetwork)
-			throws ServiceException
+	public void removeSocialAccount(final UUID customerId, final SocialNetwork socialNetwork) throws ServiceException
 	{
 		try
 		{
@@ -1226,8 +1167,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format(
-					"Problem in removing SocialAccount %s for customerId %s", socialNetwork.getName(),
+			throw new ServiceException(String.format("Problem in removing SocialAccount %s for customerId %s", socialNetwork.getName(),
 					customerId.toString()), ex);
 		}
 
@@ -1250,8 +1190,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Gift> getGifts(final UUID customerId, final GiftStatus[] giftStatus)
-			throws ServiceException
+	public List<Gift> getGifts(final UUID customerId, final GiftStatus[] giftStatus) throws ServiceException
 	{
 		List<Gift> gifts = null;
 
@@ -1275,8 +1214,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public UUID giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId,
-			final String facebookId, final String receipientName) throws ServiceException
+	public UUID giftToFacebook(final UUID owningCustomerId, final UUID dealAcquireId, final String facebookId,
+			final String receipientName) throws ServiceException
 	{
 		final FaceBookGift gift = new FacebookGiftImpl();
 		gift.setToFacebookId(facebookId);
@@ -1289,8 +1228,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId,
-			final String email, final String receipientName) throws ServiceException
+	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
+			throws ServiceException
 	{
 		final EmailGift gift = new EmailGiftImpl();
 		gift.setToEmail(email.toLowerCase());
@@ -1362,8 +1301,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public void activateCode(final UUID customerId, final UUID dealOfferId, final String code)
-			throws ServiceException
+	public void activateCode(final UUID customerId, final UUID dealOfferId, final String code) throws ServiceException
 	{
 		ActivationCode activationCode = null;
 		Search search = null;
@@ -1437,8 +1375,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			ServiceFactory.get().getActivityService().save(act);
 
-			TaloolStatsDClient.get().count(Action.purchase, SubAction.activate_code, dealOfferId,
-					requestHeaders.get());
+			TaloolStatsDClient.get().count(Action.purchase, SubAction.activate_code, dealOfferId, requestHeaders.get());
 		}
 		catch (ServiceException se)
 		{
@@ -1446,8 +1383,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem createActivationCodes dealOfferId %s",
-					dealOfferId), ex);
+			throw new ServiceException(String.format("Problem createActivationCodes dealOfferId %s", dealOfferId), ex);
 		}
 	}
 
@@ -1462,18 +1398,15 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 			daoDispatcher.save(customer);
 
-			ServiceFactory.get().getEmailService()
-					.sendPasswordRecoveryEmail(new EmailRequestParams<Customer>(customer));
+			ServiceFactory.get().getEmailService().sendPasswordRecoveryEmail(new EmailRequestParams<Customer>(customer));
 
 		}
 		catch (Exception e)
 		{
-			throw new ServiceException(
-					"Problem creating password reset for email " + customer.getEmail(), e);
+			throw new ServiceException("Problem creating password reset for email " + customer.getEmail(), e);
 		}
 
-		TaloolStatsDClient.get().count(Action.password, SubAction.create_reset, null,
-				requestHeaders.get());
+		TaloolStatsDClient.get().count(Action.password, SubAction.create_reset, null, requestHeaders.get());
 	}
 
 	@Override
@@ -1481,9 +1414,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	/**
 	 * TODO Test rollback on failures, VOID charge
 	 */
-	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId,
-			final PaymentDetail paymentDetail, final Map<String, String> paymentProperties)
-			throws ServiceException, NotFoundException
+	public TransactionResult purchaseByCard(final UUID customerId, final UUID dealOfferId, final PaymentDetail paymentDetail,
+			final Map<String, String> paymentProperties) throws ServiceException, NotFoundException
 	{
 		DealOffer dealOffer = null;
 		Customer customer = null;
@@ -1497,6 +1429,14 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			// DealOffers
 			dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
 			customer = ServiceFactory.get().getCustomerService().getCustomerById(customerId);
+
+			if (paymentProperties.containsKey(KeyValue.merchantCode))
+			{
+				String merchantCode = paymentProperties.get(KeyValue.merchantCode);
+				fundraiser = ServiceFactory.get().getTaloolService().getFundraiserByTrackingCode(merchantCode);
+				TaloolStatsDClient.get().count(Action.fundraiser_purchase, SubAction.credit_card, fundraiser.getId(), requestHeaders.get());
+			}
+
 		}
 		catch (ServiceException se)
 		{
@@ -1515,7 +1455,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail);
+			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -1536,16 +1476,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
 				}
-				if (paymentProperties.containsKey(KeyValue.merchantCode))
-				{
-					String merchantCode = paymentProperties.get(KeyValue.merchantCode);
-					fundraiser = ServiceFactory.get().getTaloolService()
-							.getFundraiserByTrackingCode(merchantCode);
-					TaloolStatsDClient.get().count(Action.fundraiser_purchase, SubAction.credit_card,
-							fundraiser.getId(), requestHeaders.get());
-				}
-				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card, dealOfferId,
-						requestHeaders.get());
+
+				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card, dealOfferId, requestHeaders.get());
 			}
 			catch (ServiceException e)
 			{
@@ -1566,41 +1498,35 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		else
 		{
-			LOG.error(String.format("Transaction failed for customerId %s errorCode %s errorText %s",
-					customerId, transactionResult.getErrorCode(), transactionResult.getErrorText()));
+			LOG.error(String.format("Transaction failed for customerId %s errorCode %s errorText %s", customerId,
+					transactionResult.getErrorCode(), transactionResult.getErrorText()));
 		}
 		return transactionResult;
 
 	}
 
-	private void rollbackPaymentTransaction(final UUID customerId, final UUID dealOfferId,
-			final TransactionResult transactionResult, final ServiceException causedException)
-			throws ProcessorException
+	private void rollbackPaymentTransaction(final UUID customerId, final UUID dealOfferId, final TransactionResult transactionResult,
+			final ServiceException causedException) throws ProcessorException
 	{
-		LOG.error(
-				String
-						.format(
-								"Creating dealOffer failed customerId '%s' dealOfferId '%s' rolling back transactionId '%s'",
-								customerId, dealOfferId, transactionResult.getTransactionId()), causedException);
+		LOG.error(String.format("Creating dealOffer failed customerId '%s' dealOfferId '%s' rolling back transactionId '%s'", customerId,
+				dealOfferId, transactionResult.getTransactionId()), causedException);
 
 		TransactionResult voidedTrans = null;
 
 		voidedTrans = BraintreeUtil.get().voidTransaction(transactionResult.getTransactionId());
 
-		LOG.error(String.format("Payment transaction roll back of transactionId '%s' success %s ",
-				transactionResult.getTransactionId(), voidedTrans.isSuccess()));
+		LOG.error(String.format("Payment transaction roll back of transactionId '%s' success %s ", transactionResult.getTransactionId(),
+				voidedTrans.isSuccess()));
 
 	}
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId,
-			final String paymentCode, final Map<String, String> paymentProperties)
-			throws ServiceException, NotFoundException
+	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId, final String paymentCode,
+			final Map<String, String> paymentProperties) throws ServiceException, NotFoundException
 	{
 		DealOffer dealOffer = null;
 		Customer customer = null;
-		Activity activity = null;
 		TransactionResult transactionResult = null;
 		DealOfferPurchase dop = null;
 		Merchant fundraiser = null;
@@ -1611,6 +1537,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			// DealOffers
 			dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
 			customer = ServiceFactory.get().getCustomerService().getCustomerById(customerId);
+
+			if (paymentProperties.containsKey(KeyValue.merchantCode))
+			{
+				String merchantCode = paymentProperties.get(KeyValue.merchantCode);
+				fundraiser = ServiceFactory.get().getTaloolService().getFundraiserByTrackingCode(merchantCode);
+				TaloolStatsDClient.get().count(Action.fundraiser_purchase, SubAction.credit_card, fundraiser.getId(), requestHeaders.get());
+			}
 		}
 		catch (ServiceException se)
 		{
@@ -1629,7 +1562,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode);
+			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -1644,8 +1577,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				getCurrentSession().flush();
 				if (LOG.isDebugEnabled())
 				{
-					LOG.debug("processing braintree for " + customer.getEmail() + " "
-							+ transactionResult.getTransactionId());
+					LOG.debug("processing braintree for " + customer.getEmail() + " " + transactionResult.getTransactionId());
 				}
 
 				// save any props
@@ -1656,16 +1588,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
 					}
 				}
-				if (paymentProperties.containsKey(KeyValue.merchantCode))
-				{
-					String merchantCode = paymentProperties.get(KeyValue.merchantCode);
-					fundraiser = ServiceFactory.get().getTaloolService()
-							.getFundraiserByTrackingCode(merchantCode);
-					TaloolStatsDClient.get().count(Action.fundraiser_purchase, SubAction.credit_card,
-							fundraiser.getId(), requestHeaders.get());
-				}
-				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card_code, dealOfferId,
-						requestHeaders.get());
+
+				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card_code, dealOfferId, requestHeaders.get());
 
 			}
 			catch (ServiceException e)
@@ -1693,8 +1617,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		else
 		{
-			LOG.error(String.format("Transaction failed for customerId %s errorCode %s errorText %s",
-					customerId, transactionResult.getErrorCode(), transactionResult.getErrorText()));
+			LOG.error(String.format("Transaction failed for customerId %s errorCode %s errorText %s", customerId,
+					transactionResult.getErrorCode(), transactionResult.getErrorText()));
 		}
 		return transactionResult;
 
@@ -1702,8 +1626,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts,
-			final boolean calculateRowSize) throws ServiceException
+	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts, final boolean calculateRowSize)
+			throws ServiceException
 	{
 		PaginatedResult<CustomerSummary> paginatedResult = null;
 		List<CustomerSummary> summaries = null;
@@ -1763,9 +1687,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<CustomerSummary> getPublisherCustomerSummary(
-			final UUID publisherMerchantId, final SearchOptions searchOpts, final boolean calculateRowSize)
-			throws ServiceException
+	public PaginatedResult<CustomerSummary> getPublisherCustomerSummary(final UUID publisherMerchantId, final SearchOptions searchOpts,
+			final boolean calculateRowSize) throws ServiceException
 	{
 		PaginatedResult<CustomerSummary> paginatedResult = null;
 		List<CustomerSummary> summaries = null;
@@ -1773,8 +1696,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummary, null, searchOpts,
-					true);
+			String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummary, null, searchOpts, true);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(CustomerSummary.class));
@@ -1807,15 +1729,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public long getPublisherCustomerSummaryCount(final UUID publisherMerchantId)
-			throws ServiceException
+	public long getPublisherCustomerSummaryCount(final UUID publisherMerchantId) throws ServiceException
 	{
 		Long total = null;
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummaryCnt, null,
-					null, true);
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
@@ -1830,15 +1750,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public long getPublisherCustomerSummaryEmailCount(final UUID publisherMerchantId,
-			final String email) throws ServiceException
+	public long getPublisherCustomerSummaryEmailCount(final UUID publisherMerchantId, final String email) throws ServiceException
 	{
 		Long total = null;
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerEmailSummaryCnt,
-					null, null, true);
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerEmailSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
 			query.setParameter("email", email.replaceAll("[*]", "%").toLowerCase());
@@ -1855,9 +1773,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<CustomerSummary> getPublisherCustomerSummaryByEmail(
-			final UUID publisherMerchantId, final SearchOptions searchOpts, final String email,
-			final boolean calculateRowSize) throws ServiceException
+	public PaginatedResult<CustomerSummary> getPublisherCustomerSummaryByEmail(final UUID publisherMerchantId,
+			final SearchOptions searchOpts, final String email, final boolean calculateRowSize) throws ServiceException
 	{
 		PaginatedResult<CustomerSummary> paginatedResult = null;
 		List<CustomerSummary> summaries = null;
@@ -1866,8 +1783,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerEmailSummary, null,
-					searchOpts, true);
+			String newSql = QueryHelper.buildQuery(QueryType.PublisherCustomerEmailSummary, null, searchOpts, true);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(CustomerSummary.class));
@@ -1904,8 +1820,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts,
-			final String email, final boolean calculateRowSize) throws ServiceException
+	public PaginatedResult<CustomerSummary> getCustomerSummary(final SearchOptions searchOpts, final String email,
+			final boolean calculateRowSize) throws ServiceException
 	{
 		PaginatedResult<CustomerSummary> paginatedResult = null;
 		List<CustomerSummary> summaries = null;
@@ -1914,8 +1830,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			String newSql = QueryHelper.buildQuery(QueryType.AllCustomerEmailSummary, null, searchOpts,
-					true);
+			String newSql = QueryHelper.buildQuery(QueryType.AllCustomerEmailSummary, null, searchOpts, true);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(CustomerSummary.class));
@@ -1942,8 +1857,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getCustomerSummary with email %s: %s",
-					email, ex.getMessage()), ex);
+			throw new ServiceException(String.format("Problem getCustomerSummary with email %s: %s", email, ex.getMessage()), ex);
 		}
 
 		return paginatedResult;
@@ -1956,8 +1870,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			final String newSql = QueryHelper.buildQuery(QueryType.AllCustomerEmailSummaryCnt, null,
-					null, true);
+			final String newSql = QueryHelper.buildQuery(QueryType.AllCustomerEmailSummaryCnt, null, null, true);
 			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setParameter("email", email.replaceAll("[*]", "%").toLowerCase());
 			query.addScalar("totalResults", StandardBasicTypes.LONG);
@@ -1965,8 +1878,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getCustomerSummary %s : %s", email,
-					ex.getMessage(), ex));
+			throw new ServiceException(String.format("Problem getCustomerSummary %s : %s", email, ex.getMessage(), ex));
 		}
 
 		return total == null ? 0 : total;
@@ -1995,8 +1907,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public boolean isActivationCodeValid(final String code, final UUID dealOfferid)
-			throws ServiceException
+	public boolean isActivationCodeValid(final String code, final UUID dealOfferid) throws ServiceException
 	{
 		ActivationCode activationCode = null;
 		Search search = null;
@@ -2009,8 +1920,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			search.addFilterEqual("code", uCode);
 			activationCode = (ActivationCodeImpl) daoDispatcher.searchUnique(search);
 
-			TaloolStatsDClient.get().count(Action.validate_code, SubAction.activation_code, dealOfferid,
-					requestHeaders.get());
+			TaloolStatsDClient.get().count(Action.validate_code, SubAction.activation_code, dealOfferid, requestHeaders.get());
 		}
 		catch (Exception ex)
 		{
