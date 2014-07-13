@@ -183,14 +183,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		taloolService.save(school);
 
 		// create 100 codes for the school, track the merchantAcccount and publisher
-		MerchantCodeGroup merchantCodeGrp = taloolService.createMerchantCodeGroup(school,
-				merchantAccount.getId(), publisher.getId(),
+		MerchantCodeGroup merchantCodeGrp = taloolService.createMerchantCodeGroup(school, merchantAccount.getId(), publisher.getId(),
 				"Lewis Palmer School codes", "first set of notes", (short) 100);
 
 		// grab a Save around dealOffer, only a code generated above will work for
 		// this publisher, yet book agnostic
-		List<DealOffer> saveAroundDealOffers =
-				taloolService.getDealOffersByMerchantId(publisher.getId());
+		List<DealOffer> saveAroundDealOffers = taloolService.getDealOffersByMerchantId(publisher.getId());
 
 		// Any save around deal offer will be valid
 		String aCodeToTest = merchantCodeGrp.getCodes().iterator().next().getCode();
@@ -298,7 +296,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	{
 		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("distanceInMeters").build();
 
-		DealOfferGeoSummariesResult result = taloolService.getDealOfferGeoSummariesWithin(Binghamton_NY, 100, searchOpts, null);
+		DealOfferGeoSummariesResult result = taloolService.getDealOfferGeoSummariesWithin(Boulder_CO, 2000, searchOpts, null);
 
 		List<DealOfferGeoSummary> dealOffers = result.getSummaries();
 		Assert.assertTrue(dealOffers.size() > 0);
@@ -316,8 +314,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	public void testMerchantsWithin() throws ServiceException, InterruptedException
 	{
 
-		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("merchant.name").ascending(true)
-				.build();
+		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("merchant.name").ascending(true).build();
 
 		List<Merchant> merchants = taloolService.getMerchantsWithin(Boulder_CO, 2, searchOpts);
 
@@ -490,8 +487,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
 						.sortProperty("dealAcquire.deal.title").ascending(ascending).build();
 
-				dealAcquires = customerService.getDealAcquires(dealOfferPurchase.getCustomer().getId(),
-						dealOfferPurchase.getDealOffer().getMerchant().getId(), searchOpts);
+				dealAcquires = customerService.getDealAcquires(dealOfferPurchase.getCustomer().getId(), dealOfferPurchase.getDealOffer()
+						.getMerchant().getId(), searchOpts);
 
 				if (CollectionUtils.isEmpty(dealAcquires))
 				{
@@ -540,8 +537,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 	 * @param expectedDealAcquires
 	 * @throws ServiceException
 	 */
-	public void testDealAquireMerchants(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer,
-			List<DealAcquire> expectedDealAcquires) throws ServiceException
+	public void testDealAquireMerchants(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer, List<DealAcquire> expectedDealAcquires)
+			throws ServiceException
 	{
 		List<Merchant> merchantsAcquired = null;
 
@@ -565,11 +562,10 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 			while (true)
 			{
-				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++)
-						.sortProperty("merchant.name").ascending(ascending).build();
+				SearchOptions searchOpts = new SearchOptions.Builder().maxResults(maxResults).page(page++).sortProperty("merchant.name")
+						.ascending(ascending).build();
 
-				merchantsAcquired = customerService.getMerchantAcquires(dealOfferPurchase.getCustomer()
-						.getId(), searchOpts);
+				merchantsAcquired = customerService.getMerchantAcquires(dealOfferPurchase.getCustomer().getId(), searchOpts);
 
 				if (CollectionUtils.isEmpty(merchantsAcquired))
 				{
@@ -595,8 +591,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			}
 			else
 			{
-				comparator = Collections.reverseOrder(new MerchantComparator(
-						MerchantComparator.ComparatorType.Name));
+				comparator = Collections.reverseOrder(new MerchantComparator(MerchantComparator.ComparatorType.Name));
 			}
 
 			List<Merchant> expectedMerchantList = new ArrayList<Merchant>(expectedMerchants);
@@ -605,22 +600,19 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 			for (int i = 0; i < expectedMerchantList.size(); i++)
 			{
-				Assert
-						.assertEquals(expectedMerchantList.get(i).getId(), allMerchantAcquires.get(i).getId());
+				Assert.assertEquals(expectedMerchantList.get(i).getId(), allMerchantAcquires.get(i).getId());
 			}
 
 		}
 
 	}
 
-	public void testDealAcquires(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer)
-			throws Exception
+	public void testDealAcquires(DealOfferPurchase dealOfferPurchase, DealOffer dealOffer) throws Exception
 	{
 		List<DealAcquire> dealAcquires = null;
 
 		// Deprecated getDealAcquiresByCustomerId
-		dealAcquires = customerService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer()
-				.getId());
+		dealAcquires = customerService.getDealAcquiresByCustomerId(dealOfferPurchase.getCustomer().getId());
 
 		SearchOptions searchOpts = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("title").ascending(true).build();
 		List<Deal> deals = taloolService.getDealsByDealOfferId(dealOffer.getId(), searchOpts, false);
@@ -795,14 +787,12 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		DealAcquire giftedDealAcquireViaTalool = dacs.get(2);
 
 		// give gift to facebookId
-		customerService
-				.giftToFacebook(givingCustomer.getId(), giftedDealAcquireViaFacebook.getId(), receivingFacebookId, receivingName);
+		customerService.giftToFacebook(givingCustomer.getId(), giftedDealAcquireViaFacebook.getId(), receivingFacebookId, receivingName);
 
 		// try to gift again, should get an exception
 		try
 		{
-			customerService.giftToFacebook(givingCustomer.getId(), giftedDealAcquireViaFacebook.getId(), receivingFacebookId,
-					receivingName);
+			customerService.giftToFacebook(givingCustomer.getId(), giftedDealAcquireViaFacebook.getId(), receivingFacebookId, receivingName);
 		}
 		catch (ServiceException ex)
 		{
@@ -810,18 +800,15 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		}
 
 		// give 2nd via email
-		customerService.giftToEmail(givingCustomer.getId(),
-				giftedDealAcquireViaEmail.getId(), receivingCustomerEmail.getEmail(),
+		customerService.giftToEmail(givingCustomer.getId(), giftedDealAcquireViaEmail.getId(), receivingCustomerEmail.getEmail(),
 				receivingName);
 
-		List<Gift> gifts = customerService.getGifts(receivingCustomerEmail.getId(),
-				new GiftStatus[] { GiftStatus.PENDING });
+		List<Gift> gifts = customerService.getGifts(receivingCustomerEmail.getId(), new GiftStatus[] { GiftStatus.PENDING });
 
 		Assert.assertEquals(1, gifts.size());
 		Assert.assertEquals(giftedDealAcquireViaEmail.getDeal().getId(), gifts.get(0).getDealAcquire().getDeal().getId());
 
-		gifts = customerService.getGifts(receivingCustomerSocial.getId(),
-				new GiftStatus[] { GiftStatus.PENDING });
+		gifts = customerService.getGifts(receivingCustomerSocial.getId(), new GiftStatus[] { GiftStatus.PENDING });
 
 		Assert.assertEquals(1, gifts.size());
 
@@ -830,18 +817,16 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			if (gf instanceof FaceBookGift)
 			{
 				Assert.assertEquals(giftedDealAcquireViaFacebook, gf.getDealAcquire());
-				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
-						gf.getDealAcquire().getAcquireStatus());
+				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE, gf.getDealAcquire().getAcquireStatus());
 
-				Assert.assertEquals(receivingCustomerSocial.getSocialAccounts().get(
-						taloolService.getSocialNetwork(SocialNetwork.NetworkName.Facebook)).getLoginId(),
-						((FaceBookGift) gf).getToFacebookId());
+				Assert.assertEquals(
+						receivingCustomerSocial.getSocialAccounts().get(taloolService.getSocialNetwork(SocialNetwork.NetworkName.Facebook))
+								.getLoginId(), ((FaceBookGift) gf).getToFacebookId());
 			}
 			if (gf instanceof TaloolGift)
 			{
 				Assert.assertEquals(giftedDealAcquireViaTalool, gf.getDealAcquire());
-				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE,
-						gf.getDealAcquire().getAcquireStatus());
+				Assert.assertEquals(AcquireStatus.PENDING_ACCEPT_CUSTOMER_SHARE, gf.getDealAcquire().getAcquireStatus());
 
 			}
 
@@ -854,8 +839,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	public DealOfferPurchase testDealOfferPurchase(final Customer customer, final DealOffer dealOffer)
-			throws ServiceException
+	public DealOfferPurchase testDealOfferPurchase(final Customer customer, final DealOffer dealOffer) throws ServiceException
 	{
 		// lets purchase!
 		DealOfferPurchase dealOfferPurchase = domainFactory.newDealOfferPurchase(customer, dealOffer);
@@ -863,13 +847,11 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		taloolService.save(dealOfferPurchase);
 		taloolService.refresh(dealOfferPurchase);
 
-		List<DealOfferPurchase> dealOfferPurchaseResult = customerService
-				.getDealOfferPurchasesByCustomerId(customer.getId());
+		List<DealOfferPurchase> dealOfferPurchaseResult = customerService.getDealOfferPurchasesByCustomerId(customer.getId());
 
 		Assert.assertEquals(1, dealOfferPurchaseResult.size());
 
-		Assert.assertEquals(dealOffer.getTitle(), dealOfferPurchaseResult.get(0).getDealOffer()
-				.getTitle());
+		Assert.assertEquals(dealOffer.getTitle(), dealOfferPurchaseResult.get(0).getDealOffer().getTitle());
 
 		Category cat = dealOffer.getMerchant().getCategory();
 		List<Merchant> merchants = customerService.getMerchantAcquires(customer.getId(), cat.getId(), null);
@@ -879,8 +861,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		return dealOfferPurchase;
 	}
 
-	public DealOffer testDealOffers(final Merchant merchant, final MerchantAccount merchantAccount,
-			final Customer customer) throws ServiceException
+	public DealOffer testDealOffers(final Merchant merchant, final MerchantAccount merchantAccount, final Customer customer)
+			throws ServiceException
 	{
 		DealOffer dealOffer = domainFactory.newDealOffer(merchant, merchantAccount);
 		dealOffer.setActive(true);
@@ -919,8 +901,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(dealOffer.getTitle(), dealOfferResult.getTitle());
 		Assert.assertEquals(dealOffer.getDealOfferLogo(), dealOfferResult.getDealOfferLogo());
 		Assert.assertEquals(dealOffer.getSummary(), dealOfferResult.getSummary());
-		Assert.assertEquals(dealOffer.getCreatedByMerchantAccount().getId(), dealOfferResult
-				.getCreatedByMerchantAccount().getId());
+		Assert.assertEquals(dealOffer.getCreatedByMerchantAccount().getId(), dealOfferResult.getCreatedByMerchantAccount().getId());
 		Assert.assertEquals(dealOffer.getPrice(), dealOfferResult.getPrice());
 
 		Assert.assertEquals(dealOffer.getType(), dealOfferResult.getType());
@@ -983,8 +964,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	}
 
-	public MerchantAccount testMerchantAccount(Merchant merchant) throws ServiceException,
-			NoSuchAlgorithmException, UnsupportedEncodingException
+	public MerchantAccount testMerchantAccount(Merchant merchant) throws ServiceException, NoSuchAlgorithmException,
+			UnsupportedEncodingException
 	{
 		String email = "chris-" + System.currentTimeMillis() + "@gmail.com";
 		MerchantAccount mac = domainFactory.newMerchantAccount(merchant);
@@ -996,8 +977,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		taloolService.save(mac);
 		taloolService.refresh(mac);
 
-		MerchantAccount macResult = taloolService.authenticateMerchantAccount(merchant.getId(), email,
-				"pass123");
+		MerchantAccount macResult = taloolService.authenticateMerchantAccount(merchant.getId(), email, "pass123");
 
 		Assert.assertEquals(email, macResult.getEmail());
 		Assert.assertEquals(EncryptService.MD5("pass123"), macResult.getPassword());
@@ -1084,7 +1064,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		final MerchantLocation mel = domainFactory.newMerchantLocation();
 
 		final List<Merchant> taloolMerchs = taloolService.getMerchantByName("Talool");
-		MerchantAccount merchAccount = taloolService.authenticateMerchantAccount(taloolMerchs.get(0).getId(), "chris@talool.com", "pass123");
+		MerchantAccount merchAccount = taloolService.authenticateMerchantAccount(taloolMerchs.get(0).getId(), "chris@talool.com",
+				"pass123");
 		mel.setCreatedByMerchantAccount(merchAccount);
 
 		mel.setAddress1(now + " East Street");
@@ -1103,8 +1084,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		taloolService.save(merchant);
 		taloolService.refresh(merchant);
 
-		MerchantMedia logo = domainFactory.newMedia(merchant.getId(),
-				"http://some/image.com", MediaType.MERCHANT_LOGO);
+		MerchantMedia logo = domainFactory.newMedia(merchant.getId(), "http://some/image.com", MediaType.MERCHANT_LOGO);
 
 		mel.setLogo(logo);
 
@@ -1114,32 +1094,22 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		Assert.assertEquals(merchant.getName(), resultMerch.getName());
 		Assert.assertNotNull(resultMerch.getCreated());
 
-		Assert.assertEquals(merchant.getPrimaryLocation().getEmail(), resultMerch.getPrimaryLocation()
-				.getEmail());
-		Assert.assertEquals(merchant.getPrimaryLocation().getLocationName(), resultMerch
-				.getPrimaryLocation().getLocationName());
+		Assert.assertEquals(merchant.getPrimaryLocation().getEmail(), resultMerch.getPrimaryLocation().getEmail());
+		Assert.assertEquals(merchant.getPrimaryLocation().getLocationName(), resultMerch.getPrimaryLocation().getLocationName());
 
-		Assert.assertEquals(merchant.getPrimaryLocation().getLogo(), resultMerch
-				.getPrimaryLocation().getLogo());
-		Assert.assertEquals(merchant.getPrimaryLocation().getPhone(), resultMerch.getPrimaryLocation()
-				.getPhone());
-		Assert.assertEquals(merchant.getPrimaryLocation().getWebsiteUrl(), resultMerch
-				.getPrimaryLocation().getWebsiteUrl());
+		Assert.assertEquals(merchant.getPrimaryLocation().getLogo(), resultMerch.getPrimaryLocation().getLogo());
+		Assert.assertEquals(merchant.getPrimaryLocation().getPhone(), resultMerch.getPrimaryLocation().getPhone());
+		Assert.assertEquals(merchant.getPrimaryLocation().getWebsiteUrl(), resultMerch.getPrimaryLocation().getWebsiteUrl());
 		Assert.assertNotNull(merchant.getPrimaryLocation().getUpdated());
 		Assert.assertNotNull(merchant.getPrimaryLocation().getCreated());
 
-		Assert.assertEquals(merchant.getPrimaryLocation().getAddress1(), resultMerch
-				.getPrimaryLocation().getAddress1());
-		Assert.assertEquals(merchant.getPrimaryLocation().getAddress2(), resultMerch
-				.getPrimaryLocation().getAddress2());
-		Assert.assertEquals(merchant.getPrimaryLocation().getCity(), resultMerch
-				.getPrimaryLocation().getCity());
-		Assert.assertEquals(merchant.getPrimaryLocation().getStateProvinceCounty(), resultMerch
-				.getPrimaryLocation().getStateProvinceCounty());
-		Assert.assertEquals(merchant.getPrimaryLocation().getZip(), resultMerch
-				.getPrimaryLocation().getZip());
-		Assert.assertEquals(merchant.getPrimaryLocation().getCountry(), resultMerch
-				.getPrimaryLocation().getCountry());
+		Assert.assertEquals(merchant.getPrimaryLocation().getAddress1(), resultMerch.getPrimaryLocation().getAddress1());
+		Assert.assertEquals(merchant.getPrimaryLocation().getAddress2(), resultMerch.getPrimaryLocation().getAddress2());
+		Assert.assertEquals(merchant.getPrimaryLocation().getCity(), resultMerch.getPrimaryLocation().getCity());
+		Assert.assertEquals(merchant.getPrimaryLocation().getStateProvinceCounty(), resultMerch.getPrimaryLocation()
+				.getStateProvinceCounty());
+		Assert.assertEquals(merchant.getPrimaryLocation().getZip(), resultMerch.getPrimaryLocation().getZip());
+		Assert.assertEquals(merchant.getPrimaryLocation().getCountry(), resultMerch.getPrimaryLocation().getCountry());
 
 		Assert.assertTrue(resultMerch.getTags().contains(mexicanTag));
 		Assert.assertTrue(resultMerch.getTags().contains(tapasTag));
@@ -1190,8 +1160,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 			customerService.addFavoriteMerchant(customer.getId(), merchant.getId());
 		}
 
-		SearchOptions searchOptions = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("merchant.created")
-				.ascending(true).build();
+		SearchOptions searchOptions = new SearchOptions.Builder().maxResults(100).page(0).sortProperty("merchant.created").ascending(true)
+				.build();
 
 		List<Merchant> favMerchants = customerService.getFavoriteMerchants(customer.getId(), searchOptions);
 
@@ -1256,8 +1226,8 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 
 	public void testCustomerSummary() throws ServiceException, InvalidInputException
 	{
-		SearchOptions searchOpts = new SearchOptions.Builder().
-				sortProperty("redemptions").ascending(false).maxResults(100).page(0).build();
+		SearchOptions searchOpts = new SearchOptions.Builder().sortProperty("redemptions").ascending(false).maxResults(100).page(0)
+				.build();
 
 		PaginatedResult<CustomerSummary> summary = customerService.getCustomerSummary(searchOpts, true);
 
