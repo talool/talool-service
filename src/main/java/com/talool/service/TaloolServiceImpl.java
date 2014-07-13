@@ -2960,10 +2960,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				throw new ServiceException(ErrorCode.BRAINTREE_SUBMERCHANT_ID_MISSING);
 			}
 
-			final Merchant fundraiser = merchants.get(0);
+			final Merchant merchant = merchants.get(0);
 
-			fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatus, status.toString());
-			fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatusTimestamp,
+			merchant.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatus, status.toString());
+			merchant.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatusTimestamp,
 					webhookNotification.getTimestamp().getTime().getTime());
 
 			switch (webhookNotification.getKind())
@@ -2971,15 +2971,15 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				case SUB_MERCHANT_ACCOUNT_APPROVED:
 					if (LOG.isDebugEnabled())
 					{
-						LOG.debug(String.format("Braintree submerchant '%s' approved with status '%s'", fundraiser.getName(), status.toString()));
+						LOG.debug(String.format("Braintree submerchant '%s' approved with status '%s'", merchant.getName(), status.toString()));
 					}
-					save(fundraiser);
+					save(merchant);
 					break;
 
 				case SUB_MERCHANT_ACCOUNT_DECLINED:
 					if (LOG.isDebugEnabled())
 					{
-						LOG.debug(String.format("Braintree submerchant '%s' declined with status '%s'", fundraiser.getName(), status.toString()));
+						LOG.debug(String.format("Braintree submerchant '%s' declined with status '%s'", merchant.getName(), status.toString()));
 					}
 
 					final StringBuilder sb = new StringBuilder();
@@ -2988,8 +2988,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 					{
 						sb.append(error.getMessage()).append(";");
 					}
-					fundraiser.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatusMessage, sb.toString());
-					save(fundraiser);
+					merchant.getProperties().createOrReplace(KeyValue.braintreeSubmerchantStatusMessage, sb.toString());
+					save(merchant);
 					break;
 
 				default:
