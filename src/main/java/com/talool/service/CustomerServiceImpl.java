@@ -1421,6 +1421,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		Customer customer = null;
 		TransactionResult transactionResult = null;
 		Merchant fundraiser = null;
+		Merchant publisher = null;
 		DealOfferPurchase dop = null;
 
 		try
@@ -1455,7 +1456,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail, fundraiser);
+			publisher = dealOffer.getMerchant();
+			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail, publisher);
 		}
 		catch (ProcessorException e)
 		{
@@ -1530,6 +1532,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		TransactionResult transactionResult = null;
 		DealOfferPurchase dop = null;
 		Merchant fundraiser = null;
+		Merchant publisher = null;
 
 		try
 		{
@@ -1562,7 +1565,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		try
 		{
-			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode, fundraiser);
+			publisher = dealOffer.getMerchant();
+			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode, publisher);
 		}
 		catch (ProcessorException e)
 		{

@@ -2957,7 +2957,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			if (CollectionUtils.isEmpty(merchants))
 			{
-				throw new ServiceException(ErrorCode.BRAINTREE_SUBMERCHANT_ID_MISSING);
+				throw new ServiceException(ErrorCode.BRAINTREE_SUBMERCHANT_ID_NOT_FOUND, webhookNotification.getMerchantAccount().getId());
 			}
 
 			final Merchant merchant = merchants.get(0);

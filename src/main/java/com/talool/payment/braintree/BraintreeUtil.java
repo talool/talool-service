@@ -147,7 +147,7 @@ public class BraintreeUtil
 	}
 
 	public TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer, final String paymentCode,
-			final Merchant fundraiser) throws ProcessorException
+			final Merchant publisher) throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
@@ -159,9 +159,9 @@ public class BraintreeUtil
 					.amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).descriptor().name(createDescriptor(dealOffer)).done()
 					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options().submitForSettlement(true).done();
 
-			if (fundraiser != null)
+			if (publisher != null)
 			{
-				decorateFundraiserTransaction(transRequest, fundraiser, dealOffer);
+				decorateFundraiserTransaction(transRequest, publisher, dealOffer);
 			}
 
 			result = gateway.transaction().sale(transRequest);
@@ -179,7 +179,7 @@ public class BraintreeUtil
 	}
 
 	public TransactionResult processCard(final Customer customer, final DealOffer dealOffer, final PaymentDetail paymentDetail,
-			Merchant fundraiser) throws ProcessorException
+			Merchant publisher) throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
@@ -196,9 +196,9 @@ public class BraintreeUtil
 					.storeInVault(paymentDetail.isSaveCard()).done().descriptor().name(createDescriptor(dealOffer)).done()
 					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
 
-			if (fundraiser != null)
+			if (publisher != null)
 			{
-				decorateFundraiserTransaction(transRequest, fundraiser, dealOffer);
+				decorateFundraiserTransaction(transRequest, publisher, dealOffer);
 			}
 
 			result = gateway.transaction().sale(transRequest);
@@ -215,21 +215,20 @@ public class BraintreeUtil
 
 	}
 
-	private void decorateFundraiserTransaction(final TransactionRequest transRequest, final Merchant fundraiser,
-			final DealOffer dealOffer)
+	private void decorateFundraiserTransaction(final TransactionRequest transRequest, final Merchant publisher, final DealOffer dealOffer)
 	{
 		String merchantAccountId = null;
 		BigDecimal serviceFee = null;
 
-		if (fundraiser != null)
+		if (publisher != null)
 		{
-			merchantAccountId = fundraiser.getProperties().getAsString(KeyValue.braintreeSubmerchantId);
-			Float percentToMerchant = fundraiser.getProperties().getAsFloat(KeyValue.percentage);
+			merchantAccountId = publisher.getProperties().getAsString(KeyValue.braintreeSubmerchantId);
+			Float percentToMerchant = publisher.getProperties().getAsFloat(KeyValue.percentage);
 			if (merchantAccountId == null || percentToMerchant == null)
 			{
 				LOG.error(String.format(
-						"Fundraiser %s and merchantId %s is missing the braintreeSubmerchantId or percent. Skipping Braintree serviceFee",
-						fundraiser.getName(), fundraiser.getId()));
+						"Publisher %s and merchantId %s is missing the braintreeSubmerchantId or percent. Skipping Braintree serviceFee",
+						publisher.getName(), publisher.getId()));
 			}
 			else
 			{
@@ -237,7 +236,7 @@ public class BraintreeUtil
 				transRequest.merchantAccountId(merchantAccountId).serviceFeeAmount(serviceFee);
 				if (LOG.isDebugEnabled())
 				{
-					LOG.debug(String.format("Braintree: fundraiser %s cost %s percentToMerchant %s serviceFee %s ", fundraiser.getName(),
+					LOG.debug(String.format("Braintree: Publisher %s cost %s percentToMerchant %s serviceFee %s ", publisher.getName(),
 							dealOffer.getPrice(), percentToMerchant, serviceFee));
 				}
 
