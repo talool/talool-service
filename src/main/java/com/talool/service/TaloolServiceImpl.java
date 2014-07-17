@@ -3008,4 +3008,24 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 	}
+
+	@Override
+	public long getDailyTrackingCodeCountByPublisher(UUID publisherId) throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			final String newSql = QueryHelper.buildQuery(QueryType.PublisherDailyCodeCnt, null, null, true);
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherId", publisherId, PostgresUUIDType.INSTANCE);
+			query.addScalar("codeCount", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(String.format("Problem getDailyTrackingCodeCountByPublisher %s : %s", publisherId.toString(), ex.getMessage(), ex));
+		}
+
+		return total == null ? 0 : total;
+	}
 }

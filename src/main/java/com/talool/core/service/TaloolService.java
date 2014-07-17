@@ -133,6 +133,8 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 	public MerchantCodeGroup createMerchantCodeGroup(final Merchant merchant, final Long createdByMerchantAccountId,
 			final UUID publisherId, final String codeGroupTitle, final String codeGroupNotes, final short totalCodes)
 			throws ServiceException;
+	
+	public long getDailyTrackingCodeCountByPublisher(final UUID publisherId) throws ServiceException;
 
 	public boolean isMerchantCodeValid(final String code, final UUID dealOfferId) throws ServiceException;
 

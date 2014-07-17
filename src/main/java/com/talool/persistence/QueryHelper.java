@@ -377,6 +377,9 @@ public final class QueryHelper
 
 	private static final String DEAL_SUMMARY_CNT =
 			"SELECT count(*) AS totalResults FROM deal AS d WHERE d.deal_offer_id = :offerId";
+	
+	private static final String PUBLISHER_DAILY_CODE_CNT = 
+			"select sum(total_codes) AS codeCount from merchant_code_group where publisher_id = :publisherId and create_dt > current_date";
 
 	private static final String MOVE_DEALS =
 			"UPDATE deal "
@@ -470,6 +473,8 @@ public final class QueryHelper
 
 		DealSummary(DEAL_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		DealSummaryCnt(DEAL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		
+		PublisherDailyCodeCnt(PUBLISHER_DAILY_CODE_CNT, EMPTY_IMMUTABLE_PROPS),
 
 		MoveDeals(MOVE_DEALS, EMPTY_IMMUTABLE_PROPS);
 

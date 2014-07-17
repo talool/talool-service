@@ -52,6 +52,8 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String IMAGE_MAGICK_PATH = "image.magick.path";
 
 	public static final String STATSD_ENVIRONMENT_IS_PRODUCTION = "statsd.environment.is.production";
+	
+	public static final String PUBLISHER_CODE_QUOTA = "publisher.code.generation.daily.quota";
 
 	// private static final String UPLOAD_LOGO_MAX_SIZE_BYTES =
 	// "upload.logo.max.size.bytes";
@@ -236,6 +238,11 @@ public class ServiceConfig extends PropertiesConfiguration
 	public long getTaloolPublisherMerchantAccountId()
 	{
 		return getLong(TALOOL_PUBLISHER_MERCHANT_ACCOUNT_ID);
+	}
+	
+	public long getPublisherCodeGenerationDailyQuota()
+	{
+		return getLong(PUBLISHER_CODE_QUOTA);
 	}
 
 	public String getAndReplace(final String key, final String propertyKey, final String propertyVal)
