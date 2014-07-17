@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
+import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantCodeGroup;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
 import com.talool.core.service.ServiceException;
@@ -188,6 +190,10 @@ public class SendGridEmailServiceImpl implements EmailService
 			case MerchantRegistration:
 				emailBody = FreemarkerUtil.get().renderMerchantRegistrationEmail((MerchantAccount) obj);
 				break;
+				
+			case TrackingCode:
+				emailBody = FreemarkerUtil.get().renderTrackingCodeEmail((EmailTrackingCodeEntity) obj);
+				break;
 
 		}
 
@@ -253,5 +259,30 @@ public class SendGridEmailServiceImpl implements EmailService
 			ex.printStackTrace();
 		}
 
+	}
+
+	@Override
+	public void sendTrackingCodeEmail(
+			EmailRequestParams<EmailTrackingCodeEntity> emailRequestParams)
+			throws ServiceException {
+		
+		EmailTrackingCodeEntity entity = emailRequestParams.getEntity();
+		MerchantCodeGroup codeGroup = entity.codeGroup;
+		Merchant fundraiser = codeGroup.getMerchant();
+		
+		String emailSubject = ServiceConfig.get().getAndReplace(ServiceConfig.PUBLISHER_CODE_SUBJ, "@fundraiser", fundraiser.getName());
+		String emailAddress = codeGroup.getCodeGroupNotes();
+		
+		final EmailParams emailParams = new EmailParams(emailSubject,
+				emailAddress, ServiceConfig.get().getMailFrom());
+		
+		final EmailRequest<EmailTrackingCodeEntity> sendGridParams = new EmailRequest<EmailTrackingCodeEntity>();
+		sendGridParams.setEmailParams(emailParams);
+		sendGridParams.setCategory(EmailCategory.MerchantCodeGroup.toString());
+		sendGridParams.setTemplateType(TemplateType.TrackingCode);
+		sendGridParams.setEntity(entity);
+
+		sendEmail(sendGridParams);
+		
 	}
 }

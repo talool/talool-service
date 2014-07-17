@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantCodeGroup;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
 import com.talool.core.service.ServiceException;
@@ -221,6 +222,14 @@ public class EmailServiceImpl implements EmailService
 	public void sendEmail(EmailRequest<?> emailRequest) throws ServiceException
 	{
 		throw new ServiceException("UNSUPPORTED FUNCTION");
+	}
+
+	@Override
+	public void sendTrackingCodeEmail(
+			EmailRequestParams<EmailTrackingCodeEntity> emailRequestParams)
+			throws ServiceException {
+		throw new ServiceException("UNSUPPORTED FUNCTION");
+		
 	}
 
 }

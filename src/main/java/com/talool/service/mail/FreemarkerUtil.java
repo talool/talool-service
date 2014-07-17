@@ -10,6 +10,7 @@ import com.talool.core.Customer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantCodeGroup;
 import com.talool.core.gift.Gift;
 import com.talool.service.ServiceConfig;
 
@@ -32,7 +33,7 @@ public final class FreemarkerUtil
 
 	public enum TemplateType
 	{
-		Registration, Gift, ResetPassword, Feedback, Fundraiser, MerchantRegistration
+		Registration, Gift, ResetPassword, Feedback, Fundraiser, MerchantRegistration, TrackingCode
 	}
 
 	private FreemarkerUtil() throws IOException
@@ -168,6 +169,28 @@ public final class FreemarkerUtil
 		sb.append(ServiceConfig.get().getAndReplace(ServiceConfig.FUNDRAISER_SUBJECT, FUNDRAISER_NAME, fundraiser.getName()));
 
 		return new EmailMessage(sb.toString(), stringWriter.toString());
+
+	}
+	
+	public String renderTrackingCodeEmail(final EmailTrackingCodeEntity entity) throws IOException, TemplateException
+	{
+		final Template template = freemarkerConfig.getTemplate(ServiceConfig.get().getTrackingCodeTemplate());
+		MerchantCodeGroup codeGroup = entity.codeGroup;
+		Merchant publisher = entity.publisher;
+
+		// Build the data-model
+		final Map<String, String> data = new HashMap<String, String>();
+		data.put("fundraiserName", codeGroup.getMerchant().getName());
+		data.put("installLink", ServiceConfig.get().getInstallLink());
+		data.put("code", codeGroup.getCodes().iterator().next().getCode());
+		data.put("fullName", codeGroup.getCodeGroupTitle());
+		data.put("offerTitle", publisher.getName()); 
+		data.put("offerSummary", "The new book..."); // TODO get the deal offer summary or canned text?
+
+		StringWriter stringWriter = new StringWriter();
+		template.process(data, stringWriter);
+
+		return stringWriter.toString();
 
 	}
 }

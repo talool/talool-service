@@ -89,8 +89,8 @@
 					</td>
 					<td height="50" align="center" bgcolor="${buttonBGColor}" 
 						background="https://statici.icloud.com/emailimages/calweb/email_assets/buttons/btn_middle.png" 
-						style="background-repeat:repeat-x;width:60px">
-						<div align="center" style="color:${buttonLabelColor};font-family:Helvetica;font-size:15px;font-weight:bold;width:60px;text-align:center;padding-bottom:0px">
+						style="background-repeat:repeat-x;width:90px">
+						<div align="center" style="color:${buttonLabelColor};font-family:Helvetica;font-size:15px;font-weight:bold;width:90px;text-align:center;padding-bottom:0px">
 							<a href="${url}" style="color:${buttonLabelColor};outline:none;text-decoration:none" target="_blank"> 
 								${label}
 							</a>

@@ -5,6 +5,7 @@ import com.talool.core.MerchantAccount;
 import com.talool.core.gift.EmailGift;
 import com.talool.service.mail.EmailRequest;
 import com.talool.service.mail.EmailRequestParams;
+import com.talool.service.mail.EmailTrackingCodeEntity;
 
 /**
  * Talool Email Service
@@ -19,6 +20,8 @@ public interface EmailService
 	public void sendPasswordRecoveryEmail(final EmailRequestParams<Customer> emailRequestParams) throws ServiceException;
 
 	public void sendGiftEmail(final EmailRequestParams<EmailGift> emailRequestParams) throws ServiceException;
+	
+	public void sendTrackingCodeEmail(final EmailRequestParams<EmailTrackingCodeEntity> emailRequestParams) throws ServiceException;
 	
 	public void sendMerchantAccountEmail(final EmailRequestParams<MerchantAccount> emailRequestParams) throws ServiceException;
 

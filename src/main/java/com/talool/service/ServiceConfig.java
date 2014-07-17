@@ -54,6 +54,8 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String STATSD_ENVIRONMENT_IS_PRODUCTION = "statsd.environment.is.production";
 	
 	public static final String PUBLISHER_CODE_QUOTA = "publisher.code.generation.daily.quota";
+	public static final String PUBLISHER_CODE_TEMPLATE = "publisher.code.template";
+	public static final String PUBLISHER_CODE_SUBJ = "publisher.code.subject";
 
 	// private static final String UPLOAD_LOGO_MAX_SIZE_BYTES =
 	// "upload.logo.max.size.bytes";
@@ -158,6 +160,16 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getRegistrationSubj()
 	{
 		return getString(REGISTRATION_SUBJ);
+	}
+	
+	public String getTrackingCodeTemplate()
+	{
+		return getString(PUBLISHER_CODE_TEMPLATE);
+	}
+
+	public String getTrackingCodeSubj()
+	{
+		return getString(PUBLISHER_CODE_SUBJ);
 	}
 
 	public String getMerchantRegistrationTemplate()
