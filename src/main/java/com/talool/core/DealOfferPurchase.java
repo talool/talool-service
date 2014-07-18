@@ -11,7 +11,7 @@ import com.talool.payment.PaymentProcessor;
  * @author clintz
  * 
  */
-public interface DealOfferPurchase extends IdentifiableUUID, Serializable
+public interface DealOfferPurchase extends IdentifiableUUID, Serializable, PropertyEntity
 {
 	public DealOffer getDealOffer();
 

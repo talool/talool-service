@@ -2487,6 +2487,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				queryStr = "from MerchantLocationImpl as ml where ";
 				queryStr += propertyCriteria.buildFilterClause("ml.props");
 			}
+			else if (type.equals(DealOfferPurchase.class))
+			{
+				queryStr = "from DealOfferPurchaseImpl as p where ";
+				queryStr += propertyCriteria.buildFilterClause("p.props");
+			}
 			else
 			{
 				throw new ServiceException("Unsupported entity class " + type.getClass().getSimpleName());
@@ -3027,5 +3032,49 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 		return total == null ? 0 : total;
+	}
+
+	@Override
+	public List<DealOfferPurchase> getDealOfferPurchasesByMerchantId(
+			UUID fundraiserId) throws ServiceException {
+		
+		List<DealOfferPurchase> purchases = null;
+		// TODO
+		// fundraiser's codes: merchant_code_groups where merchant_id = fundraiserId
+		// fundraiser's purchases: purchase where one of those codes in the merchant code property
+		
+		/*try
+		{
+			final Search search = new Search(DealOfferPurchaseImpl.class);
+			//search.addFilterEqual("name", name);
+			search.addFilterCustom("");
+			purchases = daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getDealOfferPurchasesByMerchantId  " + fundraiserId.toString(), ex);
+		}*/
+
+		return purchases;
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealOfferPurchase> getDealOfferPurchasesByTrackingCode(
+			String code) throws ServiceException {
+		
+		List<DealOfferPurchase> purchases = null;
+
+		try
+		{
+			purchases = (List<DealOfferPurchase>) getEntityByProperty(DealOfferPurchase.class, KeyValue.merchantCode, code);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getDealOfferPurchasesByTrackingCode  " + code, ex);
+		}
+
+		return purchases;
 	}
 }

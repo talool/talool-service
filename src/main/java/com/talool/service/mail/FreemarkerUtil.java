@@ -185,7 +185,7 @@ public final class FreemarkerUtil
 		data.put("code", codeGroup.getCodes().iterator().next().getCode());
 		data.put("fullName", codeGroup.getCodeGroupTitle());
 		data.put("offerTitle", publisher.getName()); 
-		data.put("offerSummary", "The new book..."); // TODO get the deal offer summary or canned text?
+		data.put("trackingLink", entity.trackingUrl);
 
 		StringWriter stringWriter = new StringWriter();
 		template.process(data, stringWriter);
