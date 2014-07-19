@@ -161,7 +161,7 @@ public class BraintreeUtil
 
 			if (publisher != null)
 			{
-				decorateFundraiserTransaction(transRequest, publisher, dealOffer);
+				decorateSubmerchantTransaction(transRequest, publisher, dealOffer);
 			}
 
 			result = gateway.transaction().sale(transRequest);
@@ -198,7 +198,7 @@ public class BraintreeUtil
 
 			if (publisher != null)
 			{
-				decorateFundraiserTransaction(transRequest, publisher, dealOffer);
+				decorateSubmerchantTransaction(transRequest, publisher, dealOffer);
 			}
 
 			result = gateway.transaction().sale(transRequest);
@@ -215,7 +215,8 @@ public class BraintreeUtil
 
 	}
 
-	private void decorateFundraiserTransaction(final TransactionRequest transRequest, final Merchant publisher, final DealOffer dealOffer)
+	private void decorateSubmerchantTransaction(final TransactionRequest transRequest, final Merchant publisher,
+			final DealOffer dealOffer)
 	{
 		String merchantAccountId = null;
 		BigDecimal serviceFee = null;
@@ -226,7 +227,7 @@ public class BraintreeUtil
 			Float percentToMerchant = publisher.getProperties().getAsFloat(KeyValue.percentage);
 			if (merchantAccountId == null || percentToMerchant == null)
 			{
-				LOG.error(String.format(
+				LOG.warn(String.format(
 						"Publisher %s and merchantId %s is missing the braintreeSubmerchantId or percent. Skipping Braintree serviceFee",
 						publisher.getName(), publisher.getId()));
 			}
