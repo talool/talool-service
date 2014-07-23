@@ -1,44 +1,35 @@
 <#import "/lib/talool.ftl" as oo>
-<#assign detailColor="#2b2b2b">
 
-<@oo.emailContainer>
+<@oo.userEmailContainer>
 	
-	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-spacing:0px;border-collapse:collapse">
-		<tbody>
-			<tr>
-				<td align="center" style="font-family:${oo.fontFamily};font-size:23px;font-weight:bold;color:${detailColor};line-height:28px;padding-top:20px;padding-bottom:26px;padding-left:40px;padding-right:40px">
-					I bought the ${offerTitle} to support ${fundraiserName}!
-				</td>
-			</tr>
-			<tr>
-				<td align="left" style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;color:${detailColor};padding-left:23px;line-height:21px">
-					Please consider showing your support by purchasing your own ${offerTitle}.  It's full of many great deals and 50% of the purchase price goes to ${fundraiserName}.  
-					Here's how to help.  
-					<ol>
-						<li><a href="${installLink}">Install Talool for iOS or Android</a></li>
-						<li>Register for a new account or sign in to the app</li>
-						<li>Select ${offerTitle} from the Find Deals tab and use the code, <b>${code}</b>, when you make your purchase</li>
-					</ol>
-				</td>
-			</tr>
-			<tr>
-				<td align="left" style="font-family:${oo.fontFamily};font-size:15px;color:${detailColor};line-height:21px;padding-left:23px;padding-top:12px;padding-right:10px">
-					${offerSummary}
-				</td> 
-			</tr>
-		</tbody>
-	</table>
+	<h2 style="font-family:${oo.fontFamily};font-weight:bold;font-size:21px;line-height:24px">
+		I bought the ${offerTitle} to support ${fundraiserName}!
+	</h2>
 	
-	<div align="center">
-		<table align="center" style="color:${oo.buttonBGColor};margin:25px 0 0;">
-			<tbody>
-				<tr>
-					<td>
-						<@oo.button url="${installLink}" label="Install Talool"/>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	<div style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;line-height:21px">
+		Please consider showing your support by purchasing your own copy of the ${offerTitle}.  
+		It's full of many great deals and 50% of the purchase price goes to ${fundraiserName}.  
+		Here's how to help.  
+		<br/><br/>
+		<b>Installation Instructions</b>
+		<ol>
+			<li><a href="${installLink}">Install Talool for iOS or Android</a></li>
+			<li>Register for a new account or sign in to the app</li>
+			<li>Select ${offerTitle} from the Find Deals tab and use the code, <b>${code}</b>, when you make your purchase</li>
+		</ol>
+		<div align="center" style="padding:25px 0 0;">
+			<#include "/components/app_store.html"/>
+		</div>
+		<br/><br/>
+		<hr/>
+		<br/>
+		<b>About The ${offerTitle}</b>
+		${offerSummary}
+		<br/><br/>
+		<b>Redeeming Deals On Talool</b>
+		<br/> 
+		Simply show your digital coupon to the participating merchant and tap the screen to select the redeem button.  
+		Once redeemed, the merchant may wish to write down the redemption code that is displayed on your phone.
 	</div>
 	
-</@oo.emailContainer>			
+</@oo.userEmailContainer>			

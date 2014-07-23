@@ -1,71 +1,51 @@
 <#import "/lib/talool.ftl" as oo>
-<#assign detailColor="#2b2b2b">
 
-<@oo.emailContainer>
+<@oo.emailContainer title="Thanks for supporting ${fundraiserName}!" cobrand="${cobrand}">
+
+	<div style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;line-height:21px">
+		${fullName},
+		<br/><br/>
+		We truly appreciate you taking the time to support ${fundraiserName} by selling the ${offerTitle}
+		on the Talool mobile app, and we hope to make it as easy as possible for you to help ${fundraiserName}
+		reach its fundraising goal.
+		<br/><br/>
+		<b>Getting Started</b>
+		<br/>
+		First, we suggest you <a href="${installLink}">Install Talool for iOS or Android</a> by following the instructions below.  
+		This will help you understand how your tracking code (${code}) is used, so you can assist others and ensure that
+		you get credit for the money you help raise.  If you wish to purchase the ${offerTitle} at this time and want to see if 
+		your first sale was tracked correctly, you can check <a href="${trackingLink}">your sales tracker</a>.
+		<br/><br/>
+		Next, we recommend you copy the instructions below into an email that you can send to your contacts to ask for their
+		help in supporting the ${fundraiserName} fundraiser.  Be sure to call out the use of the tracking code (${code}) in your email.
+		Feel free to simply forward this email if it makes the process easier.  
+		<br/><br/>
+		That's it!  Time to visit your local merchants and enjoy all the great deals in the ${offerTitle}.  Please remember to 
+		thank them all for their participation.  We couldn't have a fundraiser without them.  
+		<br/><br/>
+		<hr/>
+		<br/>
+		<b>About The ${offerTitle}</b>
+		<br/>
+		The ${offerTitle} has partnered with Talool, a mobile app that makes it easier and more fun to save money when you 
+		eat out, shop, and play in your community.  When you purchase the ${offerTitle} on Talool, you will never be without
+		your deals again.  Plus, 50% of the purchase price goes to ${fundraiserName}! 
+		<br/><br/>
+		<b>Redeeming Deals On Talool</b>
+		<br/> 
+		Simply show your digital coupon to the participating merchant and tap the screen to select the redeem button.  
+		Once redeemed, the merchant may wish to write down the redemption code that is displayed on your phone.
+		<br/><br/>
+		<b>Installation Instructions</b> 
+		<ol>
+			<li><a href="${installLink}">Install Talool for iOS or Android</a></li>
+			<li>Register for a new account or sign in to the app</li>
+			<li>Select the ${offerTitle} from the Find Deals tab and use the tracking code, <b>${code}</b>, when you make your purchase</li>
+		</ol>
+	</div>
 	
-	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-spacing:0px;border-collapse:collapse">
-		<tbody>
-			<tr>
-				<td align="center" style="font-family:${oo.fontFamily};font-size:23px;font-weight:bold;color:${detailColor};line-height:28px;padding-top:20px;padding-bottom:26px;padding-left:40px;padding-right:40px">
-					Thank you for signing up to support ${fundraiserName}!
-				</td>
-			</tr>
-			<tr>
-				<td align="left" style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;color:${detailColor};padding-left:23px;padding-right:23px;line-height:21px">
-					${fullName}
-					<br/><br/>
-					We truly appreciate you taking the time to support ${fundraiserName} by selling the ${offerTitle}
-					on the Talool mobile app, and we hope to make it as easy as possible for you to help ${fundraiserName}
-					reach its fundraising goal.
-					<br/><br/>
-					<b>Getting Started</b>
-					<br/>
-					First, we suggest you <a href="${installLink}">Install Talool for iOS or Android</a> by following the instructions below.  
-					This will help you understand how your tracking code (${code}) is used, so you can assist others and ensure that
-					you get credit for the money you help raise.  If you wish to purchase the ${offerTitle} at this time and want to see if 
-					your first sale was tracked correctly, you can check <a href="${trackingLink}">your sales tracker</a>.
-					<br/><br/>
-					Next, we recommend you copy the instructions below into an email that you can send to your contacts to ask for their
-					help in supporting the ${fundraiserName} fundraiser.  Be sure to call out the use of the tracking code (${code}) in your email.
-					Feel free to simply forward this email if it makes the process easier.  
-					<br/><br/>
-					That's it!  Time to visit your local merchants and enjoy all the great deals in the ${offerTitle}.  Please remember to 
-					thank them all for their participation.  We couldn't have a fundraiser without them.  
-					<br/><br/>
-					<hr/>
-					<br/>
-					<b>About The ${offerTitle}</b>
-					<br/>
-					The ${offerTitle} has partnered with Talool, a mobile app that makes it easier and more fun to save money when you 
-					eat out, shop, and play in your community.  When you purchase the ${offerTitle} on Talool, you will never be without
-					your deals again.  Plus, 50% of the purchase price goes to ${fundraiserName}! 
-					<br/><br/>
-					<b>Redeeming Deals On Talool</b>
-					<br/> 
-					Simply show your digital coupon to the participating merchant and tap the screen to select the redeem button.  
-					Once redeemed, the merchant may wish to write down the redemption code that is displayed on your phone.
-					<br/><br/>
-					<b>Installation Instructions</b> 
-					<ol>
-						<li><a href="${installLink}">Install Talool for iOS or Android</a></li>
-						<li>Register for a new account or sign in to the app</li>
-						<li>Select the ${offerTitle} from the Find Deals tab and use the tracking code, <b>${code}</b>, when you make your purchase</li>
-					</ol>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	
-	<div align="center">
-		<table align="center" style="color:${oo.buttonBGColor};margin:25px 0 0;">
-			<tbody>
-				<tr>
-					<td>
-						<@oo.button url="${installLink}" label="Install Talool"/>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	<div align="center" style="padding:25px 0 0;">
+		<#include "/components/app_store.html"/>
 	</div>
 	
 </@oo.emailContainer>			

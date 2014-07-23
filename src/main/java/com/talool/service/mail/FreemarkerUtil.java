@@ -186,6 +186,7 @@ public final class FreemarkerUtil
 		data.put("fullName", codeGroup.getCodeGroupTitle());
 		data.put("offerTitle", publisher.getName()); 
 		data.put("trackingLink", entity.trackingUrl);
+		data.put("cobrand", entity.cobrand);
 
 		StringWriter stringWriter = new StringWriter();
 		template.process(data, stringWriter);

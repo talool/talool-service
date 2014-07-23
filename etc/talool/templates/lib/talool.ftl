@@ -1,78 +1,92 @@
 <#assign bgcolor="#ebebeb"> 
 <#assign boxColor="#ffffff">
-<#assign boxBorderColor="#c9c9c9">
-<#assign boxInsetBorderColor="#e5e5e5">
+<#assign boxBorderColor="#19bcb9">
+<#assign boxInsetBorderColor="#ffffff">
 <#assign buttonLabelColor="#2b2b2b">
-<#assign buttonBGColor="#efefef">
+<#assign buttonBGColor="#19bcb9">
 <#assign grayTextColor="#a1a3aa">
 <#assign lightGrayTextColor="#b0b3b9">
-<#assign pageWidth=380>
 <#assign fontFamily="Helvetica,Arial,Sans-Serif">
 
 <#assign aboutUs="Talool is committed to bringing you better deals and closer relationships with the places where you shop, eat, relax, and visit.">
 
 
-<#macro emailContainer>
+<#macro emailContainer title cobrand>
 	<!DOCTYPE html>
 	<html>
 		<head></head>
-		<body style="background-color:${bgcolor};">
-			<div style="background-color:${bgcolor}; padding: 0px 10px 50px;" align="center">
-				<div width="100%" align="center" style="background-color:${bgcolor}">
-					<table bgcolor="${bgcolor}" border="0" cellpadding="0" cellspacing="0" 
-						style="border-spacing:0px;max-width:${pageWidth}px">
-						<tbody>
-							<tr>
-								<td style="padding-top:10px;padding-bottom:20px">
-									<@box>
-										<#nested/>
-									</@box>
-									<#include "/components/footer.html"/>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+		<body>
+			<style>
+				@media screen and (max-width: 480px) {
+				   table.table { width: 400px !important; }
+				}
+			</style>
+			<div style="background-color:${bgcolor}; padding: 10px 10px 50px; max-width: 700px">
+			
+				<table class="table" border="0" cellpadding="0" cellspacing="0" width="100%">
+					<tbody>
+						<tr>
+							<td width="300">
+								<a href="http://talool.com"><img src="http://www.talool.com/img/logo/TaloolLogoAndIcon_brown_xsmall.png" 
+									width="120" height="50" border="0" style="display:block" alt="Talool"></a>
+							</td>
+							<td style="text-align: right">
+								<@logo cobrand="${cobrand}"/>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			    
+
+				<@box title="${title}">
+					<#nested/>
+				</@box>
+			
+				<div align="center">
+					<#include "/components/footer.html"/>
 				</div>
+				
 			</div>
 		</body>
 	</html>
 </#macro>
 
+<#macro userEmailContainer>
+	<!DOCTYPE html>
+	<html>
+		<head></head>
+		<body>
+			<style>
+				@media screen and (max-width: 480px) {
+				   table.table { width: 400px !important; }
+				}
+			</style>
+			<div style="padding: 10px 10px 50px; max-width: 700px">
+			
+				<#nested/>
 
+			</div>
+		</body>
+	</html>
+</#macro>
 
-<#macro box>
-	<table border="0" cellpadding="0" cellspacing="0" style="max-width:${pageWidth}px">
+<#macro box title>
+	<table class="table" border="0" cellpadding="0" cellspacing="0" width="100%">
 		<tbody>
 			<tr>
-				<td colspan="5" height="16" style="vertical-align:top;max-width:${pageWidth}px">
-					<img src="http://i1328.photobucket.com/albums/w525/talooltools/box_top_zps28516e2d.png" width="100%" height="100%" alt="" style="display:block;max-width:${pageWidth - 1}px">
-                </td>
+				<td colspan="3" 
+					style="vertical-align:top; color:#fff; font-size:21px; font-weight: bold; padding: 15px 25px 10px" 
+					bgcolor="${boxBorderColor}">${title}</td>
 			</tr>
             <tr>
-            	<td width="3"></td>
-                <td width="1" bgcolor="${boxBorderColor}"></td>
-                <td width="${pageWidth - 17}" style="padding:0 4px 0 4px" bgcolor="${boxColor}">
-                	<table border="0" bgcolor="${boxColor}" cellpadding="0" cellspacing="0" width="${pageWidth - 17}" style="border-spacing:0px;border-collapse:collapse">
-                    	<tbody>
-                    		<tr>
-                            	<td width="1" bgcolor="${boxInsetBorderColor}"></td>
-                              	<td bgcolor="${boxColor}" style="padding:10px 0px">
-                              		
-                                	<#nested/>
-                                	
-								</td>
-								<td width="1" bgcolor="${boxInsetBorderColor}"></td>
-							</tr>
-						</tbody>
-					</table>
+            	<td width="1" bgcolor="${boxBorderColor}"></td>
+                <td style="padding:25px 25px 50px 25px" bgcolor="${boxColor}">         		
+                	<#nested/>
 				</td>
-				<td width="1" bgcolor="${boxBorderColor}" style="margin:auto"></td>
-				<td width="4" style="margin:auto"></td>
+				<td width="1" bgcolor="${boxBorderColor}"></td>
 			</tr>
 			<tr>
-				<td colspan="5" height="16" style="vertical-align:top;max-width:${pageWidth}px">
-					<img src="http://i1328.photobucket.com/albums/w525/talooltools/box_bottom_zps89655ac5.png" width="100%" height="100%" alt="" style="display:block;max-width:${pageWidth - 1}px">
-				</td>
+				<td colspan="3" height="1" bgcolor="${boxBorderColor}"></td>
 			</tr>
 		</tbody>
 	</table>
@@ -89,8 +103,8 @@
 					</td>
 					<td height="50" align="center" bgcolor="${buttonBGColor}" 
 						background="https://statici.icloud.com/emailimages/calweb/email_assets/buttons/btn_middle.png" 
-						style="background-repeat:repeat-x;width:90px">
-						<div align="center" style="color:${buttonLabelColor};font-family:Helvetica;font-size:15px;font-weight:bold;width:90px;text-align:center;padding-bottom:0px">
+						style="background-repeat:repeat-x;width:110px">
+						<div align="center" style="color:${buttonLabelColor};font-family:Helvetica;font-size:15px;font-weight:bold;width:110px;text-align:center;padding-bottom:0px">
 							<a href="${url}" style="color:${buttonLabelColor};outline:none;text-decoration:none" target="_blank"> 
 								${label}
 							</a>
@@ -104,4 +118,18 @@
 			</tbody>
 		</table>
 	</a>
+</#macro>
+
+<#macro logo cobrand>
+	<#switch cobrand>
+	  <#case "colorado">
+	    <img src="http://static.talool.com/17907b38-9ce4-4fcd-afff-85ac009b2117/130814104647LogoPaybackBoulder.png" 
+			border="0" alt="Payback Book"/>
+	    <#break>
+	  <#case "washington">
+	    <img src="http://static.talool.com/17907b38-9ce4-4fcd-afff-85ac009b2117/130804121807LogoPaybackBookVancouver.png" 
+			border="0" alt="Payback Book"/>
+	    <#break>
+	  <#default>
+	</#switch>
 </#macro>

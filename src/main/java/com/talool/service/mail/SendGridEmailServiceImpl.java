@@ -79,6 +79,7 @@ public class SendGridEmailServiceImpl implements EmailService
 		sendgrid.addTo(sendGridParams.getEmailParams().getRecipient());
 		sendgrid.setFrom(sendGridParams.getEmailParams().getFrom());
 		sendgrid.setSubject(sendGridParams.getEmailParams().getSubject());
+		sendgrid.setFromName(sendGridParams.getEmailParams().getFromName());
 
 		sendgrid.setHtml(renderedBody);
 
@@ -273,8 +274,9 @@ public class SendGridEmailServiceImpl implements EmailService
 		String emailSubject = ServiceConfig.get().getAndReplace(ServiceConfig.PUBLISHER_CODE_SUBJ, "@fundraiser", fundraiser.getName());
 		String emailAddress = codeGroup.getCodeGroupNotes();
 		
-		final EmailParams emailParams = new EmailParams(emailSubject,
+		EmailParams emailParams = new EmailParams(emailSubject,
 				emailAddress, ServiceConfig.get().getMailFrom());
+		emailParams.setFromName("Talool Fundraiser");
 		
 		final EmailRequest<EmailTrackingCodeEntity> sendGridParams = new EmailRequest<EmailTrackingCodeEntity>();
 		sendGridParams.setEmailParams(emailParams);
