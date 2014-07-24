@@ -15,8 +15,6 @@ import com.talool.service.mail.EmailTrackingCodeEntity;
  */
 public interface EmailService
 {
-	public void sendCustomerRegistrationEmail(final EmailRequestParams<Customer> emailRequestParams) throws ServiceException;
-
 	public void sendPasswordRecoveryEmail(final EmailRequestParams<Customer> emailRequestParams) throws ServiceException;
 
 	public void sendGiftEmail(final EmailRequestParams<EmailGift> emailRequestParams) throws ServiceException;

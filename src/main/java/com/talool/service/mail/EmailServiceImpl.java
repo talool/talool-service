@@ -191,13 +191,6 @@ public class EmailServiceImpl implements EmailService
 	// }
 
 	@Override
-	public void sendCustomerRegistrationEmail(EmailRequestParams<Customer> emailRequestParams) throws ServiceException
-	{
-		throw new ServiceException("UNSUPPORTED FUNCTION");
-
-	}
-
-	@Override
 	public void sendPasswordRecoveryEmail(EmailRequestParams<Customer> emailRequestParams) throws ServiceException
 	{
 		throw new ServiceException("UNSUPPORTED FUNCTION");

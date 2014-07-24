@@ -148,7 +148,7 @@ public final class FreemarkerUtil
 	 * 
 	 * @TODO generate subjects and bodies via a message strategy
 	 */
-	public EmailMessage renderFundraiserEmail(final DealOfferPurchase dealOfferPurchase, final Merchant fundraiser, final String code)
+	public EmailMessage renderFundraiserEmail(final DealOfferPurchase dealOfferPurchase, final Merchant fundraiser, final String code, final String name)
 			throws IOException, TemplateException
 	{
 		final StringBuilder sb = new StringBuilder();
@@ -162,6 +162,7 @@ public final class FreemarkerUtil
 		data.put("offerSummary", dealOfferPurchase.getDealOffer().getSummary());
 		data.put("installLink", ServiceConfig.get().getInstallLink());
 		data.put("code", code);
+		data.put("fullName", name);
 
 		final StringWriter stringWriter = new StringWriter();
 		template.process(data, stringWriter);

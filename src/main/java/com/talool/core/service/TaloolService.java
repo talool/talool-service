@@ -13,6 +13,7 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
+import com.talool.core.MerchantCode;
 import com.talool.core.MerchantCodeGroup;
 import com.talool.core.PropertyEntity;
 import com.talool.core.Tag;
@@ -133,6 +134,8 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 	public MerchantCodeGroup createMerchantCodeGroup(final Merchant merchant, final Long createdByMerchantAccountId,
 			final UUID publisherId, final String codeGroupTitle, final String codeGroupNotes, final short totalCodes)
 			throws ServiceException;
+	
+	public MerchantCode getMerchantCodeForCode(final String code) throws ServiceException;
 	
 	public long getDailyTrackingCodeCountByPublisher(final UUID publisherId) throws ServiceException;
 

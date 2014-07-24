@@ -57,6 +57,7 @@ import com.talool.core.Location;
 import com.talool.core.MediaType;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
+import com.talool.core.MerchantCode;
 import com.talool.core.MerchantCodeGroup;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
@@ -3065,5 +3066,25 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 
 		return purchases;
+	}
+
+	@Override
+	public MerchantCode getMerchantCodeForCode(String code)
+			throws ServiceException {
+		
+		MerchantCode merchantCode = null;
+		
+		try
+		{
+			final Search search = new Search(MerchantCodeImpl.class);
+			search.addFilterEqual("code", code);
+			merchantCode = (MerchantCode) daoDispatcher.searchUnique(search);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ex.getLocalizedMessage(), ex);
+		}
+		
+		return merchantCode;
 	}
 }
