@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.braintreegateway.BraintreeGateway;
-import com.braintreegateway.ClientTokenRequest;
 import com.braintreegateway.Environment;
 import com.braintreegateway.MerchantAccount;
 import com.braintreegateway.MerchantAccountRequest;
@@ -297,8 +296,10 @@ public class BraintreeUtil
 	
 	public String generateClientToken(UUID customerId)
 	{
-		ClientTokenRequest clientTokenRequest = new ClientTokenRequest().customerId(customerId.toString());
-		return gateway.clientToken().generate(clientTokenRequest);
+		// Note: I think this ClientTokenRequest takes a BT customerId, not our CustomerId.
+		// 		 we may want to map our customers to their customers in the future.
+		// ClientTokenRequest clientTokenRequest = new ClientTokenRequest().customerId(customerId.toString());
+		return gateway.clientToken().generate();
 	}
 	
 	public TransactionResult processPaymentNonce(final Customer customer, final DealOffer dealOffer, final String nonce,
