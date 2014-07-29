@@ -9,9 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.braintreegateway.BraintreeGateway;
+import com.braintreegateway.ClientTokenRequest;
+import com.braintreegateway.CustomerRequest;
 import com.braintreegateway.Environment;
 import com.braintreegateway.MerchantAccount;
 import com.braintreegateway.MerchantAccountRequest;
+import com.braintreegateway.PaymentMethodRequest;
 import com.braintreegateway.Result;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
@@ -296,10 +299,39 @@ public class BraintreeUtil
 	
 	public String generateClientToken(UUID customerId)
 	{
-		// Note: I think this ClientTokenRequest takes a BT customerId, not our CustomerId.
-		// 		 we may want to map our customers to their customers in the future.
-		// ClientTokenRequest clientTokenRequest = new ClientTokenRequest().customerId(customerId.toString());
-		return gateway.clientToken().generate();
+		String token;
+		String btCustomerId = null;
+		
+		// find or generate a braintree customer id
+		try
+		{
+			com.braintreegateway.Customer customer = gateway.customer().find(customerId.toString());
+			btCustomerId = customer.getId();
+		}
+		catch (com.braintreegateway.exceptions.NotFoundException nfe)
+		{
+			CustomerRequest request = new CustomerRequest()
+		    	.id(customerId.toString());
+			
+			Result<com.braintreegateway.Customer> result = gateway.customer().create(request);
+			
+			if (result.isSuccess())
+			{
+				btCustomerId = result.getTarget().getId();
+			}
+		}
+		
+		if (btCustomerId == null)
+		{
+			token = gateway.clientToken().generate();
+		}
+		else
+		{
+			ClientTokenRequest clientTokenRequest = new ClientTokenRequest().customerId(btCustomerId);
+			token = gateway.clientToken().generate(clientTokenRequest);
+		}
+		
+		return token;
 	}
 	
 	public TransactionResult processPaymentNonce(final Customer customer, final DealOffer dealOffer, final String nonce,
@@ -330,6 +362,20 @@ public class BraintreeUtil
 		catch (Exception e)
 		{
 			throw new ProcessorException("Problem processing paymentCode: " + e.getMessage(), e);
+		}
+		
+		// try to save this payment method to the vault
+		try
+		{
+			PaymentMethodRequest request = new PaymentMethodRequest()
+		    	.customerId(customer.getId().toString())
+		    	.paymentMethodNonce(nonce);
+
+		    gateway.paymentMethod().create(request);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Problem saving the payment method: " + customer.getId().toString());
 		}
 
 		return transResult;

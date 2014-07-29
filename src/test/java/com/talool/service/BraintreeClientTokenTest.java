@@ -26,8 +26,16 @@ public class BraintreeClientTokenTest
 	public void testGenerateClientToken()
 	{
 		UUID customerId = UUID.randomUUID();
-		String token = BraintreeUtil.get().generateClientToken(customerId);
-		Assert.assertNotNull(token);
+		
+		// creates a new BT Customer during token creation
+		String token1 = BraintreeUtil.get().generateClientToken(customerId);
+		Assert.assertNotNull(token1);
+		
+		// finds the BT Customer during token creation
+		String token2 = BraintreeUtil.get().generateClientToken(customerId);
+		Assert.assertNotNull(token2);
 
+		// the same customer id should still lead to different tokens
+		Assert.assertFalse(token1.equals(token2));
 	}
 }
