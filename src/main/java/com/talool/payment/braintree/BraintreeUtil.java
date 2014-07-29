@@ -2,12 +2,14 @@ package com.talool.payment.braintree;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.braintreegateway.BraintreeGateway;
+import com.braintreegateway.ClientTokenRequest;
 import com.braintreegateway.Environment;
 import com.braintreegateway.MerchantAccount;
 import com.braintreegateway.MerchantAccountRequest;
@@ -291,5 +293,45 @@ public class BraintreeUtil
 	{
 		WebhookNotification webhookNotification = gateway.webhookNotification().parse(btSignatureParam, btPayloadParam);
 		return webhookNotification;
+	}
+	
+	public String generateClientToken(UUID customerId)
+	{
+		ClientTokenRequest clientTokenRequest = new ClientTokenRequest().customerId(customerId.toString());
+		return gateway.clientToken().generate(clientTokenRequest);
+	}
+	
+	public TransactionResult processPaymentNonce(final Customer customer, final DealOffer dealOffer, final String nonce,
+			final Merchant publisher) throws ProcessorException
+	{
+		Result<Transaction> result = null;
+		TransactionRequest transRequest = null;
+		TransactionResult transResult = null;
+
+		try
+		{
+			transRequest = new TransactionRequest()
+					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
+					.paymentMethodNonce(nonce)
+					.descriptor().name(createDescriptor(dealOffer)).done()
+					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options().submitForSettlement(true).done();
+
+			if (publisher != null)
+			{
+				decorateSubmerchantTransaction(transRequest, publisher, dealOffer);
+			}
+
+			result = gateway.transaction().sale(transRequest);
+
+			transResult = getTransactionResult(result);
+
+		}
+		catch (Exception e)
+		{
+			throw new ProcessorException("Problem processing paymentCode: " + e.getMessage(), e);
+		}
+
+		return transResult;
+
 	}
 }
