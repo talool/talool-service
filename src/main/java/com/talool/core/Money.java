@@ -1,643 +1,1183 @@
 package com.talool.core;
 
-import static java.math.BigDecimal.ZERO;
+import java.io.Serializable; // Java I/O
+import java.math.BigDecimal; // Java Math classes
+import java.text.DecimalFormat; // Java Text classes
+import java.text.NumberFormat;
+import java.text.ParseException;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Currency;
+// Java Utility classes
 
 /**
- * Represent an amount of money in any currency.
  * 
- * <P>
- * This class assumes <em>decimal currency</em>, without funky divisions like
- * 1/5 and so on. <tt>Money</tt> objects are immutable. Like {@link BigDecimal},
- * many operations return new <tt>Money</tt> objects. In addition, most
- * operations involving more than one <tt>Money</tt> object will throw a
- * <tt>MismatchedCurrencyException</tt> if the currencies don't match.
+ * <b>Class Money</b>
  * 
- * <h2>Decimal Places and Scale</h2>
- * Monetary amounts can be stored in the database in various ways. Let's take
- * the example of dollars. It may appear in the database in the following ways :
- * <ul>
- * <li>as <tt>123456.78</tt>, with the usual number of decimal places associated
- * with that currency.
- * <li>as <tt>123456</tt>, without any decimal places at all.
- * <li>as <tt>123</tt>, in units of thousands of dollars.
- * <li>in some other unit, such as millions or billions of dollars.
- * </ul>
+ * <p>
+ * The Money class represents a United States monetary value, expressed in
+ * dollars and cents. Internally, the value is represented using Java's
+ * BigDecimal class.
+ * </p>
  * 
- * <P>
- * The number of decimal places or style of units is referred to as the
- * <em>scale</em> by {@link java.math.BigDecimal}. This class's constructors
- * take a <tt>BigDecimal</tt>, so you need to understand it use of the idea of
- * scale.
+ * <p>
+ * Methods are provided to perform all the usual arithmetic manipulations
+ * required when dealing with monetary data, including add, subtract, multiply,
+ * and divide.
+ * </p>
  * 
- * <P>
- * The scale can be negative. Using the above examples :
- * <table border='1' cellspacing='0' cellpadding='3'>
- * <tr>
- * <th>Number</th>
- * <th>Scale</th>
- * </tr>
- * <tr>
- * <td>123456.78</th>
- * <th>2</th>
- * </tr>
- * <tr>
- * <td>123456</th>
- * <th>0</th>
- * </tr>
- * <tr>
- * <td>123 (thousands)</th>
- * <th>-3</th>
- * </tr>
- * </table>
+ * <p>
+ * <b>Rounding</b>
+ * </p>
+ * <p>
+ * Rounding does not occur during intermediate computations; maximum precision
+ * (and accuracy) is thus preserved throughout all computations. Round-off to an
+ * integral cent occurs only when the monetary value is externalized (when
+ * formatted for display as a String or converted to a long integer). One of
+ * several different rounding modes can be specified. The default rounding mode
+ * is to discard any fractional cent and truncate the monetary value to 2
+ * decimal places.
+ * </p>
  * 
- * <P>
- * Note that scale and rounding are two separate issues. In addition, rounding
- * is only necessary for multiplication and division operations. It doesn't
- * apply to addition and subtraction.
+ * <p>
+ * <b>Currency Format</b>
+ * </p>
+ * <p>
+ * A Currency Format (an instance of DecimalFormat) is used to control
+ * formatting of monetary values for display as well as the parsing of strings
+ * which represent monetary values. By default, the Currency Format for the
+ * current locale is used. For the United States, the default Currency Symbol is
+ * the Dollar Sign ("$"). Negative amounts are enclosed in parentheses. A
+ * Decimal Point (".") separates the dollars and cents, and a comma (",")
+ * separates each group of 3 consecutive digits in the dollar amount.
+ * </p>
+ * <p>
+ * Examples: $1,234.56 ($1,234.56)
+ * </p>
  * 
- * <h2>Operations and Scale</h2>
- * <P>
- * Operations can be performed on items having <em>different scale</em>. For
- * example, these operations are valid (using an <em>ad hoc</em> symbolic
- * notation):
+ * <p>
+ * <b>Immutability</b>
+ * </p>
+ * <p>
+ * Money objects, like String objects, are <b>immutable</b>. An operation on a
+ * Money object (such as add, subtract, etc.) does not alter the object in any
+ * way. Rather, a new Money object is returned whose state reflects the result
+ * of the operation. Thus, a statement like
+ * </p>
+ * <p>
+ * <tt>money1.add(money2);</tt>
+ * </p>
+ * <p>
+ * has no effect; it does not modify money1 in any way, and the result is
+ * effectively discarded. If the intent is to modify money1, then you should
+ * code
+ * </p>
+ * <p>
+ * money1 = money1.add(money2);
+ * </p>
+ * <p>
+ * which effectively replaces money1 with the result.
+ * </p>
  * 
- * <PRE>
- * 10.plus(1.23) =&gt; 11.23
- * 10.minus(1.23) =&gt; 8.77
- * 10.gt(1.23) =&gt; true
- * 10.eq(10.00) =&gt; true
- * </PRE>
+ * @see BigDecimal
  * 
- * This corresponds to typical user expectations. An important exception to this
- * rule is that {@link #equals(Object)} is sensitive to scale (while
- * {@link #eq(Money)} is not) . That is,
+ * @see DecimalFormat
  * 
- * <PRE>
- *   10.equals(10.00) =&gt; false
- * </PRE>
- * 
- * <h2>Multiplication, Division and Extra Decimal Places</h2>
- * <P>
- * Operations involving multiplication and division are different, since the
- * result can have a scale which exceeds that expected for the given currency.
- * For example
- * 
- * <PRE>
- * ($10.00).times(0.1256) =&gt; $1.256
- * </PRE>
- * 
- * which has more than two decimals. In such cases,
- * <em>this class will always round 
- * to the expected number of decimal places for that currency.</em> This is the
- * simplest policy, and likely conforms to the expectations of most end users.
- * 
- * <P>
- * This class takes either an <tt>int</tt> or a {@link BigDecimal} for its
- * multiplication and division methods. It doesn't take <tt>float</tt> or
- * <tt>double</tt> for those methods, since those types don't interact well with
- * <tt>BigDecimal</tt>. Instead, the <tt>BigDecimal</tt> class must be used when
- * the factor or divisor is a non-integer.
- * 
- * <P>
- * <em>The {@link #init(Currency, RoundingMode)} method must be called at least 
- * once before using the other members of this class.</em> It establishes your
- * desired defaults. Typically, it will be called once (and only once) upon
- * startup.
- * 
- * <P>
- * Various methods in this class have unusually terse names, such as {@link #lt}
- * and {@link #gt}. The intent is that such names will improve the legibility of
- * mathematical expressions. Example :
- * 
- * <PRE>
- * if (amount.lt(hundred))
- * {
- * 	cost = amount.times(price);
- * }
- * </PRE>
  */
-public final class Money implements Comparable<Money>, Serializable
+public class Money implements Cloneable, // Money objects can be cloned
+		Serializable // Money objects are serializable
 {
+	/**
+	 * The monetary value.
+	 */
+	protected BigDecimal value = null; // The monetary value
+	/**
+	 * The Rounding Mode. Specifies if and how the monetary value is to be rounded
+	 * off to an integral cent.
+	 */
+	protected int roundingMode = BigDecimal.ROUND_HALF_EVEN; // Rounding Mode
+	/**
+	 * The Currency Format, used for formatting and parsing a monetary value.
+	 * Refer to the Java API documentation for the DecimalFormat class for
+	 * information on formats.
+	 */
+	protected DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(); // Currency
+																																																// format
+	/**
+	 * The special monetary value of zero ($0.00).
+	 */
+	protected static final BigDecimal ZERO = new BigDecimal("0.00"); // The value
+																																		// $0.00
 
 	/**
-	 * Thrown when a set of <tt>Money</tt> objects do not have matching
-	 * currencies.
 	 * 
-	 * <P>
-	 * For example, adding together Euros and Dollars does not make any sense.
+	 * <b>Class InvalidScaleFactorException</b>
+	 * 
+	 * <p>
+	 * The InvalidScaleFactorException is thrown if an invalid scale factor is
+	 * specified (valid scale factors are 0, 1, and 2). This is a non-checked
+	 * exception and will be detected at runtime only.
+	 * </p>
+	 * 
 	 */
-	public static final class MismatchedCurrencyException extends RuntimeException
+	public static class InvalidScaleFactorException extends RuntimeException // Non-checked
+																																						// exception
 	{
-		private static final long serialVersionUID = 4526681714037086879L;
-
-		MismatchedCurrencyException(String aMessage)
+		/**
+		 * 
+		 * Default constructor for a InvalidScaleFactorException object.
+		 * 
+		 */
+		public InvalidScaleFactorException()
 		{
-			super(aMessage);
+			super(); // Invoke super class constructor.
 		}
-	}
 
-	/**
-	 * Set default values for currency and rounding style.
-	 * 
-	 * <em>Your application must call this method upon startup</em>. This method
-	 * should usually be called only once (upon startup).
-	 * 
-	 * <P>
-	 * The recommended rounding style is {@link RoundingMode#HALF_EVEN}, also
-	 * called <em>banker's rounding</em>; this rounding style introduces the least
-	 * bias.
-	 * 
-	 * <P>
-	 * Setting these defaults allow you to use the more terse constructors of this
-	 * class, which are much more convenient.
-	 * 
-	 * <P>
-	 * (In a servlet environment, each app has its own classloader. Calling this
-	 * method in one app will never affect the operation of a second app running
-	 * in the same servlet container. They are independent.)
-	 */
-	public static void init(Currency aDefaultCurrency, RoundingMode aDefaultRounding)
-	{
-		DEFAULT_CURRENCY = aDefaultCurrency;
-		DEFAULT_ROUNDING = aDefaultRounding;
-	}
-
-	/**
-	 * Full constructor.
-	 * 
-	 * @param aAmount
-	 *          is required, can be positive or negative. The number of decimals
-	 *          in the amount cannot <em>exceed</em> the maximum number of
-	 *          decimals for the given {@link Currency}. It's possible to create a
-	 *          <tt>Money</tt> object in terms of 'thousands of dollars', for
-	 *          instance. Such an amount would have a scale of -3.
-	 * @param aCurrency
-	 *          is required.
-	 * @param aRoundingStyle
-	 *          is required, must match a rounding style used by
-	 *          {@link BigDecimal}.
-	 */
-	public Money(BigDecimal aAmount, Currency aCurrency, RoundingMode aRoundingStyle)
-	{
-		fAmount = aAmount;
-		fCurrency = aCurrency;
-		fRounding = aRoundingStyle;
-		validateState();
-	}
-
-	/**
-	 * Constructor taking only the money amount.
-	 * 
-	 * <P>
-	 * The currency and rounding style both take default values.
-	 * 
-	 * @param aAmount
-	 *          is required, can be positive or negative.
-	 */
-	public Money(BigDecimal aAmount)
-	{
-		this(aAmount, DEFAULT_CURRENCY, DEFAULT_ROUNDING);
-	}
-
-	/**
-	 * Constructor taking the money amount and currency.
-	 * 
-	 * <P>
-	 * The rounding style takes a default value.
-	 * 
-	 * @param aAmount
-	 *          is required, can be positive or negative.
-	 * @param aCurrency
-	 *          is required.
-	 */
-	public Money(BigDecimal aAmount, Currency aCurrency)
-	{
-		this(aAmount, aCurrency, DEFAULT_ROUNDING);
-	}
-
-	/** Return the amount passed to the constructor. */
-	public BigDecimal getAmount()
-	{
-		return fAmount;
-	}
-
-	/** Return the currency passed to the constructor, or the default currency. */
-	public Currency getCurrency()
-	{
-		return fCurrency;
-	}
-
-	/**
-	 * Return the rounding style passed to the constructor, or the default
-	 * rounding style.
-	 */
-	public RoundingMode getRoundingStyle()
-	{
-		return fRounding;
-	}
-
-	/**
-	 * Return <tt>true</tt> only if <tt>aThat</tt> <tt>Money</tt> has the same
-	 * currency as this <tt>Money</tt>.
-	 */
-	public boolean isSameCurrencyAs(Money aThat)
-	{
-		boolean result = false;
-		if (aThat != null)
+		/**
+		 * 
+		 * Constructor for a InvalidScaleFactorException object.
+		 * 
+		 * <p>
+		 * 
+		 * @param info
+		 *          Descriptive information
+		 *          </p>
+		 * 
+		 */
+		public InvalidScaleFactorException(String info) // Descriptive info
 		{
-			result = this.fCurrency.equals(aThat.fCurrency);
+			super(info); // Invoke super class constructor.
 		}
-		return result;
-	}
-
-	/** Return <tt>true</tt> only if the amount is positive. */
-	public boolean isPlus()
-	{
-		return fAmount.compareTo(ZERO) > 0;
-	}
-
-	/** Return <tt>true</tt> only if the amount is negative. */
-	public boolean isMinus()
-	{
-		return fAmount.compareTo(ZERO) < 0;
-	}
-
-	/** Return <tt>true</tt> only if the amount is zero. */
-	public boolean isZero()
-	{
-		return fAmount.compareTo(ZERO) == 0;
-	}
+	} // Class InvalidScaleFactorException
 
 	/**
-	 * Add <tt>aThat</tt> <tt>Money</tt> to this <tt>Money</tt>. Currencies must
-	 * match.
-	 */
-	public Money plus(Money aThat)
-	{
-		checkCurrenciesMatch(aThat);
-		return new Money(fAmount.add(aThat.fAmount), fCurrency, fRounding);
-	}
-
-	/**
-	 * Subtract <tt>aThat</tt> <tt>Money</tt> from this <tt>Money</tt>. Currencies
-	 * must match.
-	 */
-	public Money minus(Money aThat)
-	{
-		checkCurrenciesMatch(aThat);
-		return new Money(fAmount.subtract(aThat.fAmount), fCurrency, fRounding);
-	}
-
-	/**
-	 * Sum a collection of <tt>Money</tt> objects. Currencies must match. You are
-	 * encouraged to use database summary functions whenever possible, instead of
-	 * this method.
 	 * 
-	 * @param aMoneys
-	 *          collection of <tt>Money</tt> objects, all of the same currency. If
-	 *          the collection is empty, then a zero value is returned.
-	 * @param aCurrencyIfEmpty
-	 *          is used only when <tt>aMoneys</tt> is empty; that way, this method
-	 *          can return a zero amount in the desired currency.
+	 * <b>Class InvalidRoundingModeException</b>
+	 * 
+	 * <p>
+	 * The InvalidRoundingModeException is thrown if an invalid Rounding Mode is
+	 * specified (all rounding modes except ROUND_UNNECESSARY are valid). This is
+	 * a non-checked exception and will be detected at runtime only.
+	 * </p>
+	 * 
+	 * @see BigDecimal#ROUND_UP
+	 * @see BigDecimal#ROUND_DOWN
+	 * @see BigDecimal#ROUND_CEILING
+	 * @see BigDecimal#ROUND_FLOOR
+	 * @see BigDecimal#ROUND_HALF_UP
+	 * @see BigDecimal#ROUND_HALF_DOWN
+	 * @see BigDecimal#ROUND_HALF_EVEN
+	 * 
 	 */
-	public static Money sum(Collection<Money> aMoneys, Currency aCurrencyIfEmpty)
+	public static class InvalidRoundingModeException extends RuntimeException // Non-checked
+																																						// exception
 	{
-		Money sum = new Money(ZERO, aCurrencyIfEmpty);
-		for (Money money : aMoneys)
+		/**
+		 * 
+		 * Default constructor for a InvalidRoundingModeException object.
+		 * 
+		 */
+		public InvalidRoundingModeException()
 		{
-			sum = sum.plus(money);
+			super(); // Invoke super class constructor.
+		} // Default Constructor InvalidRoundingModeException()
+
+		/**
+		 * 
+		 * Constructor for a InvalidRoundingModeException object.
+		 * 
+		 * <p>
+		 * 
+		 * @param info
+		 *          Descriptive information
+		 *          </p>
+		 * 
+		 */
+		public InvalidRoundingModeException(String info) // Descriptive info
+		{
+			super(info); // Invoke super class constructor.
 		}
-		return sum;
-	}
+	} // Class InvalidRoundingModeException
 
 	/**
-	 * Equals (insensitive to scale).
 	 * 
-	 * <P>
-	 * Return <tt>true</tt> only if the amounts are equal. Currencies must match.
-	 * This method is <em>not</em> synonymous with the <tt>equals</tt> method.
+	 * Default Constructor for a Money object; creates an object whose value is
+	 * $0.00.
+	 * 
 	 */
-	public boolean eq(Money aThat)
+	public Money()
 	{
-		checkCurrenciesMatch(aThat);
-		return compareAmount(aThat) == 0;
-	}
+		value = ZERO; // Initialize the monetary value
+		// to $0.00.
+	} // Default Constructor Money()
 
 	/**
-	 * Greater than.
 	 * 
-	 * <P>
-	 * Return <tt>true</tt> only if 'this' amount is greater than 'that' amount.
-	 * Currencies must match.
+	 * Constructs a Money object from a double-precision, floating-point value.
+	 * The Currency Format is set to the default format for the current locale.
+	 * 
+	 * <p>
+	 * The integral part of the value represents whole dollars, and the fractional
+	 * part of the value represents fractional dollars (cents). As an example, the
+	 * value 19.95 would represent $19.95.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>amount</b> The monetary amount, in dollars and cents
+	 *        </p>
+	 * 
 	 */
-	public boolean gt(Money aThat)
+	public Money(double amount) // Monetary Value, dollars and cents
 	{
-		checkCurrenciesMatch(aThat);
-		return compareAmount(aThat) > 0;
-	}
+		// In general, a double floating point value cannot represent a
+		// decimal value exactly, and
+		// therefore is only a very close approximation of the actual decimal
+		// value. Fortunately,
+		// the Double.toString() method is able to "recognize" an approximated
+		// decimal value, and
+		// will return the original (approximated) decimal value, rather than
+		// the literal floating
+		// point value. Here, we take advantage of this fact to obtain a
+		// string representation of
+		// the monetary value (without formatting, except for the decimal
+		// point), which we then use
+		// to create a BigDecimal object having the required value.
+		// Were we not to make this simplifying assumption, the only
+		// alternative would be to parse the
+		// string ourselves, which can be quite complicated, and would
+		// unnecessarily duplicate code
+		// already implemented by the format's parse() method.
+		// Convert the parsed value to a simple string (decimal point only)
+		// and use it to set the monetary value.
+		value = new BigDecimal(Double.toString(amount));
+	} // Constructor Money(double amount)
 
 	/**
-	 * Greater than or equal to.
 	 * 
-	 * <P>
-	 * Return <tt>true</tt> only if 'this' amount is greater than or equal to
-	 * 'that' amount. Currencies must match.
+	 * Constructs a Money object from a long integer value. The specified value
+	 * represents whole dollars only (that is, cents are implicity assumed to be
+	 * 00). For example, the integer 25 would represent a monetary value of
+	 * $25.00.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>amount</b> The monetary amount, in whole dollars (no cents)
+	 *        </p>
+	 * 
 	 */
-	public boolean gteq(Money aThat)
+	public Money(long amount) // Monetary amount, whole dollars (no cents)
 	{
-		checkCurrenciesMatch(aThat);
-		return compareAmount(aThat) >= 0;
-	}
+		value = new BigDecimal(Long.toString(amount)); // Set monetary value.
+	} // Constructor Money(long amount)
 
 	/**
-	 * Less than.
 	 * 
-	 * <P>
-	 * Return <tt>true</tt> only if 'this' amount is less than 'that' amount.
-	 * Currencies must match.
+	 * Constructs a Money object from a long integer value with a specified scale
+	 * factor. The scale factor (0, 1, or 2) specifies the number of digits to the
+	 * right of an implied decimal point.
+	 * 
+	 * <p>
+	 * For example, the value 1995 would be interpreted as a monetary value of
+	 * $1995.00, $199.50, and $19.95 for scale factors of 0, 1, or 2,
+	 * respectively.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>amount</b> The monetary amount, in dollars and cents
+	 * 
+	 * @param <b>scale</b> Scale factor (must be 0, 1, or 2)
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @throws InvalidScaleFactorException
+	 *           The scale factor specified is not valid (must be 0, 1, or 2)
+	 *           </p>
+	 * 
 	 */
-	public boolean lt(Money aThat)
+	public Money(long amount, // Montetary amount
+			int scale) // Scale Factor (0, 1, 2)
+			throws InvalidScaleFactorException
 	{
-		checkCurrenciesMatch(aThat);
-		return compareAmount(aThat) < 0;
-	}
+		if ( // If the Scale Factor is not
+		(scale < 0) // 0, 1, or
+				|| (scale > 2) // 2,
+		)
+		{
+			throw new InvalidScaleFactorException("Invalid scale factor: " + scale + " (must be 0, 1, or 2)");
+		}
+		// Set the monetary value and scale as specified.
+		value = (new BigDecimal(Long.toString(amount))).movePointLeft(scale);
+	} // Constructor Money(long amount, int scale)
 
 	/**
-	 * Less than or equal to.
 	 * 
-	 * <P>
-	 * Return <tt>true</tt> only if 'this' amount is less than or equal to 'that'
-	 * amount. Currencies must match.
+	 * Constructs a Money object from a string representation of a monetary value.
+	 * The format of the string must be consistent with the Currency Format;
+	 * otherwise, a ParseException is recognized.
+	 * 
+	 * Refer to the Java API documentation for the DecimalFormat class for
+	 * information on Decimal Formats in general, and Currency Formats in
+	 * particular.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>string</b> A String representing a monetary value
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @throws ParseException
+	 *           The string is inconsistent with the Currency Format
+	 *           </p>
+	 * 
+	 * @see DecimalFormat
+	 * @see #setCurrencyFormat
+	 * 
 	 */
-	public boolean lteq(Money aThat)
+	public Money(String string) // String representing a Monetary Value
+			throws ParseException // If string is inconsistent with
+	// Currency Format
 	{
-		checkCurrenciesMatch(aThat);
-		return compareAmount(aThat) <= 0;
-	}
+		// We make use of the format's parse() method, which parses the string
+		// according to the format and returns either a Double or a Long
+		// object representing the value.
+		Number number;
+		// Attempt to parse the string as a monetary value. May throw
+		// ParseException if the string is not consistent with the Currency
+		// Format.
+		number = currencyFormat.parse(string);
+		// In general, a double floating point value cannot represent a
+		// decimal value exactly, and
+		// therefore is only a very close approximation of the actual decimal
+		// value. Fortunately,
+		// the Double.toString() method is able to "recognize" an approximated
+		// decimal value, and
+		// will return the original (approximated) decimal value, rather than
+		// the literal floating
+		// point value. Here, we take advantage of this fact to obtain a
+		// string representation of
+		// the monetary value (without formatting, except for the decimal
+		// point), which we then use
+		// to create a BigDecimal object having the required value.
+		// Were we not to make this simplifying assumption, the only
+		// alternative would be to parse the
+		// string ourselves, which can be quite complicated, and would
+		// unnecessarily duplicate code
+		// already implemented by the format's parse() method.
+		// Convert the parsed value to a simple string (decimal point only)
+		// and use it to set the monetary value.
+		value = new BigDecimal(number.toString());
+	} // Constructor Money(String)
 
 	/**
-	 * Multiply this <tt>Money</tt> by an integral factor.
 	 * 
-	 * The scale of the returned <tt>Money</tt> is equal to the scale of 'this'
-	 * <tt>Money</tt>.
+	 * Constructs a Money object from a BigDecimal object.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>amount</b> A BigDecimal value representing a monetary amount, in
+	 *        dollars and cents
+	 *        </p>
+	 * 
 	 */
-	public Money times(int aFactor)
+	public Money(BigDecimal amount) // A BigDecimal object representing a
+	// monetary amount
 	{
-		BigDecimal factor = new BigDecimal(aFactor);
-		BigDecimal newAmount = fAmount.multiply(factor);
-		return new Money(newAmount, fCurrency, fRounding);
-	}
+		value = new BigDecimal(amount.toString()); // Set the monetary value.
+	} // Constructor Money(BigDecimal amount)
 
 	/**
-	 * Multiply this <tt>Money</tt> by an non-integral factor (having a decimal
-	 * point).
 	 * 
-	 * <P>
-	 * The scale of the returned <tt>Money</tt> is equal to the scale of 'this'
-	 * <tt>Money</tt>.
+	 * Copy Constructor; constructs a Money object from another Money object.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>amount</b> A Money object
+	 *        </p>
+	 * 
 	 */
-	public Money times(double aFactor)
+	public Money(Money amount) // Money Object
 	{
-		BigDecimal newAmount = fAmount.multiply(asBigDecimal(aFactor));
-		newAmount = newAmount.setScale(getNumDecimalsForCurrency(), fRounding);
-		return new Money(newAmount, fCurrency, fRounding);
-	}
+		roundingMode = amount.roundingMode; // Copy the Rounding Mode.
+		// Clone the Currency Format.
+		currencyFormat = (DecimalFormat) amount.currencyFormat.clone();
+		value = amount.value; // Copy the Monetary Value.
+	} // Copy Constructor Money(Money money)
 
 	/**
-	 * Divide this <tt>Money</tt> by an integral divisor.
 	 * 
-	 * <P>
-	 * The scale of the returned <tt>Money</tt> is equal to the scale of 'this'
-	 * <tt>Money</tt>.
+	 * Adds a specified monetary value to this monetary value.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>money</b> The monetary value to be added
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
 	 */
-	public Money div(int aDivisor)
+	public Money add(Money money) // The Monetary Value to be added
 	{
-		BigDecimal divisor = new BigDecimal(aDivisor);
-		BigDecimal newAmount = fAmount.divide(divisor, fRounding);
-		return new Money(newAmount, fCurrency, fRounding);
-	}
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		result.value = value.add(money.value); // Add the two monetary values.
+		return result; // Return the result.
+	} // Method Money.add()
 
 	/**
-	 * Divide this <tt>Money</tt> by an non-integral divisor.
 	 * 
-	 * <P>
-	 * The scale of the returned <tt>Money</tt> is equal to the scale of 'this'
-	 * <tt>Money</tt>.
+	 * Subtracts a specified monetary value from this monetary value.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>money</b> The monetary value to be subtracted
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
 	 */
-	public Money div(double aDivisor)
+	public Money subtract(Money money) // The monetary value to be
+	// subtracted
 	{
-		BigDecimal newAmount = fAmount.divide(asBigDecimal(aDivisor), fRounding);
-		return new Money(newAmount, fCurrency, fRounding);
-	}
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		result.value = value.subtract(money.value); // Subtract the specified
+		// monetary value.
+		return result; // Return the result.
+	} // Method Money.subtract()
 
-	/** Return the absolute value of the amount. */
-	public Money abs()
+	/**
+	 * 
+	 * Multiplies this monetary value by a specified value.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>mult</b> The multiplier value
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 */
+	public Money multiply(double mult) // The multiplier value
 	{
-		return isPlus() ? this : times(-1);
-	}
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		// Multiply by the specified value.
+		result.value = value.multiply(new BigDecimal(mult));
+		return result; // Return the result.
+	} // Method Money.multiply()
 
-	/** Return the amount x (-1). */
+	/**
+	 * 
+	 * Multiplies this monetary value by a specified value.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>mult</b> The multiplier value
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 */
+	public Money multiply(long mult) // The multiplier value
+	{
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		// Multiply by the specified value.
+		result.value = value.multiply(new BigDecimal(Long.toString(mult)));
+		return result; // Return the result.
+	} // Method Money.multiply()
+
+	/**
+	 * 
+	 * Divides this monetary value by a specified value.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>div</b> The divisor value
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 */
+	public Money divide(double div) // The divisor value
+	{
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		// Divide the monetary value by the specified value and round if
+		// necessary.
+		result.value = value.divide(new BigDecimal(div), BigDecimal.ROUND_HALF_UP);
+		return result; // Return the result.
+	} // Method Money.divide()
+
+	/**
+	 * 
+	 * Divides this monetary value by a specified value.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>div</b> The divisor value
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 */
+	public Money divide(long div) // The divisor value
+	{
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		// Divide the monetary value by the specified value and round if
+		// necessary.
+		result.value = value.divide(new BigDecimal(Long.toString(div)), BigDecimal.ROUND_HALF_UP);
+		return result; // Return the result.
+	} // Method Money.divide()
+
+	/**
+	 * 
+	 * Negates this monetary value.
+	 * 
+	 * Positive values become negative, and negative values become positive. The
+	 * effect is the same as if the monetary value were multiplied by -1.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 */
 	public Money negate()
 	{
-		return times(-1);
-	}
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		result.value = value.negate(); // Negate the monetary value.
+		return result; // Return the result.
+	} // Method Money.negate()
 
 	/**
-	 * Returns {@link #getAmount()}.getPlainString() + space +
-	 * {@link #getCurrency()}.getSymbol().
 	 * 
-	 * <P>
-	 * The return value uses the runtime's <em>default locale</em>, and will not
-	 * always be suitable for display to an end user.
+	 * Returns the absolute monetary value.
+	 * 
+	 * A positive value is returned, irrespective of whether the monetary value is
+	 * positive or negative.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 */
+	public Money abs()
+	{
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		result.value = value.abs(); // Get the abolute monetary value.
+		return result; // Return the result.
+	} // Method Money.abs()
+
+	/**
+	 * 
+	 * Returns the monetary value as a long integer with 2 decimal digits to the
+	 * right of an implicit decimal point. For example, if the monetary value were
+	 * $19.95, a value of 1995 would be returned. Note that the monetary value is
+	 * rounded, if necessary, according to the specified Rounding Mode.
+	 * 
+	 * <p>
+	 * 
+	 * @return The monetary value
+	 *         </p>
+	 * 
+	 */
+	public long toLong()
+	{
+		// Round off the monetary value to 2 decimal places.
+		BigDecimal result = value.setScale(2, roundingMode);
+		result = result.movePointRight(2); // Move decimal point 2 places to
+		// the right to preserve cents.
+		return result.longValue(); // Return the result.
+	} // Method Money.toLong()
+
+	/**
+	 * 
+	 * Returns the monetary value as a double-precision, floating-point value.
+	 * 
+	 * <p>
+	 * Note: Exercise care when converting monetary values to floating point
+	 * values, because floating-point arithmetic is not well-suited for use with
+	 * monetary data.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @return The monetary value
+	 *         </p>
+	 * 
+	 */
+	public double toDouble()
+	{
+		return value.doubleValue(); // Return the monetary value as a
+		// double floating point value.
+	} // Method Money.toDouble()
+
+	/**
+	 * 
+	 * Returns the monetary value as a BigDecimal object.
+	 * 
+	 * <p>
+	 * 
+	 * @return The monetary value
+	 *         </p>
+	 * 
+	 */
+	public BigDecimal getValue()
+	{
+		return value; // Return the monetary value.
+	} // Method Money.getValue()
+
+	/**
+	 * 
+	 * Returns the Rounding Mode.
+	 * 
+	 * Refer to Java's BigDecimal object for a description of the possible
+	 * rounding modes.
+	 * 
+	 * <p>
+	 * 
+	 * @return The Rounding Mode
+	 *         </p>
+	 * 
+	 * @see BigDecimal#ROUND_UP
+	 * @see BigDecimal#ROUND_DOWN
+	 * @see BigDecimal#ROUND_CEILING
+	 * @see BigDecimal#ROUND_FLOOR
+	 * @see BigDecimal#ROUND_HALF_UP
+	 * @see BigDecimal#ROUND_HALF_DOWN
+	 * @see BigDecimal#ROUND_HALF_EVEN
+	 * 
+	 */
+	public int getRoundingMode()
+	{
+		return roundingMode; // Return the Rounding Mode.
+	} // Method Money.getRoundingMode()
+
+	/**
+	 * 
+	 * Sets the Rounding Mode.
+	 * 
+	 * Refer to the Java API documentation for the BigDecimal class for a
+	 * description of the possible Rounding Modes.
+	 * 
+	 * The default Rounding Mode is BigDecimal.ROUND_DOWN, which effectively
+	 * discards any fractional cent amount and truncates the monetary value to 2
+	 * decimal places.
+	 * 
+	 * A Rounding Mode of BigDecimal.ROUND_UNNECESSARY is not valid for use with
+	 * monetary data since certain operations result in a loss of precision and
+	 * therefore require that a rounding mode be explicitly specified.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>int</b> The Rounding Mode
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 *         <p>
+	 * @throws InvalidRoundingModeException
+	 *           The Rounding Mode specified is not valid for monetary data
+	 *           </p>
+	 * 
+	 * @see BigDecimal#ROUND_UP
+	 * @see BigDecimal#ROUND_DOWN
+	 * @see BigDecimal#ROUND_CEILING
+	 * @see BigDecimal#ROUND_FLOOR
+	 * @see BigDecimal#ROUND_HALF_UP
+	 * @see BigDecimal#ROUND_HALF_DOWN
+	 * @see BigDecimal#ROUND_HALF_EVEN
+	 * 
+	 */
+	public Money setRoundingMode(int mode) // Rounding Mode
+			throws InvalidRoundingModeException
+	{
+		if (mode == BigDecimal.ROUND_UNNECESSARY) // If Rounding Mode is not
+		// valid,
+		{
+			throw new InvalidRoundingModeException("Rounding mode not valid for monetary data: " + mode);
+		}
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		result.roundingMode = mode; // Set the Rounding Mode.
+		return result; // Return the result.
+	} // Method Money.setRoundingMode(int mode)
+
+	/**
+	 * 
+	 * Returns the Currency Format, used to format and parse monetary values.
+	 * 
+	 * Refer to the Java API documentation for the DecimalFormat class for
+	 * information on Decimal Formats in general, and Currency Formats in
+	 * particular.
+	 * 
+	 * <p>
+	 * 
+	 * @return The Currency Format
+	 *         </p>
+	 * 
+	 * @see DecimalFormat
+	 * 
+	 */
+	public DecimalFormat getCurrencyFormat()
+	{
+		return currencyFormat; // Return the Currency Format.
+	} // Method Money.getCurrencyFormat()
+
+	/**
+	 * 
+	 * Sets the Currency Format, used for formatting and parsing monetary values.
+	 * 
+	 * Refer to the Java API documentation for the DecimalFormat class for
+	 * information on Decimal Formats in general, and Currency Formats in
+	 * particular.
+	 * 
+	 * <p>
+	 * By default, the Currency Format for the current locale is used. For the
+	 * United States, the default Currency Symbol is the Dollar Sign ("$").
+	 * Negative amounts are enclosed in parentheses. A Decimal Point (".")
+	 * separates the dollars and cents, and a comma (",") separates each group of
+	 * 3 consecutive digits in the dollar amount.
+	 * </p>
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>format</b> The Currency Format
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representing the result
+	 *         </p>
+	 * 
+	 * @see DecimalFormat
+	 * 
+	 */
+	public Money setCurrencyFormat(DecimalFormat format) // Currency Format
+	{
+		Money result = new Money(this); // Create a new Money object for
+		// the result.
+		result.currencyFormat = format; // Set the Currency Format.
+		return result; // Return the result.
+	} // Method Money.setCurrencyFormat()
+
+	/**
+	 * 
+	 * Returns a formatted string representation of the monetary value. The format
+	 * of the string is determined by the Currency Format.
+	 * 
+	 * Refer to the Java API documentation for the DecimalFormat class for
+	 * information on Decimal Formats in general, and Currency Formats in
+	 * particular.
+	 * 
+	 * <p>
+	 * By default, the Currency Format for the current locale is used.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @return A string representation of the monetary value
+	 *         </p>
+	 * 
+	 * @see DecimalFormat
+	 * @see #setCurrencyFormat
+	 * 
 	 */
 	public String toString()
 	{
-		return fAmount.toPlainString() + " " + fCurrency.getSymbol();
+		// Round off the monetary value to 2 decimal places.
+		BigDecimal result = value.setScale(2, roundingMode);
+		return currencyFormat.format(result); // Format the result according
+		// to the Currency Format.
 	}
 
 	/**
-	 * Like {@link BigDecimal#equals(java.lang.Object)}, this <tt>equals</tt>
-	 * method is also sensitive to scale.
 	 * 
-	 * For example, <tt>10</tt> is <em>not</em> equal to <tt>10.00</tt> The
-	 * {@link #eq(Money)} method, on the other hand, is <em>not</em> sensitive to
-	 * scale.
+	 * Parses a string representation of a monetary value, returning a new Money
+	 * object with the specified value. The format of the string must be
+	 * consistent with the Currency Format; otherwise, a ParseException is
+	 * recognized.
+	 * 
+	 * Refer to the Java API documentation for the DecimalFormat class for
+	 * information on Decimal Formats in general, and Currency Formats in
+	 * particular.
+	 * 
+	 * <p>
+	 * The value of this object is not affected in any way. A new object is
+	 * returned reflecting the result of the operation.
+	 * </p>
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>string</b> A String representing a monetary value
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return A new Money object representating the parsed monetary value
+	 *         </p>
+	 * 
+	 *         <p>
+	 * @throws ParseException
+	 *           The string is inconsistent with the Currency Format
+	 *           </p>
+	 * 
+	 * @see DecimalFormat
+	 * @see #setCurrencyFormat
+	 * 
 	 */
-	public boolean equals(Object aThat)
+	public Money parse(String string) // String representing a Monetary Value
+			throws ParseException // If string is inconsistent with
+	// Currency Format
 	{
-		if (this == aThat)
-			return true;
-		if (!(aThat instanceof Money))
-			return false;
-		Money that = (Money) aThat;
-		// the object fields are never null :
-		boolean result = (this.fAmount.equals(that.fAmount));
-		result = result && (this.fCurrency.equals(that.fCurrency));
-		result = result && (this.fRounding == that.fRounding);
-		return result;
-	}
+		Money result = new Money(this); // Create a Money object for the
+		// result.
+		// We make use of the format's parse() method, which parses the string
+		// according to the format and returns either a Double or a Long
+		// object representing the value.
+		Number number;
+		// Attempt to parse the string as a monetary value. May throw a
+		// ParseException if the string is not consistent with the Currency
+		// Format.
+		number = currencyFormat.parse(string);
+		// In general, a double floating point value cannot represent a
+		// decimal value exactly, and
+		// therefore is only a very close approximation of the actual decimal
+		// value. Fortunately,
+		// the Double.toString() method is able to "recognize" an approximated
+		// decimal value, and
+		// will return the original (approximated) decimal value, rather than
+		// the literal floating
+		// point value. Here, we take advantage of this fact to obtain a
+		// string representation of
+		// the monetary value (without formatting, except for the decimal
+		// point), which we then use
+		// to create a BigDecimal object having the required value.
+		// Were we not to make this simplifying assumption, the only
+		// alternative would be to parse the
+		// string ourselves, which can be quite complicated, and would
+		// unnecessarily duplicate code
+		// already implemented by the format's parse() method.
+		// Convert the parsed value to a simple string (decimal point only)
+		// and use it to set the monetary value.
+		result.value = new BigDecimal(number.toString());
+		return result; // Return the new Money object.
+	} // Method Money.parse()
 
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is zero (equal
+	 * to $0.00).
+	 * 
+	 * <p>
+	 * 
+	 * @return <b>true </b> The monetary value is zero <br>
+	 *         <b>false</b> The monetary value is not zero
+	 *         </p>
+	 * 
+	 */
+	public boolean isZero()
+	{
+		return (value.compareTo(ZERO) == 0); // Return true if value is zero.
+	} // Method Money.isZero()
+
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is negative
+	 * (less than $0.00).
+	 * 
+	 * <p>
+	 * 
+	 * @return <b>true </b> The monetary value is negative <br>
+	 *         <b>false</b> The monetary value is not negative
+	 *         </p>
+	 * 
+	 */
+	public boolean isNegative()
+	{
+		return (value.compareTo(ZERO) < 0); // Return true if value is less
+		// than zero.
+	} // Method Money.isNegative()
+
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is positive
+	 * (greater than or equal to $0.00).
+	 * 
+	 * <p>
+	 * 
+	 * @return <b>true </b> The monetary value is positive <br>
+	 *         <b>false</b> The monetary value is not positive
+	 *         </p>
+	 * 
+	 */
+	public boolean isPositive()
+	{
+		return (value.compareTo(ZERO) >= 0); // Return true if value is
+		// greater than zero.
+	} // Method Money.isPositive()
+
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is equal to
+	 * another monetary value.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>other</b> A monetary value with which this monetary value is to
+	 *        be compared
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return <b>true </b> This monetary values are equal <br>
+	 *         <b>false</b> This monetary values are not equal
+	 *         </p>
+	 * 
+	 */
+	public boolean isEqual(Money other) // Monetary value for comparison
+	{
+		return (value.compareTo(other.value) == 0); // Return true if equal to
+		// the other amount.
+	} // Method Money.isEqual()
+
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is less than
+	 * another monetary value.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>other</b> A monetary value with which this monetary value is to
+	 *        be compared
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return <b>true </b> This monetary value is less than the specified
+	 *         monetary value <br>
+	 *         <b>false</b> This monetary value is not less than the specified
+	 *         monetary value
+	 *         </p>
+	 * 
+	 */
+	public boolean isLessThan(Money other) // Monetary value for comparison
+	{
+		return (value.compareTo(other.value) < 0); // Return true if less than
+		// the other amount.
+	} // Method Money.isLessThan()
+
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is less than or
+	 * equal to another monetary value.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>other</b> A monetary value with which this monetary value is to
+	 *        be compared
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return <b>true </b> This monetary value is less than or equal to the
+	 *         specified monetary value <br>
+	 *         <b>false</b> This monetary value is not less than or equal to the
+	 *         specified monetary value
+	 *         </p>
+	 * 
+	 */
+	public boolean isLessThanOrEqual(Money other) // Monetary value for
+	// comparison
+	{
+		// Return true if less than or equal to the other amount.
+		return (value.compareTo(other.value) <= 0);
+	} // Method Money.isLessThanOrEqual()
+
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is greater than
+	 * another monetary value.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>other</b> A monetary value with which this monetary value is to
+	 *        be compared
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return <b>true </b> This monetary value is greater than the specified
+	 *         monetary value <br>
+	 *         <b>false</b> This monetary value is not greater than the specified
+	 *         monetary value
+	 *         </p>
+	 * 
+	 */
+	public boolean isGreaterThan(Money other) // Monetary value for
+	// comparison
+	{
+		// Return true if greater than the other amount.
+		return (value.compareTo(other.value) > 0);
+	} // Method Money.isGreaterThan()
+
+	/**
+	 * 
+	 * Returns an indication of whether or not this monetary value is greater than
+	 * or equal to another monetary value.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>other</b> A monetary value with which this monetary value is to
+	 *        be compared
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return <b>true </b> This monetary value is greater than or equal to the
+	 *         specified monetary value <br>
+	 *         <b>false</b> This monetary value is not greater than or equal to
+	 *         the specified monetary value
+	 *         </p>
+	 * 
+	 */
+	public boolean isGreaterThanOrEqual(Money other) // Monetary value for
+	// comparison
+	{
+		// Return true if greater than or equal to the other amount.
+		return (value.compareTo(other.value) >= 0);
+	} // Method Money.isGreaterThanOrEqual()
+
+	/**
+	 * 
+	 * Compares this object with the specified object. The objects are equal if
+	 * and only if the specified object is not null, is a Money object, and has
+	 * the same monetary value as this object.
+	 * 
+	 * <p>
+	 * 
+	 * @param <b>object</b> Some object
+	 *        </p>
+	 * 
+	 *        <p>
+	 * @return <b>true </b> The objects are equal <br>
+	 *         <b>false</b> The objects are not equal
+	 *         </p>
+	 * 
+	 */
+	public boolean equals(Object object) // Object to compare
+	{
+		if (object == this) // If the object is this object,
+		{
+			return true; // the objects are equal by
+		} // definition.
+		if (object == null) // If the object is null,
+		{
+			return false; // the objects are not equal by
+		} // definition.
+		if (!(object instanceof Money)) // If the object is not an instance
+		// of Money,
+		{
+			return false; // the objects are not equal by
+		} // definition.
+		// Return true if monetary values are the same.
+		return (value.compareTo(((Money) object).value) == 0);
+	} // Method Money.equals()
+
+	/**
+	 * 
+	 * Returns a hashcode for this object. The hashcode is identical to that for
+	 * the BigDecimal object that represents the monetary value.
+	 * 
+	 * <p>
+	 * 
+	 * @return The hashcode
+	 *         </p>
+	 * 
+	 */
 	public int hashCode()
 	{
-		if (fHashCode == 0)
-		{
-			fHashCode = HASH_SEED;
-			fHashCode = HASH_FACTOR * fHashCode + fAmount.hashCode();
-			fHashCode = HASH_FACTOR * fHashCode + fCurrency.hashCode();
-			fHashCode = HASH_FACTOR * fHashCode + fRounding.hashCode();
-		}
-		return fHashCode;
-	}
-
-	public int compareTo(Money aThat)
-	{
-		final int EQUAL = 0;
-
-		if (this == aThat)
-			return EQUAL;
-
-		// the object fields are never null
-		int comparison = this.fAmount.compareTo(aThat.fAmount);
-		if (comparison != EQUAL)
-			return comparison;
-
-		comparison = this.fCurrency.getCurrencyCode().compareTo(aThat.fCurrency.getCurrencyCode());
-		if (comparison != EQUAL)
-			return comparison;
-
-		comparison = this.fRounding.compareTo(aThat.fRounding);
-		if (comparison != EQUAL)
-			return comparison;
-
-		return EQUAL;
-	}
-
-	// PRIVATE //
+		return value.hashCode(); // Return the hashcode for the
+		// monetary value.
+	} // Method Money.hashCode()
 
 	/**
-	 * The money amount. Never null.
 	 * 
-	 * @serial
-	 */
-	private BigDecimal fAmount;
-
-	/**
-	 * The currency of the money, such as US Dollars or Euros. Never null.
+	 * Clones a Money object. The new object is an exact copy of this object, and
+	 * inherits the object's monetary value and Currency Format.
 	 * 
-	 * @serial
-	 */
-	private final Currency fCurrency;
-
-	/**
-	 * The rounding style to be used. See {@link BigDecimal}.
+	 * <p>
 	 * 
-	 * @serial
-	 */
-	private final RoundingMode fRounding;
-
-	/**
-	 * The default currency to be used if no currency is passed to the
-	 * constructor.
-	 */
-	private static Currency DEFAULT_CURRENCY;
-
-	/**
-	 * The default rounding style to be used if no currency is passed to the
-	 * constructor. See {@link BigDecimal}.
-	 */
-	private static RoundingMode DEFAULT_ROUNDING;
-
-	/** @serial */
-	private int fHashCode;
-	private static final int HASH_SEED = 23;
-	private static final int HASH_FACTOR = 37;
-
-	/**
-	 * Determines if a deserialized file is compatible with this class.
+	 * @return <b>Money</b> The cloned object
+	 *         </p>
 	 * 
-	 * Maintainers must change this value if and only if the new version of this
-	 * class is not compatible with old versions. See Sun docs for <a
-	 * href=http://java.sun.com/products/jdk/1.1/docs/guide
-	 * /serialization/spec/version.doc.html> details. </a>
-	 * 
-	 * Not necessary to include in first version of the class, but included here
-	 * as a reminder of its importance.
 	 */
-	private static final long serialVersionUID = 7526471155622776147L;
-
-	/**
-	 * Always treat de-serialization as a full-blown constructor, by validating
-	 * the final state of the de-serialized object.
-	 */
-	private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException,
-			IOException
+	public Object clone()
 	{
-		// always perform the default de-serialization first
-		aInputStream.defaultReadObject();
-		// defensive copy for mutable date field
-		// BigDecimal is not technically immutable, since its non-final
-		fAmount = new BigDecimal(fAmount.toPlainString());
-		// ensure that object state has not been corrupted or tampered with
-		// maliciously
-		validateState();
-	}
+		Money result = new Money(this); // Create a copy of this Money object.
+		return result; // Return the cloned object.
+	} // Method Money.clone()
+} // Class Money
 
-	private void writeObject(ObjectOutputStream aOutputStream) throws IOException
-	{
-		// perform the default serialization for all non-transient, non-static
-		// fields
-		aOutputStream.defaultWriteObject();
-	}
-
-	private void validateState()
-	{
-		if (fAmount == null)
-		{
-			throw new IllegalArgumentException("Amount cannot be null");
-		}
-		if (fCurrency == null)
-		{
-			throw new IllegalArgumentException("Currency cannot be null");
-		}
-		if (fAmount.scale() > getNumDecimalsForCurrency())
-		{
-			throw new IllegalArgumentException("Number of decimals is " + fAmount.scale()
-					+ ", but currency only takes " + getNumDecimalsForCurrency() + " decimals.");
-		}
-	}
-
-	private int getNumDecimalsForCurrency()
-	{
-		return fCurrency.getDefaultFractionDigits();
-	}
-
-	private void checkCurrenciesMatch(Money aThat)
-	{
-		if (!this.fCurrency.equals(aThat.getCurrency()))
-		{
-			throw new MismatchedCurrencyException(aThat.getCurrency()
-					+ " doesn't match the expected currency : " + fCurrency);
-		}
-	}
-
-	/** Ignores scale: 0 same as 0.00 */
-	private int compareAmount(Money aThat)
-	{
-		return this.fAmount.compareTo(aThat.fAmount);
-	}
-
-	private BigDecimal asBigDecimal(double aDouble)
-	{
-		String asString = Double.toString(aDouble);
-		return new BigDecimal(asString);
-	}
-}

@@ -1,12 +1,10 @@
 package com.talool.persistence;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Currency;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -66,24 +64,24 @@ public class MoneyUserType implements UserType
 		return false;
 	}
 
-	@Override
-	public Object nullSafeGet(ResultSet rs, String[] names, Object arg2) throws HibernateException,
-			SQLException
-	{
-		final Float valueInUSD = (Float) rs.getFloat(names[0]);
-		if (rs.wasNull())
-			return null;
-		// Here is where we would convert currency !
-		// Currency userCurrency=User.getPreferences().getCurrency();
-		final BigDecimal value = new BigDecimal(valueInUSD.toString());
-		final Money amount = new Money(value.setScale(2, BigDecimal.ROUND_HALF_UP),
-				Currency.getInstance("USD"));
-		return amount;
-	}
+	// @Override
+	// public Object nullSafeGet(ResultSet rs, String[] names, Object arg2) throws
+	// HibernateException,
+	// SQLException
+	// {
+	// final Float valueInUSD = (Float) rs.getFloat(names[0]);
+	// if (rs.wasNull())
+	// return null;
+	// // Here is where we would convert currency !
+	// // Currency userCurrency=User.getPreferences().getCurrency();
+	// final BigDecimal value = new BigDecimal(valueInUSD.toString());
+	// final Money amount = new Money(value.setScale(2, BigDecimal.ROUND_HALF_UP),
+	// Currency.getInstance("USD"));
+	// return amount;
+	// }
 
 	@Override
-	public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException,
-			SQLException
+	public void nullSafeSet(PreparedStatement st, Object value, int index) throws HibernateException, SQLException
 	{
 		if (value == null)
 		{
@@ -93,7 +91,7 @@ public class MoneyUserType implements UserType
 		{
 			final Money amount = (Money) value;
 			// Here is where you would convert the amount from any currency to USD
-			st.setFloat(index, amount.getAmount().floatValue());
+			st.setFloat(index, amount.getValue().floatValue());
 		}
 
 	}
@@ -114,6 +112,13 @@ public class MoneyUserType implements UserType
 	public int[] sqlTypes()
 	{
 		return sqlTypes;
+	}
+
+	@Override
+	public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws HibernateException, SQLException
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
