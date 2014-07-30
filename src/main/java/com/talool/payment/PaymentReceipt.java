@@ -3,7 +3,10 @@ package com.talool.payment;
 import com.talool.core.Money;
 
 /**
- * A payment receipt supporting funraiser, publisher
+ * A payment receipt which breaks down fees
+ * 
+ * https://docs.google.com/a/talool.com/spreadsheets/d/1
+ * UFWrvLZwaPGF7WWz6jiT8K9UOQehwvPVcXEDuMw2AK4/edit#gid=0
  * 
  * @author clintz
  * 
