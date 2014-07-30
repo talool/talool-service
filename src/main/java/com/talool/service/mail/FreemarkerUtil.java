@@ -185,7 +185,7 @@ public final class FreemarkerUtil
 		data.put("installLink", ServiceConfig.get().getInstallLink());
 		data.put("code", codeGroup.getCodes().iterator().next().getCode());
 		data.put("fullName", codeGroup.getCodeGroupTitle());
-		data.put("offerTitle", publisher.getName()); 
+		data.put("publisherName", publisher.getName()); 
 		data.put("trackingLink", entity.trackingUrl);
 		data.put("cobrand", entity.cobrand);
 
