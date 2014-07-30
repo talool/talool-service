@@ -55,18 +55,7 @@
 	<!DOCTYPE html>
 	<html>
 		<head></head>
-		<body>
-			<style>
-				@media screen and (max-width: 480px) {
-				   table.table { width: 400px !important; }
-				}
-			</style>
-			<div style="padding: 10px 10px 50px; max-width: 700px">
-			
-				<#nested/>
-
-			</div>
-		</body>
+		<body><#nested/></body>
 	</html>
 </#macro>
 

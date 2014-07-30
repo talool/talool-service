@@ -206,6 +206,11 @@ public interface CustomerService extends HibernateService, RequestHeaderSupport
 
 	public TransactionResult purchaseByCode(final UUID customerId, final UUID dealOfferId,
 			final String paymentCode, final Map<String, String> paymentProperties) throws ServiceException, NotFoundException;
+	
+	public TransactionResult purchaseByNonce(final UUID customerId, final UUID dealOfferId,
+			final String nonce, final Map<String, String> paymentProperties) throws ServiceException, NotFoundException;
+	
+	public String generateBraintreeClientToken(final UUID customerId) throws ServiceException, NotFoundException;
 
 	/**
 	 * Gets all customers in Talool
