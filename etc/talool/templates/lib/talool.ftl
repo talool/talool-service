@@ -11,17 +11,17 @@
 <#assign aboutUs="Talool is committed to bringing you better deals and closer relationships with the places where you shop, eat, relax, and visit.">
 
 
-<#macro emailContainer title cobrand>
+<#macro emailContainer title cobrand="" max=700 min=400>
 	<!DOCTYPE html>
 	<html>
 		<head></head>
 		<body>
 			<style>
 				@media screen and (max-width: 480px) {
-				   table.table { width: 400px !important; }
+				   table.table { width: ${min}px !important; }
 				}
 			</style>
-			<div style="background-color:${bgcolor}; padding: 10px 10px 50px; max-width: 700px">
+			<div style="background-color:${bgcolor}; padding: 10px 10px 50px; max-width: ${max}px">
 			
 				<table class="table" border="0" cellpadding="0" cellspacing="0" width="100%">
 					<tbody>
@@ -55,18 +55,7 @@
 	<!DOCTYPE html>
 	<html>
 		<head></head>
-		<body>
-			<style>
-				@media screen and (max-width: 480px) {
-				   table.table { width: 400px !important; }
-				}
-			</style>
-			<div style="padding: 10px 10px 50px; max-width: 700px">
-			
-				<#nested/>
-
-			</div>
-		</body>
+		<body><#nested/></body>
 	</html>
 </#macro>
 

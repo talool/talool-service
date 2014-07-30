@@ -128,23 +128,6 @@ public class SendGridEmailServiceImpl implements EmailService
 	}
 
 	@Override
-	public void sendCustomerRegistrationEmail(final EmailRequestParams<Customer> emailRequestParams)
-			throws ServiceException
-	{
-
-		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getRegistrationSubj(),
-				emailRequestParams.getEntity().getEmail(), ServiceConfig.get().getMailFrom());
-
-		final EmailRequest<Customer> sendGridParams = new EmailRequest<Customer>();
-		sendGridParams.setEmailParams(emailParams);
-		sendGridParams.setCategory(EmailCategory.Registration.toString());
-		sendGridParams.setTemplateType(TemplateType.Registration);
-
-		sendEmail(sendGridParams);
-
-	}
-
-	@Override
 	public void sendPasswordRecoveryEmail(final EmailRequestParams<Customer> emailRequestParams)
 			throws ServiceException
 	{

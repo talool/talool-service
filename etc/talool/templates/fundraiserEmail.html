@@ -2,34 +2,27 @@
 
 <@oo.userEmailContainer>
 	
-	<h2 style="font-family:${oo.fontFamily};font-weight:bold;font-size:21px;line-height:24px">
-		I bought the ${offerTitle} to support ${fundraiserName}!
-	</h2>
-	
-	<div style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;line-height:21px">
-		Please consider showing your support by purchasing your own copy of the ${offerTitle}.  
-		It's full of many great deals and 50% of the purchase price goes to ${fundraiserName}.  
-		Here's how to help.  
-		<br/><br/>
-		<b>Installation Instructions</b>
-		<ol>
-			<li><a href="${installLink}">Install Talool for iOS or Android</a></li>
-			<li>Register for a new account or sign in to the app</li>
-			<li>Select ${offerTitle} from the Find Deals tab and use the code, <b>${code}</b>, when you make your purchase</li>
-		</ol>
-		<div align="center" style="padding:25px 0 0;">
-			<#include "/components/app_store.html"/>
-		</div>
-		<br/><br/>
-		<hr/>
-		<br/>
-		<b>About The ${offerTitle}</b>
-		${offerSummary}
-		<br/><br/>
-		<b>Redeeming Deals On Talool</b>
-		<br/> 
-		Simply show your digital coupon to the participating merchant and tap the screen to select the redeem button.  
-		Once redeemed, the merchant may wish to write down the redemption code that is displayed on your phone.
-	</div>
+<h2>I helped ${fullName} by buying the ${offerTitle} to support ${fundraiserName}!</h2>
+Please consider showing your support by purchasing your own copy of the ${offerTitle}.
+It's full of many great deals and 50% of the proceeds go to ${fundraiserName}
+when you use the code, <b>${code}</b>, during your purchase.  That code also
+supports <b>${fullName}</b>, so don't forget to use it.  Here's how to help.
+<br/>
+
+<h3>Installation Instructions</h3>
+<b>1.</b> Install Talool for the <a href="https://itunes.apple.com/us/app/talool/id669529943">iPhone</a> or <a href="https://play.google.com/store/apps/details?id=com.talool.android">Android</a>
+<br/>
+<b>2.</b> Register for a new account or sign in to the app
+<br/>
+<b>3.</b> Select ${offerTitle} from the Find Deals tab and use the code, <b>${code}</b>, when you make your purchase
+<br/>
+
+<h3>About The ${offerTitle}</h3>
+${offerSummary}
+<br/>
+
+<h3>Redeeming Deals On Talool</h3>
+Simply show your digital coupon to the participating merchant and tap the screen to select the redeem button.
+Once redeemed, the merchant may wish to write down the redemption code that is displayed on your phone.
 	
 </@oo.userEmailContainer>			

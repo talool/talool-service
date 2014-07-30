@@ -67,12 +67,16 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 	@Column(name = "total_codes", nullable = false)
 	private Short totalCodes;
 
-	@Column(name = "created_dt", insertable = false, updatable = false)
+	@Column(name = "create_dt", insertable = false, updatable = false)
 	private Date created;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "merchantCodeGroup", targetEntity = MerchantCodeImpl.class)
 	private Set<MerchantCode> codes = new HashSet<MerchantCode>();
 
+	public MerchantCodeGroupImpl()
+	{
+	}
+	
 	public MerchantCodeGroupImpl(final Merchant merchant)
 	{
 		this.merchant = merchant;

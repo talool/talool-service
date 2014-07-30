@@ -3066,4 +3066,35 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return purchases;
 	}
+
+	@Override
+	public MerchantCodeGroup getMerchantCodeGroupForCode(String code)
+			throws ServiceException {
+		
+		if (code == null)
+		{
+			return null;
+		}
+
+		MerchantCodeGroup group = null;
+
+		try
+		{
+
+			Query query = getCurrentSession().createQuery(
+					"select mcg from MerchantCodeGroupImpl as mcg,MerchantCodeImpl as mc "
+							+ "WHERE mc.merchantCodeGroup=mcg.id AND mc.code=:code");
+
+			query.setParameter("code", code);
+			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
+			group = (MerchantCodeGroup) query.uniqueResult();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException(ex.getLocalizedMessage(), ex);
+		}
+		return group;
+
+	}
 }

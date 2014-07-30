@@ -1940,4 +1940,117 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	{
 		requestHeaders.set(headers);
 	}
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public TransactionResult purchaseByNonce(UUID customerId, UUID dealOfferId,
+			String nonce, Map<String, String> paymentProperties)
+			throws ServiceException, NotFoundException {
+		
+
+		DealOffer dealOffer = null;
+		Customer customer = null;
+		TransactionResult transactionResult = null;
+		DealOfferPurchase dop = null;
+		Merchant fundraiser = null;
+		Merchant publisher = null;
+
+		try
+		{
+			// TODO Optimize the heavy call which pulls dealOffers - maybe ehcache
+			// DealOffers
+			dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
+			customer = ServiceFactory.get().getCustomerService().getCustomerById(customerId);
+
+			if (paymentProperties.containsKey(KeyValue.merchantCode))
+			{
+				String merchantCode = paymentProperties.get(KeyValue.merchantCode);
+				fundraiser = ServiceFactory.get().getTaloolService().getFundraiserByTrackingCode(merchantCode);
+				TaloolStatsDClient.get().count(Action.fundraiser_purchase, SubAction.credit_card, fundraiser.getId(), requestHeaders.get());
+			}
+		}
+		catch (ServiceException se)
+		{
+			throw se;
+		}
+
+		if (dealOffer == null)
+		{
+			throw new NotFoundException("deal offer", dealOfferId == null ? null : dealOfferId.toString());
+		}
+
+		if (customer == null)
+		{
+			throw new NotFoundException("customer", customerId == null ? null : customerId.toString());
+		}
+
+		try
+		{
+			publisher = dealOffer.getMerchant();
+			transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher);
+		}
+		catch (ProcessorException e)
+		{
+			throw new ServiceException(ErrorCode.GENERAL_PROCESSOR_ERROR, e);
+		}
+
+		if (transactionResult.isSuccess())
+		{
+			try
+			{
+				dop = createDealOfferPurchase(customer, dealOffer, transactionResult);
+				getCurrentSession().flush();
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug("processing braintree for " + customer.getEmail() + " " + transactionResult.getTransactionId());
+				}
+
+				// save any props
+				if (MapUtils.isNotEmpty(paymentProperties))
+				{
+					for (Entry<String, String> entry : paymentProperties.entrySet())
+					{
+						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
+					}
+				}
+
+				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card_nonce, dealOfferId, requestHeaders.get());
+
+			}
+			catch (ServiceException e)
+			{
+				try
+				{
+					if (LOG.isDebugEnabled())
+					{
+						LOG.debug("rolling back braintree transaction " + customer.getEmail());
+					}
+
+					rollbackPaymentTransaction(customerId, dealOfferId, transactionResult, e);
+				}
+				catch (ProcessorException pe)
+				{
+					LOG.error("Transaction not rolled back with processor! " + pe.getMessage(), pe);
+				}
+
+				throw e;
+			}
+
+			// send purchase events to anyone listing
+			purchaseEventBus.post(new PurchaseEvent(dop, paymentProperties, fundraiser));
+
+		}
+		else
+		{
+			LOG.error(String.format("Transaction failed for customerId %s errorCode %s errorText %s", customerId,
+					transactionResult.getErrorCode(), transactionResult.getErrorText()));
+		}
+		return transactionResult;
+	}
+
+	@Override
+	public String generateBraintreeClientToken(UUID customerId)
+			throws ServiceException, NotFoundException {
+		return BraintreeUtil.get().generateClientToken(customerId);
+	}
 }

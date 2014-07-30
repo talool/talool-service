@@ -1,9 +1,8 @@
 <#import "/lib/talool.ftl" as oo>
 <#assign labelColor="#9b9b9b">
 <#assign detailColor="#2b2b2b">
-<#assign detailWidth=280>
 
-<@oo.emailContainer title="${name} has sent you a gift!" cobrand="">
+<@oo.emailContainer title="${name} has sent you a gift!" cobrand="" max=500 min=360>
 	
 	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-spacing:0px;border-collapse:collapse">
 		<tbody>
@@ -20,50 +19,44 @@
 				</td>
 			</tr>
 			<tr>
-				<td style="font-family:${oo.fontFamily};font-size:13px;font-weight:normal;color:${labelColor};line-height:21px;vertical-align:top" align="right" width="120">
+				<td style="width:50px;font-family:${oo.fontFamily};font-size:13px;font-weight:normal;color:${labelColor};line-height:21px;vertical-align:top" align="right">
 					where?
 				</td>
-				<td width="${detailWidth}" align="left" style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;color:${detailColor};padding-left:23px;line-height:21px">
+				<td align="left" style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;color:${detailColor};padding-left:23px;line-height:21px">
 					${merchantName}
 				</td>
 			</tr>
 			<tr>
-				<td style="font-family:${oo.fontFamily};font-size:13px;font-weight:normal;color:${labelColor};padding-top:13px;line-height:21px;vertical-align:top" align="right" width="120">
+				<td style="font-family:${oo.fontFamily};font-size:13px;font-weight:normal;color:${labelColor};padding-top:13px;line-height:21px;vertical-align:top" align="right">
 					what?
 				</td>
-				<td width="${detailWidth}" align="left" style="font-family:${oo.fontFamily};font-size:15px;color:${detailColor};line-height:21px;padding-left:23px;padding-top:12px;padding-right:10px">
+				<td align="left" style="font-family:${oo.fontFamily};font-size:15px;color:${detailColor};line-height:21px;padding-left:23px;padding-top:12px;padding-right:10px">
 					${dealSummary}
 				</td> 
 			</tr>
 			<tr>
-				<td style="font-family:${oo.fontFamily};font-size:13px;font-weight:normal;color:${labelColor};padding-top:11px;line-height:21px;vertical-align:top" align="right" width="63">
+				<td style="font-family:${oo.fontFamily};font-size:13px;font-weight:normal;color:${labelColor};padding-top:11px;line-height:21px;vertical-align:top" align="right">
 					how?
 				</td>
-				<td width="${detailWidth}" align="left" style="font-family:${oo.fontFamily};font-size:15px;color:${detailColor};font-weight:normal;padding-left:23px;line-height:21px;padding-top:10px;padding-right:10px">
+				<td align="left" style="font-family:${oo.fontFamily};font-size:15px;color:${detailColor};font-weight:normal;padding-left:23px;line-height:21px;padding-top:10px;padding-right:10px">
 					To accept your deal, <a href="${giftLink}">download Talool for iOS or Android</a> and register with this email address.
 				</td>
 			</tr>
 			<tr>
-				<td style="font-family:${oo.fontFamily};font-size:13px;font-weight:normal;color:${labelColor};padding-top:12px;line-height:21px;vertical-align:top" align="right" width="120">
-					about us
-				</td>
-				<td width="${detailWidth}" align="left" style="font-family:${oo.fontFamily};font-size:15px;color:${detailColor};padding-top:11px;padding-left:23px;padding-right:10px;line-height:21px">
-					${oo.aboutUs}
+				<td colspan="2" align="center" style="padding-top:25px;">
+					<div style="display:inline-block"><@oo.button url="${giftLink}" label="Accept"/></div>
 				</td>
 			</tr>
 		</tbody>
 	</table>
 	
-	<div align="center">
-		<table align="center" style="color:${oo.buttonBGColor};margin:25px 0 0;">
-			<tbody>
-				<tr>
-					<td>
-						<@oo.button url="${giftLink}" label="Accept"/>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	<div style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;line-height:21px">
+		<br/><br/>
+		<hr/>
+		<br/>
+		<b>About Talool</b>
+		<br/>
+		${oo.aboutUs}
 	</div>
 	
 </@oo.emailContainer>			

@@ -3,17 +3,24 @@ package com.talool.service;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+<<<<<<< HEAD
 import org.junit.Assert;
+=======
+>>>>>>> release
 import org.junit.Test;
 
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
+<<<<<<< HEAD
 import com.talool.core.Money;
 import com.talool.domain.Properties;
 import com.talool.payment.PaymentCalculator;
 import com.talool.payment.PaymentProcessor;
 import com.talool.payment.PaymentReceipt;
 import com.talool.utils.KeyValue;
+=======
+import com.talool.domain.Properties;
+>>>>>>> release
 
 /**
  * 
@@ -23,6 +30,7 @@ import com.talool.utils.KeyValue;
 public class BraintreeFeesTest
 {
 
+<<<<<<< HEAD
 	/**
 	 * Testing the Boulder/Vancouver case
 	 */
@@ -35,6 +43,17 @@ public class BraintreeFeesTest
 		when(publisherProps.getAsString(KeyValue.braintreeSubmerchantStatus)).thenReturn("ACTIVE");
 		when(publisherProps.getAsString(KeyValue.braintreeSubmerchantStatusTimestamp)).thenReturn("1406168391000");
 		when(publisherProps.getAsFloat(KeyValue.fundraiserDistributionPercent)).thenReturn(50.0f);
+=======
+	@Test
+	public void testPublisherFees()
+	{
+		// mock publisher
+		Properties publisherProps = mock(Properties.class);
+		when(publisherProps.getAsString("bt_submerch_id")).thenReturn("paybackbook_instant_f2k625v4");
+		when(publisherProps.getAsString("bt_submerch_status")).thenReturn("ACTIVE");
+		when(publisherProps.getAsString("bt_submerch_status_ts")).thenReturn("1406168391000");
+		when(publisherProps.getAsString("publisher")).thenReturn("true");
+>>>>>>> release
 
 		Merchant publisher = mock(Merchant.class);
 		when(publisher.getName()).thenReturn("Payback Book");
@@ -42,6 +61,7 @@ public class BraintreeFeesTest
 
 		// mock deal offer
 		Properties dealOfferProps = mock(Properties.class);
+<<<<<<< HEAD
 
 		when(dealOfferProps.getAsFloat(KeyValue.taloolFeeDiscountPercent)).thenReturn(75.0f);
 		when(dealOfferProps.getAsFloat(KeyValue.taloolFeePercent)).thenReturn(20.0f);
@@ -227,6 +247,16 @@ public class BraintreeFeesTest
 				fundraiser);
 
 		Assert.assertEquals(expectedPaymentReceipt.toString(), paymentReceipt.toString());
+=======
+		when(dealOfferProps.getAsFloat("book_percent")).thenReturn(40f);
+
+		DealOffer dealOffer = mock(DealOffer.class);
+		when(dealOffer.getMerchant()).thenReturn(publisher);
+		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
+
+		System.out.println(publisher.getName());
+		System.out.println(publisher.getProperties().getAsFloat("book_percent"));
+>>>>>>> release
 
 	}
 }

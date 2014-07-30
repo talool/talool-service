@@ -12,7 +12,7 @@ public class GraphiteConstants {
 	
 	public enum SubAction {
 		facebook, email, user, merchant, merchant_code, add, remove, accept, reject,
-		activate_code, create_reset, credit_card, credit_card_code, credit_wildcard, activation_code
+		activate_code, create_reset, credit_card, credit_card_code, credit_card_nonce, credit_wildcard, activation_code
 	}
 	
 	public enum DeviceType
