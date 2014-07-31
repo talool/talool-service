@@ -1457,7 +1457,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			publisher = dealOffer.getMerchant();
-			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail, publisher);
+			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail, publisher, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -1468,7 +1468,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			try
 			{
+
 				dop = createDealOfferPurchase(customer, dealOffer, transactionResult);
+				dop.getProperties().createOrReplace(KeyValue.paymentReceipt, transactionResult.getPaymentReceipt().toString());
 				getCurrentSession().flush();
 				// save any props
 				if (MapUtils.isNotEmpty(paymentProperties))
@@ -1566,7 +1568,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			publisher = dealOffer.getMerchant();
-			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode, publisher);
+			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode, publisher, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -1943,10 +1945,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public TransactionResult purchaseByNonce(UUID customerId, UUID dealOfferId,
-			String nonce, Map<String, String> paymentProperties)
-			throws ServiceException, NotFoundException {
-		
+	public TransactionResult purchaseByNonce(UUID customerId, UUID dealOfferId, String nonce, Map<String, String> paymentProperties)
+			throws ServiceException, NotFoundException
+	{
 
 		DealOffer dealOffer = null;
 		Customer customer = null;
@@ -1987,7 +1988,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			publisher = dealOffer.getMerchant();
-			transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher);
+			transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -2049,8 +2050,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public String generateBraintreeClientToken(UUID customerId)
-			throws ServiceException, NotFoundException {
+	public String generateBraintreeClientToken(UUID customerId) throws ServiceException, NotFoundException
+	{
 		return BraintreeUtil.get().generateClientToken(customerId);
 	}
 }

@@ -41,8 +41,7 @@ public final class PaymentCalculator
 	public PaymentReceipt generatePaymentReceipt(final PaymentProcessor paymentProcessor, final DealOffer dealOffer,
 			final Merchant publisher, final Merchant fundraiser)
 	{
-		// final Money gross = new Money(dealOffer.getPrice().doubleValue());
-		final Money gross = new Money(20.00);
+		final Money gross = new Money(dealOffer.getPrice().doubleValue());
 		Float fdpPercent = null;
 		Float tfdPercent = null;
 		Float tfPercent = null;
