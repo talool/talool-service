@@ -37,6 +37,9 @@ public class KeyValue implements Serializable
 	public static final String taloolFeePercent = "TFP";
 	public static final String taloolFeeMinumum = "TFM";
 
+	// Payment receipt containing break down of items
+	public static final String paymentReceipt = "payment_receipt";
+
 	public String key;
 	public String value;
 

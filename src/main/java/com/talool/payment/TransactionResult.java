@@ -16,6 +16,8 @@ public class TransactionResult
 	protected String transactionId = null;
 	protected PaymentProcessor paymentProcessor = PaymentProcessor.BRAINTREE;
 
+	protected PaymentReceipt paymentReceipt;
+
 	private TransactionResult()
 	{}
 
@@ -35,10 +37,11 @@ public class TransactionResult
 		return StringUtils.isEmpty(errorText);
 	}
 
-	public static TransactionResult successfulTransaction(final String transactionId)
+	public static TransactionResult successfulTransaction(final String transactionId, final PaymentReceipt paymentReceipt)
 	{
 		final TransactionResult tr = new TransactionResult();
 		tr.transactionId = transactionId;
+		tr.paymentReceipt = paymentReceipt;
 		return tr;
 	}
 
@@ -103,4 +106,13 @@ public class TransactionResult
 		this.errorText = errorText;
 	}
 
+	/**
+	 * Gets the payment receipt associated with the transaction or null otherwise
+	 * 
+	 * @return
+	 */
+	public PaymentReceipt getPaymentReceipt()
+	{
+		return paymentReceipt;
+	}
 }

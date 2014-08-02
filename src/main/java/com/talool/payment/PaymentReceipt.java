@@ -16,16 +16,18 @@ public class PaymentReceipt
 	private final float fundraiserDistributionPercent;
 	private final float taloolFeeDiscountPercent;
 	private final float taloolFeePercent;
+	private final Money cost;
 	private final Money taloolFeeMinimum;
 	private final Money paymentProcessingFee;
 	private final Money fundraiserDistribution;
 	private final Money netRevenue;
 	private final Money taloolProcessingFee;
 
-	public PaymentReceipt(float fundraiserDistributionPercent, float taloolFeeDiscountPercent, float taloolFeePercent,
+	public PaymentReceipt(float fundraiserDistributionPercent, float taloolFeeDiscountPercent, float taloolFeePercent, Money cost,
 			Money taloolFeeMinimum, Money paymentProcessingFee, Money fundraiserDistribution, Money netRevenue, Money taloolProcessingFee)
 	{
 		super();
+		this.cost = cost;
 		this.fundraiserDistributionPercent = fundraiserDistributionPercent;
 		this.taloolFeeDiscountPercent = taloolFeeDiscountPercent;
 		this.taloolFeePercent = taloolFeePercent;
@@ -36,18 +38,23 @@ public class PaymentReceipt
 		this.taloolProcessingFee = taloolProcessingFee;
 	}
 
+	public String getDisplay()
+	{
+		StringBuilder sb = new StringBuilder(64);
+
+		sb.append("cost: ").append(cost).append(" fundraiserDistPerc: ").append(fundraiserDistributionPercent)
+				.append(" taloolFeeDiscPerc: ").append(taloolFeeDiscountPercent).append(" taloolFeePerc: ").append(taloolFeePercent)
+				.append(" taloolFeeMin: ").append(taloolFeeMinimum.toString()).append(" processingFee: ")
+				.append(paymentProcessingFee.toString()).append(" fundraiserDist: ").append(fundraiserDistribution.toString())
+				.append(" netRev: ").append(netRevenue).append(" taloolFee: ").append(taloolProcessingFee);
+
+		return sb.toString();
+	}
+
 	@Override
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("fundraiserDistributionPercent: ").append(fundraiserDistributionPercent).append(" taloolFeeDiscountPercent: ")
-				.append(taloolFeeDiscountPercent).append(" taloolFeePercent: ").append(taloolFeePercent).append(" taloolFeeMinimum: ")
-				.append(taloolFeeMinimum.toString()).append(" paymentProcessingFee: ").append(paymentProcessingFee.toString())
-				.append(" fundraiserDistribution: ").append(fundraiserDistribution.toString()).append(" netRevenue: ").append(netRevenue)
-				.append(" taloolProcessingFee: ").append(taloolProcessingFee);
-
-		return sb.toString();
-
+		return getDisplay();
 	}
 
 	public float getFundraiserDistributionPercent()

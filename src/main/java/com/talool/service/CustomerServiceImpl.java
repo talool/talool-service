@@ -805,15 +805,29 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Transactional(propagation = Propagation.NESTED)
 	public DealOfferPurchase createDealOfferPurchase(final Customer customer, final DealOffer dealOffer,
-			final TransactionResult transactionResult) throws ServiceException
+			final TransactionResult transactionResult, final Map<String, String> paymentProperties) throws ServiceException
 	{
 		try
 		{
 			final DealOfferPurchase purchase = new DealOfferPurchaseImpl(customer, dealOffer);
 			purchase.setPaymentProcessor(transactionResult.getPaymentProcessor());
 			purchase.setProcessorTransactionId(transactionResult.getTransactionId());
-			daoDispatcher.save(purchase);
 
+			// store payment receipt
+			if (transactionResult.getPaymentReceipt() != null)
+			{
+				purchase.getProperties().createOrReplace(KeyValue.paymentReceipt, transactionResult.getPaymentReceipt().getDisplay());
+			}
+
+			// save any props
+			if (MapUtils.isNotEmpty(paymentProperties))
+			{
+				for (Entry<String, String> entry : paymentProperties.entrySet())
+				{
+					purchase.getProperties().createOrReplace(entry.getKey(), entry.getValue());
+				}
+			}
+			daoDispatcher.save(purchase);
 			return purchase;
 		}
 		catch (Exception ex)
@@ -1457,7 +1471,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			publisher = dealOffer.getMerchant();
-			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail, publisher);
+			transactionResult = BraintreeUtil.get().processCard(customer, dealOffer, paymentDetail, publisher, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -1468,17 +1482,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			try
 			{
-				dop = createDealOfferPurchase(customer, dealOffer, transactionResult);
+				dop = createDealOfferPurchase(customer, dealOffer, transactionResult, paymentProperties);
 				getCurrentSession().flush();
-				// save any props
-				if (MapUtils.isNotEmpty(paymentProperties))
-				{
-					for (Entry<String, String> entry : paymentProperties.entrySet())
-					{
-						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
-					}
-				}
-
 				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card, dealOfferId, requestHeaders.get());
 			}
 			catch (ServiceException e)
@@ -1566,7 +1571,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			publisher = dealOffer.getMerchant();
-			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode, publisher);
+			transactionResult = BraintreeUtil.get().processPaymentCode(customer, dealOffer, paymentCode, publisher, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -1577,24 +1582,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			try
 			{
-				dop = createDealOfferPurchase(customer, dealOffer, transactionResult);
+				dop = createDealOfferPurchase(customer, dealOffer, transactionResult, paymentProperties);
 				getCurrentSession().flush();
 				if (LOG.isDebugEnabled())
 				{
 					LOG.debug("processing braintree for " + customer.getEmail() + " " + transactionResult.getTransactionId());
 				}
-
-				// save any props
-				if (MapUtils.isNotEmpty(paymentProperties))
-				{
-					for (Entry<String, String> entry : paymentProperties.entrySet())
-					{
-						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
-					}
-				}
-
 				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card_code, dealOfferId, requestHeaders.get());
-
 			}
 			catch (ServiceException e)
 			{
@@ -1943,10 +1937,9 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.NESTED)
-	public TransactionResult purchaseByNonce(UUID customerId, UUID dealOfferId,
-			String nonce, Map<String, String> paymentProperties)
-			throws ServiceException, NotFoundException {
-		
+	public TransactionResult purchaseByNonce(UUID customerId, UUID dealOfferId, String nonce, Map<String, String> paymentProperties)
+			throws ServiceException, NotFoundException
+	{
 
 		DealOffer dealOffer = null;
 		Customer customer = null;
@@ -1987,7 +1980,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		try
 		{
 			publisher = dealOffer.getMerchant();
-			transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher);
+			transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher, fundraiser);
 		}
 		catch (ProcessorException e)
 		{
@@ -1998,24 +1991,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			try
 			{
-				dop = createDealOfferPurchase(customer, dealOffer, transactionResult);
+				dop = createDealOfferPurchase(customer, dealOffer, transactionResult, paymentProperties);
 				getCurrentSession().flush();
 				if (LOG.isDebugEnabled())
 				{
 					LOG.debug("processing braintree for " + customer.getEmail() + " " + transactionResult.getTransactionId());
 				}
-
-				// save any props
-				if (MapUtils.isNotEmpty(paymentProperties))
-				{
-					for (Entry<String, String> entry : paymentProperties.entrySet())
-					{
-						dop.getProperties().createOrReplace(entry.getKey(), entry.getValue());
-					}
-				}
-
 				TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card_nonce, dealOfferId, requestHeaders.get());
-
 			}
 			catch (ServiceException e)
 			{
@@ -2049,8 +2031,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public String generateBraintreeClientToken(UUID customerId)
-			throws ServiceException, NotFoundException {
+	public String generateBraintreeClientToken(UUID customerId) throws ServiceException, NotFoundException
+	{
 		return BraintreeUtil.get().generateClientToken(customerId);
 	}
 }

@@ -1,7 +1,6 @@
 package com.talool.payment.braintree;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +21,13 @@ import com.braintreegateway.WebhookNotification;
 import com.talool.core.Customer;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
+import com.talool.core.Money;
 import com.talool.core.service.ProcessorException;
 import com.talool.payment.Card;
+import com.talool.payment.PaymentCalculator;
 import com.talool.payment.PaymentDetail;
+import com.talool.payment.PaymentProcessor;
+import com.talool.payment.PaymentReceipt;
 import com.talool.payment.TransactionResult;
 import com.talool.service.ServiceConfig;
 import com.talool.utils.KeyValue;
@@ -97,11 +100,12 @@ public class BraintreeUtil
 				PRODUCT_DESCRIPTOR_MAX_LEN).toUpperCase();
 	}
 
-	private TransactionResult getTransactionResult(final Result<Transaction> result) throws ProcessorException
+	private TransactionResult getTransactionResult(final Result<Transaction> result, final PaymentReceipt paymentReceipt)
+			throws ProcessorException
 	{
 		if (result.isSuccess())
 		{
-			return TransactionResult.successfulTransaction(result.getTarget().getId());
+			return TransactionResult.successfulTransaction(result.getTarget().getId(), paymentReceipt);
 		}
 
 		// validation errors
@@ -140,7 +144,7 @@ public class BraintreeUtil
 		try
 		{
 			final Result<Transaction> result = gateway.transaction().voidTransaction(transactionId);
-			transResult = getTransactionResult(result);
+			transResult = getTransactionResult(result, null);
 		}
 		catch (Exception e)
 		{
@@ -151,11 +155,12 @@ public class BraintreeUtil
 	}
 
 	public TransactionResult processPaymentCode(final Customer customer, final DealOffer dealOffer, final String paymentCode,
-			final Merchant publisher) throws ProcessorException
+			final Merchant publisher, final Merchant fundraiser) throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
 		TransactionResult transResult = null;
+		PaymentReceipt paymentReceipt = null;
 
 		try
 		{
@@ -165,12 +170,13 @@ public class BraintreeUtil
 
 			if (publisher != null)
 			{
-				decorateSubmerchantTransaction(transRequest, publisher, dealOffer);
+				paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher, fundraiser);
+				decorateSubmerchantTransaction(transRequest, publisher, dealOffer, paymentReceipt);
 			}
 
 			result = gateway.transaction().sale(transRequest);
 
-			transResult = getTransactionResult(result);
+			transResult = getTransactionResult(result, paymentReceipt);
 
 		}
 		catch (Exception e)
@@ -183,18 +189,19 @@ public class BraintreeUtil
 	}
 
 	public TransactionResult processCard(final Customer customer, final DealOffer dealOffer, final PaymentDetail paymentDetail,
-			Merchant publisher) throws ProcessorException
+			Merchant publisher, final Merchant fundraiser) throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
 		TransactionResult transResult = null;
+		PaymentReceipt paymentReceipt = null;
 
 		try
 		{
 			final String venmoSession = paymentDetail.getPaymentMetadata().get(VENMO_SDK_SESSION);
 			final Card card = paymentDetail.getCard();
 
-			transRequest = new TransactionRequest().amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).creditCard()
+			transRequest = new TransactionRequest().amount(new Money(dealOffer.getPrice()).getValue()).creditCard()
 					.number(card.getAccountnumber()).expirationMonth(card.getExpirationMonth()).expirationYear(card.getExpirationYear())
 					.cvv(card.getSecurityCode()).done().options().venmoSdkSession(venmoSession).submitForSettlement(true)
 					.storeInVault(paymentDetail.isSaveCard()).done().descriptor().name(createDescriptor(dealOffer)).done()
@@ -202,12 +209,13 @@ public class BraintreeUtil
 
 			if (publisher != null)
 			{
-				decorateSubmerchantTransaction(transRequest, publisher, dealOffer);
+				paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher, fundraiser);
+				decorateSubmerchantTransaction(transRequest, publisher, dealOffer, paymentReceipt);
 			}
 
 			result = gateway.transaction().sale(transRequest);
 
-			transResult = getTransactionResult(result);
+			transResult = getTransactionResult(result, paymentReceipt);
 
 		}
 		catch (Exception e)
@@ -220,60 +228,35 @@ public class BraintreeUtil
 	}
 
 	private void decorateSubmerchantTransaction(final TransactionRequest transRequest, final Merchant publisher,
-			final DealOffer dealOffer)
+			final DealOffer dealOffer, final PaymentReceipt paymentReceipt)
 	{
 		String merchantAccountId = null;
-		BigDecimal serviceFee = null;
 
 		if (publisher != null)
 		{
 			merchantAccountId = publisher.getProperties().getAsString(KeyValue.braintreeSubmerchantId);
-			Float percentToMerchant = publisher.getProperties().getAsFloat(KeyValue.percentage);
-			if (merchantAccountId == null || percentToMerchant == null)
+			if (merchantAccountId == null)
 			{
-				LOG.warn(String.format(
-						"Publisher %s and merchantId %s is missing the braintreeSubmerchantId or percent. Skipping Braintree serviceFee",
+				LOG.warn(String.format("merchantId %s is missing the braintreeSubmerchantId Skipping Braintree serviceFee",
 						publisher.getName(), publisher.getId()));
 			}
 			else
 			{
-				serviceFee = calculateServiceFee(percentToMerchant, dealOffer.getPrice());
-				transRequest.merchantAccountId(merchantAccountId).serviceFeeAmount(serviceFee);
 				if (LOG.isDebugEnabled())
 				{
-					LOG.debug(String.format("Braintree: Publisher %s cost %s percentToMerchant %s serviceFee %s ", publisher.getName(),
-							dealOffer.getPrice(), percentToMerchant, serviceFee));
+					LOG.debug(String.format("paymentReceipt %s", paymentReceipt.toString()));
 				}
+
+				transRequest.merchantAccountId(merchantAccountId).serviceFeeAmount(paymentReceipt.getTaloolProcessingFee().getValue());
 
 			}
 		}
-	}
-
-	/**
-	 * Calculates the serviceFee kept by Talool based on the percent owed to the
-	 * merchant and the purchase price
-	 * 
-	 * @param percent
-	 * @param price
-	 * @return
-	 */
-	public BigDecimal calculateServiceFee(final Float percentToMerchant, final Float purchasePrice)
-	{
-		return new BigDecimal(((100 - percentToMerchant) / 100) * purchasePrice).setScale(2, RoundingMode.HALF_EVEN);
 	}
 
 	// https://www.braintreepayments.com/docs/java/merchant_accounts/create
 	public Result<MerchantAccount> onboardSubMerchant(final MerchantAccountRequest request)
 	{
 		return gateway.merchantAccount().create(request);
-	}
-
-	public void pay()
-	{
-		TransactionRequest request = new TransactionRequest().amount(new BigDecimal("100.00")).merchantAccountId("blue_ladders_store")
-				.creditCard().number("5105105105105100").expirationDate("05/2020").done().options().submitForSettlement(true)
-				.holdInEscrow(false).done().serviceFeeAmount(new BigDecimal("10.00"));
-
 	}
 
 	public String verifyWebhook(final String challenge)
@@ -296,12 +279,12 @@ public class BraintreeUtil
 		WebhookNotification webhookNotification = gateway.webhookNotification().parse(btSignatureParam, btPayloadParam);
 		return webhookNotification;
 	}
-	
+
 	public String generateClientToken(UUID customerId)
 	{
 		String token;
 		String btCustomerId = null;
-		
+
 		// find or generate a braintree customer id
 		try
 		{
@@ -310,17 +293,16 @@ public class BraintreeUtil
 		}
 		catch (com.braintreegateway.exceptions.NotFoundException nfe)
 		{
-			CustomerRequest request = new CustomerRequest()
-		    	.id(customerId.toString());
-			
+			CustomerRequest request = new CustomerRequest().id(customerId.toString());
+
 			Result<com.braintreegateway.Customer> result = gateway.customer().create(request);
-			
+
 			if (result.isSuccess())
 			{
 				btCustomerId = result.getTarget().getId();
 			}
 		}
-		
+
 		if (btCustomerId == null)
 		{
 			token = gateway.clientToken().generate();
@@ -330,48 +312,48 @@ public class BraintreeUtil
 			ClientTokenRequest clientTokenRequest = new ClientTokenRequest().customerId(btCustomerId);
 			token = gateway.clientToken().generate(clientTokenRequest);
 		}
-		
+
 		return token;
 	}
-	
+
 	public TransactionResult processPaymentNonce(final Customer customer, final DealOffer dealOffer, final String nonce,
-			final Merchant publisher) throws ProcessorException
+			final Merchant publisher, final Merchant fundraiser) throws ProcessorException
 	{
 		Result<Transaction> result = null;
 		TransactionRequest transRequest = null;
 		TransactionResult transResult = null;
+		PaymentReceipt paymentReceipt = null;
 
 		try
 		{
-			transRequest = new TransactionRequest()
-					.amount(new BigDecimal(Float.toString(dealOffer.getPrice())))
-					.paymentMethodNonce(nonce)
-					.descriptor().name(createDescriptor(dealOffer)).done()
-					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options().submitForSettlement(true).done();
+			final BigDecimal amount = new BigDecimal(Float.toString(dealOffer.getPrice()));
+			if (LOG.isDebugEnabled())
+			{
+				LOG.debug("Amount: " + amount);
+			}
+			transRequest = new TransactionRequest().amount(amount).paymentMethodNonce(nonce).descriptor().name(createDescriptor(dealOffer))
+					.done().customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options().submitForSettlement(true).done();
 
 			if (publisher != null)
 			{
-				decorateSubmerchantTransaction(transRequest, publisher, dealOffer);
+				paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher, fundraiser);
+				decorateSubmerchantTransaction(transRequest, publisher, dealOffer, paymentReceipt);
 			}
 
 			result = gateway.transaction().sale(transRequest);
-
-			transResult = getTransactionResult(result);
-
+			transResult = getTransactionResult(result, paymentReceipt);
 		}
 		catch (Exception e)
 		{
 			throw new ProcessorException("Problem processing paymentCode: " + e.getMessage(), e);
 		}
-		
+
 		// try to save this payment method to the vault
 		try
 		{
-			PaymentMethodRequest request = new PaymentMethodRequest()
-		    	.customerId(customer.getId().toString())
-		    	.paymentMethodNonce(nonce);
+			PaymentMethodRequest request = new PaymentMethodRequest().customerId(customer.getId().toString()).paymentMethodNonce(nonce);
 
-		    gateway.paymentMethod().create(request);
+			gateway.paymentMethod().create(request);
 		}
 		catch (Exception e)
 		{
@@ -381,4 +363,5 @@ public class BraintreeUtil
 		return transResult;
 
 	}
+
 }
