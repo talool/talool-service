@@ -41,6 +41,7 @@ public class TransactionResult
 	{
 		final TransactionResult tr = new TransactionResult();
 		tr.transactionId = transactionId;
+		tr.paymentReceipt = paymentReceipt;
 		return tr;
 	}
 
@@ -106,7 +107,7 @@ public class TransactionResult
 	}
 
 	/**
-	 * Gets the payment receipt associated with the transation or null otherwise
+	 * Gets the payment receipt associated with the transaction or null otherwise
 	 * 
 	 * @return
 	 */
