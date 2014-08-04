@@ -45,6 +45,7 @@ import com.talool.core.ActivationCode;
 import com.talool.core.ActivationSummary;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
+import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
@@ -52,6 +53,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
@@ -63,6 +65,7 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.PropertyEntity;
 import com.talool.core.SearchOptions;
+import com.talool.core.Sex;
 import com.talool.core.Tag;
 import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.ServiceException;
@@ -3096,5 +3099,64 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 		return group;
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.talool.core.service.MerchantService#getCustomerForMerchant(com.talool.core.Merchant)
+	 * 
+	 * Gets (or creates) a "dummy" customer for a merchant for using in sending gifts to customers in the app.
+	 * The dummy customer id is stored in a property on the merchant after it has been created.
+	 */
+	@Override
+	public Customer getCustomerForMerchant(Merchant merchant)
+			throws ServiceException {
+		
+		Customer dummy = null;
+		
+		String id = merchant.getProperties().getAsString(KeyValue.merchantCustomerId);
+		if (StringUtils.isEmpty(id))
+		{
+			try
+			{
+				// create a customer
+				dummy = new CustomerImpl();
+				dummy.setFirstName(merchant.getName());
+				dummy.setLastName("");
+				
+				StringBuilder sb = new StringBuilder();
+				sb.append("dummy").append((new Date()).getTime());
+				dummy.setPassword(sb.toString());
+				sb.append("@talool.com");
+				dummy.setEmail(sb.toString());
+				
+				dummy.setSex(Sex.Unknown);
+				
+				daoDispatcher.save(dummy);
+				
+				id = dummy.getId().toString();
+				
+				merchant.getProperties().createOrReplace(KeyValue.merchantCustomerId, id);
+				daoDispatcher.save(merchant);
+			}
+			catch (Exception e)
+			{
+				throw new ServiceException("Failed to create customer for merchant with merchant: "+merchant.getName(), e);
+			}
+		}
+		else
+		{
+			// look up the customer
+			try
+			{
+				UUID customerId = UUID.fromString(id);
+				dummy = daoDispatcher.find(CustomerImpl.class, customerId);
+			}
+			catch (Exception e)
+			{
+				throw new ServiceException("Failed to find customer for merchant with customer id: "+id, e);
+			}
+		}
+		return dummy;
 	}
 }
