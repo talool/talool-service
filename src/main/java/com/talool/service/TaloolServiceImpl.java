@@ -3163,7 +3163,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@Override
 	public void sendGiftToCustomers(Merchant merchant,
-			List<Customer> customers, EmailGift gift) throws ServiceException {
+			List<Customer> customers, Deal deal) throws ServiceException {
 		
 		final Customer fromCustomer = getCustomerForMerchant(merchant);
 		

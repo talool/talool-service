@@ -317,5 +317,5 @@ public interface MerchantService extends HibernateService
 	public Customer getCustomerForMerchant(final Merchant merchant) throws ServiceException;
 	
 	public void sendGiftToCustomers(final Merchant merchant, final List<Customer> customers, 
-			final EmailGift gift) throws ServiceException;
+			final Deal deal) throws ServiceException;
 }
