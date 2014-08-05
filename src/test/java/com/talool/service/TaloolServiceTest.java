@@ -299,7 +299,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase
 		DealOfferGeoSummariesResult result = taloolService.getDealOfferGeoSummariesWithin(Boulder_CO, 2000, searchOpts, null);
 
 		List<DealOfferGeoSummary> dealOffers = result.getSummaries();
-		Assert.assertTrue(dealOffers.size() > 0);
+		Assert.assertTrue("No dealOffers within 2000 miles of Boulder!", dealOffers.size() > 0);
 
 	}
 
