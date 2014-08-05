@@ -13,7 +13,6 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
-import com.talool.core.MerchantCode;
 import com.talool.core.MerchantCodeGroup;
 import com.talool.core.PropertyEntity;
 import com.talool.core.Tag;

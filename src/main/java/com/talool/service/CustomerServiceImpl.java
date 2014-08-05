@@ -25,6 +25,7 @@ import org.hibernate.type.StandardBasicTypes;
 import org.hibernatespatial.GeometryUserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.support.DaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -1250,6 +1251,27 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 		return gift.getId();
 
+	}
+	
+	@Override
+	public void giftToEmails(final Customer fromCustomer, final List<Customer> toCustomers, final Deal deal)
+			throws ServiceException {
+		
+		for (Customer customer : toCustomers)
+		{
+			// create the deal acquire
+			DealAcquireImpl da = new DealAcquireImpl();
+			da.setDeal(deal);
+			da.setAcquireStatus(AcquireStatus.PURCHASED);
+			da.setCustomer(fromCustomer);
+			// save the deal acquire
+			daoDispatcher.save(da);
+					
+			// TODO put the job id on the gift (or deal acquire)
+			
+			// send the gift
+			giftToEmail(fromCustomer.getId(), da.getId(), customer.getEmail().toLowerCase(), customer.getFullName());
+		}
 	}
 
 	public UniqueCodeStrategy getRedemptionCodeStrategy()

@@ -53,7 +53,6 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
-import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
@@ -67,7 +66,6 @@ import com.talool.core.PropertyEntity;
 import com.talool.core.SearchOptions;
 import com.talool.core.Sex;
 import com.talool.core.Tag;
-import com.talool.core.gift.EmailGift;
 import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
@@ -3160,14 +3158,5 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 		return dummy;
 	}
-
-	@Override
-	public void sendGiftToCustomers(Merchant merchant,
-			List<Customer> customers, Deal deal) throws ServiceException {
-		
-		final Customer fromCustomer = getCustomerForMerchant(merchant);
-		
-		// TODO Auto-generated method stub
-		
-	}
+	
 }

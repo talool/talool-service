@@ -163,6 +163,10 @@ public interface CustomerService extends HibernateService, RequestHeaderSupport
 			throws ServiceException;
 
 	public Gift getGift(final UUID giftId) throws ServiceException;
+	
+	// TODO pass in the Job too
+	public void giftToEmails(final Customer fromCustomer, final List<Customer> toCustomers, final Deal deal)
+			throws ServiceException;
 
 	/**
 	 * Gets the Gift (if one exists) related to the dealAcquireId
