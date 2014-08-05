@@ -3,9 +3,6 @@ package com.talool.service;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,12 +22,6 @@ import com.talool.utils.KeyValue;
  */
 public class BraintreeFeesTest
 {
-	public static void main(String args[]) throws ParseException
-	{
-		BigDecimal money = new BigDecimal("9.99");
-
-		System.out.println(money);
-	}
 
 	/**
 	 * Testing the Boulder/Vancouver case
@@ -101,13 +92,27 @@ public class BraintreeFeesTest
 		when(dealOffer.getMerchant()).thenReturn(publisher);
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
-		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .50f, .20f, new Money(2.50), new Money(20.00), new Money(.88),
+		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .50f, .20f, new Money(2.50), new Money(2.50), new Money(.88),
 				new Money(10.00), new Money(9.12), new Money(1.25));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
 				null);
 
-		Assert.assertEquals(expectedPaymentReceipt.toString(), paymentReceipt.toString());
+		Assert.assertEquals(expectedPaymentReceipt.getFundraiserDistributionPercent(), paymentReceipt.getFundraiserDistributionPercent(),
+				0);
+
+		Assert.assertEquals(expectedPaymentReceipt.getTaloolFeeDiscountPercent(), paymentReceipt.getTaloolFeeDiscountPercent(), 0);
+
+		Assert.assertEquals(expectedPaymentReceipt.getTaloolFeePercent(), paymentReceipt.getTaloolFeePercent(), 0);
+
+		Assert.assertEquals(expectedPaymentReceipt.getNetRevenue().getValue().doubleValue(), paymentReceipt.getNetRevenue().getValue()
+				.doubleValue(), 0);
+
+		Assert.assertEquals(expectedPaymentReceipt.getPaymentProcessingFee().getValue().doubleValue(), paymentReceipt
+				.getPaymentProcessingFee().getValue().doubleValue(), 0);
+
+		Assert.assertEquals("Talool Fee Min does not match", expectedPaymentReceipt.getTaloolFeeMinimum().getValue().doubleValue(),
+				paymentReceipt.getTaloolFeeMinimum().getValue().doubleValue(), 0);
 
 	}
 
