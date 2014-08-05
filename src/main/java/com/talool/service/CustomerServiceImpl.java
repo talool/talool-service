@@ -62,6 +62,7 @@ import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.ActivationCodeImpl;
+import com.talool.domain.CustomerCriteria;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
@@ -2052,5 +2053,20 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	public String generateBraintreeClientToken(UUID customerId)
 			throws ServiceException, NotFoundException {
 		return BraintreeUtil.get().generateClientToken(customerId);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Customer> getCustomers(CustomerCriteria criteria)
+			throws ServiceException {
+		try
+		{
+			final Query query = criteria.getQuery(sessionFactory.getCurrentSession());
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomers with criteria", ex);
+		}
 	}
 }

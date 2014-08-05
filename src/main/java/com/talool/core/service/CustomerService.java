@@ -16,6 +16,7 @@ import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
+import com.talool.domain.CustomerCriteria;
 import com.talool.payment.PaymentDetail;
 import com.talool.payment.TransactionResult;
 import com.talool.service.HibernateService;
@@ -46,6 +47,8 @@ public interface CustomerService extends HibernateService, RequestHeaderSupport
 	public Customer getCustomerByEmail(final String email) throws ServiceException, InvalidInputException;
 
 	public List<Customer> getCustomers() throws ServiceException;
+	
+	public List<Customer> getCustomers(final CustomerCriteria criteria) throws ServiceException;
 
 	/**
 	 * Gets Merchants associated with a customer (via paid deal books or free)

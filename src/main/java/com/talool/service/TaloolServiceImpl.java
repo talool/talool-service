@@ -67,6 +67,7 @@ import com.talool.core.PropertyEntity;
 import com.talool.core.SearchOptions;
 import com.talool.core.Sex;
 import com.talool.core.Tag;
+import com.talool.core.gift.EmailGift;
 import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
@@ -3158,5 +3159,15 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			}
 		}
 		return dummy;
+	}
+
+	@Override
+	public void sendGiftToCustomers(Merchant merchant,
+			List<Customer> customers, EmailGift gift) throws ServiceException {
+		
+		final Customer fromCustomer = getCustomerForMerchant(merchant);
+		
+		// TODO Auto-generated method stub
+		
 	}
 }

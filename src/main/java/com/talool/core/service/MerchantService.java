@@ -19,6 +19,7 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.SearchOptions;
 import com.talool.core.Tag;
+import com.talool.core.gift.EmailGift;
 import com.talool.domain.PropertyCriteria;
 import com.talool.service.HibernateService;
 import com.talool.stats.DealOfferMetrics;
@@ -314,4 +315,7 @@ public interface MerchantService extends HibernateService
 	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException;
 	
 	public Customer getCustomerForMerchant(final Merchant merchant) throws ServiceException;
+	
+	public void sendGiftToCustomers(final Merchant merchant, final List<Customer> customers, 
+			final EmailGift gift) throws ServiceException;
 }
