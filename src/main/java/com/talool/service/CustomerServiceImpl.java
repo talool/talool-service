@@ -25,7 +25,6 @@ import org.hibernate.type.StandardBasicTypes;
 import org.hibernatespatial.GeometryUserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.support.DaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -1257,6 +1256,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	public void giftToEmails(final Customer fromCustomer, final List<Customer> toCustomers, final Deal deal)
 			throws ServiceException {
 		
+		// TODO This is a long running operation that needs to be moved to a thread
+		// 		This is where the new Job object gets created
 		for (Customer customer : toCustomers)
 		{
 			// create the deal acquire
@@ -2085,6 +2086,20 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		{
 			final Query query = criteria.getQuery(sessionFactory.getCurrentSession());
 			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomers with criteria", ex);
+		}
+	}
+
+	@Override
+	public long getCustomerCount(CustomerCriteria criteria)
+			throws ServiceException {
+		try
+		{
+			final Query query = criteria.getCountQuery(sessionFactory.getCurrentSession());
+			return (Long)query.uniqueResult();
 		}
 		catch (Exception ex)
 		{

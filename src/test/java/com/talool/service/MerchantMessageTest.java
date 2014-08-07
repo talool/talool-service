@@ -59,17 +59,17 @@ public class MerchantMessageTest extends HibernateFunctionalTestBase
 		
 		CustomerCriteria cc = new CustomerCriteria();
 		
-		cc.filterSex(Sex.Female);
+		cc.setSex(Sex.Female);
 		customers = customerService.getCustomers(cc);
 		Assert.assertNotNull(customers);
 		Assert.assertNotEquals(0, customers.size());
 		
-		cc.filterAge(new Date(), null);
+		cc.setAges(new Date(), null);
 		customers = customerService.getCustomers(cc);
 		Assert.assertNotNull(customers);
 		Assert.assertNotEquals(0, customers.size());
 		
-		cc.filterPurchase(UUID.randomUUID());
+		cc.setDealOfferId(UUID.randomUUID());
 		customers = customerService.getCustomers(cc);
 		Assert.assertNotNull(customers);
 		Assert.assertEquals(0, customers.size());

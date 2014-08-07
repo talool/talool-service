@@ -1,5 +1,6 @@
 package com.talool.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,16 +14,18 @@ import com.talool.core.Sex;
  * @author dmccuen
  * 
  */
-public class CustomerCriteria
+public class CustomerCriteria implements Serializable
 {
+
+	private static final long serialVersionUID = 2581391093684670689L;
 	private Sex sex;
 	private Date olderThan;
 	private Date youngerThan;
 	private UUID dealOfferId;
 	
-	public Query getQuery(Session session)
+	private Query buildQuery(StringBuilder sb, Session session)
 	{
-		StringBuilder sb = new StringBuilder("from CustomerImpl c, DealOfferPurchaseImpl dbp where dbp.customer.id=c.id ");
+		sb.append(" from CustomerImpl c, DealOfferPurchaseImpl dbp where dbp.customer.id=c.id ");
 		
 		if (dealOfferId != null)
 		{
@@ -60,16 +63,20 @@ public class CustomerCriteria
 			query.setParameter("sex", sex);
 		}
 		
-		
 		return query;
 	}
-
-	public void filterSex(Sex s)
+	
+	public Query getQuery(Session session)
 	{
-		sex = s;
+		return buildQuery(new StringBuilder("select c"), session);
 	}
 	
-	public void filterAge(Date olderThan, Date youngerThan)
+	public Query getCountQuery(Session session)
+	{
+		return buildQuery(new StringBuilder("select count(c)"), session);
+	}
+	
+	public void setAges(Date olderThan, Date youngerThan)
 	{
 		if (olderThan != null)
 		{
@@ -81,9 +88,36 @@ public class CustomerCriteria
 			this.youngerThan = youngerThan;
 		}
 	}
-	
-	public void filterPurchase(UUID dealOfferId)
-	{
+
+	public Sex getSex() {
+		return sex;
+	}
+
+	public void setSex(Sex sex) {
+		this.sex = sex;
+	}
+
+	public Date getOlderThan() {
+		return olderThan;
+	}
+
+	public void setOlderThan(Date olderThan) {
+		this.olderThan = olderThan;
+	}
+
+	public Date getYoungerThan() {
+		return youngerThan;
+	}
+
+	public void setYoungerThan(Date youngerThan) {
+		this.youngerThan = youngerThan;
+	}
+
+	public UUID getDealOfferId() {
+		return dealOfferId;
+	}
+
+	public void setDealOfferId(UUID dealOfferId) {
 		this.dealOfferId = dealOfferId;
 	}
 

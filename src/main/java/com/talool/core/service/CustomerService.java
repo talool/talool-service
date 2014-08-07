@@ -49,6 +49,8 @@ public interface CustomerService extends HibernateService, RequestHeaderSupport
 	public List<Customer> getCustomers() throws ServiceException;
 	
 	public List<Customer> getCustomers(final CustomerCriteria criteria) throws ServiceException;
+	
+	public long getCustomerCount(final CustomerCriteria criteria) throws ServiceException;
 
 	/**
 	 * Gets Merchants associated with a customer (via paid deal books or free)
