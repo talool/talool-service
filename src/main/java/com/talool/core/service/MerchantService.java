@@ -24,6 +24,7 @@ import com.talool.service.HibernateService;
 import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
+import com.talool.stats.MerchantCodeSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
 
@@ -314,6 +315,9 @@ public interface MerchantService extends HibernateService
 	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException;
 	
 	public Customer getCustomerForMerchant(final Merchant merchant) throws ServiceException;
+	
+	public List<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
+			final SearchOptions searchOpts) throws ServiceException;
 
 	
 }

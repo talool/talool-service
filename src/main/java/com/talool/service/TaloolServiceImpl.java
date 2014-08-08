@@ -100,6 +100,7 @@ import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferMetrics.MetricType;
 import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
+import com.talool.stats.MerchantCodeSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.GraphiteConstants.Action;
@@ -3157,6 +3158,33 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			}
 		}
 		return dummy;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, final SearchOptions searchOpts) throws ServiceException {
+		List<MerchantCodeSummary> codes;
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummary, null, searchOpts);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(MerchantCodeSummary.class));
+			query.addScalar("code", StandardBasicTypes.STRING);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("email", StandardBasicTypes.STRING);
+			query.addScalar("purchaseCount", StandardBasicTypes.INTEGER);
+
+			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
+			
+			codes = (List<MerchantCodeSummary>) query.list();
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantCodeGroupsForFundraiser  " + merchantId.toString(), ex);
+		}
+		return codes;
 	}
 	
 }
