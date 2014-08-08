@@ -316,8 +316,8 @@ public interface MerchantService extends HibernateService
 	
 	public Customer getCustomerForMerchant(final Merchant merchant) throws ServiceException;
 	
-	public List<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
-			final SearchOptions searchOpts) throws ServiceException;
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
+			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException;
 
-	
+	public long getMerchantCodeSummaryCount(final UUID merchantId) throws ServiceException;
 }

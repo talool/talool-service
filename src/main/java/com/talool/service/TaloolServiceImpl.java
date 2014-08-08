@@ -3162,11 +3162,16 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, final SearchOptions searchOpts) throws ServiceException {
-		List<MerchantCodeSummary> codes;
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
+			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException {
+		
+		PaginatedResult<MerchantCodeSummary> paginatedResult = null;
+		List<MerchantCodeSummary> codes = null;
+		Long totalResults = null;
+		
 		try
 		{
-			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummary, null, searchOpts);
+			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummary, null, searchOpts, true);
 
 			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
 			query.setResultTransformer(Transformers.aliasToBean(MerchantCodeSummary.class));
@@ -3177,14 +3182,44 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
 			
+			QueryHelper.applyOffsetLimit(query, searchOpts);
 			codes = (List<MerchantCodeSummary>) query.list();
+			
+			if (calculateTotalResults && codes != null)
+			{
+				totalResults = (Long) getMerchantCodeSummaryCount(merchantId);
+			}
+
+			paginatedResult = new PaginatedResult<MerchantCodeSummary>(searchOpts, totalResults, codes);
 
 		}
 		catch (Exception ex)
 		{
 			throw new ServiceException("Problem getMerchantCodeGroupsForFundraiser  " + merchantId.toString(), ex);
 		}
-		return codes;
+		return paginatedResult;
+	}
+
+	@Override
+	public long getMerchantCodeSummaryCount(UUID merchantId)
+			throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummaryCnt, null, null);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantCodeSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
 	}
 	
 }
