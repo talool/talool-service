@@ -1,6 +1,7 @@
 package com.talool.payment.braintree;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +22,6 @@ import com.braintreegateway.WebhookNotification;
 import com.talool.core.Customer;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
-import com.talool.core.Money;
 import com.talool.core.service.ProcessorException;
 import com.talool.payment.Card;
 import com.talool.payment.PaymentCalculator;
@@ -59,6 +59,8 @@ public class BraintreeUtil
 	public static final String KEY_SECURITY_CODE = "security_code";
 	public static final String KEY_ACCOUNT_NUMBER = "card_number";
 	public static final String VENMO_SDK_SESSION = "venmo_sdk_session";
+
+	public static final DecimalFormat MONEY_FORMAT = new DecimalFormat("0.00");
 
 	private BraintreeUtil()
 	{
@@ -164,9 +166,10 @@ public class BraintreeUtil
 
 		try
 		{
-			transRequest = new TransactionRequest().venmoSdkPaymentMethodCode(paymentCode)
-					.amount(new BigDecimal(Float.toString(dealOffer.getPrice()))).descriptor().name(createDescriptor(dealOffer)).done()
-					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options().submitForSettlement(true).done();
+			final BigDecimal amount = new BigDecimal(Float.toString(dealOffer.getPrice()));
+			transRequest = new TransactionRequest().venmoSdkPaymentMethodCode(paymentCode).amount(amount).descriptor()
+					.name(createDescriptor(dealOffer)).done().customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle()).options()
+					.submitForSettlement(true).done();
 
 			if (publisher != null)
 			{
@@ -200,12 +203,12 @@ public class BraintreeUtil
 		{
 			final String venmoSession = paymentDetail.getPaymentMetadata().get(VENMO_SDK_SESSION);
 			final Card card = paymentDetail.getCard();
+			final BigDecimal amount = new BigDecimal(Float.toString(dealOffer.getPrice()));
 
-			transRequest = new TransactionRequest().amount(new Money(dealOffer.getPrice()).getValue()).creditCard()
-					.number(card.getAccountnumber()).expirationMonth(card.getExpirationMonth()).expirationYear(card.getExpirationYear())
-					.cvv(card.getSecurityCode()).done().options().venmoSdkSession(venmoSession).submitForSettlement(true)
-					.storeInVault(paymentDetail.isSaveCard()).done().descriptor().name(createDescriptor(dealOffer)).done()
-					.customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
+			transRequest = new TransactionRequest().amount(amount).creditCard().number(card.getAccountnumber())
+					.expirationMonth(card.getExpirationMonth()).expirationYear(card.getExpirationYear()).cvv(card.getSecurityCode()).done()
+					.options().venmoSdkSession(venmoSession).submitForSettlement(true).storeInVault(paymentDetail.isSaveCard()).done()
+					.descriptor().name(createDescriptor(dealOffer)).done().customField(CUSTOM_FIELD_PRODUCT, dealOffer.getTitle());
 
 			if (publisher != null)
 			{
@@ -247,10 +250,27 @@ public class BraintreeUtil
 					LOG.debug(String.format("paymentReceipt %s", paymentReceipt.toString()));
 				}
 
-				transRequest.merchantAccountId(merchantAccountId).serviceFeeAmount(paymentReceipt.getTaloolProcessingFee().getValue());
+				transRequest.merchantAccountId(merchantAccountId).serviceFeeAmount(
+						new BigDecimal(paymentReceipt.getTaloolProcessingFee().toString()));
 
 			}
 		}
+	}
+
+	public static synchronized String formatMoney(final double money)
+	{
+		return MONEY_FORMAT.format(money);
+	}
+
+	/**
+	 * Money should not be a float!
+	 * 
+	 * @param money
+	 * @return
+	 */
+	public static synchronized String formatMoney(final float money)
+	{
+		return MONEY_FORMAT.format(money);
 	}
 
 	// https://www.braintreepayments.com/docs/java/merchant_accounts/create
@@ -327,6 +347,7 @@ public class BraintreeUtil
 		try
 		{
 			final BigDecimal amount = new BigDecimal(Float.toString(dealOffer.getPrice()));
+
 			if (LOG.isDebugEnabled())
 			{
 				LOG.debug("Amount: " + amount);
@@ -363,5 +384,4 @@ public class BraintreeUtil
 		return transResult;
 
 	}
-
 }

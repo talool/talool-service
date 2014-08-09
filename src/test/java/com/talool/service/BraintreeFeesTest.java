@@ -3,6 +3,9 @@ package com.talool.service;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,6 +25,15 @@ import com.talool.utils.KeyValue;
  */
 public class BraintreeFeesTest
 {
+
+	@Test
+	public void testBigDecimal() throws ParseException
+	{
+		Money money = new Money(new Double(.625)).setRoundingMode(BigDecimal.ROUND_UP);
+		System.out.println(money.getValue());
+
+		System.out.println(money.toString());
+	}
 
 	/**
 	 * Testing the Boulder/Vancouver case
@@ -243,4 +255,5 @@ public class BraintreeFeesTest
 		Assert.assertEquals(expectedPaymentReceipt.toString(), paymentReceipt.toString());
 
 	}
+
 }
