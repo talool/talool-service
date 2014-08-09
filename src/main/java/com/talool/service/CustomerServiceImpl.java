@@ -62,6 +62,7 @@ import com.talool.core.service.ServiceException;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.ActivationCodeImpl;
+import com.talool.domain.CustomerCriteria;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
@@ -1264,6 +1265,31 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		return gift.getId();
 
 	}
+	
+	@Override
+	public void giftToEmails(final Customer fromCustomer, final List<Customer> toCustomers, final Deal deal)
+			throws ServiceException {
+		
+		// TODO This is a long running operation that needs to be moved to a thread
+		// 		This is where the new Job object gets created
+		/*
+		for (Customer customer : toCustomers)
+		{
+			// create the deal acquire
+			DealAcquireImpl da = new DealAcquireImpl();
+			da.setDeal(deal);
+			da.setAcquireStatus(AcquireStatus.PURCHASED);
+			da.setCustomer(fromCustomer);
+			// save the deal acquire
+			daoDispatcher.save(da);
+					
+			// TODO put the job id on the gift (or deal acquire)
+			
+			// send the gift
+			giftToEmail(fromCustomer.getId(), da.getId(), customer.getEmail().toLowerCase(), customer.getFullName());
+		}
+		*/
+	}
 
 	public UniqueCodeStrategy getRedemptionCodeStrategy()
 	{
@@ -2034,5 +2060,34 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	public String generateBraintreeClientToken(UUID customerId) throws ServiceException, NotFoundException
 	{
 		return BraintreeUtil.get().generateClientToken(customerId);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Customer> getCustomers(CustomerCriteria criteria)
+			throws ServiceException {
+		try
+		{
+			final Query query = criteria.getQuery(sessionFactory.getCurrentSession());
+			return query.list();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomers with criteria", ex);
+		}
+	}
+
+	@Override
+	public long getCustomerCount(CustomerCriteria criteria)
+			throws ServiceException {
+		try
+		{
+			final Query query = criteria.getCountQuery(sessionFactory.getCurrentSession());
+			return (Long)query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getCustomers with criteria", ex);
+		}
 	}
 }

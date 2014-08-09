@@ -45,6 +45,7 @@ import com.talool.core.ActivationCode;
 import com.talool.core.ActivationSummary;
 import com.talool.core.Category;
 import com.talool.core.CategoryTag;
+import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
@@ -63,6 +64,7 @@ import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.PropertyEntity;
 import com.talool.core.SearchOptions;
+import com.talool.core.Sex;
 import com.talool.core.Tag;
 import com.talool.core.purchase.UniqueCodeStrategy;
 import com.talool.core.service.ServiceException;
@@ -98,6 +100,7 @@ import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferMetrics.MetricType;
 import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
+import com.talool.stats.MerchantCodeSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.GraphiteConstants.Action;
@@ -3097,4 +3100,126 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		return group;
 
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.talool.core.service.MerchantService#getCustomerForMerchant(com.talool.core.Merchant)
+	 * 
+	 * Gets (or creates) a "dummy" customer for a merchant for using in sending gifts to customers in the app.
+	 * The dummy customer id is stored in a property on the merchant after it has been created.
+	 */
+	@Override
+	public Customer getCustomerForMerchant(Merchant merchant)
+			throws ServiceException {
+		
+		Customer dummy = null;
+		
+		String id = merchant.getProperties().getAsString(KeyValue.merchantCustomerId);
+		if (StringUtils.isEmpty(id))
+		{
+			try
+			{
+				// create a customer
+				dummy = new CustomerImpl();
+				dummy.setFirstName(merchant.getName());
+				dummy.setLastName("");
+				
+				StringBuilder sb = new StringBuilder();
+				sb.append("dummy").append((new Date()).getTime());
+				dummy.setPassword(sb.toString());
+				sb.append("@talool.com");
+				dummy.setEmail(sb.toString());
+				
+				dummy.setSex(Sex.Unknown);
+				
+				daoDispatcher.save(dummy);
+				
+				id = dummy.getId().toString();
+				
+				merchant.getProperties().createOrReplace(KeyValue.merchantCustomerId, id);
+				daoDispatcher.save(merchant);
+			}
+			catch (Exception e)
+			{
+				throw new ServiceException("Failed to create customer for merchant with merchant: "+merchant.getName(), e);
+			}
+		}
+		else
+		{
+			// look up the customer
+			try
+			{
+				UUID customerId = UUID.fromString(id);
+				dummy = daoDispatcher.find(CustomerImpl.class, customerId);
+			}
+			catch (Exception e)
+			{
+				throw new ServiceException("Failed to find customer for merchant with customer id: "+id, e);
+			}
+		}
+		return dummy;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
+			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException {
+		
+		PaginatedResult<MerchantCodeSummary> paginatedResult = null;
+		List<MerchantCodeSummary> codes = null;
+		Long totalResults = null;
+		
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummary, null, searchOpts, true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(MerchantCodeSummary.class));
+			query.addScalar("code", StandardBasicTypes.STRING);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("email", StandardBasicTypes.STRING);
+			query.addScalar("purchaseCount", StandardBasicTypes.INTEGER);
+
+			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
+			
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			codes = (List<MerchantCodeSummary>) query.list();
+			
+			if (calculateTotalResults && codes != null)
+			{
+				totalResults = (Long) getMerchantCodeSummaryCount(merchantId);
+			}
+
+			paginatedResult = new PaginatedResult<MerchantCodeSummary>(searchOpts, totalResults, codes);
+
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantCodeGroupsForFundraiser  " + merchantId.toString(), ex);
+		}
+		return paginatedResult;
+	}
+
+	@Override
+	public long getMerchantCodeSummaryCount(UUID merchantId)
+			throws ServiceException {
+		Long total = null;
+
+		try
+		{
+			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummaryCnt, null, null);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMerchantCodeSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+	
 }
