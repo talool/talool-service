@@ -1258,6 +1258,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		
 		// TODO This is a long running operation that needs to be moved to a thread
 		// 		This is where the new Job object gets created
+		/*
 		for (Customer customer : toCustomers)
 		{
 			// create the deal acquire
@@ -1273,6 +1274,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			// send the gift
 			giftToEmail(fromCustomer.getId(), da.getId(), customer.getEmail().toLowerCase(), customer.getFullName());
 		}
+		*/
 	}
 
 	public UniqueCodeStrategy getRedemptionCodeStrategy()
