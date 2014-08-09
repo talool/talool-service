@@ -97,6 +97,20 @@ public final class QueryHelper
 					+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) "
 					+ "where o.title like :title and o.merchant_id=:publisherMerchantId";
 
+	private static final String MERCHANT_CODE_SUMMARY_CNT = 
+			"SELECT count(distinct c.code) AS totalResults "
+				+ "FROM merchant_code AS c, merchant_code_group AS g " 
+				+ "WHERE c.merchant_code_group_id=g.merchant_code_group_id "
+				+ "AND g.merchant_id = :merchantId ";
+	
+	private static final String MERCHANT_CODE_SUMMARY = 
+			"SELECT g.code_group_title AS name, g.code_group_notes AS email, c.code AS code, "
+					+ "(SELECT count(distinct deal_offer_purchase_id) FROM deal_offer_purchase "
+					+ "WHERE properties->'merchant_code' = c.code ) AS purchaseCount " 
+					+ "FROM merchant_code AS c, merchant_code_group AS g " 
+					+ "WHERE c.merchant_code_group_id=g.merchant_code_group_id "
+					+ "AND g.merchant_id = :merchantId ";
+	
 	private static final String MERCHANT_SUMMARY_CNT =
 			"SELECT count(distinct m.merchant_id) AS totalResults FROM merchant AS m "
 					+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt FROM merchant_location ml1 "
@@ -471,6 +485,9 @@ public final class QueryHelper
 		PublisherMerchantSummary(PUBLISHER_MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		PublisherMerchantNameSummary(PUBLISHER_MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
+		MerchantCodeSummaryCnt(MERCHANT_CODE_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		MerchantCodeSummary(MERCHANT_CODE_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		
 		DealSummary(DEAL_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 		DealSummaryCnt(DEAL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
 		

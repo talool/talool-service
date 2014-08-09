@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
@@ -23,6 +24,7 @@ import com.talool.service.HibernateService;
 import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
+import com.talool.stats.MerchantCodeSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
 
@@ -311,4 +313,11 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException;
+	
+	public Customer getCustomerForMerchant(final Merchant merchant) throws ServiceException;
+	
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
+			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException;
+
+	public long getMerchantCodeSummaryCount(final UUID merchantId) throws ServiceException;
 }
