@@ -3,7 +3,6 @@ package com.talool.core;
 import java.io.Serializable; // Java I/O
 import java.math.BigDecimal; // Java Math classes
 import java.text.DecimalFormat; // Java Text classes
-import java.text.NumberFormat;
 import java.text.ParseException;
 
 // Java Utility classes
@@ -99,8 +98,8 @@ public class Money implements Cloneable, // Money objects can be cloned
 	 * Refer to the Java API documentation for the DecimalFormat class for
 	 * information on formats.
 	 */
-	protected DecimalFormat currencyFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(); // Currency
-																																																// format
+	protected DecimalFormat currencyFormat = new DecimalFormat("0.00");
+
 	/**
 	 * The special monetary value of zero ($0.00).
 	 */
