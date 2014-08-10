@@ -119,6 +119,10 @@
 	    <img src="http://static.talool.com/17907b38-9ce4-4fcd-afff-85ac009b2117/130804121807LogoPaybackBookVancouver.png" 
 			border="0" alt="Payback Book"/>
 	    <#break>
+          <#case "oregan">
+	    <img src="http://static.talool.com/17907b38-9ce4-4fcd-afff-85ac009b2117/140810195239_-1020647579.png" 
+			border="0" alt="Payback Mobile"/>
+	    <#break>
 	  <#default>
 	</#switch>
 </#macro>
