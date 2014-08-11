@@ -12,7 +12,7 @@ import com.talool.core.Identifiable;
  */
 public interface MessagingJobStats extends Identifiable, Serializable
 {
-	public Long getJobId();
+	public MessagingJob getMessagingJob();
 
 	public Long getSends();
 

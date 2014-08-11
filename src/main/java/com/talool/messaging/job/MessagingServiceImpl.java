@@ -29,7 +29,13 @@ public class MessagingServiceImpl implements MessagingService
 	@Override
 	public void scheduleMessagingJob(final MessagingJob messagingJob, final FutureCallback<MessagingJob> callback)
 	{
-		MessagingJobPool.get().submitJob(messagingJob, callback);
+		MessagingJobManager.get().submitJob(messagingJob, callback);
+	}
+
+	@Override
+	public void scheduleMessagingJob(final MessagingJob messagingJob)
+	{
+
 	}
 
 	@Override

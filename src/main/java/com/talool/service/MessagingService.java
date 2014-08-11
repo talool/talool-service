@@ -17,8 +17,8 @@ import com.talool.messaging.job.MessagingJob;
 public interface MessagingService
 {
 	/**
-	 * Schedules and persists the messaging job. The future callback is also
-	 * registered.
+	 * Schedules and persists the messaging job. If the scheduledStartDate is now
+	 * the job is immediately submitted and the future callback is registered.
 	 * 
 	 * @param messagingJob
 	 * @param callback
@@ -26,6 +26,14 @@ public interface MessagingService
 	 */
 	public void scheduleMessagingJob(final MessagingJob messagingJob, final FutureCallback<MessagingJob> callback)
 			throws ServiceException;
+
+	/**
+	 * Schedules and persists the messaging job.
+	 * 
+	 * @param messagingJob
+	 * @throws ServiceException
+	 */
+	public void scheduleMessagingJob(final MessagingJob messagingJob) throws ServiceException;
 
 	public MessagingJob getMessagingJob(final Long jobId) throws ServiceException;
 

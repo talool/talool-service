@@ -13,15 +13,11 @@ import com.talool.core.Identifiable;
  * @author clintz
  * 
  */
-public interface MessagingReceipientStatus extends Identifiable, Serializable
+public interface RecipientStatus extends Identifiable, Serializable
 {
-	public enum MessagingStatus
-	{
-		Success, Failure
-	}
+	public MessagingJob getMessagingJob();
 
 	public Customer getCustomer();
 
-	public MessagingStatus getMessagingStatus();
-
+	public DeliveryStatus getDeliveryStatus();
 }

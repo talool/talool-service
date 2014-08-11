@@ -3,42 +3,88 @@ package com.talool.domain.job;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Type;
 
 import com.talool.core.Customer;
 import com.talool.core.MerchantAccount;
+import com.talool.domain.CustomerImpl;
+import com.talool.domain.MerchantAccountImpl;
+import com.talool.messaging.job.JobState;
 import com.talool.messaging.job.MessagingJob;
 import com.talool.messaging.job.MessagingJobStats;
-import com.talool.messaging.job.MessagingReceipientStatus;
+import com.talool.messaging.job.RecipientStatus;
 
 /**
- * Messaging Job Implementation
+ * A Hibernate mapped Messaging Job Implementation
  * 
  * @author clintz
  * 
  */
+@Entity
+@Table(name = "messaging_job", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class MessagingJobImpl implements MessagingJob
 {
 	private static final long serialVersionUID = -4134065711388463064L;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "my_mj_seq")
+	@SequenceGenerator(name = "my_mj_seq", sequenceName = "messaging_job_messaging_job_id_seq")
+	@Column(name = "messaging_job_id", unique = true, nullable = false)
 	private Long id;
-	private MerchantAccount createdByMerchantAccount;
-	private Customer fromCustomer;
+
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantAccountImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinColumn(name = "created_by_merchant_account_id")
+	private final MerchantAccount createdByMerchantAccount;
+
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class, cascade = CascadeType.ALL)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinColumn(name = "customer_id")
+	private final Customer fromCustomer;
+
+	@Type(type = "jobState")
+	@Column(name = "job_state", nullable = false, columnDefinition = "job_state")
 	private JobState jobState;
+
+	@Column(name = "create_dt", unique = false, insertable = false, updatable = false)
 	private Date created;
+
+	@Column(name = "scheduled_start_dt", unique = false, insertable = true, updatable = true)
 	private Date scheduledStartDate;
 
-	private MessagingJobStats messagingJobStats;
-	private List<MessagingReceipientStatus> messagingReceipientStatuses;
-
+	@Column(name = "job_notes", unique = false, nullable = true, length = 128)
 	private String notes;
 
-	public MessagingJobImpl(final MessagingJobBuilder messagingJobBuilder)
+	@Transient
+	private MessagingJobStats messagingJobStats;
+
+	@Transient
+	private List<RecipientStatus> messagingReceipientStatuses;
+
+	public MessagingJobImpl(final MerchantAccount createdByMerchantAccount, final Customer fromCustomer, final Date scheduledStartDate,
+			final String notes)
 	{
-		this.createdByMerchantAccount = messagingJobBuilder.createdByMerchantAccount;
-		this.fromCustomer = messagingJobBuilder.fromCustomer;
-		this.notes = messagingJobBuilder.notes;
-		this.scheduledStartDate = messagingJobBuilder.scheduledStartDate;
+		this.createdByMerchantAccount = createdByMerchantAccount;
+		this.fromCustomer = fromCustomer;
+		this.jobState = JobState.STOPPED;
+		this.notes = notes;
 	}
 
 	@Override
@@ -84,19 +130,19 @@ public class MessagingJobImpl implements MessagingJob
 	}
 
 	@Override
-	public List<MessagingReceipientStatus> getMessagingReceipientStatuses()
+	public List<RecipientStatus> getMessagingReceipientStatuses()
 	{
 		return messagingReceipientStatuses;
 	}
 
 	@Override
-	public String getNotes()
+	public String getJobNotes()
 	{
 		return notes;
 	}
 
 	@Override
-	public void setNotes(final String notes)
+	public void setJobNotes(final String notes)
 	{
 		this.notes = notes;
 	}

@@ -13,24 +13,25 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 /**
+ * MessagingJobManager is responsible for submitting a
  * 
  * @author clintz
  * 
  */
-public final class MessagingJobPool
+public final class MessagingJobManager
 {
-	private static final Logger LOG = LoggerFactory.getLogger(MessagingJobPool.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MessagingJobManager.class);
 	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
-	private static final MessagingJobPool INSTANCE = new MessagingJobPool();
+	private static final MessagingJobManager INSTANCE = new MessagingJobManager();
 
 	private ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE));
 
-	private MessagingJobPool()
+	private MessagingJobManager()
 	{
 		LOG.info("Starting MessagingJobPool with poolSize " + DEFAULT_THREAD_POOL_SIZE);
 	};
 
-	public static MessagingJobPool get()
+	public static MessagingJobManager get()
 	{
 		return INSTANCE;
 	}

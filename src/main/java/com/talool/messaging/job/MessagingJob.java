@@ -16,11 +16,6 @@ import com.talool.core.MerchantAccount;
  */
 public interface MessagingJob extends Identifiable, Serializable
 {
-	public enum JobState
-	{
-		Stopped, Started, Finished, Failed
-	}
-
 	/**
 	 * Gets the merchant account that created the job
 	 * 
@@ -69,18 +64,18 @@ public interface MessagingJob extends Identifiable, Serializable
 	 * 
 	 * @return
 	 */
-	public List<MessagingReceipientStatus> getMessagingReceipientStatuses();
+	public List<RecipientStatus> getMessagingReceipientStatuses();
 
 	/**
 	 * Gets the job notes
 	 * 
 	 * @return notes
 	 */
-	public String getNotes();
+	public String getJobNotes();
 
 	/**
 	 * Sets the job notes
 	 */
-	public void setNotes(final String notes);
+	public void setJobNotes(final String notes);
 
 }
