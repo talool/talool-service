@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
 import com.talool.core.MerchantAccount;
-import com.talool.core.MerchantCodeGroup;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
 import com.talool.core.service.ServiceException;
