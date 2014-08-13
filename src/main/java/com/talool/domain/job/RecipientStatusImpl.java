@@ -1,6 +1,7 @@
 package com.talool.domain.job;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.Type;
@@ -25,6 +27,9 @@ import com.talool.messaging.job.RecipientStatus;
  * @author clintz
  * 
  */
+@Entity
+@Table(name = "recipient_status", catalog = "public")
+@org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class RecipientStatusImpl implements RecipientStatus
 {
 	private static final long serialVersionUID = -1662638530762854056L;
@@ -37,7 +42,7 @@ public class RecipientStatusImpl implements RecipientStatus
 
 	@Type(type = "deliveryStatus")
 	@Column(name = "delivery_status", nullable = false, columnDefinition = "delivery_status")
-	private DeliveryStatus deliveryStatus;
+	private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
 
 	@OneToOne(targetEntity = MessagingJobImpl.class, fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "messaging_job_id")
@@ -46,6 +51,12 @@ public class RecipientStatusImpl implements RecipientStatus
 	@OneToOne(targetEntity = CustomerImpl.class, fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
+
+	public RecipientStatusImpl(final MessagingJob messagingJob, final Customer customer)
+	{
+		this.messagingJob = messagingJob;
+		this.customer = customer;
+	}
 
 	@Override
 	public Long getId()

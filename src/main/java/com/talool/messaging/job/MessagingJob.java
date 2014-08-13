@@ -52,13 +52,6 @@ public interface MessagingJob extends Identifiable, Serializable
 	public Date getScheduledStartDate();
 
 	/**
-	 * Gets the job statistics
-	 * 
-	 * @return
-	 */
-	public MessagingJobStats getMessagingJobStats();
-
-	/**
 	 * Gets the list of MessagingReceipientStatus. If the jobState is Finished,
 	 * this list may have been cleaned and could be null.
 	 * 

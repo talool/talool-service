@@ -7,10 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.util.concurrent.FutureCallback;
+import com.talool.core.Customer;
 import com.talool.core.service.ServiceException;
+import com.talool.messaging.MessagingFactory;
+import com.talool.service.AbstractHibernateService;
 import com.talool.service.MessagingService;
 
 /**
@@ -22,19 +26,28 @@ import com.talool.service.MessagingService;
 @Transactional(readOnly = true)
 @Service
 @Repository
-public class MessagingServiceImpl implements MessagingService
+public class MessagingServiceImpl extends AbstractHibernateService implements MessagingService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingServiceImpl.class);
 
 	@Override
-	public void scheduleMessagingJob(final MessagingJob messagingJob, final FutureCallback<MessagingJob> callback)
+	public void scheduleMessagingJob(final MessagingJob messagingJob, final FutureCallback<MessagingJob> callback,
+			final List<Customer> targetedCustomers)
 	{
 		MessagingJobManager.get().submitJob(messagingJob, callback);
 	}
 
 	@Override
-	public void scheduleMessagingJob(final MessagingJob messagingJob)
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void scheduleMessagingJob(final MessagingJob messagingJob, final List<Customer> targetedCustomers)
 	{
+		daoDispatcher.save(messagingJob);
+
+		// need to create the tracking/recipient status records
+		for (Customer customer : targetedCustomers)
+		{
+			daoDispatcher.save(MessagingFactory.newRecipientStatus(messagingJob, customer));
+		}
 
 	}
 

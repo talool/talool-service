@@ -12,9 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.Fetch;
@@ -27,7 +27,6 @@ import com.talool.domain.CustomerImpl;
 import com.talool.domain.MerchantAccountImpl;
 import com.talool.messaging.job.JobState;
 import com.talool.messaging.job.MessagingJob;
-import com.talool.messaging.job.MessagingJobStats;
 import com.talool.messaging.job.RecipientStatus;
 
 /**
@@ -56,7 +55,7 @@ public class MessagingJobImpl implements MessagingJob
 
 	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class, cascade = CascadeType.ALL)
 	@Fetch(value = FetchMode.JOIN)
-	@JoinColumn(name = "customer_id")
+	@JoinColumn(name = "from_customer_id")
 	private final Customer fromCustomer;
 
 	@Type(type = "jobState")
@@ -72,10 +71,19 @@ public class MessagingJobImpl implements MessagingJob
 	@Column(name = "job_notes", unique = false, nullable = true, length = 128)
 	private String notes;
 
-	@Transient
-	private MessagingJobStats messagingJobStats;
+	@Column(name = "sends")
+	private Long sends = 0l;
 
-	@Transient
+	@Column(name = "email_opens")
+	private Long emailOpens = 0l;
+
+	@Column(name = "gift_opens")
+	private Long giftOpens = 0l;
+
+	@Column(name = "users_targeted")
+	private Long usersTargeted = 0l;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "messagingJob", targetEntity = RecipientStatusImpl.class)
 	private List<RecipientStatus> messagingReceipientStatuses;
 
 	public MessagingJobImpl(final MerchantAccount createdByMerchantAccount, final Customer fromCustomer, final Date scheduledStartDate,
@@ -85,6 +93,7 @@ public class MessagingJobImpl implements MessagingJob
 		this.fromCustomer = fromCustomer;
 		this.jobState = JobState.STOPPED;
 		this.notes = notes;
+		this.scheduledStartDate = scheduledStartDate;
 	}
 
 	@Override
@@ -121,12 +130,6 @@ public class MessagingJobImpl implements MessagingJob
 	public Date getScheduledStartDate()
 	{
 		return scheduledStartDate;
-	}
-
-	@Override
-	public MessagingJobStats getMessagingJobStats()
-	{
-		return messagingJobStats;
 	}
 
 	@Override

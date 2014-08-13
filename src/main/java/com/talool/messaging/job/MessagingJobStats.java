@@ -2,18 +2,14 @@ package com.talool.messaging.job;
 
 import java.io.Serializable;
 
-import com.talool.core.Identifiable;
-
 /**
  * Messaging Job Analytics
  * 
  * @author clintz
  * 
  */
-public interface MessagingJobStats extends Identifiable, Serializable
+public interface MessagingJobStats extends Serializable
 {
-	public MessagingJob getMessagingJob();
-
 	public Long getSends();
 
 	public Long getEmailOpens();

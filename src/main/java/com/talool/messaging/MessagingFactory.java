@@ -6,7 +6,9 @@ import java.util.concurrent.Callable;
 import com.talool.core.Customer;
 import com.talool.core.MerchantAccount;
 import com.talool.domain.job.MessagingJobImpl;
+import com.talool.domain.job.RecipientStatusImpl;
 import com.talool.messaging.job.MessagingJob;
+import com.talool.messaging.job.RecipientStatus;
 import com.talool.messaging.job.task.MerchantGiftTask;
 
 /**
@@ -38,6 +40,11 @@ public class MessagingFactory
 	public static Callable<MessagingJob> newMessagingJobTask(final String taskType, final MessagingJob messagingJob)
 	{
 		return new MerchantGiftTask(messagingJob);
+	}
+
+	public static RecipientStatus newRecipientStatus(final MessagingJob messagingJob, final Customer customer)
+	{
+		return new RecipientStatusImpl(messagingJob, customer);
 	}
 
 }

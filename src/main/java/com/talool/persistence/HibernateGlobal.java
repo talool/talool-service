@@ -62,7 +62,7 @@ import org.hibernate.annotations.TypeDefs;
 
 		@TypeDef(name = "jobState", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.messaging.job.JobState") }),
 
-		@TypeDef(name = "delieveryStatus", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.messaging.job.DelieveryStatus") })
+		@TypeDef(name = "deliveryStatus", typeClass = GenericEnumUserType.class, parameters = { @Parameter(name = "enumClass", value = "com.talool.messaging.job.DeliveryStatus") })
 
 })
 public class HibernateGlobal
