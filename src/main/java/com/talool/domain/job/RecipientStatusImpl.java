@@ -17,7 +17,6 @@ import org.hibernate.annotations.Type;
 import com.talool.core.Customer;
 import com.talool.domain.CustomerImpl;
 import com.talool.messaging.job.DeliveryStatus;
-import com.talool.messaging.job.MessagingJob;
 import com.talool.messaging.job.RecipientStatus;
 
 /**
@@ -44,17 +43,19 @@ public class RecipientStatusImpl implements RecipientStatus
 	@Column(name = "delivery_status", nullable = false, columnDefinition = "delivery_status")
 	private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
 
-	@OneToOne(targetEntity = MessagingJobImpl.class, fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "messaging_job_id")
-	private MessagingJob messagingJob;
+	@Column(name = "messaging_job_id", nullable = false)
+	private Long messagingJobId;
 
-	@OneToOne(targetEntity = CustomerImpl.class, fetch = FetchType.LAZY, optional = false)
+	@OneToOne(targetEntity = CustomerImpl.class, fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
 
-	public RecipientStatusImpl(final MessagingJob messagingJob, final Customer customer)
+	public RecipientStatusImpl()
+	{}
+
+	public RecipientStatusImpl(final Long messagingJobId, final Customer customer)
 	{
-		this.messagingJob = messagingJob;
+		this.messagingJobId = messagingJobId;
 		this.customer = customer;
 	}
 
@@ -71,9 +72,9 @@ public class RecipientStatusImpl implements RecipientStatus
 	}
 
 	@Override
-	public MessagingJob getMessagingJob()
+	public Long getMessagingJobId()
 	{
-		return messagingJob;
+		return messagingJobId;
 	}
 
 	@Override

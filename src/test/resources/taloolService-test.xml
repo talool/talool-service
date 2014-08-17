@@ -14,38 +14,45 @@
 
 	<import resource="./taloolCommon-test.xml" />
 	<!-- <import resource="./dataSource-test.xml"/> -->
-	<import resource="./dataSourceLocal-test.xml"/> 
-	
+	<import resource="./dataSourceLocal-test.xml" />
+
 	<import resource="./taloolHibernateContext-test.xml" />
-	<import resource="./taloolMailService-test.xml"/>
-	
-	<import resource="./messagingService-test.xml"/>
+	<import resource="./taloolMailService-test.xml" />
+
+	<import resource="./messagingService-test.xml" />
 
 
-	<bean id="serviceFactory" class="com.talool.service.ServiceFactory" factory-method="createInstance">
-		<constructor-arg ref="taloolServiceImpl"/>
-		<constructor-arg ref="customerServiceImpl"/>
-		<constructor-arg ref="emailServiceImpl"/>
-		<constructor-arg ref="activityServiceImpl"/>
-		<constructor-arg ref="analyticServiceImpl"/>
-		<constructor-arg ref="messagingServiceImpl"/>
-   </bean>
-   
-   
-    <bean id="tagCache" class="com.talool.cache.TagCache" factory-method="createInstance">
-		<constructor-arg value="${tag.cache.refresh.in.secs}"/>
-   </bean>
-   
-    <bean id="dealOfferMetadataCache" class="com.talool.cache.DealOfferMetadataCache" 
-      factory-method="createInstance">
-   </bean>
-   
-				
-	<bean id="domainFactory" class="com.talool.domain.DomainFactoryImpl"/>
-	
-	<bean id="factoryManager" class="com.talool.core.FactoryManager" factory-method="createInstance">
-	    <constructor-arg ref="serviceFactory"/>
-	    <constructor-arg ref="domainFactory"/>
+	<bean id="serviceFactory" class="com.talool.service.ServiceFactory"
+		factory-method="createInstance">
+		<constructor-arg ref="taloolServiceImpl" />
+		<constructor-arg ref="customerServiceImpl" />
+		<constructor-arg ref="emailServiceImpl" />
+		<constructor-arg ref="activityServiceImpl" />
+		<constructor-arg ref="analyticServiceImpl" />
+		<constructor-arg ref="messagingServiceImpl" />
+	</bean>
+
+	<bean id="messagingJobManager" class="com.talool.messaging.job.MessagingJobManager"
+		factory-method="createInstance">
+		<constructor-arg ref="messagingServiceImpl" />
+	</bean>
+
+	<bean id="tagCache" class="com.talool.cache.TagCache"
+		factory-method="createInstance">
+		<constructor-arg value="${tag.cache.refresh.in.secs}" />
+	</bean>
+
+	<bean id="dealOfferMetadataCache" class="com.talool.cache.DealOfferMetadataCache"
+		factory-method="createInstance">
+	</bean>
+
+
+	<bean id="domainFactory" class="com.talool.domain.DomainFactoryImpl" />
+
+	<bean id="factoryManager" class="com.talool.core.FactoryManager"
+		factory-method="createInstance">
+		<constructor-arg ref="serviceFactory" />
+		<constructor-arg ref="domainFactory" />
 	</bean>
 
 </beans>

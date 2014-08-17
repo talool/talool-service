@@ -1,5 +1,6 @@
 package com.talool.messaging.job;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
@@ -11,6 +12,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.talool.core.service.ServiceException;
+import com.talool.messaging.job.task.MerchantGiftTask;
+import com.talool.service.MessagingService;
 
 /**
  * MessagingJobManager is responsible for submitting a
@@ -18,40 +22,92 @@ import com.google.common.util.concurrent.MoreExecutors;
  * @author clintz
  * 
  */
-public final class MessagingJobManager
+public class MessagingJobManager
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingJobManager.class);
 	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
-	private static final MessagingJobManager INSTANCE = new MessagingJobManager();
+	private static final long DEFAULT_SLEEP_TIME_IN_MILLS = 12000l;
+	private static MessagingJobManager INSTANCE;
+
+	private MessagingService messagingService;
 
 	private ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE));
 
-	private MessagingJobManager()
+	private MessagingJobManagerThread messagingManagerThread;
+
+	private class MessagingJobManagerThread extends Thread
 	{
+		MessagingJobManagerThread(String name)
+		{
+			super(name);
+		}
+
+		@Override
+		public void run()
+		{
+			while (true)
+			{
+				LOG.info("Starting MessagingJobPool with poolSize " + DEFAULT_THREAD_POOL_SIZE);
+
+				try
+				{
+					List<MessagingJob> messagingJobs = messagingService.getJobsToProcess();
+
+					for (MessagingJob job : messagingJobs)
+					{
+						if (job instanceof MerchantGiftJob)
+						{
+							if (LOG.isDebugEnabled())
+							{
+								LOG.debug("Submitting MerchantGiftJobTask with jobId:" + job.getId());
+							}
+							submitTask(new MerchantGiftTask((MerchantGiftJob) job), null);
+						}
+						else
+						{
+							LOG.error("Job Type not recognized - jobId:" + job.getId());
+						}
+					}
+				}
+				catch (ServiceException e)
+				{
+					e.printStackTrace();
+				}
+
+				try
+				{
+					sleep(DEFAULT_SLEEP_TIME_IN_MILLS);
+				}
+				catch (InterruptedException e)
+				{
+					// ignore
+				}
+			}
+		}
+	}
+
+	public static synchronized MessagingJobManager createInstance(final MessagingService messagingService)
+	{
+		if (INSTANCE == null)
+		{
+			INSTANCE = new MessagingJobManager(messagingService);
+		}
+
+		return INSTANCE;
+	}
+
+	private MessagingJobManager(final MessagingService messagingService)
+	{
+		this.messagingService = messagingService;
+
 		LOG.info("Starting MessagingJobPool with poolSize " + DEFAULT_THREAD_POOL_SIZE);
+		messagingManagerThread = new MessagingJobManagerThread(MessagingJobManagerThread.class.getSimpleName());
+		messagingManagerThread.start();
 	};
 
 	public static MessagingJobManager get()
 	{
 		return INSTANCE;
-	}
-
-	private class MessagingJobTask implements Callable<MessagingJob>
-	{
-		final MessagingJob messagingJob;
-
-		MessagingJobTask(final MessagingJob messagingJob)
-		{
-			this.messagingJob = messagingJob;
-		}
-
-		@Override
-		public MessagingJob call() throws Exception
-		{
-			LOG.info("Call() starting job");
-			return messagingJob;
-		}
-
 	}
 
 	/**
@@ -60,16 +116,16 @@ public final class MessagingJobManager
 	 * @param messagingJob
 	 * @return a listenable future
 	 */
-	public ListenableFuture<MessagingJob> submitJob(final MessagingJob messagingJob, final FutureCallback<MessagingJob> callback)
+	public ListenableFuture<? extends MessagingJob> submitTask(final Callable<? extends MessagingJob> task,
+			final FutureCallback<MessagingJob> callback)
 	{
-		ListenableFuture<MessagingJob> future = service.submit(new MessagingJobTask(messagingJob));
-		Futures.addCallback(future, callback);
-
-		if (LOG.isDebugEnabled())
+		ListenableFuture<? extends MessagingJob> future = service.submit(task);
+		if (callback != null)
 		{
-			LOG.debug("Submitted job " + messagingJob.toString());
+			Futures.addCallback(future, callback);
 		}
 
 		return future;
 	}
+
 }

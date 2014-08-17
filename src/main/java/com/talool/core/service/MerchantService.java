@@ -107,9 +107,9 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId) throws ServiceException;
-	
+
 	public List<DealOfferPurchase> getDealOfferPurchasesByMerchantId(final UUID fundraiserId) throws ServiceException;
-	
+
 	public List<DealOfferPurchase> getDealOfferPurchasesByTrackingCode(final String code) throws ServiceException;
 
 	public DealOfferPurchase getDealOfferPurchase(final UUID dealOfferPurchaseId) throws ServiceException;
@@ -313,10 +313,10 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException;
-	
+
 	public Customer getCustomerForMerchant(final Merchant merchant) throws ServiceException;
-	
-	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
+
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId,
 			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException;
 
 	public long getMerchantCodeSummaryCount(final UUID merchantId) throws ServiceException;

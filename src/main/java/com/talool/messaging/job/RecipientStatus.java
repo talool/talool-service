@@ -15,7 +15,7 @@ import com.talool.core.Identifiable;
  */
 public interface RecipientStatus extends Identifiable, Serializable
 {
-	public MessagingJob getMessagingJob();
+	public Long getMessagingJobId();
 
 	public Customer getCustomer();
 

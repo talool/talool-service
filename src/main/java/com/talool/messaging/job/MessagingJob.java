@@ -2,7 +2,6 @@ package com.talool.messaging.job;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import com.talool.core.Customer;
 import com.talool.core.Identifiable;
@@ -38,6 +37,13 @@ public interface MessagingJob extends Identifiable, Serializable
 	public JobState getJobState();
 
 	/**
+	 * Sets the jobState
+	 * 
+	 * @param jobState
+	 */
+	public void setJobState(final JobState jobState);
+
+	/**
 	 * Gets the created date of the job
 	 * 
 	 * @return
@@ -52,14 +58,6 @@ public interface MessagingJob extends Identifiable, Serializable
 	public Date getScheduledStartDate();
 
 	/**
-	 * Gets the list of MessagingReceipientStatus. If the jobState is Finished,
-	 * this list may have been cleaned and could be null.
-	 * 
-	 * @return
-	 */
-	public List<RecipientStatus> getMessagingReceipientStatuses();
-
-	/**
 	 * Gets the job notes
 	 * 
 	 * @return notes
@@ -70,5 +68,21 @@ public interface MessagingJob extends Identifiable, Serializable
 	 * Sets the job notes
 	 */
 	public void setJobNotes(final String notes);
+
+	/**
+	 * Gets the last running update time. If the job hasn't started yet, this will
+	 * be null.
+	 * 
+	 * @return
+	 */
+	public Date getRunningUpdateTime();
+
+	/**
+	 * Sets the last running update time. If the job hasn't started yet, this will
+	 * be null.
+	 * 
+	 * @return
+	 */
+	public void setRunningUpdateTime(final Date date);
 
 }

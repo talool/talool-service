@@ -4,9 +4,11 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 
 import com.talool.core.Customer;
+import com.talool.core.Deal;
 import com.talool.core.MerchantAccount;
-import com.talool.domain.job.MessagingJobImpl;
+import com.talool.domain.job.MerchantGiftJobImpl;
 import com.talool.domain.job.RecipientStatusImpl;
+import com.talool.messaging.job.MerchantGiftJob;
 import com.talool.messaging.job.MessagingJob;
 import com.talool.messaging.job.RecipientStatus;
 import com.talool.messaging.job.task.MerchantGiftTask;
@@ -24,10 +26,10 @@ public class MessagingFactory
 	 * 
 	 * @return MessagingJobBuilder
 	 */
-	public static MessagingJob newMessagingJob(final MerchantAccount createdByMerchantAccount, final Customer fromCustomer,
-			final Date scheduledStartDate, final String notes)
+	public static MerchantGiftJob newMerchantGiftJob(final MerchantAccount createdByMerchantAccount, final Customer fromCustomer,
+			final Deal deal, final Date scheduledStartDate, final String notes)
 	{
-		return new MessagingJobImpl(createdByMerchantAccount, fromCustomer, scheduledStartDate, notes);
+		return new MerchantGiftJobImpl(createdByMerchantAccount, fromCustomer, deal, scheduledStartDate, notes);
 	}
 
 	/**
@@ -37,14 +39,14 @@ public class MessagingFactory
 	 * @param messagingJob
 	 * @return Callable<MessagingJob>
 	 */
-	public static Callable<MessagingJob> newMessagingJobTask(final String taskType, final MessagingJob messagingJob)
+	public static Callable<MerchantGiftJob> newMerchantGiftJobTask(final String taskType, final MerchantGiftJob messagingJob)
 	{
 		return new MerchantGiftTask(messagingJob);
 	}
 
 	public static RecipientStatus newRecipientStatus(final MessagingJob messagingJob, final Customer customer)
 	{
-		return new RecipientStatusImpl(messagingJob, customer);
+		return new RecipientStatusImpl(messagingJob.getId(), customer);
 	}
 
 }
