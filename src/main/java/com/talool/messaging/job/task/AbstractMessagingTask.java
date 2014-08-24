@@ -10,7 +10,7 @@ import com.talool.messaging.job.MessagingJob;
 import com.talool.service.ServiceFactory;
 
 /**
- * An Abstract messaging task . All Messaging tasks should dervice from this
+ * An Abstract messaging task. All Messaging tasks should derive from this
  * class.
  * 
  * @author clintz

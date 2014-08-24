@@ -3018,7 +3018,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getDailyTrackingCodeCountByPublisher(UUID publisherId) throws ServiceException {
+	public long getDailyTrackingCodeCountByPublisher(UUID publisherId) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -3031,31 +3032,32 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getDailyTrackingCodeCountByPublisher %s : %s", publisherId.toString(), ex.getMessage(), ex));
+			throw new ServiceException(String.format("Problem getDailyTrackingCodeCountByPublisher %s : %s", publisherId.toString(),
+					ex.getMessage(), ex));
 		}
 
 		return total == null ? 0 : total;
 	}
 
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByMerchantId(
-			UUID fundraiserId) throws ServiceException {
-		
+	public List<DealOfferPurchase> getDealOfferPurchasesByMerchantId(UUID fundraiserId) throws ServiceException
+	{
+
 		List<DealOfferPurchase> purchases = null;
-		
+
 		// TODO
 		// fundraiser's codes: merchant_code_groups where merchant_id = fundraiserId
 		// fundraiser's purchases: purchase where one of those codes in the merchant code property
 
 		return purchases;
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByTrackingCode(
-			String code) throws ServiceException {
-		
+	public List<DealOfferPurchase> getDealOfferPurchasesByTrackingCode(String code) throws ServiceException
+	{
+
 		List<DealOfferPurchase> purchases = null;
 
 		try
@@ -3071,9 +3073,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public MerchantCodeGroup getMerchantCodeGroupForCode(String code)
-			throws ServiceException {
-		
+	public MerchantCodeGroup getMerchantCodeGroupForCode(String code) throws ServiceException
+	{
+
 		if (code == null)
 		{
 			return null;
@@ -3103,17 +3105,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.talool.core.service.MerchantService#getCustomerForMerchant(com.talool.core.Merchant)
 	 * 
-	 * Gets (or creates) a "dummy" customer for a merchant for using in sending gifts to customers in the app.
-	 * The dummy customer id is stored in a property on the merchant after it has been created.
+	 * Gets (or creates) a "dummy" customer for a merchant for using in sending gifts to customers in the app. The dummy
+	 * customer id is stored in a property on the merchant after it has been created.
 	 */
 	@Override
-	public Customer getCustomerForMerchant(Merchant merchant)
-			throws ServiceException {
-		
+	public Customer getCustomerForMerchant(Merchant merchant) throws ServiceException
+	{
+
 		Customer dummy = null;
-		
+
 		String id = merchant.getProperties().getAsString(KeyValue.merchantCustomerId);
 		if (StringUtils.isEmpty(id))
 		{
@@ -3123,25 +3126,25 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				dummy = new CustomerImpl();
 				dummy.setFirstName(merchant.getName());
 				dummy.setLastName("");
-				
+
 				StringBuilder sb = new StringBuilder();
 				sb.append("dummy").append((new Date()).getTime());
 				dummy.setPassword(sb.toString());
 				sb.append("@talool.com");
 				dummy.setEmail(sb.toString());
-				
+
 				dummy.setSex(Sex.Unknown);
-				
+
 				daoDispatcher.save(dummy);
-				
+
 				id = dummy.getId().toString();
-				
+
 				merchant.getProperties().createOrReplace(KeyValue.merchantCustomerId, id);
 				daoDispatcher.save(merchant);
 			}
 			catch (Exception e)
 			{
-				throw new ServiceException("Failed to create customer for merchant with merchant: "+merchant.getName(), e);
+				throw new ServiceException("Failed to create customer for merchant with merchant: " + merchant.getName(), e);
 			}
 		}
 		else
@@ -3154,7 +3157,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			}
 			catch (Exception e)
 			{
-				throw new ServiceException("Failed to find customer for merchant with customer id: "+id, e);
+				throw new ServiceException("Failed to find customer for merchant with customer id: " + id, e);
 			}
 		}
 		return dummy;
@@ -3162,13 +3165,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
-			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException {
-		
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId,
+			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException
+	{
+
 		PaginatedResult<MerchantCodeSummary> paginatedResult = null;
 		List<MerchantCodeSummary> codes = null;
 		Long totalResults = null;
-		
+
 		try
 		{
 			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummary, null, searchOpts, true);
@@ -3181,10 +3185,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("purchaseCount", StandardBasicTypes.INTEGER);
 
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
-			
+
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			codes = (List<MerchantCodeSummary>) query.list();
-			
+
 			if (calculateTotalResults && codes != null)
 			{
 				totalResults = (Long) getMerchantCodeSummaryCount(merchantId);
@@ -3201,8 +3205,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getMerchantCodeSummaryCount(UUID merchantId)
-			throws ServiceException {
+	public long getMerchantCodeSummaryCount(final UUID merchantId) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -3221,5 +3225,19 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return total == null ? 0 : total;
 	}
-	
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void save(final List<DealAcquire> dealAcquires) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(dealAcquires);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem saving dealAcquires", e);
+		}
+	}
+
 }

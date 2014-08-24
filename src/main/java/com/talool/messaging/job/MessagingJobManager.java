@@ -2,15 +2,15 @@ package com.talool.messaging.job;
 
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.talool.core.service.ServiceException;
 import com.talool.messaging.job.task.MerchantGiftTask;
@@ -26,14 +26,19 @@ public class MessagingJobManager
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingJobManager.class);
 	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
+	private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 4;
 	private static final long DEFAULT_SLEEP_TIME_IN_MILLS = 12000l;
 	private static MessagingJobManager INSTANCE;
 
 	private MessagingService messagingService;
 
-	private ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE));
+	// daemon threads and shutdown hooks are registered.
+	private ExecutorService service = MoreExecutors.getExitingExecutorService(new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE,
+			DEFAULT_MAX_THREAD_POOL_SIZE, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>()), 30, TimeUnit.SECONDS);
 
 	private MessagingJobManagerThread messagingManagerThread;
+
+	private volatile boolean isRunning = false;
 
 	private class MessagingJobManagerThread extends Thread
 	{
@@ -45,7 +50,7 @@ public class MessagingJobManager
 		@Override
 		public void run()
 		{
-			while (true)
+			while (isRunning)
 			{
 				LOG.info("Starting MessagingJobPool with poolSize " + DEFAULT_THREAD_POOL_SIZE);
 
@@ -61,7 +66,8 @@ public class MessagingJobManager
 							{
 								LOG.debug("Submitting MerchantGiftJobTask with jobId:" + job.getId());
 							}
-							submitTask(new MerchantGiftTask((MerchantGiftJob) job), null);
+							// don't capture the future. for now the job is responsible for everything
+							submitTask(new MerchantGiftTask((MerchantGiftJob) job));
 						}
 						else
 						{
@@ -80,7 +86,7 @@ public class MessagingJobManager
 				}
 				catch (InterruptedException e)
 				{
-					// ignore
+					LOG.warn("MessagingJob Thread interupted.  A shutdown may be coming");
 				}
 			}
 		}
@@ -102,7 +108,21 @@ public class MessagingJobManager
 
 		LOG.info("Starting MessagingJobPool with poolSize " + DEFAULT_THREAD_POOL_SIZE);
 		messagingManagerThread = new MessagingJobManagerThread(MessagingJobManagerThread.class.getSimpleName());
+		isRunning = true;
 		messagingManagerThread.start();
+
+		// adding shutdown hook to gracefully stop messaging manager
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			@Override
+			public void run()
+			{
+				// prevent new tasks from being submitted
+				service.shutdown();
+				isRunning = false;
+				messagingManagerThread.interrupt();
+			}
+		});
 	};
 
 	public static MessagingJobManager get()
@@ -116,15 +136,9 @@ public class MessagingJobManager
 	 * @param messagingJob
 	 * @return a listenable future
 	 */
-	public ListenableFuture<? extends MessagingJob> submitTask(final Callable<? extends MessagingJob> task,
-			final FutureCallback<MessagingJob> callback)
+	public Future<? extends MessagingJob> submitTask(final Callable<? extends MessagingJob> task)
 	{
-		ListenableFuture<? extends MessagingJob> future = service.submit(task);
-		if (callback != null)
-		{
-			Futures.addCallback(future, callback);
-		}
-
+		Future<? extends MessagingJob> future = service.submit(task);
 		return future;
 	}
 

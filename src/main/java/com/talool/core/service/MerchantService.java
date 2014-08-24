@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.talool.core.Customer;
 import com.talool.core.Deal;
+import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferPurchase;
@@ -39,9 +40,8 @@ public interface MerchantService extends HibernateService
 	public void save(final MerchantAccount merchantAccount) throws ServiceException;
 
 	/**
-	 * For now it will throw an error if there are more than 1 MerchantAccounts
-	 * for the given email . In order to support multiple accounts, do a separate
-	 * call to get the MerchantAccounts for the email
+	 * For now it will throw an error if there are more than 1 MerchantAccounts for the given email . In order to support
+	 * multiple accounts, do a separate call to get the MerchantAccounts for the email
 	 * 
 	 * @param email
 	 * @param password
@@ -82,6 +82,8 @@ public interface MerchantService extends HibernateService
 	// DealOffer stuff
 	public void save(final DealOffer dealOffer) throws ServiceException;
 
+	public void save(final List<DealAcquire> dealAcquires) throws ServiceException;
+
 	public DealOffer getDealOffer(final UUID dealOfferId) throws ServiceException;
 
 	public List<DealOffer> getDealOffers() throws ServiceException;
@@ -93,8 +95,7 @@ public interface MerchantService extends HibernateService
 	public Deal getDeal(final UUID dealId) throws ServiceException;
 
 	/**
-	 * Gets all deals by deal offer. If activeDealsOnly=true, expired or inActive
-	 * deals will not be returned.
+	 * Gets all deals by deal offer. If activeDealsOnly=true, expired or inActive deals will not be returned.
 	 * 
 	 * @param dealOfferId
 	 * @param searchOpts
@@ -162,9 +163,8 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	/**
-	 * Gets active and non-expired DealOffer summaries within maxMiles of a
-	 * location. If the location is null or fields are zero or null then the
-	 * fallbackSearchOptions are used.
+	 * Gets active and non-expired DealOffer summaries within maxMiles of a location. If the location is null or fields
+	 * are zero or null then the fallbackSearchOptions are used.
 	 * 
 	 * @param location
 	 * @param maxMiles
@@ -215,8 +215,7 @@ public interface MerchantService extends HibernateService
 	public long getDealOfferSummaryCount(final String title) throws ServiceException;
 
 	/**
-	 * Gets all the offers of a publisher. A publishers offers are defined by a
-	 * merchant that is the publisher
+	 * Gets all the offers of a publisher. A publishers offers are defined by a merchant that is the publisher
 	 * 
 	 * @param publisherMerchantId
 	 * @param searchOpts
@@ -269,8 +268,8 @@ public interface MerchantService extends HibernateService
 	public long getMerchantSummaryCount(final String name, final PropertyCriteria propertyCriteria) throws ServiceException;
 
 	/**
-	 * Gets all the merchants of a publisher. A publishers merchants are defined
-	 * by having a location created by the publisher
+	 * Gets all the merchants of a publisher. A publishers merchants are defined by having a location created by the
+	 * publisher
 	 * 
 	 * @param publisherMerchantId
 	 * @param searchOpts

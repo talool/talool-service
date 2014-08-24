@@ -20,8 +20,7 @@ import com.talool.messaging.job.DeliveryStatus;
 import com.talool.messaging.job.RecipientStatus;
 
 /**
- * Implementation of MessagingReceipientStatus . Represents the state of job
- * receipient.
+ * Implementation of MessagingReceipientStatus . Represents the state of job receipient.
  * 
  * @author clintz
  * 
@@ -87,6 +86,12 @@ public class RecipientStatusImpl implements RecipientStatus
 	public DeliveryStatus getDeliveryStatus()
 	{
 		return deliveryStatus;
+	}
+
+	@Override
+	public void setDeliveryStatus(final DeliveryStatus deliveryStatus)
+	{
+		this.deliveryStatus = deliveryStatus;
 	}
 
 }
