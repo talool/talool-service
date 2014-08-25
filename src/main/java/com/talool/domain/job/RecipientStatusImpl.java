@@ -12,11 +12,9 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.hibernate.annotations.Type;
 
 import com.talool.core.Customer;
 import com.talool.domain.CustomerImpl;
-import com.talool.messaging.job.DeliveryStatus;
 import com.talool.messaging.job.RecipientStatus;
 
 /**
@@ -38,9 +36,9 @@ public class RecipientStatusImpl implements RecipientStatus
 	@Column(name = "recipient_status_id", unique = true, nullable = false)
 	private Long id;
 
-	@Type(type = "deliveryStatus")
-	@Column(name = "delivery_status", nullable = false, columnDefinition = "delivery_status")
-	private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
+	// @Type(type = "deliveryStatus")
+	// @Column(name = "delivery_status", nullable = false, columnDefinition = "delivery_status")
+	// private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
 
 	@Column(name = "messaging_job_id", nullable = false)
 	private Long messagingJobId;
@@ -82,16 +80,16 @@ public class RecipientStatusImpl implements RecipientStatus
 		return ReflectionToStringBuilder.toString(this);
 	}
 
-	@Override
-	public DeliveryStatus getDeliveryStatus()
-	{
-		return deliveryStatus;
-	}
-
-	@Override
-	public void setDeliveryStatus(final DeliveryStatus deliveryStatus)
-	{
-		this.deliveryStatus = deliveryStatus;
-	}
+	// @Override
+	// public DeliveryStatus getDeliveryStatus()
+	// {
+	// return deliveryStatus;
+	// }
+	//
+	// @Override
+	// public void setDeliveryStatus(final DeliveryStatus deliveryStatus)
+	// {
+	// this.deliveryStatus = deliveryStatus;
+	// }
 
 }

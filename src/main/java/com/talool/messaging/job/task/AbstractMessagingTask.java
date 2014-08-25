@@ -1,6 +1,5 @@
 package com.talool.messaging.job.task;
 
-import java.util.Calendar;
 import java.util.concurrent.Callable;
 
 import com.talool.core.service.ServiceException;
@@ -10,8 +9,7 @@ import com.talool.messaging.job.MessagingJob;
 import com.talool.service.ServiceFactory;
 
 /**
- * An Abstract messaging task. All Messaging tasks should derive from this
- * class.
+ * An Abstract messaging task. All Messaging tasks should derive from this class.
  * 
  * @author clintz
  * 
@@ -40,11 +38,9 @@ public abstract class AbstractMessagingTask<T extends MessagingJob> implements C
 		updateJobState(JobState.FAILED);
 	}
 
-	protected void updateJobState(JobState jobState) throws ServiceException
+	protected void updateJobState(final JobState jobState) throws ServiceException
 	{
-		messagingJob.setJobState(jobState);
-		messagingJob.setRunningUpdateTime(Calendar.getInstance().getTime());
-		ServiceFactory.get().getMessagingService().merge(messagingJob);
+		ServiceFactory.get().getMessagingService().updateMessagingJobState(messagingJob.getId(), jobState);
 	}
 
 }

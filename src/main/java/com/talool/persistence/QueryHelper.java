@@ -340,7 +340,7 @@ public final class QueryHelper
 	private static final String MOVE_DEALS = "UPDATE deal "
 			+ "SET deal_offer_id = :dealOfferId, updated_by_merchant_account_id = :merchantAccountId " + "WHERE deal_id IN (:dealIds)";
 
-	private static final String RECIPIENT_STATUSES = "from RecipientStatusImpl as recipientStatus left join fetch recipientStatus.customer where recipientStatus.deliveryStatus != 'SUCCESS' AND recipientStatus.messagingJobId=:messagingJobId";
+	private static final String RECIPIENT_STATUSES = "from RecipientStatusImpl as recipientStatus left join fetch recipientStatus.customer where recipientStatus.messagingJobId=:messagingJobId";
 
 	private static final String RECIPIENT_STATUSES_CNT = "select count(*) from RecipientStatusImpl where messagingJobId=:messagingJobId";
 

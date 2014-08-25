@@ -4,8 +4,6 @@ BEGIN;
 
 CREATE TYPE job_state AS ENUM ('STOPPED', 'STARTED', 'FINISHED', 'FAILED');
 
-CREATE TYPE delivery_status AS ENUM ('PENDING','SUCCESS', 'FAILURE');
-
 CREATE TABLE messaging_job (
     messaging_job_id bigserial NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
@@ -17,10 +15,10 @@ CREATE TABLE messaging_job (
     scheduled_start_dt timestamp without time zone NOT NULL,
     running_update_dt timestamp without time zone,
     job_notes character varying(128),
-    users_targeted bigint DEFAULT 0 NOT NULL,
-    sends bigint DEFAULT 0 NOT NULL,
-    email_opens bigint DEFAULT 0 NOT NULL,
-    gift_opens bigint DEFAULT 0 NOT NULL, 
+    users_targeted integer DEFAULT 0 NOT NULL,
+    sends integer DEFAULT 0 NOT NULL,
+    email_opens integer DEFAULT 0 NOT NULL,
+    gift_opens integer DEFAULT 0 NOT NULL, 
     PRIMARY KEY(messaging_job_id)
  );
  
@@ -39,7 +37,6 @@ CREATE TABLE recipient_status (
     recipient_status_id bigserial NOT NULL,
     messaging_job_id bigint NOT NULL,
     customer_id UUID NOT NULL,
-    delivery_status delivery_status NOT NULL,
     PRIMARY KEY(recipient_status_id)
  );
  
@@ -51,4 +48,8 @@ ALTER TABLE ONLY recipient_status ADD CONSTRAINT "FK_RecipientStatus_Customer" F
 CREATE INDEX recipient_status_messaging_job_id_idx ON recipient_status (messaging_job_id);
 CREATE INDEX recipient_status_customer_id_id_idx ON recipient_status (customer_id);
  
- COMMIT;
+ALTER TABLE gift add column properties HSTORE;
+CREATE INDEX gift_properties_idx ON gift USING BTREE (properties);
+CREATE INDEX gift_properties_gist_idx ON gift USING GIST (properties);
+ 
+COMMIT;

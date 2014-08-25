@@ -18,7 +18,7 @@ public interface RecipientStatus extends Identifiable, Serializable
 
 	public Customer getCustomer();
 
-	public DeliveryStatus getDeliveryStatus();
-
-	public void setDeliveryStatus(final DeliveryStatus deliveryStatus);
+	// public DeliveryStatus getDeliveryStatus();
+	//
+	// public void setDeliveryStatus(final DeliveryStatus deliveryStatus);
 }

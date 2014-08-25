@@ -19,6 +19,7 @@ import com.talool.core.DealAcquire;
 import com.talool.core.SearchOptions;
 import com.talool.core.service.ServiceException;
 import com.talool.domain.DealAcquireImpl;
+import com.talool.domain.job.RecipientStatusImpl;
 import com.talool.messaging.MessagingFactory;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
@@ -46,6 +47,8 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 	@Transactional(propagation = Propagation.REQUIRED)
 	public MessagingJob scheduleMessagingJob(final MessagingJob messagingJob, final List<Customer> targetedCustomers)
 	{
+		messagingJob.setUsersTargerted(targetedCustomers.size());
+
 		daoDispatcher.save(messagingJob);
 
 		// need to create the tracking/recipient status records
@@ -110,7 +113,7 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 
 			if (totalResults != null && totalResults > 0)
 			{
-				newSql = QueryHelper.buildQuery(QueryType.RecipientStatuses, null, searchOpts, true);
+				newSql = QueryHelper.buildQuery(QueryType.RecipientStatuses, null, searchOpts, false);
 				query = sessionFactory.getCurrentSession().createQuery(newSql);
 				query.setParameter("messagingJobId", jobId);
 				QueryHelper.applyOffsetLimit(query, searchOpts);
@@ -201,25 +204,27 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 			}
 
 			save(dac);
-			daoDispatcher.flush(DealAcquireImpl.class);
-
 		}
 
-		// try
-		// {
-		// // save the batch and only send emails on no exception
-		// ServiceFactory.get().getTaloolService().save(dealAcquires);
-		// }
-		// catch (ServiceException e)
-		// {
-		// throw e;
-		// }
+		daoDispatcher.flush(DealAcquireImpl.class);
+
+		try
+		{
+			Query updateSends = sessionFactory.getCurrentSession().createQuery("update MerchantGiftJobImpl set sends=sends + :sends");
+			updateSends.setParameter("sends", recipientStatuses.size());
+			updateSends.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
 
 		for (RecipientStatus recipient : recipientStatuses)
 		{
-			recipient.setDeliveryStatus(DeliveryStatus.SUCCESS);
-			daoDispatcher.save(recipient);
+			daoDispatcher.remove(recipient);
 		}
+
+		daoDispatcher.flush(RecipientStatusImpl.class);
 
 		// TODO put the job id on the gift (or deal acquire)
 
@@ -228,6 +233,28 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 		// ServiceFactory.get().getCustomerService()
 		// .giftToEmail(messagingJob.getFromCustomer().getId(), daq.getId(), customer.getEmail().toLowerCase(),
 		// customer.getFullName());
+
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = ServiceException.class)
+	public void updateMessagingJobState(final Long jobId, final JobState jobState) throws ServiceException
+	{
+		try
+		{
+			final Query query = sessionFactory.getCurrentSession().createQuery(
+					"update MessagingJobImpl set jobState=:jobState,runningUpdateTime=:now where id=:jobId");
+
+			query.setParameter("jobId", jobId);
+			query.setParameter("jobState", jobState);
+			query.setParameter("now", Calendar.getInstance().getTime());
+
+			query.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem updating jobState", ex);
+		}
 
 	}
 }

@@ -27,7 +27,7 @@ public class MessagingJobManager
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingJobManager.class);
 	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
 	private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 4;
-	private static final long DEFAULT_SLEEP_TIME_IN_MILLS = 12000l;
+	private static final long DEFAULT_SLEEP_TIME_IN_MILLS = 24000l;
 	private static MessagingJobManager INSTANCE;
 
 	private MessagingService messagingService;

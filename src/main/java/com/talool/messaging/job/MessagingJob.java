@@ -70,19 +70,25 @@ public interface MessagingJob extends Identifiable, Serializable
 	public void setJobNotes(final String notes);
 
 	/**
-	 * Gets the last running update time. If the job hasn't started yet, this will
-	 * be null.
+	 * Gets the last running update time. If the job hasn't started yet, this will be null.
 	 * 
 	 * @return
 	 */
 	public Date getRunningUpdateTime();
 
 	/**
-	 * Sets the last running update time. If the job hasn't started yet, this will
-	 * be null.
+	 * Sets the last running update time. If the job hasn't started yet, this will be null.
 	 * 
 	 * @return
 	 */
 	public void setRunningUpdateTime(final Date date);
+
+	public Integer getUsersTargeted();
+
+	public void setUsersTargerted(final Integer usersTargeted);
+
+	public void setSends(final Integer sends);
+
+	public Integer getSends();
 
 }

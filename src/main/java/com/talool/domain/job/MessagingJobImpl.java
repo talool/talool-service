@@ -81,16 +81,16 @@ public class MessagingJobImpl implements MessagingJob
 
 	// stats below should not update on saves. Only HQL queries should increment
 	@Column(name = "sends", updatable = false)
-	private Long sends = 0l;
+	private Integer sends = 0;
 
 	@Column(name = "email_opens", updatable = false)
-	private Long emailOpens = 0l;
+	private Integer emailOpens = 0;
 
 	@Column(name = "gift_opens", updatable = false)
-	private Long giftOpens = 0l;
+	private Integer giftOpens = 0;
 
 	@Column(name = "users_targeted", updatable = false)
-	private Long usersTargeted = 0l;
+	private Integer usersTargeted = 0;
 
 	public MessagingJobImpl()
 	{}
@@ -175,5 +175,29 @@ public class MessagingJobImpl implements MessagingJob
 	public void setRunningUpdateTime(Date date)
 	{
 		this.runningUpdateTime = date;
+	}
+
+	@Override
+	public Integer getUsersTargeted()
+	{
+		return usersTargeted;
+	}
+
+	@Override
+	public void setUsersTargerted(Integer usersTargeted)
+	{
+		this.usersTargeted = usersTargeted;
+	}
+
+	@Override
+	public void setSends(Integer sends)
+	{
+		this.sends = sends;
+	}
+
+	@Override
+	public Integer getSends()
+	{
+		return sends;
 	}
 }

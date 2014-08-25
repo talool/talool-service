@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.talool.core.Customer;
 import com.talool.core.SearchOptions;
 import com.talool.core.service.ServiceException;
+import com.talool.messaging.job.JobState;
 import com.talool.messaging.job.MerchantGiftJob;
 import com.talool.messaging.job.MessagingJob;
 import com.talool.messaging.job.RecipientStatus;
@@ -59,6 +60,15 @@ public interface MessagingService
 	 * @throws ServiceException
 	 */
 	public void processMerchantGifts(final MerchantGiftJob job, final List<RecipientStatus> recipientStatuses) throws ServiceException;
+
+	/**
+	 * Updates the state of a messaging job
+	 * 
+	 * @param jobId
+	 * @param jobState
+	 * @throws ServiceException
+	 */
+	public void updateMessagingJobState(final Long jobId, final JobState jobState) throws ServiceException;
 
 	public void save(final Object entity) throws ServiceException;
 

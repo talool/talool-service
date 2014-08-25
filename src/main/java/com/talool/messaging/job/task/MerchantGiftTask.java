@@ -27,6 +27,7 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantGiftTask.class);
 	private static final int MAX_FAILED_ATTEMPTS = 3;
+	private static final int RESULTS_PER_PAGE = 2;
 
 	public MerchantGiftTask(final MerchantGiftJob messagingJob)
 	{
@@ -36,8 +37,7 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 	@Override
 	public MerchantGiftJob call() throws Exception
 	{
-		int page = 0;
-		int resultsPerPage = 2;
+		int pageChunk = 0;
 		Long totalRecipients = 0l;
 		PaginatedResult<RecipientStatus> result = null;
 		SearchOptions searchOpts = null;
@@ -46,7 +46,9 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 
 		while (stillProcessingBatch)
 		{
-			searchOpts = new SearchOptions.Builder().ascending(true).maxResults(resultsPerPage).page(page)
+			// recipientStatus objects are removed as they are processed. we only increment pageChunk when MAX_FAILED_ATTEMPTS
+			// is reached for a chunk (so we can move to the next available chunk)
+			searchOpts = new SearchOptions.Builder().ascending(true).maxResults(RESULTS_PER_PAGE).page(pageChunk)
 					.sortProperty("recipientStatus.id").build();
 
 			result = ServiceFactory.get().getMessagingService().getAvailableReceipientStatuses(messagingJob.getId(), searchOpts);
@@ -67,34 +69,26 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 				// persist started state
 				setJobAsStarted();
 
-				totalRecipients = result.getTotalResults(); // this should not change
+				// totalRecipients will not change
+				totalRecipients = result.getTotalResults();
 				try
 				{
 					ServiceFactory.get().getMessagingService().processMerchantGifts(messagingJob, result.getResults());
 
-					if ((page + 1 * resultsPerPage) >= totalRecipients)
-					{
-						stillProcessingBatch = false;
-					}
-					else
-					{
-						++page;
-					}
-
 				}
 				catch (ServiceException se)
 				{
-					Integer failedAttempts = failedPages.get(page);
+					Integer failedAttempts = failedPages.get(pageChunk);
 					failedAttempts = failedAttempts == null ? 1 : failedAttempts + 1;
-					failedPages.put(page, failedAttempts);
+					failedPages.put(pageChunk, failedAttempts);
 					if (failedAttempts < MAX_FAILED_ATTEMPTS)
 					{
-						LOG.error(String.format("Batch fail page %d failedAttempts %d", page, failedAttempts), se);
+						LOG.error(String.format("Batch fail chunk %d failedAttempts %d", pageChunk, failedAttempts), se);
 					}
 					else
 					{
-						LOG.error(
-								String.format("Max batch failures page %d failedAttempts %d - Advancing to page %d", page, failedAttempts, ++page), se);
+						LOG.error(String.format("Max batch failures chunk %d failedAttempts %d - Advancing to chunk %d", pageChunk,
+								failedAttempts, ++pageChunk), se);
 					}
 
 				}
