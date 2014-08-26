@@ -13,6 +13,7 @@ import com.talool.core.SearchOptions;
 import com.talool.core.service.ServiceException;
 import com.talool.messaging.job.MerchantGiftJob;
 import com.talool.messaging.job.RecipientStatus;
+import com.talool.service.ServiceConfig;
 import com.talool.service.ServiceFactory;
 import com.talool.stats.PaginatedResult;
 
@@ -26,8 +27,6 @@ import com.talool.stats.PaginatedResult;
 public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MerchantGiftTask.class);
-	private static final int MAX_FAILED_ATTEMPTS = 3;
-	private static final int RESULTS_PER_PAGE = 2;
 
 	public MerchantGiftTask(final MerchantGiftJob messagingJob)
 	{
@@ -48,8 +47,8 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 		{
 			// recipientStatus objects are removed as they are processed. we only increment pageChunk when MAX_FAILED_ATTEMPTS
 			// is reached for a chunk (so we can move to the next available chunk)
-			searchOpts = new SearchOptions.Builder().ascending(true).maxResults(RESULTS_PER_PAGE).page(pageChunk)
-					.sortProperty("recipientStatus.id").build();
+			searchOpts = new SearchOptions.Builder().ascending(true).maxResults(ServiceConfig.get().getMessagingJobManagerTaskBatchSize())
+					.page(pageChunk).sortProperty("recipientStatus.id").build();
 
 			result = ServiceFactory.get().getMessagingService().getAvailableReceipientStatuses(messagingJob.getId(), searchOpts);
 
@@ -81,7 +80,7 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 					Integer failedAttempts = failedPages.get(pageChunk);
 					failedAttempts = failedAttempts == null ? 1 : failedAttempts + 1;
 					failedPages.put(pageChunk, failedAttempts);
-					if (failedAttempts < MAX_FAILED_ATTEMPTS)
+					if (failedAttempts < ServiceConfig.get().getMessagingJobManagerTaskMaxAttempts())
 					{
 						LOG.error(String.format("Batch fail chunk %d failedAttempts %d", pageChunk, failedAttempts), se);
 					}
@@ -108,7 +107,7 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 		{
 			for (Entry<Integer, Integer> entry : failedPages.entrySet())
 			{
-				if (entry.getValue() == MAX_FAILED_ATTEMPTS)
+				if (entry.getValue() == ServiceConfig.get().getMessagingJobManagerTaskMaxAttempts())
 				{
 					numRetriesExhausted++;
 				}

@@ -61,6 +61,8 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String MESSAGING_JOB_MANAGER_MAX_THREADS = "messaging.job.manager.max.threads";
 	public static final String MESSAGING_JOB_MANAGER_MIN_THREADS = "messaging.job.manager.min.threads";
 	public static final String MESSAGING_JOB_MANAGER_SLEEP_SECS = "messaging.job.manager.sleep.secs";
+	public static final String MESSAGING_JOB_MANAGER_TASK_MAX_ATTEMPTS = "messaging.job.manager.task.max.attempts";
+	public static final String MESSAGING_JOB_MANAGER_TASK_BATCH_SIZE = "messaging.job.manager.task.batch.size";
 
 	// private static final String UPLOAD_LOGO_MAX_SIZE_BYTES =
 	// "upload.logo.max.size.bytes";
@@ -285,6 +287,16 @@ public class ServiceConfig extends PropertiesConfiguration
 	public int getMessagingJobManagerSleepSecs()
 	{
 		return getInteger(MESSAGING_JOB_MANAGER_SLEEP_SECS, 0);
+	}
+
+	public int getMessagingJobManagerTaskMaxAttempts()
+	{
+		return getInteger(MESSAGING_JOB_MANAGER_TASK_MAX_ATTEMPTS, 3);
+	}
+
+	public int getMessagingJobManagerTaskBatchSize()
+	{
+		return getInteger(MESSAGING_JOB_MANAGER_TASK_BATCH_SIZE, 100);
 	}
 
 	public static synchronized ServiceConfig createInstance(final String propertyFile)
