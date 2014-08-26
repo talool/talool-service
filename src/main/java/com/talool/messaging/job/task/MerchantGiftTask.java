@@ -117,12 +117,12 @@ public class MerchantGiftTask extends AbstractMessagingTask<MerchantGiftJob>
 
 		if (numRetriesExhausted > 0)
 		{
-			LOG.info("merchantGiftTask with jobId %d has %d batch failures", messagingJob.getId(), numRetriesExhausted);
+			LOG.info(String.format("merchantGiftTask with jobId %d has %d batch failures", messagingJob.getId(), numRetriesExhausted));
 			setJobAsFailed();
 		}
 		else
 		{
-			LOG.info("merchantGiftTask with jobId %d completed successfully", messagingJob.getId());
+			LOG.info(String.format("merchantGiftTask with jobId %d completed successfully", messagingJob.getId()));
 			setJobAsFinished();
 		}
 

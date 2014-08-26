@@ -25,6 +25,7 @@ import com.talool.service.MessagingService;
 public class MessagingJobManager
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingJobManager.class);
+	private static final int TERMINATION_TIMEOUT_IN_SECS = 30;
 	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
 	private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 4;
 	private static final long DEFAULT_SLEEP_TIME_IN_MILLS = 24000l;
@@ -33,8 +34,9 @@ public class MessagingJobManager
 	private MessagingService messagingService;
 
 	// daemon threads and shutdown hooks are registered.
-	private ExecutorService service = MoreExecutors.getExitingExecutorService(new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE,
-			DEFAULT_MAX_THREAD_POOL_SIZE, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>()), 30, TimeUnit.SECONDS);
+	private ExecutorService jobPool = MoreExecutors.getExitingExecutorService(new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE,
+			DEFAULT_MAX_THREAD_POOL_SIZE, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>()), TERMINATION_TIMEOUT_IN_SECS,
+			TimeUnit.SECONDS);
 
 	private MessagingJobManagerThread messagingManagerThread;
 
@@ -86,9 +88,11 @@ public class MessagingJobManager
 				}
 				catch (InterruptedException e)
 				{
-					LOG.warn("MessagingJob Thread interupted.  A shutdown may be coming");
+					// ignore
 				}
 			}
+
+			LOG.info("MessagingJobManager thread ended");
 		}
 	}
 
@@ -118,9 +122,33 @@ public class MessagingJobManager
 			public void run()
 			{
 				// prevent new tasks from being submitted
-				service.shutdown();
+				LOG.info("Shutting down MessagingJobManager.  No new tasks will be submitted..");
+				jobPool.shutdown();
 				isRunning = false;
 				messagingManagerThread.interrupt();
+				try
+				{
+					// wait for tasks to terminate. the executor is already and ExitingExecutorService, but we want
+					// to capture the LOG info messages by waiting anyways
+					if (!jobPool.awaitTermination(TERMINATION_TIMEOUT_IN_SECS, TimeUnit.SECONDS))
+					{
+						// cancel currently executing tasks
+						jobPool.shutdownNow();
+						LOG.info("MessagingJobManager jobPool shutdownNow - tasks may end in bad state.");
+					}
+					else
+					{
+						LOG.info("MessagingJobManager and jobPool shutdown gracefully.");
+					}
+				}
+				catch (InterruptedException ie)
+				{
+					// re-cancel if current thread also interrupted
+					jobPool.shutdownNow();
+					// Preserve interrupt status
+					Thread.currentThread().interrupt();
+				}
+
 			}
 		});
 	};
@@ -138,7 +166,7 @@ public class MessagingJobManager
 	 */
 	public Future<? extends MessagingJob> submitTask(final Callable<? extends MessagingJob> task)
 	{
-		Future<? extends MessagingJob> future = service.submit(task);
+		Future<? extends MessagingJob> future = jobPool.submit(task);
 		return future;
 	}
 
