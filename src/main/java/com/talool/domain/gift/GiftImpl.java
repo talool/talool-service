@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ import com.talool.core.gift.Gift;
 import com.talool.core.gift.GiftStatus;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
+import com.talool.domain.Properties;
 
 /**
  * 
@@ -75,6 +77,9 @@ public abstract class GiftImpl implements Gift
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = CustomerImpl.class)
 	@JoinColumn(name = "to_customer_id")
 	private Customer toCustomer;
+
+	@Embedded
+	private Properties props;
 
 	@Override
 	public UUID getId()
@@ -163,15 +168,15 @@ public abstract class GiftImpl implements Gift
 
 		final GiftImpl other = (GiftImpl) obj;
 
-		return super.equals(obj) && new EqualsBuilder().append(getFromCustomer(), other.getFromCustomer())
-				.append(getDealAcquire(), other.getDealAcquire()).append(getGiftStatus(), other.getGiftStatus()).isEquals();
+		return super.equals(obj)
+				&& new EqualsBuilder().append(getFromCustomer(), other.getFromCustomer()).append(getDealAcquire(), other.getDealAcquire())
+						.append(getGiftStatus(), other.getGiftStatus()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getFromCustomer()).append(getDealAcquire()).append(getGiftStatus()).
-				hashCode();
+		return new HashCodeBuilder(17, 37).append(getFromCustomer()).append(getDealAcquire()).append(getGiftStatus()).hashCode();
 	}
 
 	@Override
@@ -184,7 +189,16 @@ public abstract class GiftImpl implements Gift
 	public void setToCustomer(Customer customer)
 	{
 		this.toCustomer = customer;
+	}
 
+	@Override
+	public Properties getProperties()
+	{
+		if (props == null)
+		{
+			props = new Properties();
+		}
+		return props;
 	}
 
 }

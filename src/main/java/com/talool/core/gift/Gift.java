@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.talool.core.Customer;
 import com.talool.core.DealAcquire;
 import com.talool.core.IdentifiableUUID;
+import com.talool.core.PropertyEntity;
 import com.talool.core.TimeAware;
 
 /**
@@ -13,7 +14,7 @@ import com.talool.core.TimeAware;
  * @author clintz
  * 
  */
-public interface Gift extends IdentifiableUUID, Serializable, TimeAware
+public interface Gift extends IdentifiableUUID, Serializable, TimeAware, PropertyEntity
 {
 	public Customer getFromCustomer();
 

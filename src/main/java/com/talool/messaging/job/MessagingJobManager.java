@@ -19,7 +19,9 @@ import com.talool.service.MessagingService;
 import com.talool.service.ServiceConfig;
 
 /**
- * MessagingJobManager is responsible for submitting a
+ * MessagingJobManager is responsible for running messaging tasks. It is backed by a Guava ExitingExecutorService and
+ * proper shutdown hooks are registered to attempt to wait for already running jobs to execute while preventing the
+ * submital of new ones.
  * 
  * @author clintz
  * 

@@ -209,6 +209,10 @@ public class MessagingJobImpl implements MessagingJob
 	@Override
 	public Properties getProperties()
 	{
+		if (props == null)
+		{
+			props = new Properties();
+		}
 		return props;
 	}
 }
