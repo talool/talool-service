@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ import com.talool.core.Customer;
 import com.talool.core.MerchantAccount;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.MerchantAccountImpl;
+import com.talool.domain.Properties;
 import com.talool.messaging.job.JobState;
 import com.talool.messaging.job.MessagingJob;
 
@@ -78,6 +80,9 @@ public class MessagingJobImpl implements MessagingJob
 
 	@Column(name = "job_notes", unique = false, nullable = true, length = 128)
 	private String notes;
+
+	@Embedded
+	private Properties props;
 
 	// stats below should not update on saves. Only HQL queries should increment
 	@Column(name = "sends", updatable = false)
@@ -199,5 +204,11 @@ public class MessagingJobImpl implements MessagingJob
 	public Integer getSends()
 	{
 		return sends;
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		return props;
 	}
 }

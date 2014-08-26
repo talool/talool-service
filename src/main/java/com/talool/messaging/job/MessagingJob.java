@@ -6,6 +6,7 @@ import java.util.Date;
 import com.talool.core.Customer;
 import com.talool.core.Identifiable;
 import com.talool.core.MerchantAccount;
+import com.talool.core.PropertyEntity;
 
 /**
  * Messaging Job
@@ -13,7 +14,7 @@ import com.talool.core.MerchantAccount;
  * @author clintz
  * 
  */
-public interface MessagingJob extends Identifiable, Serializable
+public interface MessagingJob extends Identifiable, Serializable, PropertyEntity
 {
 	/**
 	 * Gets the merchant account that created the job

@@ -15,6 +15,7 @@ CREATE TABLE messaging_job (
     scheduled_start_dt timestamp without time zone NOT NULL,
     running_update_dt timestamp without time zone,
     job_notes character varying(128),
+    properties HSTORE,
     users_targeted integer DEFAULT 0 NOT NULL,
     sends integer DEFAULT 0 NOT NULL,
     email_opens integer DEFAULT 0 NOT NULL,
@@ -32,6 +33,8 @@ ALTER TABLE ONLY messaging_job ADD CONSTRAINT "FK_MessagingJob_Deal" FOREIGN KEY
 
 CREATE INDEX messaging_job_merchant_account_id_idx ON messaging_job (merchant_account_id);
 CREATE INDEX messaging_job_deal_id_idx ON messaging_job (deal_id);
+CREATE INDEX messaging_job_properties_idx ON messaging_job USING BTREE (properties);
+CREATE INDEX messaging_job_properties_gist_idx ON messaging_job USING GIST (properties);
 
 CREATE TABLE recipient_status (
     recipient_status_id bigserial NOT NULL,
@@ -51,5 +54,8 @@ CREATE INDEX recipient_status_customer_id_id_idx ON recipient_status (customer_i
 ALTER TABLE gift add column properties HSTORE;
 CREATE INDEX gift_properties_idx ON gift USING BTREE (properties);
 CREATE INDEX gift_properties_gist_idx ON gift USING GIST (properties);
+
+
+
  
 COMMIT;

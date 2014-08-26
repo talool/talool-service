@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import com.talool.core.service.ServiceException;
-import com.talool.messaging.job.task.MerchantGiftTask;
+import com.talool.messaging.job.task.AbstractMessagingTask;
 import com.talool.service.MessagingService;
 
 /**
@@ -58,23 +58,22 @@ public class MessagingJobManager
 
 				try
 				{
-					List<MessagingJob> messagingJobs = messagingService.getJobsToProcess();
+					final List<MessagingJob> messagingJobs = messagingService.getJobsToProcess();
 
-					for (MessagingJob job : messagingJobs)
+					for (final MessagingJob job : messagingJobs)
 					{
-						if (job instanceof MerchantGiftJob)
+						final AbstractMessagingTask<? extends MessagingJob> task = MessagingTaskFactory.createMessagingTask(job);
+						if (task == null)
 						{
-							if (LOG.isDebugEnabled())
-							{
-								LOG.debug("Submitting MerchantGiftJobTask with jobId:" + job.getId());
-							}
-							// don't capture the future. for now the job is responsible for everything
-							submitTask(new MerchantGiftTask((MerchantGiftJob) job));
+							LOG.error("Messaging job type not known. messagingJobId " + job.getId());
+							continue;
 						}
-						else
+						if (LOG.isDebugEnabled())
 						{
-							LOG.error("Job Type not recognized - jobId:" + job.getId());
+							LOG.debug("Submitting MerchantGiftJobTask with jobId:" + job.getId());
 						}
+						// don't capture the future. for now the job is responsible for everything
+						submitTask(task);
 					}
 				}
 				catch (ServiceException e)
