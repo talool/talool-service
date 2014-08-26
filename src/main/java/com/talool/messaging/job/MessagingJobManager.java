@@ -8,6 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.talool.core.service.ServiceException;
 import com.talool.messaging.job.task.AbstractMessagingTask;
 import com.talool.service.MessagingService;
+import com.talool.service.ServiceConfig;
 
 /**
  * MessagingJobManager is responsible for submitting a
@@ -26,17 +28,12 @@ public class MessagingJobManager
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingJobManager.class);
 	private static final int TERMINATION_TIMEOUT_IN_SECS = 30;
-	private static final int DEFAULT_THREAD_POOL_SIZE = 4;
-	private static final int DEFAULT_MAX_THREAD_POOL_SIZE = 4;
-	private static final long DEFAULT_SLEEP_TIME_IN_MILLS = 24000l;
 	private static MessagingJobManager INSTANCE;
 
 	private MessagingService messagingService;
 
 	// daemon threads and shutdown hooks are registered.
-	private ExecutorService jobPool = MoreExecutors.getExitingExecutorService(new ThreadPoolExecutor(DEFAULT_THREAD_POOL_SIZE,
-			DEFAULT_MAX_THREAD_POOL_SIZE, 5000, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>()), TERMINATION_TIMEOUT_IN_SECS,
-			TimeUnit.SECONDS);
+	private ExecutorService jobPool;
 
 	private MessagingJobManagerThread messagingManagerThread;
 
@@ -54,11 +51,15 @@ public class MessagingJobManager
 		{
 			while (isRunning)
 			{
-				LOG.info("Starting MessagingJobPool with poolSize " + DEFAULT_THREAD_POOL_SIZE);
 
 				try
 				{
 					final List<MessagingJob> messagingJobs = messagingService.getJobsToProcess();
+
+					if (CollectionUtils.isNotEmpty(messagingJobs))
+					{
+						LOG.info(String.format("Loaded %d jobs", messagingJobs.size()));
+					}
 
 					for (final MessagingJob job : messagingJobs)
 					{
@@ -83,7 +84,7 @@ public class MessagingJobManager
 
 				try
 				{
-					sleep(DEFAULT_SLEEP_TIME_IN_MILLS);
+					sleep(ServiceConfig.get().getMessagingJobManagerSleepSecs() * 1000);
 				}
 				catch (InterruptedException e)
 				{
@@ -99,6 +100,11 @@ public class MessagingJobManager
 	{
 		if (INSTANCE == null)
 		{
+			if (ServiceConfig.get().getMessagingJobManagerActive() == false)
+			{
+				LOG.info("MessagingJobManager is not active");
+				return null;
+			}
 			INSTANCE = new MessagingJobManager(messagingService);
 		}
 
@@ -107,9 +113,16 @@ public class MessagingJobManager
 
 	private MessagingJobManager(final MessagingService messagingService)
 	{
+		LOG.info(String.format("Starting MessagingJobPool minPoolSize %d maxPoolSize %d sleepInSecs %d", ServiceConfig.get()
+				.getMessagingJobManagerMinThreads(), ServiceConfig.get().getMessagingJobManagerMaxThreads(), ServiceConfig.get()
+				.getMessagingJobManagerSleepSecs()));
+
+		this.jobPool = MoreExecutors.getExitingExecutorService(new ThreadPoolExecutor(ServiceConfig.get()
+				.getMessagingJobManagerMinThreads(), ServiceConfig.get().getMessagingJobManagerMinThreads(), 5000, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>()), TERMINATION_TIMEOUT_IN_SECS, TimeUnit.SECONDS);
+
 		this.messagingService = messagingService;
 
-		LOG.info("Starting MessagingJobPool with poolSize " + DEFAULT_THREAD_POOL_SIZE);
 		messagingManagerThread = new MessagingJobManagerThread(MessagingJobManagerThread.class.getSimpleName());
 		isRunning = true;
 		messagingManagerThread.start();
