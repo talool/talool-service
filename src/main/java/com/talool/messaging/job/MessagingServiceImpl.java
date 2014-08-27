@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.googlecode.genericdao.search.Search;
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
 import com.talool.core.FactoryManager;
@@ -22,6 +23,7 @@ import com.talool.core.SearchOptions;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.ServiceException;
 import com.talool.domain.DealAcquireImpl;
+import com.talool.domain.job.MessagingJobImpl;
 import com.talool.messaging.MessagingFactory;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
@@ -68,13 +70,35 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 	@Override
 	public MessagingJob getMessagingJob(final Long jobId) throws ServiceException
 	{
-		return null;
+		MessagingJob job = null;
+		try
+		{
+			job = daoDispatcher.find(MessagingJobImpl.class, jobId);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getMessagingJob  " + jobId, ex);
+		}
+
+		return job;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<MessagingJob> getMessagingJobByMerchantAccount(final UUID merchantAccountId) throws ServiceException
+	public List<MessagingJob> getMessagingJobsByMerchantAccount(final Long createdByMerchantAccountId) throws ServiceException
 	{
-		return null;
+		final Search search = new Search(MessagingJobImpl.class);
+		try
+		{
+			search.addFilterEqual("createdByMerchantAccount.id", createdByMerchantAccountId);
+			return daoDispatcher.search(search);
+		}
+		catch (Exception ex)
+		{
+			String msg = "Problem getMessagingJobByCreatedMerchantAccount createdMerchantAccountId: " + createdByMerchantAccountId;
+			LOG.error(msg, ex);
+			throw new ServiceException(msg, ex);
+		}
 	}
 
 	@Override

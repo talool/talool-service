@@ -1,7 +1,6 @@
 package com.talool.service;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.talool.core.Customer;
 import com.talool.core.SearchOptions;
@@ -40,7 +39,7 @@ public interface MessagingService
 
 	public MessagingJob getMessagingJob(final Long jobId) throws ServiceException;
 
-	public List<MessagingJob> getMessagingJobByMerchantAccount(final UUID merchantAccountId) throws ServiceException;
+	public List<MessagingJob> getMessagingJobsByMerchantAccount(final Long createdByMerchantAccountId) throws ServiceException;
 
 	public List<MessagingJob> getJobsToProcess() throws ServiceException;
 
