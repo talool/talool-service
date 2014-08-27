@@ -16,5 +16,12 @@
 <bean id="messagingServiceImpl" class="com.talool.messaging.job.MessagingServiceImpl" >
 		<property name="daoDispatcher" ref="daoDispatcher" />
 		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>           
+</bean>           
+
+
+<bean id="messagingJobManager" class="com.talool.messaging.job.MessagingJobManager" factory-method="createInstance">
+  <constructor-arg ref="messagingServiceImpl" />
+</bean>
+
 </beans>
+	
