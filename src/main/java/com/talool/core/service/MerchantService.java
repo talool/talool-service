@@ -82,6 +82,8 @@ public interface MerchantService extends HibernateService
 	// DealOffer stuff
 	public void save(final DealOffer dealOffer) throws ServiceException;
 
+	public void save(final DealAcquire dealAcquire) throws ServiceException;
+
 	public void save(final List<DealAcquire> dealAcquires) throws ServiceException;
 
 	public DealOffer getDealOffer(final UUID dealOfferId) throws ServiceException;

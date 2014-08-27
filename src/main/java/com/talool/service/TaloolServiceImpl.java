@@ -89,6 +89,8 @@ import com.talool.domain.MerchantMediaImpl;
 import com.talool.domain.Properties;
 import com.talool.domain.PropertyCriteria;
 import com.talool.domain.TagImpl;
+import com.talool.domain.gift.GiftImpl;
+import com.talool.domain.job.MessagingJobImpl;
 import com.talool.domain.social.SocialNetworkImpl;
 import com.talool.payment.braintree.BraintreeUtil;
 import com.talool.persistence.HstoreUserType;
@@ -2495,6 +2497,16 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				queryStr = "from DealOfferPurchaseImpl as p where ";
 				queryStr += propertyCriteria.buildFilterClause("p.props");
 			}
+			else if (type.equals(GiftImpl.class))
+			{
+				queryStr = "from GiftImpl as g where ";
+				queryStr += propertyCriteria.buildFilterClause("g.props");
+			}
+			else if (type.equals(MessagingJobImpl.class))
+			{
+				queryStr = "from MessagingJobImpl as m where ";
+				queryStr += propertyCriteria.buildFilterClause("m.props");
+			}
 			else
 			{
 				throw new ServiceException("Unsupported entity class " + type.getClass().getSimpleName());
@@ -3238,6 +3250,22 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		{
 			throw new ServiceException("There was a problem saving dealAcquires", e);
 		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final DealAcquire dealAcquire) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(dealAcquire);
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem saving DealAcquire";
+			throw new ServiceException(err, e);
+		}
+
 	}
 
 }

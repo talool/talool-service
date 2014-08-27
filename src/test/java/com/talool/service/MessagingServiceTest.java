@@ -43,10 +43,10 @@ public class MessagingServiceTest extends HibernateFunctionalTestBase
 		try
 		{
 			List<Customer> targetedCustomers = new ArrayList<Customer>();
-			targetedCustomers.add(customerService.getCustomerByEmail("douglasmccuen@yahoo.com"));
-			targetedCustomers.add(customerService.getCustomerByEmail("doug@talool.com"));
+			// targetedCustomers.add(customerService.getCustomerByEmail("douglasmccuen@yahoo.com"));
+			// targetedCustomers.add(customerService.getCustomerByEmail("doug@talool.com"));
 			targetedCustomers.add(customerService.getCustomerByEmail("christopher.justin@gmail.com"));
-			targetedCustomers.add(customerService.getCustomerByEmail("cory@talool.com"));
+			// targetedCustomers.add(customerService.getCustomerByEmail("chris@talool.com"));
 
 			Customer fromCustomer = customerService.getCustomerByEmail("chris@talool.com");
 

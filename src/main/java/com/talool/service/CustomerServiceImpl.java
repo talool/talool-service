@@ -371,15 +371,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	/*
-	 * Redeems a deal. Uses a StatelessSession . Be careful with stateless
-	 * sessions:
+	 * Redeems a deal. Uses a StatelessSession . Be careful with stateless sessions:
 	 * 
-	 * http://docs.jboss.org/hibernate/core/3.3/api/org/hibernate/StatelessSession.
-	 * html
+	 * http://docs.jboss.org/hibernate/core/3.3/api/org/hibernate/StatelessSession. html
 	 * 
-	 * The reason a StatelessSession is used is so we dont break the transaction
-	 * upon any DB error, particularly a ConstraintViolation because we
-	 * optimistically believe redemptionCode is unique. If by chance it isn't, we
+	 * The reason a StatelessSession is used is so we dont break the transaction upon any DB error, particularly a
+	 * ConstraintViolation because we optimistically believe redemptionCode is unique. If by chance it isn't, we
 	 * regenerate a new one.
 	 */
 	@Override
@@ -1242,7 +1239,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	@Transactional(propagation = Propagation.NESTED)
+	@Transactional(propagation = Propagation.REQUIRED)
 	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final String email, final String receipientName)
 			throws ServiceException
 	{
@@ -1265,30 +1262,25 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		return gift.getId();
 
 	}
-	
+
 	@Override
-	public void giftToEmails(final Customer fromCustomer, final List<Customer> toCustomers, final Deal deal)
-			throws ServiceException {
-		
-		// TODO This is a long running operation that needs to be moved to a thread
-		// 		This is where the new Job object gets created
-		/*
-		for (Customer customer : toCustomers)
+	@Transactional(propagation = Propagation.REQUIRED)
+	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final EmailGift gift) throws ServiceException
+	{
+		createGift(owningCustomerId, dealAcquireId, gift);
+
+		if (!gift.getToEmail().contains(IGNORE_TEST_EMAIL_DOMAIN))
 		{
-			// create the deal acquire
-			DealAcquireImpl da = new DealAcquireImpl();
-			da.setDeal(deal);
-			da.setAcquireStatus(AcquireStatus.PURCHASED);
-			da.setCustomer(fromCustomer);
-			// save the deal acquire
-			daoDispatcher.save(da);
-					
-			// TODO put the job id on the gift (or deal acquire)
-			
-			// send the gift
-			giftToEmail(fromCustomer.getId(), da.getId(), customer.getEmail().toLowerCase(), customer.getFullName());
+			if (LOG.isDebugEnabled())
+			{
+				LOG.info("Sending gift email to " + gift.getToEmail());
+			}
+
+			ServiceFactory.get().getEmailService().sendGiftEmail(new EmailRequestParams<EmailGift>(gift));
+
 		}
-		*/
+
+		return gift.getId();
 	}
 
 	public UniqueCodeStrategy getRedemptionCodeStrategy()
@@ -2064,8 +2056,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Customer> getCustomers(CustomerCriteria criteria)
-			throws ServiceException {
+	public List<Customer> getCustomers(CustomerCriteria criteria) throws ServiceException
+	{
 		try
 		{
 			final Query query = criteria.getQuery(sessionFactory.getCurrentSession());
@@ -2078,12 +2070,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Override
-	public long getCustomerCount(CustomerCriteria criteria)
-			throws ServiceException {
+	public long getCustomerCount(CustomerCriteria criteria) throws ServiceException
+	{
 		try
 		{
 			final Query query = criteria.getCountQuery(sessionFactory.getCurrentSession());
-			return (Long)query.uniqueResult();
+			return (Long) query.uniqueResult();
 		}
 		catch (Exception ex)
 		{

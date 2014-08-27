@@ -1,8 +1,10 @@
 package com.talool.messaging.job;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.hibernate.Query;
@@ -15,17 +17,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
-import com.talool.core.DealAcquire;
+import com.talool.core.FactoryManager;
 import com.talool.core.SearchOptions;
+import com.talool.core.gift.EmailGift;
 import com.talool.core.service.ServiceException;
 import com.talool.domain.DealAcquireImpl;
-import com.talool.domain.job.RecipientStatusImpl;
 import com.talool.messaging.MessagingFactory;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.service.AbstractHibernateService;
 import com.talool.service.MessagingService;
+import com.talool.service.ServiceFactory;
 import com.talool.stats.PaginatedResult;
+import com.talool.utils.KeyValue;
 
 /**
  * Implementation of MessagingJobService
@@ -185,54 +189,56 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 	}
 
 	@Override
-	@Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
+	@Transactional(propagation = Propagation.NESTED)
 	public void processMerchantGifts(final MerchantGiftJob job, final List<RecipientStatus> recipientStatuses) throws ServiceException
 	{
-		final List<DealAcquire> dealAcquires = new ArrayList<DealAcquire>(recipientStatuses.size());
+		final Map<UUID, RecipientStatus> dealMap = new HashMap<UUID, RecipientStatus>();
 
+		// step #1 - batch generating deal acquires
 		for (RecipientStatus recipient : recipientStatuses)
 		{
-
-			DealAcquireImpl dac = new DealAcquireImpl();
+			final DealAcquireImpl dac = new DealAcquireImpl();
 			dac.setDeal(job.getDeal());
 			dac.setAcquireStatus(AcquireStatus.PURCHASED);
-			dac.setCustomer(recipient.getCustomer());
-			dealAcquires.add(dac);
-			if (LOG.isDebugEnabled())
-			{
-				LOG.debug("processing to:" + recipient.getCustomer().getEmail());
-			}
+			dac.setCustomer(job.getFromCustomer());
 
-			save(dac);
+			ServiceFactory.get().getTaloolService().save(dac);
+
+			UUID dealAcquireId = dac.getId();
+			dealMap.put(dealAcquireId, recipient);
+
+			// it is safer to remove the recipient here rather than wait for the gift to be created.
+			// a rare worst case is that on error below, a recipient will never get the email, but we are guarnateed they will
+			// not get a dup deal
+			daoDispatcher.remove(recipient);
 		}
 
-		daoDispatcher.flush(DealAcquireImpl.class);
+		// step #1 - its ok to ensure the merchants Merchant DealAcquires are saved first
+		getCurrentSession().flush();
+		getCurrentSession().clear();
+
+		// step #2 - lets generate gifts to the customers now based on the acquires persisted above
+		for (Entry<UUID, RecipientStatus> entry : dealMap.entrySet())
+		{
+			// if a ServiceException is thrown creating the gift, an email will not be sent
+			// however, created dealAcquires above will still be persisted (not rolled back)
+			final EmailGift emailGift = FactoryManager.get().getDomainFactory().newEmailGift();
+			emailGift.getProperties().createOrReplace(KeyValue.jobId, job.getId());
+			emailGift.setReceipientName(entry.getValue().getCustomer().getFullName());
+			emailGift.setToEmail(entry.getValue().getCustomer().getEmail().toLowerCase());
+			ServiceFactory.get().getCustomerService().giftToEmail(job.getFromCustomer().getId(), entry.getKey(), emailGift);
+		}
 
 		try
 		{
-			Query updateSends = sessionFactory.getCurrentSession().createQuery("update MerchantGiftJobImpl set sends=sends + :sends");
+			final Query updateSends = sessionFactory.getCurrentSession().createQuery("update MerchantGiftJobImpl set sends=sends + :sends");
 			updateSends.setParameter("sends", recipientStatuses.size());
 			updateSends.executeUpdate();
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+			throw new ServiceException("problem updating sends", ex);
 		}
-
-		for (RecipientStatus recipient : recipientStatuses)
-		{
-			daoDispatcher.remove(recipient);
-		}
-
-		daoDispatcher.flush(RecipientStatusImpl.class);
-
-		// TODO put the job id on the gift (or deal acquire)
-
-		// LOG.info("sending to:" + rs.getCustomer().getEmail());
-		// send the gift
-		// ServiceFactory.get().getCustomerService()
-		// .giftToEmail(messagingJob.getFromCustomer().getId(), daq.getId(), customer.getEmail().toLowerCase(),
-		// customer.getFullName());
 
 	}
 
@@ -257,4 +263,5 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 		}
 
 	}
+
 }

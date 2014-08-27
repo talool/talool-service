@@ -41,6 +41,8 @@ public class KeyValue implements Serializable
 	// Payment receipt containing break down of items
 	public static final String paymentReceipt = "payment_receipt";
 
+	public static final String jobId = "job_id";
+
 	public String key;
 	public String value;
 

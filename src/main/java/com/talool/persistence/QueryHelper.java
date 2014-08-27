@@ -428,7 +428,9 @@ public final class QueryHelper
 
 		RecipientStatuses(RECIPIENT_STATUSES, EMPTY_IMMUTABLE_PROPS),
 
-		RecipientStatusesCnt(RECIPIENT_STATUSES_CNT, EMPTY_IMMUTABLE_PROPS);
+		RecipientStatusesCnt(RECIPIENT_STATUSES_CNT, EMPTY_IMMUTABLE_PROPS),
+
+		GiftsByJobIdCnt(RECIPIENT_STATUSES_CNT, EMPTY_IMMUTABLE_PROPS);
 
 		private String query;
 		private ImmutableMap<String, String> propertyColumnMap;
