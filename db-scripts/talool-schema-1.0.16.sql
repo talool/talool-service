@@ -31,7 +31,7 @@ ALTER TABLE ONLY messaging_job ADD CONSTRAINT "FK_MessagingJob_Customer" FOREIGN
 ALTER TABLE ONLY messaging_job ADD CONSTRAINT "FK_MessagingJob_Deal" FOREIGN KEY (deal_id) 
   REFERENCES deal(deal_id);
 
-CREATE INDEX messaging_job_merchant_account_id_idx ON messaging_job (merchant_account_id);
+CREATE INDEX messaging_job_created_by_merchant_account_id_idx ON messaging_job (created_by_merchant_account_id);
 CREATE INDEX messaging_job_deal_id_idx ON messaging_job (deal_id);
 CREATE INDEX messaging_job_properties_idx ON messaging_job USING BTREE (properties);
 CREATE INDEX messaging_job_properties_gist_idx ON messaging_job USING GIST (properties);
