@@ -8,11 +8,9 @@ import com.talool.core.Money;
 import com.talool.utils.KeyValue;
 
 /**
- * Provides the business logic for calculating the Talool fee to charge sub
- * merchants at the time of purchase. Please see the Google doc
- * https://docs.google.com/a/talool.com/spreadsheets/d/1
- * UFWrvLZwaPGF7WWz6jiT8K9UOQehwvPVcXEDuMw2AK4/edit#gid=0 for details on the
- * logic.
+ * Provides the business logic for calculating the Talool fee to charge sub merchants at the time of purchase. Please
+ * see the Google doc https://docs.google.com/a/talool.com/spreadsheets/d/1
+ * UFWrvLZwaPGF7WWz6jiT8K9UOQehwvPVcXEDuMw2AK4/edit#gid=0 for details on the logic.
  * 
  * @author clintz
  * 
@@ -34,8 +32,7 @@ public final class PaymentCalculator
 	}
 
 	/**
-	 * TODO fundraiserDistributionPercent is set on publisher but can be override
-	 * by fundraiser . Any nulls go to defaults
+	 * TODO fundraiserDistributionPercent is set on publisher but can be override by fundraiser . Any nulls go to defaults
 	 * 
 	 * @param paymentProcessor
 	 * @param dealOffer
@@ -96,7 +93,8 @@ public final class PaymentCalculator
 		final Double taloolProcessingFee = Math.max(netRevenue.multiply(tfp).multiply(1 - tfdp).getValue().doubleValue(),
 				tfm.multiply(1 - tfdp).getValue().doubleValue());
 
-		Money fee = new Money(taloolProcessingFee).setRoundingMode(BigDecimal.ROUND_UP);
+		// rounding round_half_even - the "bankers' rounding"
+		Money fee = new Money(taloolProcessingFee).setRoundingMode(BigDecimal.ROUND_HALF_EVEN).add(paymentProcessingFee);
 
 		return new PaymentReceipt(fdp, tfdp, tfp, gross, tfm, paymentProcessingFee, fundraiserDistribution, netRevenue, fee);
 
