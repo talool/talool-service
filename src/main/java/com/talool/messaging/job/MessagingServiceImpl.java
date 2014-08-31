@@ -30,6 +30,7 @@ import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.service.AbstractHibernateService;
 import com.talool.service.MessagingService;
 import com.talool.service.ServiceFactory;
+import com.talool.service.mail.EmailCategory;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.KeyValue;
 
@@ -241,16 +242,19 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 		getCurrentSession().flush();
 		getCurrentSession().clear();
 
+		// the category set on the email message for Sendgrid
+		final String emailCategory = EmailCategory.Gift.toString() + "-" + job.getId();
 		// step #2 - lets generate gifts to the customers now based on the acquires persisted above
 		for (Entry<UUID, RecipientStatus> entry : dealMap.entrySet())
 		{
 			// if a ServiceException is thrown creating the gift, an email will not be sent
 			// however, created dealAcquires above will still be persisted (not rolled back)
 			final EmailGift emailGift = FactoryManager.get().getDomainFactory().newEmailGift();
+
 			emailGift.getProperties().createOrReplace(KeyValue.jobId, job.getId());
 			emailGift.setReceipientName(entry.getValue().getCustomer().getFullName());
 			emailGift.setToEmail(entry.getValue().getCustomer().getEmail().toLowerCase());
-			ServiceFactory.get().getCustomerService().giftToEmail(job.getFromCustomer().getId(), entry.getKey(), emailGift);
+			ServiceFactory.get().getCustomerService().giftToEmail(job.getFromCustomer().getId(), entry.getKey(), emailGift, emailCategory);
 		}
 
 		try

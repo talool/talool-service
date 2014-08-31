@@ -1265,7 +1265,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final EmailGift gift) throws ServiceException
+	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final EmailGift gift, final String emailCategory)
+			throws ServiceException
 	{
 		createGift(owningCustomerId, dealAcquireId, gift);
 
