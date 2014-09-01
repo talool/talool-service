@@ -1291,7 +1291,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				LOG.info("Sending gift email to " + gift.getToEmail());
 			}
 
-			ServiceFactory.get().getEmailService().sendGiftEmail(new EmailRequestParams<EmailGift>(gift));
+			ServiceFactory.get().getEmailService().sendGiftEmail(new EmailRequestParams<EmailGift>(gift), emailCategory);
 
 		}
 
