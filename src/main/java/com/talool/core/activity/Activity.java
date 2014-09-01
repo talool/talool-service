@@ -5,13 +5,14 @@ import java.util.Date;
 import java.util.UUID;
 
 import com.talool.core.IdentifiableUUID;
+import com.talool.core.PropertyEntity;
 
 /**
  * 
  * @author clintz
  * 
  */
-public interface Activity extends IdentifiableUUID, Serializable
+public interface Activity extends IdentifiableUUID, Serializable, PropertyEntity
 {
 	public ActivityEvent getActivityEvent();
 
@@ -26,6 +27,10 @@ public interface Activity extends IdentifiableUUID, Serializable
 	public void setCustomerId(final UUID customerId);
 
 	public void setActivityData(final byte[] activityData);
+
+	public boolean getIsOpened();
+
+	public void setIsOpened(final boolean isOpened);
 
 	public byte[] getActivityData();
 

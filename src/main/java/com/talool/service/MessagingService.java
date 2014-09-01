@@ -39,6 +39,8 @@ public interface MessagingService
 
 	public MessagingJob getMessagingJob(final Long jobId) throws ServiceException;
 
+	public void incrementGiftOpens(final Long jobId, final int totalOpens) throws ServiceException;
+
 	public List<MessagingJob> getMessagingJobsByMerchantAccount(final Long createdByMerchantAccountId) throws ServiceException;
 
 	public List<MessagingJob> getJobsToProcess() throws ServiceException;

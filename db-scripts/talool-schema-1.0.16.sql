@@ -55,5 +55,8 @@ ALTER TABLE gift add column properties HSTORE;
 CREATE INDEX gift_properties_idx ON gift USING BTREE (properties);
 CREATE INDEX gift_properties_gist_idx ON gift USING GIST (properties);
 
- 
+ALTER TABLE activity add column properties HSTORE;
+ALTER TABLE activity add column opened bool NOT NULL DEFAULT false;
+CREATE INDEX activity_properties_idx ON gift USING BTREE (properties);
+CREATE INDEX activity_properties_gist_idx ON gift USING GIST (properties); 
 COMMIT;
