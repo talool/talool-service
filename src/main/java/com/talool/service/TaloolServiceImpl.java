@@ -3152,7 +3152,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				id = dummy.getId().toString();
 
 				merchant.getProperties().createOrReplace(KeyValue.merchantCustomerId, id);
-				daoDispatcher.save(merchant);
+				merge(merchant);
+				// daoDispatcher.save(merchant);
 			}
 			catch (Exception e)
 			{
