@@ -65,7 +65,7 @@ public class BraintreeFeesTest
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
 		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .75f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
-				new Money(10.00), new Money(9.12), new Money(.63));
+				new Money(10.00), new Money(9.12), new Money(1.51));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
 				null);
@@ -75,8 +75,7 @@ public class BraintreeFeesTest
 	}
 
 	/**
-	 * Testing with a smaller Talool Fee Percent (TFP) of 50% . Represenative of
-	 * Bend
+	 * Testing with a smaller Talool Fee Percent (TFP) of 50% . Represenative of Bend
 	 */
 	@Test
 	public void testPublisherFeesCaseTwo()
@@ -104,8 +103,8 @@ public class BraintreeFeesTest
 		when(dealOffer.getMerchant()).thenReturn(publisher);
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
-		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .50f, .20f, new Money(2.50), new Money(2.50), new Money(.88),
-				new Money(10.00), new Money(9.12), new Money(1.25));
+		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .50f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
+				new Money(10.00), new Money(9.12), new Money(2.13));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
 				null);
@@ -129,8 +128,7 @@ public class BraintreeFeesTest
 	}
 
 	/**
-	 * Testing the case of every where else where the Talool Fee Discount Percent
-	 * is zero
+	 * Testing the case of every where else where the Talool Fee Discount Percent is zero
 	 * 
 	 */
 	@Test
@@ -160,7 +158,7 @@ public class BraintreeFeesTest
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
 		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, 0.0f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
-				new Money(10.00), new Money(9.12), new Money(2.50));
+				new Money(10.00), new Money(9.12), new Money(3.38));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
 				null);
@@ -199,7 +197,7 @@ public class BraintreeFeesTest
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
 		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.0f, 0.0f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
-				new Money(0.00), new Money(19.12), new Money(3.83));
+				new Money(0.00), new Money(19.12), new Money(4.70));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
 				null);
@@ -209,8 +207,7 @@ public class BraintreeFeesTest
 	}
 
 	/**
-	 * Tests override the Publisher fundraiserDistributionPercent by the
-	 * Fundraiser
+	 * Tests override the Publisher fundraiserDistributionPercent by the Fundraiser
 	 */
 	@Test
 	public void testOverridefundraiserDistributionPercent()
@@ -247,7 +244,7 @@ public class BraintreeFeesTest
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
 		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .75f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
-				new Money(10.00), new Money(9.12), new Money(.63));
+				new Money(10.00), new Money(9.12), new Money(1.51));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
 				fundraiser);

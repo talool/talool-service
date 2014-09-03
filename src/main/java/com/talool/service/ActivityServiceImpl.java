@@ -20,6 +20,7 @@ import com.talool.core.service.ServiceException;
 import com.talool.domain.activity.ActivityImpl;
 import com.talool.persistence.QueryHelper;
 import com.talool.utils.GraphiteConstants.Action;
+import com.talool.utils.KeyValue;
 import com.talool.utils.TaloolStatsDClient;
 
 /**
@@ -46,8 +47,7 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format(
-					"Problem saving activity for customerId " + activity.getCustomerId(), ex));
+			throw new ServiceException(String.format("Problem saving activity for customerId " + activity.getCustomerId(), ex));
 		}
 	}
 
@@ -62,9 +62,9 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 
 			QueryHelper.applySearchOptions(searchOpts, search);
 			search.addSort(Sort.asc("activityEvent"));
-			
+
 			TaloolStatsDClient.get().count(Action.get_activities, null, null, requestHeaders.get());
-			
+
 			return daoDispatcher.search(search);
 		}
 		catch (Exception ex)
@@ -101,10 +101,16 @@ public class ActivityServiceImpl extends AbstractHibernateService implements Act
 			final Search search = new Search(ActivityImpl.class);
 			search.addFilterEqual("id", actionId);
 			Activity activity = (Activity) daoDispatcher.searchUnique(search);
+			activity.setIsOpened(true);
 			ActivityFactory.setActionTaken(activity, true);
-			
 			save(activity);
-			
+
+			// if we have an associated jobId, lets increment the opens count
+			final Long jobId = activity.getProperties().getAsLong(KeyValue.jobId);
+			if (jobId != null)
+			{
+				ServiceFactory.get().getMessagingService().incrementGiftOpens(jobId, 1);
+			}
 			TaloolStatsDClient.get().count(Action.activity_action_taken, null, null, requestHeaders.get());
 		}
 		catch (Exception ex)

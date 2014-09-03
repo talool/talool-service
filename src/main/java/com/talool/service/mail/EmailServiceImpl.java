@@ -202,12 +202,12 @@ public class EmailServiceImpl implements EmailService
 		throw new ServiceException("UNSUPPORTED FUNCTION");
 
 	}
-	
+
 	@Override
-	public void sendMerchantAccountEmail( EmailRequestParams<MerchantAccount> emailRequestParams) throws ServiceException 
+	public void sendMerchantAccountEmail(EmailRequestParams<MerchantAccount> emailRequestParams) throws ServiceException
 	{
 		throw new ServiceException("UNSUPPORTED FUNCTION");
-		
+
 	}
 
 	@Override
@@ -217,11 +217,17 @@ public class EmailServiceImpl implements EmailService
 	}
 
 	@Override
-	public void sendTrackingCodeEmail(
-			EmailRequestParams<EmailTrackingCodeEntity> emailRequestParams)
-			throws ServiceException {
+	public void sendTrackingCodeEmail(EmailRequestParams<EmailTrackingCodeEntity> emailRequestParams) throws ServiceException
+	{
 		throw new ServiceException("UNSUPPORTED FUNCTION");
-		
+
+	}
+
+	@Override
+	public void sendGiftEmail(final EmailRequestParams<EmailGift> emailRequestParams, final String emailCategory)
+			throws ServiceException
+	{
+		throw new ServiceException("UNSUPPORTED FUNCTION");
 	}
 
 }

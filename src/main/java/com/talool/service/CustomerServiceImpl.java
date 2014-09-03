@@ -883,7 +883,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	}
 
 	@Transactional(propagation = Propagation.NESTED)
-	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift gift) throws ServiceException
+	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift gift, final Long jobId)
+			throws ServiceException
 	{
 		final DealAcquire dac = getDealAcquire(dealAcquireId);
 		Customer toCust = null;
@@ -945,6 +946,13 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				}
 			}
 
+			if (jobId != null)
+			{
+				// relating the messaging job to this send
+				recvActivity.getProperties().createOrReplace(KeyValue.jobId, jobId);
+				sendActivity.getProperties().createOrReplace(KeyValue.jobId, jobId);
+			}
+
 			if (LOG.isDebugEnabled() && toCust != null)
 			{
 				LOG.debug("Sending immediate activity to Talool customer " + toCust.getEmail());
@@ -974,6 +982,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		SubAction subaction = (gift instanceof FaceBookGift) ? SubAction.facebook : SubAction.email;
 		TaloolStatsDClient.get().count(Action.gift, subaction, gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
 
+	}
+
+	@Transactional(propagation = Propagation.NESTED)
+	public void createGift(final UUID owningCustomerId, final UUID dealAcquireId, final Gift gift) throws ServiceException
+	{
+		createGift(owningCustomerId, dealAcquireId, gift, null);
 	}
 
 	@Override
@@ -1265,9 +1279,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED)
-	public UUID giftToEmail(final UUID owningCustomerId, final UUID dealAcquireId, final EmailGift gift) throws ServiceException
+	public UUID giftToEmail(final Long jobId, final UUID owningCustomerId, final UUID dealAcquireId, final EmailGift gift,
+			final String emailCategory) throws ServiceException
 	{
-		createGift(owningCustomerId, dealAcquireId, gift);
+		createGift(owningCustomerId, dealAcquireId, gift, jobId);
 
 		if (!gift.getToEmail().contains(IGNORE_TEST_EMAIL_DOMAIN))
 		{
@@ -1276,7 +1291,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 				LOG.info("Sending gift email to " + gift.getToEmail());
 			}
 
-			ServiceFactory.get().getEmailService().sendGiftEmail(new EmailRequestParams<EmailGift>(gift));
+			ServiceFactory.get().getEmailService().sendGiftEmail(new EmailRequestParams<EmailGift>(gift), emailCategory);
 
 		}
 

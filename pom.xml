@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>talool-service</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.16-SNAPSHOT</version>
+	<version>1.0.18-SNAPSHOT</version>
 	<name>Talool Service</name>
 	<scm>
 		<connection>scm:git:git@github.com:talool/talool-service.git</connection>

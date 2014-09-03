@@ -18,9 +18,12 @@ public interface EmailService
 	public void sendPasswordRecoveryEmail(final EmailRequestParams<Customer> emailRequestParams) throws ServiceException;
 
 	public void sendGiftEmail(final EmailRequestParams<EmailGift> emailRequestParams) throws ServiceException;
-	
+
+	public void sendGiftEmail(final EmailRequestParams<EmailGift> emailRequestParams, final String emailCategory)
+			throws ServiceException;
+
 	public void sendTrackingCodeEmail(final EmailRequestParams<EmailTrackingCodeEntity> emailRequestParams) throws ServiceException;
-	
+
 	public void sendMerchantAccountEmail(final EmailRequestParams<MerchantAccount> emailRequestParams) throws ServiceException;
 
 	public void sendEmail(final EmailRequest<?> emailRequest) throws ServiceException;
