@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.talool.core.activity.Activity;
 import com.talool.core.activity.ActivityEvent;
+import com.talool.core.gift.EmailGift;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.MerchantSocialAccount;
 
@@ -44,11 +45,11 @@ public interface DomainFactory
 
 	public Location newLocation(final Double longitude, final Double latitude);
 
-	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer,
-			final RelationshipStatus status);
+	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer, final RelationshipStatus status);
 
 	public MerchantIdentity newMerchantIdentity(final UUID id, final String name);
 
-	public MerchantMedia newMedia(final UUID merchantId, final String mediaUrl,
-			final MediaType mediaType);
+	public MerchantMedia newMedia(final UUID merchantId, final String mediaUrl, final MediaType mediaType);
+
+	public EmailGift newEmailGift();
 }

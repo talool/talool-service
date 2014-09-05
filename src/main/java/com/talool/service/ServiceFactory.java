@@ -20,6 +20,7 @@ public final class ServiceFactory
 	private EmailService emailService;
 	private ActivityService activityService;
 	private AnalyticService analyticService;
+	private MessagingService messagingService;
 
 	private ServiceFactory()
 	{}
@@ -29,10 +30,9 @@ public final class ServiceFactory
 		return instance;
 	}
 
-	public static synchronized ServiceFactory createInstance(final TaloolService taloolService,
-			final CustomerService customerService, final EmailService emailService,
-			final ActivityService activityService,
-			final AnalyticService analyticService)
+	public static synchronized ServiceFactory createInstance(final TaloolService taloolService, final CustomerService customerService,
+			final EmailService emailService, final ActivityService activityService, final AnalyticService analyticService,
+			final MessagingService messagingService)
 	{
 		if (instance == null)
 		{
@@ -42,6 +42,7 @@ public final class ServiceFactory
 			instance.emailService = emailService;
 			instance.activityService = activityService;
 			instance.analyticService = analyticService;
+			instance.messagingService = messagingService;
 		}
 
 		return instance;
@@ -65,6 +66,11 @@ public final class ServiceFactory
 	public CustomerService getCustomerService()
 	{
 		return customerService;
+	}
+
+	public MessagingService getMessagingService()
+	{
+		return messagingService;
 	}
 
 	public EmailService getEmailService()

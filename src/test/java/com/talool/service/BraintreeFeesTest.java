@@ -103,7 +103,7 @@ public class BraintreeFeesTest
 		when(dealOffer.getMerchant()).thenReturn(publisher);
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
-		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .50f, .20f, new Money(2.50), new Money(2.50), new Money(.88),
+		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .50f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
 				new Money(10.00), new Money(9.12), new Money(2.13));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,

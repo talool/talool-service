@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.talool.core.Customer;
 import com.talool.core.Deal;
+import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferPurchase;
@@ -24,6 +25,7 @@ import com.talool.service.HibernateService;
 import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
+import com.talool.stats.FundraiserSummary;
 import com.talool.stats.MerchantCodeSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
@@ -39,9 +41,8 @@ public interface MerchantService extends HibernateService
 	public void save(final MerchantAccount merchantAccount) throws ServiceException;
 
 	/**
-	 * For now it will throw an error if there are more than 1 MerchantAccounts
-	 * for the given email . In order to support multiple accounts, do a separate
-	 * call to get the MerchantAccounts for the email
+	 * For now it will throw an error if there are more than 1 MerchantAccounts for the given email . In order to support
+	 * multiple accounts, do a separate call to get the MerchantAccounts for the email
 	 * 
 	 * @param email
 	 * @param password
@@ -82,6 +83,10 @@ public interface MerchantService extends HibernateService
 	// DealOffer stuff
 	public void save(final DealOffer dealOffer) throws ServiceException;
 
+	public void save(final DealAcquire dealAcquire) throws ServiceException;
+
+	public void save(final List<DealAcquire> dealAcquires) throws ServiceException;
+
 	public DealOffer getDealOffer(final UUID dealOfferId) throws ServiceException;
 
 	public List<DealOffer> getDealOffers() throws ServiceException;
@@ -93,8 +98,7 @@ public interface MerchantService extends HibernateService
 	public Deal getDeal(final UUID dealId) throws ServiceException;
 
 	/**
-	 * Gets all deals by deal offer. If activeDealsOnly=true, expired or inActive
-	 * deals will not be returned.
+	 * Gets all deals by deal offer. If activeDealsOnly=true, expired or inActive deals will not be returned.
 	 * 
 	 * @param dealOfferId
 	 * @param searchOpts
@@ -107,9 +111,9 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByDealOfferId(final UUID dealOfferId) throws ServiceException;
-	
+
 	public List<DealOfferPurchase> getDealOfferPurchasesByMerchantId(final UUID fundraiserId) throws ServiceException;
-	
+
 	public List<DealOfferPurchase> getDealOfferPurchasesByTrackingCode(final String code) throws ServiceException;
 
 	public DealOfferPurchase getDealOfferPurchase(final UUID dealOfferPurchaseId) throws ServiceException;
@@ -162,9 +166,8 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	/**
-	 * Gets active and non-expired DealOffer summaries within maxMiles of a
-	 * location. If the location is null or fields are zero or null then the
-	 * fallbackSearchOptions are used.
+	 * Gets active and non-expired DealOffer summaries within maxMiles of a location. If the location is null or fields
+	 * are zero or null then the fallbackSearchOptions are used.
 	 * 
 	 * @param location
 	 * @param maxMiles
@@ -215,8 +218,7 @@ public interface MerchantService extends HibernateService
 	public long getDealOfferSummaryCount(final String title) throws ServiceException;
 
 	/**
-	 * Gets all the offers of a publisher. A publishers offers are defined by a
-	 * merchant that is the publisher
+	 * Gets all the offers of a publisher. A publishers offers are defined by a merchant that is the publisher
 	 * 
 	 * @param publisherMerchantId
 	 * @param searchOpts
@@ -269,8 +271,8 @@ public interface MerchantService extends HibernateService
 	public long getMerchantSummaryCount(final String name, final PropertyCriteria propertyCriteria) throws ServiceException;
 
 	/**
-	 * Gets all the merchants of a publisher. A publishers merchants are defined
-	 * by having a location created by the publisher
+	 * Gets all the merchants of a publisher. A publishers merchants are defined by having a location created by the
+	 * publisher
 	 * 
 	 * @param publisherMerchantId
 	 * @param searchOpts
@@ -293,6 +295,18 @@ public interface MerchantService extends HibernateService
 	public long getPublisherMerchantSummaryCount(final UUID publisherMerchantId, final PropertyCriteria propertyCriteria)
 			throws ServiceException;
 
+	public PaginatedResult<FundraiserSummary> getPublisherFundraiserSummaries(final UUID publisherMerchantId, final SearchOptions searchOpts,
+			final boolean calculateRowSize) throws ServiceException;
+	
+	public long getPublisherFundraiserSummaryCount(final UUID publisherMerchantId)
+			throws ServiceException;
+	
+	public PaginatedResult<FundraiserSummary> getFundraiserSummaries(final SearchOptions searchOpts, final boolean calculateRowSize) 
+			throws ServiceException;
+	
+	public long getFundraiserSummaryCount() 
+			throws ServiceException;
+	
 	/**
 	 * Gets deals in an offer
 	 * 
@@ -313,10 +327,10 @@ public interface MerchantService extends HibernateService
 			throws ServiceException;
 
 	public Merchant getFundraiserByTrackingCode(final String code) throws ServiceException;
-	
+
 	public Customer getCustomerForMerchant(final Merchant merchant) throws ServiceException;
-	
-	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
+
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId,
 			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException;
 
 	public long getMerchantCodeSummaryCount(final UUID merchantId) throws ServiceException;

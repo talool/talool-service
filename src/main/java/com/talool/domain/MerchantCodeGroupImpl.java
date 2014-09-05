@@ -62,7 +62,7 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 	private String codeGroupTitle;
 
 	@Column(name = "code_group_notes", length = 128)
-	private String codeGroupNodes;
+	private String codeGroupNotes;
 
 	@Column(name = "total_codes", nullable = false)
 	private Short totalCodes;
@@ -103,7 +103,7 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 	@Override
 	public String getCodeGroupNotes()
 	{
-		return codeGroupNodes;
+		return codeGroupNotes;
 	}
 
 	@Override
@@ -128,9 +128,9 @@ public class MerchantCodeGroupImpl implements MerchantCodeGroup, Serializable
 		this.codeGroupTitle = codeGroupTitle;
 	}
 
-	public void setCodeGroupNodes(String codeGroupNodes)
+	public void setCodeGroupNotes(String codeGroupNodes)
 	{
-		this.codeGroupNodes = codeGroupNodes;
+		this.codeGroupNotes = codeGroupNodes;
 	}
 
 	public void setCreated(Date created)
