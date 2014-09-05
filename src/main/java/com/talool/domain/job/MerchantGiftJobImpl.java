@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import com.talool.core.Customer;
 import com.talool.core.Deal;
+import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.domain.DealImpl;
 import com.talool.messaging.job.MerchantGiftJob;
@@ -34,10 +35,10 @@ public class MerchantGiftJobImpl extends MessagingJobImpl implements MerchantGif
 	public MerchantGiftJobImpl()
 	{};
 
-	public MerchantGiftJobImpl(final MerchantAccount createdByMerchantAccount, final Customer fromCustomer, final Deal deal,
-			final Date scheduledStartDate, final String notes)
+	public MerchantGiftJobImpl(final Merchant merchant, final MerchantAccount createdByMerchantAccount, final Customer fromCustomer,
+			final Deal deal, final Date scheduledStartDate, final String notes)
 	{
-		super(createdByMerchantAccount, fromCustomer, scheduledStartDate, notes);
+		super(merchant, createdByMerchantAccount, fromCustomer, scheduledStartDate, notes);
 		this.deal = deal;
 	}
 

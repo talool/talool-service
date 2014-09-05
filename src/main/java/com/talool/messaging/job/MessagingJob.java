@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.talool.core.Customer;
 import com.talool.core.Identifiable;
+import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.PropertyEntity;
 
@@ -22,6 +23,20 @@ public interface MessagingJob extends Identifiable, Serializable, PropertyEntity
 	 * @return
 	 */
 	public MerchantAccount getCreatedByMerchantAccount();
+
+	/**
+	 * Gets the owning merchant of the job
+	 * 
+	 * @return merchant
+	 */
+	public Merchant getMerchant();
+
+	/**
+	 * Sets the owning merchant for the job
+	 * 
+	 * @param merchant
+	 */
+	public void setMerchant(final Merchant merchant);
 
 	/**
 	 * Gets the customer used for job sending

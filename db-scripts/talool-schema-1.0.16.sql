@@ -6,6 +6,7 @@ CREATE TYPE job_state AS ENUM ('STOPPED', 'STARTED', 'FINISHED', 'FAILED');
 
 CREATE TABLE messaging_job (
     messaging_job_id bigserial NOT NULL,
+    merchant_id UUID NOT NULL,
     created_by_merchant_account_id bigint NOT NULL,
     from_customer_id UUID NOT NULL,
     job_type character(2) NOT NULL,
@@ -24,6 +25,8 @@ CREATE TABLE messaging_job (
  );
  
 ALTER TABLE public.messaging_job OWNER TO talool;
+ALTER TABLE ONLY messaging_job ADD CONSTRAINT "FK_Merchant" FOREIGN KEY (merchant_id) 
+  REFERENCES merchant(merchant_id);
 ALTER TABLE ONLY messaging_job ADD CONSTRAINT "FK_MessagingJob_MerchantAccount" FOREIGN KEY (created_by_merchant_account_id) 
   REFERENCES merchant_account(merchant_account_id);
 ALTER TABLE ONLY messaging_job ADD CONSTRAINT "FK_MessagingJob_Customer" FOREIGN KEY (from_customer_id) 
@@ -33,6 +36,7 @@ ALTER TABLE ONLY messaging_job ADD CONSTRAINT "FK_MessagingJob_Deal" FOREIGN KEY
 
 CREATE INDEX messaging_job_created_by_merchant_account_id_idx ON messaging_job (created_by_merchant_account_id);
 CREATE INDEX messaging_job_deal_id_idx ON messaging_job (deal_id);
+CREATE INDEX messaging_job_merchant_id_idx ON messaging_job (merchant_id);
 CREATE INDEX messaging_job_properties_idx ON messaging_job USING BTREE (properties);
 CREATE INDEX messaging_job_properties_gist_idx ON messaging_job USING GIST (properties);
 
@@ -44,7 +48,7 @@ CREATE TABLE recipient_status (
  );
  
 ALTER TABLE public.recipient_status OWNER TO talool;
- ALTER TABLE ONLY recipient_status ADD CONSTRAINT "FK_RecipientStatus_MessagingJob" FOREIGN KEY (messaging_job_id) 
+ALTER TABLE ONLY recipient_status ADD CONSTRAINT "FK_RecipientStatus_MessagingJob" FOREIGN KEY (messaging_job_id) 
   REFERENCES messaging_job(messaging_job_id);
 ALTER TABLE ONLY recipient_status ADD CONSTRAINT "FK_RecipientStatus_Customer" FOREIGN KEY (customer_id) 
   REFERENCES customer(customer_id);
