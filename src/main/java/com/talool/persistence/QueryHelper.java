@@ -168,6 +168,22 @@ public final class QueryHelper
 			+ "JOIN (SELECT merchant_location_id, merchant_id, address1, address2, city, state_province_county, zip, phone, website_url, logo_url_id, merchant_image_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
 			+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 			+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' AND m.merchant_name ILIKE :name ";
+	
+	private static final String PUBLISHER_FUNDRAISER_SUMMARY = "SELECT m.merchant_id AS merchantId, m.merchant_name AS name,  %#m.properties AS properties, "
+			+ "(SELECT count(distinct deal_offer_purchase_id) FROM deal_offer_purchase WHERE properties->'merchant_code' IN " 
+			+ "(SELECT mc.code FROM merchant_code AS mc, merchant_code_group AS mcg WHERE mcg.merchant_code_group_id = mc.merchant_code_group_id AND mcg.merchant_id = m.merchant_id) ) AS dealOffersSoldCount, "
+			+ "(SELECT count(distinct mc.code) FROM merchant_code AS mc, merchant_code_group AS mcg WHERE mcg.merchant_code_group_id = mc.merchant_code_group_id AND mcg.merchant_id = m.merchant_id) AS merchantCodeCount "
+			+ "FROM merchant AS m "
+			+ "JOIN (SELECT merchant_location_id, merchant_id, create_dt, created_by_merchant_id FROM merchant_location ml1 "
+			+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.created_by_merchant_id=:publisherMerchantId AND ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+			+ "ON (m.merchant_id = l.merchant_id) WHERE m.is_discoverable = 't' ";
+	
+	private static final String FUNDRAISER_SUMMARY = "SELECT m.merchant_id AS merchantId, m.merchant_name AS name,  %#m.properties AS properties, "
+			+ "(SELECT count(distinct deal_offer_purchase_id) FROM deal_offer_purchase WHERE properties->'merchant_code' IN " 
+			+ "(SELECT mc.code FROM merchant_code AS mc, merchant_code_group AS mcg WHERE mcg.merchant_code_group_id = mc.merchant_code_group_id AND mcg.merchant_id = m.merchant_id) ) AS dealOffersSoldCount, "
+			+ "(SELECT count(distinct mc.code) FROM merchant_code AS mc, merchant_code_group AS mcg WHERE mcg.merchant_code_group_id = mc.merchant_code_group_id AND mcg.merchant_id = m.merchant_id) AS merchantCodeCount "
+			+ "FROM merchant AS m "
+			+ "WHERE m.is_discoverable = 't' ";
 
 	private static final String CUSTOMER_SUMMARY = "select c.customer_id as customerId,c.email as email,c.first_name as firstName,c.last_name as lastName,"
 			+ "c.create_dt as registrationDate,(select count(*) "
@@ -411,11 +427,16 @@ public final class QueryHelper
 				PUBLISHER_DEAL_OFFER_SUMMARY, EMPTY_IMMUTABLE_PROPS), DealOfferTitleSummary(DEAL_OFFER_TITLE_SUMMARY, EMPTY_IMMUTABLE_PROPS), PublisherDealOfferTitleSummary(
 				PUBLISHER_DEAL_OFFER_TITLE_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
-		MerchantSummaryCnt(MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), MerchantNameSummaryCnt(MERCHANT_NAME_SUMMARY_CNT,
-				EMPTY_IMMUTABLE_PROPS), PublisherMerchantSummaryCnt(PUBLISHER_MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), PublisherMerchantNameSummaryCnt(
-				PUBLISHER_MERCHANT_NAME_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), MerchantSummary(MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS), MerchantNameSummary(
-				MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS), PublisherMerchantSummary(PUBLISHER_MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS), PublisherMerchantNameSummary(
-				PUBLISHER_MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		MerchantSummaryCnt(MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), 
+		MerchantNameSummaryCnt(MERCHANT_NAME_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), 
+		PublisherMerchantSummaryCnt(PUBLISHER_MERCHANT_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), 
+		PublisherMerchantNameSummaryCnt(PUBLISHER_MERCHANT_NAME_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), 
+		MerchantSummary(MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS), 
+		MerchantNameSummary(MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS), 
+		PublisherMerchantSummary(PUBLISHER_MERCHANT_SUMMARY, EMPTY_IMMUTABLE_PROPS), 
+		PublisherMerchantNameSummary(PUBLISHER_MERCHANT_NAME_SUMMARY, EMPTY_IMMUTABLE_PROPS),
+		PublisherFundraiserSummary(PUBLISHER_FUNDRAISER_SUMMARY, EMPTY_IMMUTABLE_PROPS), 
+		FundraiserSummary(FUNDRAISER_SUMMARY, EMPTY_IMMUTABLE_PROPS),
 
 		MerchantCodeSummaryCnt(MERCHANT_CODE_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS), MerchantCodeSummary(MERCHANT_CODE_SUMMARY,
 				EMPTY_IMMUTABLE_PROPS),

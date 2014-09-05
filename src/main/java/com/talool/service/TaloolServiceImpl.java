@@ -102,6 +102,7 @@ import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferMetrics.MetricType;
 import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
+import com.talool.stats.FundraiserSummary;
 import com.talool.stats.MerchantCodeSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
@@ -3267,6 +3268,142 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throw new ServiceException(err, e);
 		}
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<FundraiserSummary> getPublisherFundraiserSummaries(
+			UUID publisherMerchantId, SearchOptions searchOpts,
+			boolean calculateRowSize) throws ServiceException {
+		PaginatedResult<FundraiserSummary> paginatedResult = null;
+		List<FundraiserSummary> summaries = null;
+		Long totalResults = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+
+		try
+		{
+
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherFundraiserSummary, criteria, searchOpts);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(FundraiserSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("dealOffersSoldCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantCodeCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
+
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<FundraiserSummary>) query.list();
+
+			if (summaries != null)
+			{
+				totalResults = (Long) getPublisherFundraiserSummaryCount(publisherMerchantId);
+			}
+
+			paginatedResult = new PaginatedResult<FundraiserSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherFundraiserSummary: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@Override
+	public long getPublisherFundraiserSummaryCount(UUID publisherMerchantId)
+			throws ServiceException {
+		Long total = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+		
+		try
+		{
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantSummaryCnt, criteria, null);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherFundraiserSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<FundraiserSummary> getFundraiserSummaries(
+			SearchOptions searchOpts, boolean calculateRowSize)
+			throws ServiceException {
+		PaginatedResult<FundraiserSummary> paginatedResult = null;
+		List<FundraiserSummary> summaries = null;
+		Long totalResults = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+
+		try
+		{
+
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.FundraiserSummary, criteria, searchOpts);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(FundraiserSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("dealOffersSoldCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantCodeCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<FundraiserSummary>) query.list();
+
+			if (summaries != null)
+			{
+				totalResults = (Long) getFundraiserSummaryCount();
+			}
+
+			paginatedResult = new PaginatedResult<FundraiserSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherFundraiserSummary: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@Override
+	public long getFundraiserSummaryCount() throws ServiceException {
+		Long total = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+		
+		try
+		{
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantSummaryCnt, criteria, null);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getFundraiserSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
 	}
 
 }
