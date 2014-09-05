@@ -57,7 +57,8 @@ public class MessagingServiceTest extends HibernateFunctionalTestBase
 
 			MerchantAccount merchantAccount = taloolService.getMerchantAccountById(2l); // chris@talool.com
 
-			MerchantGiftJob job = MessagingFactory.newMerchantGiftJob(merchantAccount, fromCustomer, deal, new Date(), "some job notes");
+			MerchantGiftJob job = MessagingFactory.newMerchantGiftJob(deal.getMerchant(), merchantAccount, fromCustomer, deal, new Date(),
+					"some job notes");
 
 			ServiceFactory.get().getMessagingService().scheduleMessagingJob(job, targetedCustomers);
 		}

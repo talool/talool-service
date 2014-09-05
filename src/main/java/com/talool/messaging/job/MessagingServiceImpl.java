@@ -257,8 +257,10 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 
 		try
 		{
-			final Query updateSends = sessionFactory.getCurrentSession().createQuery("update MerchantGiftJobImpl set sends=sends + :sends");
+			final Query updateSends = sessionFactory.getCurrentSession().createQuery(
+					"update MerchantGiftJobImpl set sends=sends + :sends where id=:jobId");
 			updateSends.setParameter("sends", recipientStatuses.size());
+			updateSends.setParameter("jobId", job.getId());
 			updateSends.executeUpdate();
 		}
 		catch (Exception ex)
@@ -276,7 +278,6 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 		{
 			final Query query = sessionFactory.getCurrentSession().createQuery(
 					"update MessagingJobImpl set jobState=:jobState,runningUpdateTime=:now where id=:jobId");
-
 			query.setParameter("jobId", jobId);
 			query.setParameter("jobState", jobState);
 			query.setParameter("now", Calendar.getInstance().getTime());

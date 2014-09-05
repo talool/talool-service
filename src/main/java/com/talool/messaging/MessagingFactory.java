@@ -5,6 +5,7 @@ import java.util.concurrent.Callable;
 
 import com.talool.core.Customer;
 import com.talool.core.Deal;
+import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.domain.job.MerchantGiftJobImpl;
 import com.talool.domain.job.RecipientStatusImpl;
@@ -26,10 +27,10 @@ public class MessagingFactory
 	 * 
 	 * @return MessagingJobBuilder
 	 */
-	public static MerchantGiftJob newMerchantGiftJob(final MerchantAccount createdByMerchantAccount, final Customer fromCustomer,
-			final Deal deal, final Date scheduledStartDate, final String notes)
+	public static MerchantGiftJob newMerchantGiftJob(final Merchant merchant, final MerchantAccount createdByMerchantAccount,
+			final Customer fromCustomer, final Deal deal, final Date scheduledStartDate, final String notes)
 	{
-		return new MerchantGiftJobImpl(createdByMerchantAccount, fromCustomer, deal, scheduledStartDate, notes);
+		return new MerchantGiftJobImpl(merchant, createdByMerchantAccount, fromCustomer, deal, scheduledStartDate, notes);
 	}
 
 	/**

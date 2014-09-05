@@ -2,7 +2,6 @@ package com.talool.domain.job;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -26,9 +25,11 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 
 import com.talool.core.Customer;
+import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.MerchantAccountImpl;
+import com.talool.domain.MerchantImpl;
 import com.talool.domain.Properties;
 import com.talool.messaging.job.JobState;
 import com.talool.messaging.job.MessagingJob;
@@ -55,12 +56,17 @@ public class MessagingJobImpl implements MessagingJob
 	@Column(name = "messaging_job_id", unique = true, nullable = false)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantAccountImpl.class, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantImpl.class)
+	@Fetch(value = FetchMode.JOIN)
+	@JoinColumn(name = "merchant_id")
+	private Merchant merchant;
+
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = MerchantAccountImpl.class)
 	@Fetch(value = FetchMode.JOIN)
 	@JoinColumn(name = "created_by_merchant_account_id")
 	private MerchantAccount createdByMerchantAccount;
 
-	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER, targetEntity = CustomerImpl.class)
 	@Fetch(value = FetchMode.JOIN)
 	@JoinColumn(name = "from_customer_id")
 	private Customer fromCustomer;
@@ -100,9 +106,10 @@ public class MessagingJobImpl implements MessagingJob
 	public MessagingJobImpl()
 	{}
 
-	public MessagingJobImpl(final MerchantAccount createdByMerchantAccount, final Customer fromCustomer, final Date scheduledStartDate,
-			final String notes)
+	public MessagingJobImpl(final Merchant merchant, final MerchantAccount createdByMerchantAccount, final Customer fromCustomer,
+			final Date scheduledStartDate, final String notes)
 	{
+		this.merchant = merchant;
 		this.createdByMerchantAccount = createdByMerchantAccount;
 		this.fromCustomer = fromCustomer;
 		this.jobState = JobState.STOPPED;
@@ -214,5 +221,17 @@ public class MessagingJobImpl implements MessagingJob
 			props = new Properties();
 		}
 		return props;
+	}
+
+	@Override
+	public Merchant getMerchant()
+	{
+		return merchant;
+	}
+
+	@Override
+	public void setMerchant(final Merchant merchant)
+	{
+		this.merchant = merchant;
 	}
 }
