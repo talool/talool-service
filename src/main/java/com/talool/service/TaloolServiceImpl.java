@@ -2570,7 +2570,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			mcg = new MerchantCodeGroupImpl(merchant);
 			mcg.setCreatedBymerchantAccountId(createdByMerchantAccountId);
 			mcg.setPublisherId(publisherId);
-			mcg.setCodeGroupNodes(codeGroupNotes);
+			mcg.setCodeGroupNotes(codeGroupNotes);
 			mcg.setCodeGroupTitle(codeGroupTitle);
 			mcg.setTotalCodes(totalCodes);
 			mcg.setCreated(Calendar.getInstance().getTime());
