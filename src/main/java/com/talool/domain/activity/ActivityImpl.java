@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,6 +17,7 @@ import org.hibernate.annotations.Type;
 
 import com.talool.core.activity.Activity;
 import com.talool.core.activity.ActivityEvent;
+import com.talool.domain.Properties;
 
 /**
  * 
@@ -53,6 +55,12 @@ public class ActivityImpl implements Activity
 
 	@Column(name = "activity_dt", insertable = false, updatable = false)
 	private Date activityDate;
+
+	@Column(name = "opened")
+	private boolean opened;
+
+	@Embedded
+	private Properties props;
 
 	@Override
 	public UUID getId()
@@ -122,18 +130,16 @@ public class ActivityImpl implements Activity
 
 		final ActivityImpl other = (ActivityImpl) obj;
 
-		return super.equals(obj) && new EqualsBuilder().append(getCustomerId(), other.getCustomerId())
-				.append(getActivityEvent(), other.getActivityEvent())
-				.append(getActivityDate(), other.getActivityDate())
-				.append(getActivityData(), other.getActivityData()).
-				isEquals();
+		return super.equals(obj)
+				&& new EqualsBuilder().append(getCustomerId(), other.getCustomerId()).append(getActivityEvent(), other.getActivityEvent())
+						.append(getActivityDate(), other.getActivityDate()).append(getActivityData(), other.getActivityData()).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder(17, 37).append(getCustomerId()).append(getActivityEvent()).
-				append(getActivityDate()).append(getActivityData()).hashCode();
+		return new HashCodeBuilder(17, 37).append(getCustomerId()).append(getActivityEvent()).append(getActivityDate())
+				.append(getActivityData()).hashCode();
 	}
 
 	@Override
@@ -146,5 +152,27 @@ public class ActivityImpl implements Activity
 	public void setGiftId(UUID giftId)
 	{
 		this.giftId = giftId;
+	}
+
+	@Override
+	public Properties getProperties()
+	{
+		if (props == null)
+		{
+			props = new Properties();
+		}
+		return props;
+	}
+
+	@Override
+	public boolean getIsOpened()
+	{
+		return opened;
+	}
+
+	@Override
+	public void setIsOpened(boolean isOpened)
+	{
+		this.opened = isOpened;
 	}
 }

@@ -26,12 +26,14 @@ import com.talool.core.RelationshipStatus;
 import com.talool.core.Tag;
 import com.talool.core.activity.Activity;
 import com.talool.core.activity.ActivityEvent;
+import com.talool.core.gift.EmailGift;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.MerchantSocialAccount;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.activity.ActivityImpl;
+import com.talool.domain.gift.EmailGiftImpl;
 import com.talool.domain.social.CustomerSocialAccountImpl;
 import com.talool.domain.social.MerchantSocialAccountImpl;
 
@@ -154,8 +156,7 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer,
-			final RelationshipStatus status)
+	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer, final RelationshipStatus status)
 	{
 		final Relationship rel = new RelationshipImpl();
 		rel.setFromCustomer(fromCustomer);
@@ -177,13 +178,11 @@ final class DomainFactoryImpl implements DomainFactory
 			TaloolService taloolService = FactoryManager.get().getServiceFactory().getTaloolService();
 
 			/*
-			 * Grab a DealOffer from the logged in Merchant and use it's expiration
-			 * date as the default for the Deal
+			 * Grab a DealOffer from the logged in Merchant and use it's expiration date as the default for the Deal
 			 */
 			try
 			{
-				List<DealOffer> offers = taloolService.getDealOffersByMerchantId(createdByMerchantAccount
-						.getMerchant().getId());
+				List<DealOffer> offers = taloolService.getDealOffersByMerchantId(createdByMerchantAccount.getMerchant().getId());
 				if (CollectionUtils.isNotEmpty(offers))
 				{
 					// TODO New Deals should default to the most recently updated
@@ -199,8 +198,7 @@ final class DomainFactoryImpl implements DomainFactory
 			}
 
 			/*
-			 * Pass the Merchant's tags to the Deal by default TODO should use
-			 * "reattach" rather than "refresh"
+			 * Pass the Merchant's tags to the Deal by default TODO should use "reattach" rather than "refresh"
 			 */
 			try
 			{
@@ -241,8 +239,7 @@ final class DomainFactoryImpl implements DomainFactory
 	}
 
 	@Override
-	public MerchantMedia newMedia(final UUID merchantId, final String mediaUrl,
-			final MediaType mediaType)
+	public MerchantMedia newMedia(final UUID merchantId, final String mediaUrl, final MediaType mediaType)
 	{
 		final MerchantMediaImpl media = new MerchantMediaImpl();
 		media.setMediaUrl(mediaUrl);
@@ -272,5 +269,11 @@ final class DomainFactoryImpl implements DomainFactory
 		act.setActivityEvent(activityType);
 		act.setCustomerId(customerId);
 		return act;
+	}
+
+	@Override
+	public EmailGift newEmailGift()
+	{
+		return new EmailGiftImpl();
 	}
 }

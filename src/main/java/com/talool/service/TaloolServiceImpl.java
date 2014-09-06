@@ -89,6 +89,8 @@ import com.talool.domain.MerchantMediaImpl;
 import com.talool.domain.Properties;
 import com.talool.domain.PropertyCriteria;
 import com.talool.domain.TagImpl;
+import com.talool.domain.gift.GiftImpl;
+import com.talool.domain.job.MessagingJobImpl;
 import com.talool.domain.social.SocialNetworkImpl;
 import com.talool.payment.braintree.BraintreeUtil;
 import com.talool.persistence.HstoreUserType;
@@ -100,6 +102,7 @@ import com.talool.stats.DealOfferMetrics;
 import com.talool.stats.DealOfferMetrics.MetricType;
 import com.talool.stats.DealOfferSummary;
 import com.talool.stats.DealSummary;
+import com.talool.stats.FundraiserSummary;
 import com.talool.stats.MerchantCodeSummary;
 import com.talool.stats.MerchantSummary;
 import com.talool.stats.PaginatedResult;
@@ -2495,6 +2498,16 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				queryStr = "from DealOfferPurchaseImpl as p where ";
 				queryStr += propertyCriteria.buildFilterClause("p.props");
 			}
+			else if (type.equals(GiftImpl.class))
+			{
+				queryStr = "from GiftImpl as g where ";
+				queryStr += propertyCriteria.buildFilterClause("g.props");
+			}
+			else if (type.equals(MessagingJobImpl.class))
+			{
+				queryStr = "from MessagingJobImpl as m where ";
+				queryStr += propertyCriteria.buildFilterClause("m.props");
+			}
 			else
 			{
 				throw new ServiceException("Unsupported entity class " + type.getClass().getSimpleName());
@@ -2557,7 +2570,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			mcg = new MerchantCodeGroupImpl(merchant);
 			mcg.setCreatedBymerchantAccountId(createdByMerchantAccountId);
 			mcg.setPublisherId(publisherId);
-			mcg.setCodeGroupNodes(codeGroupNotes);
+			mcg.setCodeGroupNotes(codeGroupNotes);
 			mcg.setCodeGroupTitle(codeGroupTitle);
 			mcg.setTotalCodes(totalCodes);
 			mcg.setCreated(Calendar.getInstance().getTime());
@@ -3018,7 +3031,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getDailyTrackingCodeCountByPublisher(UUID publisherId) throws ServiceException {
+	public long getDailyTrackingCodeCountByPublisher(UUID publisherId) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -3031,31 +3045,32 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		}
 		catch (Exception ex)
 		{
-			throw new ServiceException(String.format("Problem getDailyTrackingCodeCountByPublisher %s : %s", publisherId.toString(), ex.getMessage(), ex));
+			throw new ServiceException(String.format("Problem getDailyTrackingCodeCountByPublisher %s : %s", publisherId.toString(),
+					ex.getMessage(), ex));
 		}
 
 		return total == null ? 0 : total;
 	}
 
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByMerchantId(
-			UUID fundraiserId) throws ServiceException {
-		
+	public List<DealOfferPurchase> getDealOfferPurchasesByMerchantId(UUID fundraiserId) throws ServiceException
+	{
+
 		List<DealOfferPurchase> purchases = null;
-		
+
 		// TODO
 		// fundraiser's codes: merchant_code_groups where merchant_id = fundraiserId
 		// fundraiser's purchases: purchase where one of those codes in the merchant code property
 
 		return purchases;
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<DealOfferPurchase> getDealOfferPurchasesByTrackingCode(
-			String code) throws ServiceException {
-		
+	public List<DealOfferPurchase> getDealOfferPurchasesByTrackingCode(String code) throws ServiceException
+	{
+
 		List<DealOfferPurchase> purchases = null;
 
 		try
@@ -3071,9 +3086,9 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public MerchantCodeGroup getMerchantCodeGroupForCode(String code)
-			throws ServiceException {
-		
+	public MerchantCodeGroup getMerchantCodeGroupForCode(String code) throws ServiceException
+	{
+
 		if (code == null)
 		{
 			return null;
@@ -3103,17 +3118,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see com.talool.core.service.MerchantService#getCustomerForMerchant(com.talool.core.Merchant)
 	 * 
-	 * Gets (or creates) a "dummy" customer for a merchant for using in sending gifts to customers in the app.
-	 * The dummy customer id is stored in a property on the merchant after it has been created.
+	 * Gets (or creates) a "dummy" customer for a merchant for using in sending gifts to customers in the app. The dummy
+	 * customer id is stored in a property on the merchant after it has been created.
 	 */
 	@Override
-	public Customer getCustomerForMerchant(Merchant merchant)
-			throws ServiceException {
-		
+	public Customer getCustomerForMerchant(Merchant merchant) throws ServiceException
+	{
+
 		Customer dummy = null;
-		
+
 		String id = merchant.getProperties().getAsString(KeyValue.merchantCustomerId);
 		if (StringUtils.isEmpty(id))
 		{
@@ -3123,25 +3139,26 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				dummy = new CustomerImpl();
 				dummy.setFirstName(merchant.getName());
 				dummy.setLastName("");
-				
+
 				StringBuilder sb = new StringBuilder();
 				sb.append("dummy").append((new Date()).getTime());
 				dummy.setPassword(sb.toString());
 				sb.append("@talool.com");
 				dummy.setEmail(sb.toString());
-				
+
 				dummy.setSex(Sex.Unknown);
-				
+
 				daoDispatcher.save(dummy);
-				
+
 				id = dummy.getId().toString();
-				
+
 				merchant.getProperties().createOrReplace(KeyValue.merchantCustomerId, id);
-				daoDispatcher.save(merchant);
+				merge(merchant);
+				// daoDispatcher.save(merchant);
 			}
 			catch (Exception e)
 			{
-				throw new ServiceException("Failed to create customer for merchant with merchant: "+merchant.getName(), e);
+				throw new ServiceException("Failed to create customer for merchant with merchant: " + merchant.getName(), e);
 			}
 		}
 		else
@@ -3154,7 +3171,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			}
 			catch (Exception e)
 			{
-				throw new ServiceException("Failed to find customer for merchant with customer id: "+id, e);
+				throw new ServiceException("Failed to find customer for merchant with customer id: " + id, e);
 			}
 		}
 		return dummy;
@@ -3162,13 +3179,14 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId, 
-			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException {
-		
+	public PaginatedResult<MerchantCodeSummary> getMerchantCodeSummariesForFundraiser(final UUID merchantId,
+			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException
+	{
+
 		PaginatedResult<MerchantCodeSummary> paginatedResult = null;
 		List<MerchantCodeSummary> codes = null;
 		Long totalResults = null;
-		
+
 		try
 		{
 			String newSql = QueryHelper.buildQuery(QueryType.MerchantCodeSummary, null, searchOpts, true);
@@ -3181,10 +3199,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("purchaseCount", StandardBasicTypes.INTEGER);
 
 			query.setParameter("merchantId", merchantId, PostgresUUIDType.INSTANCE);
-			
+
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 			codes = (List<MerchantCodeSummary>) query.list();
-			
+
 			if (calculateTotalResults && codes != null)
 			{
 				totalResults = (Long) getMerchantCodeSummaryCount(merchantId);
@@ -3201,8 +3219,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getMerchantCodeSummaryCount(UUID merchantId)
-			throws ServiceException {
+	public long getMerchantCodeSummaryCount(final UUID merchantId) throws ServiceException
+	{
 		Long total = null;
 
 		try
@@ -3221,5 +3239,171 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 		return total == null ? 0 : total;
 	}
-	
+
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void save(final List<DealAcquire> dealAcquires) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(dealAcquires);
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("There was a problem saving dealAcquires", e);
+		}
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void save(final DealAcquire dealAcquire) throws ServiceException
+	{
+		try
+		{
+			daoDispatcher.save(dealAcquire);
+		}
+		catch (Exception e)
+		{
+			final String err = "There was a problem saving DealAcquire";
+			throw new ServiceException(err, e);
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<FundraiserSummary> getPublisherFundraiserSummaries(
+			UUID publisherMerchantId, SearchOptions searchOpts,
+			boolean calculateRowSize) throws ServiceException {
+		PaginatedResult<FundraiserSummary> paginatedResult = null;
+		List<FundraiserSummary> summaries = null;
+		Long totalResults = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+
+		try
+		{
+
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherFundraiserSummary, criteria, searchOpts);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(FundraiserSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("dealOffersSoldCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantCodeCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
+
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<FundraiserSummary>) query.list();
+
+			if (summaries != null)
+			{
+				totalResults = (Long) getPublisherFundraiserSummaryCount(publisherMerchantId);
+			}
+
+			paginatedResult = new PaginatedResult<FundraiserSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherFundraiserSummary: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@Override
+	public long getPublisherFundraiserSummaryCount(UUID publisherMerchantId)
+			throws ServiceException {
+		Long total = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+		
+		try
+		{
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantSummaryCnt, criteria, null);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setParameter("publisherMerchantId", publisherMerchantId, PostgresUUIDType.INSTANCE);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherFundraiserSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PaginatedResult<FundraiserSummary> getFundraiserSummaries(
+			SearchOptions searchOpts, boolean calculateRowSize)
+			throws ServiceException {
+		PaginatedResult<FundraiserSummary> paginatedResult = null;
+		List<FundraiserSummary> summaries = null;
+		Long totalResults = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+
+		try
+		{
+
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.FundraiserSummary, criteria, searchOpts);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(FundraiserSummary.class));
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("name", StandardBasicTypes.STRING);
+			query.addScalar("dealOffersSoldCount", StandardBasicTypes.INTEGER);
+			query.addScalar("merchantCodeCount", StandardBasicTypes.INTEGER);
+			query.addScalar("properties", StandardBasicTypes.STRING);
+
+			QueryHelper.applyOffsetLimit(query, searchOpts);
+			summaries = (List<FundraiserSummary>) query.list();
+
+			if (summaries != null)
+			{
+				totalResults = (Long) getFundraiserSummaryCount();
+			}
+
+			paginatedResult = new PaginatedResult<FundraiserSummary>(searchOpts, totalResults, summaries);
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getPublisherFundraiserSummary: " + ex.getMessage(), ex);
+		}
+
+		return paginatedResult;
+	}
+
+	@Override
+	public long getFundraiserSummaryCount() throws ServiceException {
+		Long total = null;
+		
+		PropertyCriteria criteria = new PropertyCriteria();
+		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
+		
+		try
+		{
+			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantSummaryCnt, criteria, null);
+
+			final SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.addScalar("totalResults", StandardBasicTypes.LONG);
+			total = (Long) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getFundraiserSummaryCount: " + ex.getMessage(), ex);
+		}
+
+		return total == null ? 0 : total;
+	}
+
 }

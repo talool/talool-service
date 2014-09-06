@@ -52,10 +52,17 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String IMAGE_MAGICK_PATH = "image.magick.path";
 
 	public static final String STATSD_ENVIRONMENT_IS_PRODUCTION = "statsd.environment.is.production";
-	
+
 	public static final String PUBLISHER_CODE_QUOTA = "publisher.code.generation.daily.quota";
 	public static final String PUBLISHER_CODE_TEMPLATE = "publisher.code.template";
 	public static final String PUBLISHER_CODE_SUBJ = "publisher.code.subject";
+
+	public static final String MESSAGING_JOB_MANAGER_ACTIVE = "messaging.job.manager.active";
+	public static final String MESSAGING_JOB_MANAGER_MAX_THREADS = "messaging.job.manager.max.threads";
+	public static final String MESSAGING_JOB_MANAGER_MIN_THREADS = "messaging.job.manager.min.threads";
+	public static final String MESSAGING_JOB_MANAGER_SLEEP_SECS = "messaging.job.manager.sleep.secs";
+	public static final String MESSAGING_JOB_MANAGER_TASK_MAX_ATTEMPTS = "messaging.job.manager.task.max.attempts";
+	public static final String MESSAGING_JOB_MANAGER_TASK_BATCH_SIZE = "messaging.job.manager.task.batch.size";
 
 	// private static final String UPLOAD_LOGO_MAX_SIZE_BYTES =
 	// "upload.logo.max.size.bytes";
@@ -161,7 +168,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	{
 		return getString(REGISTRATION_SUBJ);
 	}
-	
+
 	public String getTrackingCodeTemplate()
 	{
 		return getString(PUBLISHER_CODE_TEMPLATE);
@@ -251,7 +258,7 @@ public class ServiceConfig extends PropertiesConfiguration
 	{
 		return getLong(TALOOL_PUBLISHER_MERCHANT_ACCOUNT_ID);
 	}
-	
+
 	public long getPublisherCodeGenerationDailyQuota()
 	{
 		return getLong(PUBLISHER_CODE_QUOTA);
@@ -260,6 +267,36 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getAndReplace(final String key, final String propertyKey, final String propertyVal)
 	{
 		return getString(key).replaceFirst(propertyKey, propertyVal);
+	}
+
+	public boolean getMessagingJobManagerActive()
+	{
+		return getBoolean(MESSAGING_JOB_MANAGER_ACTIVE, false);
+	}
+
+	public int getMessagingJobManagerMaxThreads()
+	{
+		return getInteger(MESSAGING_JOB_MANAGER_MAX_THREADS, 0);
+	}
+
+	public int getMessagingJobManagerMinThreads()
+	{
+		return getInteger(MESSAGING_JOB_MANAGER_MIN_THREADS, 0);
+	}
+
+	public int getMessagingJobManagerSleepSecs()
+	{
+		return getInteger(MESSAGING_JOB_MANAGER_SLEEP_SECS, 0);
+	}
+
+	public int getMessagingJobManagerTaskMaxAttempts()
+	{
+		return getInteger(MESSAGING_JOB_MANAGER_TASK_MAX_ATTEMPTS, 3);
+	}
+
+	public int getMessagingJobManagerTaskBatchSize()
+	{
+		return getInteger(MESSAGING_JOB_MANAGER_TASK_BATCH_SIZE, 100);
 	}
 
 	public static synchronized ServiceConfig createInstance(final String propertyFile)
