@@ -35,8 +35,7 @@ import com.talool.utils.KeyValue;
 /**
  * Braintree Utils
  * 
- * TODO - Create a PaymentProcessor interface and move these methods into an
- * implementation
+ * TODO - Create a PaymentProcessor interface and move these methods into an implementation
  * 
  * @author clintz
  * 
@@ -90,8 +89,7 @@ public class BraintreeUtil
 	/**
 	 * Creates a descriptor seen on card statements
 	 * 
-	 * @see https 
-	 *      ://www.braintreepayments.com/docs/java/transactions/dynamic_descriptors
+	 * @see https ://www.braintreepayments.com/docs/java/transactions/dynamic_descriptors
 	 * 
 	 * @param dealOffer
 	 * @return descriptor as a String
@@ -100,6 +98,11 @@ public class BraintreeUtil
 	{
 		return StringUtils.left(COMPANY_PREFIX_DESCRIPTOR + dealOffer.getTitle().replaceAll(CLEAN_REGEX_DESCRIPTOR, "").trim(),
 				PRODUCT_DESCRIPTOR_MAX_LEN).toUpperCase();
+	}
+
+	private TransactionResult getTransactionResult(final Result<Transaction> result) throws ProcessorException
+	{
+		return getTransactionResult(result, null);
 	}
 
 	private TransactionResult getTransactionResult(final Result<Transaction> result, final PaymentReceipt paymentReceipt)
@@ -289,6 +292,40 @@ public class BraintreeUtil
 		return gateway.merchantAccount().find(merchantAccountId);
 	}
 
+	/**
+	 * Refunds or voids the full amount of the transaction if it exists. A Refund occurs if the transaction is settling or
+	 * settled, or voids if the transaction has not yet begun settlement
+	 * 
+	 * @param transactionId
+	 * @return true/false on success/fail or throws com.braintreegateway.exceptions.NotFoundException
+	 * @throws ProcessorException
+	 */
+	public TransactionResult refundOrVoid(final String transactionId) throws ProcessorException
+	{
+		final Transaction transaction = gateway.transaction().find(transactionId);
+		// transaction should never be null because if it is not found it will throw an exception
+
+		switch (transaction.getStatus())
+		{
+			case VOIDED:
+				return TransactionResult.failedTransaction("Transaction is already VOID");
+
+			case AUTHORIZED:
+			case SUBMITTED_FOR_SETTLEMENT:
+				return getTransactionResult(gateway.transaction().voidTransaction(transactionId));
+
+			case SETTLED:
+			case SETTLING:
+				return getTransactionResult(gateway.transaction().refund(transactionId));
+
+			default:
+				return TransactionResult.failedTransaction((String.format("Cannot void/refeund transactionId %s - status is %s",
+						transactionId, transaction.getStatus())));
+
+		}
+
+	}
+
 	public Result<MerchantAccount> updateMerchantAccount(final String merchantAccountId, final MerchantAccountRequest request)
 	{
 		return gateway.merchantAccount().update(merchantAccountId, request);
@@ -384,4 +421,5 @@ public class BraintreeUtil
 		return transResult;
 
 	}
+
 }
