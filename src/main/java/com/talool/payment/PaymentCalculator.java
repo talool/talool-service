@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
 import com.talool.core.Money;
+import com.talool.domain.Properties;
 import com.talool.utils.KeyValue;
 
 /**
@@ -48,14 +49,22 @@ public final class PaymentCalculator
 		Float tfPercent = null;
 		Double tfMin = null;
 
-		// fundraiserDistributionPercent on publisher can be override by fundraisers
-		if (fundraiser == null || (fdpPercent = fundraiser.getProperties().getAsFloat(KeyValue.fundraiserDistributionPercent)) == null)
+		if (fundraiser != null)
 		{
-			fdpPercent = publisher.getProperties().getAsFloat(KeyValue.fundraiserDistributionPercent);
+			Properties fundraiserProps = fundraiser.getProperties();
+			if (fundraiserProps != null)
+			{
+				fdpPercent = fundraiser.getProperties().getAsFloat(KeyValue.fundraiserDistributionPercent);
+			}
 			if (fdpPercent == null)
 			{
-				fdpPercent = DEFAULT_FUNDRAISER_DIST_PERC;
+				fdpPercent = publisher.getProperties().getAsFloat(KeyValue.fundraiserDistributionPercent);
 			}
+		}
+
+		if (fdpPercent == null)
+		{
+			fdpPercent = DEFAULT_FUNDRAISER_DIST_PERC;
 		}
 
 		final float fdp = fdpPercent / 100;
