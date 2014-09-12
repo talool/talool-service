@@ -2868,6 +2868,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 				query = sessionFactory.getCurrentSession().createQuery("update MerchantAccountImpl set props=:properties where id=:id");
 				query.setParameter("id", ((MerchantAccount) entity).getId());
 			}
+			else if (entity instanceof DealOfferPurchase)
+			{
+				query = sessionFactory.getCurrentSession().createQuery("update DealOfferPurchaseImpl set props=:properties where id=:id");
+				query.setParameter("id", ((MerchantAccount) entity).getId());
+			}
 
 			query.setParameter("properties", properties.getAllProperties(), HstoreUserType.TYPE);
 
@@ -2904,6 +2909,11 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			{
 				query = sessionFactory.getCurrentSession()
 						.createSQLQuery("select distinct skeys( properties ) as keys from merchant_location");
+			}
+			else if (entity == DealOfferPurchase.class)
+			{
+				query = sessionFactory.getCurrentSession()
+						.createSQLQuery("select distinct skeys( properties ) as keys from deal_offer_purchase");
 			}
 
 			return query.list();

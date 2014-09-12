@@ -158,7 +158,7 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 	@Override
 	public String getProcessorTransactionId()
 	{
-		return getProcessorTransactionId();
+		return processorTransactionId;
 	}
 
 	@Override
