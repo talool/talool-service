@@ -64,11 +64,49 @@ public class BraintreeFeesTest
 		when(dealOffer.getMerchant()).thenReturn(publisher);
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
+		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(0f, .75f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
+				new Money(0.00), new Money(19.12), new Money(1.84));
+
+		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
+				null);
+
+		Assert.assertEquals(expectedPaymentReceipt.toString(), paymentReceipt.toString());
+
+	}
+
+	@Test
+	public void testFundraiserValidPublisherOverride()
+	{
+		// mock publisher
+		Properties publisherProps = mock(Properties.class);
+		when(publisherProps.getAsString(KeyValue.braintreeSubmerchantId)).thenReturn("paybackbook_instant_f2k625v4");
+		when(publisherProps.getAsString(KeyValue.braintreeSubmerchantStatus)).thenReturn("ACTIVE");
+		when(publisherProps.getAsString(KeyValue.braintreeSubmerchantStatusTimestamp)).thenReturn("1406168391000");
+		when(publisherProps.getAsFloat(KeyValue.fundraiserDistributionPercent)).thenReturn(50.0f);
+
+		Merchant publisher = mock(Merchant.class);
+		when(publisher.getName()).thenReturn("Payback Book");
+		when(publisher.getProperties()).thenReturn(publisherProps);
+
+		Merchant fundraiser = mock(Merchant.class);
+
+		// mock deal offer
+		Properties dealOfferProps = mock(Properties.class);
+
+		when(dealOfferProps.getAsFloat(KeyValue.taloolFeeDiscountPercent)).thenReturn(75.0f);
+		when(dealOfferProps.getAsFloat(KeyValue.taloolFeePercent)).thenReturn(20.0f);
+		when(dealOfferProps.getAsDouble(KeyValue.taloolFeeMinumum)).thenReturn(2.5);
+
+		DealOffer dealOffer = mock(DealOffer.class);
+		when(dealOffer.getPrice()).thenReturn(20.0f);
+		when(dealOffer.getMerchant()).thenReturn(publisher);
+		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
+
 		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .75f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
 				new Money(10.00), new Money(9.12), new Money(1.51));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
-				null);
+				fundraiser);
 
 		Assert.assertEquals(expectedPaymentReceipt.toString(), paymentReceipt.toString());
 
@@ -103,11 +141,17 @@ public class BraintreeFeesTest
 		when(dealOffer.getMerchant()).thenReturn(publisher);
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
+		Merchant fundraiser = mock(Merchant.class);
+		Properties fundraiserProps = mock(Properties.class);
+
+		when(fundraiser.getProperties()).thenReturn(fundraiserProps);
+		when(fundraiserProps.getAsFloat(KeyValue.fundraiserDistributionPercent)).thenReturn(null);
+
 		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, .50f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
 				new Money(10.00), new Money(9.12), new Money(2.13));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
-				null);
+				fundraiser);
 
 		Assert.assertEquals(expectedPaymentReceipt.getFundraiserDistributionPercent(), paymentReceipt.getFundraiserDistributionPercent(),
 				0);
@@ -128,7 +172,7 @@ public class BraintreeFeesTest
 	}
 
 	/**
-	 * Testing the case of every where else where the Talool Fee Discount Percent is zero
+	 * Testing another case of no publisher
 	 * 
 	 */
 	@Test
@@ -157,8 +201,8 @@ public class BraintreeFeesTest
 		when(dealOffer.getMerchant()).thenReturn(publisher);
 		when(dealOffer.getProperties()).thenReturn(dealOfferProps);
 
-		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(.50f, 0.0f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
-				new Money(10.00), new Money(9.12), new Money(3.38));
+		PaymentReceipt expectedPaymentReceipt = new PaymentReceipt(0f, 0.0f, .20f, new Money(20.00), new Money(2.50), new Money(.88),
+				new Money(0.00), new Money(19.12), new Money(4.70));
 
 		PaymentReceipt paymentReceipt = PaymentCalculator.get().generatePaymentReceipt(PaymentProcessor.BRAINTREE, dealOffer, publisher,
 				null);
