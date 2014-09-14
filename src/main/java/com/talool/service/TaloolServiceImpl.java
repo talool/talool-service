@@ -3451,14 +3451,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 				// TODO - Be careful! This deletes all purchases of a book rather than a single book (if the customer purcahsed
 				// multiple books)
-				final SQLQuery query = getCurrentSession()
-						.createSQLQuery(
-								"delete from deal_acquire where customer_id=:customerId and deal_id in (select deal_id from deal where deal_offer_id=:dealOfferId)");
+				int totalDeleted = 0;
+				if (removeDealAcquires)
+				{
+					final SQLQuery query = getCurrentSession()
+							.createSQLQuery(
+									"delete from deal_acquire where customer_id=:customerId and deal_id in (select deal_id from deal where deal_offer_id=:dealOfferId)");
 
-				query.setParameter("customerId", dealOfferPurchase.getCustomer().getId(), PostgresUUIDType.INSTANCE);
-				query.setParameter("dealOfferId", dealOfferPurchase.getDealOffer().getId(), PostgresUUIDType.INSTANCE);
+					query.setParameter("customerId", dealOfferPurchase.getCustomer().getId(), PostgresUUIDType.INSTANCE);
+					query.setParameter("dealOfferId", dealOfferPurchase.getDealOffer().getId(), PostgresUUIDType.INSTANCE);
 
-				int totalDeleted = query.executeUpdate();
+					totalDeleted = query.executeUpdate();
+				}
 
 				return new RefundResult(refundType, totalDeleted);
 			}
