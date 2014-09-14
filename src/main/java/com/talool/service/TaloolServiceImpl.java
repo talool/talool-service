@@ -63,10 +63,12 @@ import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
 import com.talool.core.PropertyEntity;
+import com.talool.core.RefundResult;
 import com.talool.core.SearchOptions;
 import com.talool.core.Sex;
 import com.talool.core.Tag;
 import com.talool.core.purchase.UniqueCodeStrategy;
+import com.talool.core.service.ProcessorException;
 import com.talool.core.service.ServiceException;
 import com.talool.core.service.TaloolService;
 import com.talool.core.social.SocialNetwork;
@@ -93,6 +95,8 @@ import com.talool.domain.gift.GiftImpl;
 import com.talool.domain.job.MessagingJobImpl;
 import com.talool.domain.social.SocialNetworkImpl;
 import com.talool.payment.braintree.BraintreeUtil;
+import com.talool.payment.braintree.BraintreeUtil.RefundType;
+import com.talool.payment.braintree.BraintreeUtil.RefundVoidResult;
 import com.talool.persistence.HstoreUserType;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
@@ -1377,10 +1381,22 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	{
 		try
 		{
-			final Query query = getCurrentSession().createQuery("delete from CustomerImpl where id=:customerId").setParameter("customerId",
+			int deleted = 0;
+			Query query = getCurrentSession().createQuery("delete from CustomerImpl where id=:customerId").setParameter("customerId",
 					customerId);
 
-			query.executeUpdate();
+			deleted = query.executeUpdate();
+
+			query = getCurrentSession().createQuery("delete from ActivityImpl where customerId=:customerId").setParameter("customerId",
+					customerId);
+
+			deleted = query.executeUpdate();
+
+			query = getCurrentSession().createSQLQuery(
+					"delete from gift where to_email=(select email from customer where customer_id=:customerId)").setParameter("customerId",
+					customerId, PostgresUUIDType.INSTANCE);
+
+			deleted = query.executeUpdate();
 		}
 		catch (Exception e)
 		{
@@ -3272,13 +3288,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<FundraiserSummary> getPublisherFundraiserSummaries(
-			UUID publisherMerchantId, SearchOptions searchOpts,
-			boolean calculateRowSize) throws ServiceException {
+	public PaginatedResult<FundraiserSummary> getPublisherFundraiserSummaries(UUID publisherMerchantId, SearchOptions searchOpts,
+			boolean calculateRowSize) throws ServiceException
+	{
 		PaginatedResult<FundraiserSummary> paginatedResult = null;
 		List<FundraiserSummary> summaries = null;
 		Long totalResults = null;
-		
+
 		PropertyCriteria criteria = new PropertyCriteria();
 		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
 
@@ -3316,13 +3332,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getPublisherFundraiserSummaryCount(UUID publisherMerchantId)
-			throws ServiceException {
+	public long getPublisherFundraiserSummaryCount(UUID publisherMerchantId) throws ServiceException
+	{
 		Long total = null;
-		
+
 		PropertyCriteria criteria = new PropertyCriteria();
 		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
-		
+
 		try
 		{
 			String newSql = QueryHelper.buildPropertyQuery(QueryType.PublisherMerchantSummaryCnt, criteria, null);
@@ -3342,13 +3358,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public PaginatedResult<FundraiserSummary> getFundraiserSummaries(
-			SearchOptions searchOpts, boolean calculateRowSize)
-			throws ServiceException {
+	public PaginatedResult<FundraiserSummary> getFundraiserSummaries(SearchOptions searchOpts, boolean calculateRowSize)
+			throws ServiceException
+	{
 		PaginatedResult<FundraiserSummary> paginatedResult = null;
 		List<FundraiserSummary> summaries = null;
 		Long totalResults = null;
-		
+
 		PropertyCriteria criteria = new PropertyCriteria();
 		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
 
@@ -3384,12 +3400,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 	}
 
 	@Override
-	public long getFundraiserSummaryCount() throws ServiceException {
+	public long getFundraiserSummaryCount() throws ServiceException
+	{
 		Long total = null;
-		
+
 		PropertyCriteria criteria = new PropertyCriteria();
 		criteria.setFilters(com.talool.domain.PropertyCriteria.Filter.equal(KeyValue.fundraiser, true));
-		
+
 		try
 		{
 			String newSql = QueryHelper.buildPropertyQuery(QueryType.MerchantSummaryCnt, criteria, null);
@@ -3406,4 +3423,53 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 		return total == null ? 0 : total;
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
+	public RefundResult refundOrVoid(final DealOfferPurchase dealOfferPurchase, boolean removeDealAcquires) throws ServiceException
+	{
+		final String transactionId = dealOfferPurchase.getProcessorTransactionId();
+		RefundType refundType = null;
+
+		try
+		{
+			final RefundVoidResult result = BraintreeUtil.get().refundOrVoid(transactionId);
+			final Long now = Calendar.getInstance().getTime().getTime();
+			if (result.getTransactionResult().isSuccess())
+			{
+				refundType = result.getRefundType();
+				switch (refundType)
+				{
+					case Refund:
+						dealOfferPurchase.getProperties().createOrReplace(KeyValue.processorRefundDate, now);
+						break;
+					case Void:
+						dealOfferPurchase.getProperties().createOrReplace(KeyValue.processorVoidDate, now);
+						break;
+				}
+
+				save(dealOfferPurchase);
+
+				// TODO - Be careful! This deletes all purchases of a book rather than a single book (if the customer purcahsed
+				// multiple books)
+				final SQLQuery query = getCurrentSession()
+						.createSQLQuery(
+								"delete from deal_acquire where customer_id=:customerId and deal_id in (select deal_id from deal where deal_offer_id=:dealOfferId)");
+
+				query.setParameter("customerId", dealOfferPurchase.getCustomer().getId(), PostgresUUIDType.INSTANCE);
+				query.setParameter("dealOfferId", dealOfferPurchase.getDealOffer().getId(), PostgresUUIDType.INSTANCE);
+
+				int totalDeleted = query.executeUpdate();
+
+				return new RefundResult(refundType, totalDeleted);
+			}
+
+			throw new ServiceException("Refund/Void was not successful: " + result.getTransactionResult().getErrorText());
+
+		}
+		catch (ProcessorException e)
+		{
+			throw new ServiceException("problem refund/void transactionId: " + transactionId, e);
+		}
+
+	}
 }
