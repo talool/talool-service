@@ -35,4 +35,6 @@ public interface DealOfferPurchase extends IdentifiableUUID, Serializable, Prope
 
 	public String getPropertyValue(final String key);
 
+	public boolean isRefundedOrVoided();
+
 }

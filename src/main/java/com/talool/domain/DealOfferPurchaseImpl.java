@@ -25,6 +25,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Location;
 import com.talool.payment.PaymentProcessor;
+import com.talool.utils.KeyValue;
 
 /**
  * 
@@ -194,6 +195,17 @@ public class DealOfferPurchaseImpl implements DealOfferPurchase
 		}
 
 		return null;
+	}
+
+	@Override
+	public boolean isRefundedOrVoided()
+	{
+		if (props == null)
+		{
+			return false;
+		}
+
+		return props.getAsString(KeyValue.processorRefundDate) != null || props.getAsString(KeyValue.processorVoidDate) != null;
 	}
 
 }

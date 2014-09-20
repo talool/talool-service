@@ -77,6 +77,7 @@ import com.talool.hibernate.MerchantAcquiresResultTransformer;
 import com.talool.payment.PaymentDetail;
 import com.talool.payment.TransactionResult;
 import com.talool.payment.braintree.BraintreeUtil;
+import com.talool.payment.braintree.BraintreeUtil.RefundVoidResult;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.service.mail.EmailRequestParams;
@@ -1551,12 +1552,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 		LOG.error(String.format("Creating dealOffer failed customerId '%s' dealOfferId '%s' rolling back transactionId '%s'", customerId,
 				dealOfferId, transactionResult.getTransactionId()), causedException);
 
-		TransactionResult voidedTrans = null;
-
-		voidedTrans = BraintreeUtil.get().voidTransaction(transactionResult.getTransactionId());
+		final RefundVoidResult result = BraintreeUtil.get().refundOrVoid(transactionResult.getTransactionId());
 
 		LOG.error(String.format("Payment transaction roll back of transactionId '%s' success %s ", transactionResult.getTransactionId(),
-				voidedTrans.isSuccess()));
+				result.getTransactionResult().isSuccess()));
 
 	}
 
