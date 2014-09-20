@@ -1,10 +1,19 @@
 package com.talool.service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.braintreegateway.Result;
+import com.braintreegateway.SettlementBatchSummary;
 import com.talool.core.DealOffer;
 import com.talool.domain.DealOfferImpl;
 import com.talool.payment.braintree.BraintreeUtil;
@@ -35,9 +44,26 @@ public class BraintreeTest
 
 	}
 
-	public void testOnBoardMerchant()
+	public static void main(String args[])
 	{
+		ServiceConfig.createInstance("service.properties");
 
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(DateUtils.addDays(new Date(), -60));
+		Result<SettlementBatchSummary> result = null;
+		// Result<SettlementBatchSummary> result = BraintreeUtil.get().settlementBatchSummary(cal);
+
+		if (result.isSuccess())
+		{
+			List<Map<String, String>> records = result.getTarget().getRecords();
+
+			for (Map<String, String> record : records)
+			{
+				for (Entry<String, String> entry : record.entrySet())
+				{
+					System.out.println("key:" + entry.getKey() + ",val:" + entry.getValue());
+				}
+			}
+		}
 	}
-
 }

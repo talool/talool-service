@@ -12,9 +12,11 @@ import com.talool.core.CategoryTag;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealAcquireHistory;
 import com.talool.core.DealOffer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantCodeGroup;
 import com.talool.core.PropertyEntity;
+import com.talool.core.RefundResult;
 import com.talool.core.Tag;
 import com.talool.core.social.SocialNetwork;
 import com.talool.domain.Properties;
@@ -71,9 +73,8 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 	public void deleteCustomer(final UUID customerId) throws ServiceException;
 
 	/**
-	 * Copies all deals of an existing deal offer and assigns them to the newly
-	 * copied deal offer. The deal offer is set to in-active and the title of the
-	 * new deal offer is "copy of {orginalDealOfferTitle}"
+	 * Copies all deals of an existing deal offer and assigns them to the newly copied deal offer. The deal offer is set
+	 * to in-active and the title of the new deal offer is "copy of {orginalDealOfferTitle}"
 	 * 
 	 * @param dealOffer
 	 * @return
@@ -133,9 +134,9 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 	public MerchantCodeGroup createMerchantCodeGroup(final Merchant merchant, final Long createdByMerchantAccountId,
 			final UUID publisherId, final String codeGroupTitle, final String codeGroupNotes, final short totalCodes)
 			throws ServiceException;
-	
+
 	public MerchantCodeGroup getMerchantCodeGroupForCode(final String code) throws ServiceException;
-	
+
 	public long getDailyTrackingCodeCountByPublisher(final UUID publisherId) throws ServiceException;
 
 	public boolean isMerchantCodeValid(final String code, final UUID dealOfferId) throws ServiceException;
@@ -143,4 +144,16 @@ public interface TaloolService extends MerchantService, HibernateService, Reques
 	public <T extends PropertyEntity> void saveProperties(final T entity, final Properties properties) throws ServiceException;
 
 	public void processBraintreeNotification(final String btSignatureParam, final String btPayloadParam) throws ServiceException;
+
+	/**
+	 * Refunds or voids the transaction associated with the dealOfferPurchase and optionally will remove the dealAquires.
+	 * 
+	 * @param dealOfferPurchase
+	 * @param removeDealAcquires
+	 * @return the RefundType
+	 * @throws ServiceException
+	 */
+	public RefundResult refundOrVoid(final DealOfferPurchase dealOfferPurchase, final boolean removeDealAcquires)
+			throws ServiceException;
+
 }
