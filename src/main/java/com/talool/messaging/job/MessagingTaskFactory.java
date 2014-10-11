@@ -1,6 +1,7 @@
 package com.talool.messaging.job;
 
 import com.talool.messaging.job.task.AbstractMessagingTask;
+import com.talool.messaging.job.task.DealOfferPurchaseTask;
 import com.talool.messaging.job.task.MerchantGiftTask;
 
 /**
@@ -22,6 +23,10 @@ public class MessagingTaskFactory
 		if (job instanceof MerchantGiftJob)
 		{
 			return new MerchantGiftTask((MerchantGiftJob) job);
+		}
+		else if (job instanceof DealOfferPurchaseJob)
+		{
+			return new DealOfferPurchaseTask((DealOfferPurchaseJob) job);
 		}
 		else
 		{

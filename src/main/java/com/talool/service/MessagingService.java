@@ -5,6 +5,7 @@ import java.util.List;
 import com.talool.core.Customer;
 import com.talool.core.SearchOptions;
 import com.talool.core.service.ServiceException;
+import com.talool.messaging.job.DealOfferPurchaseJob;
 import com.talool.messaging.job.JobState;
 import com.talool.messaging.job.MerchantGiftJob;
 import com.talool.messaging.job.MessagingJob;
@@ -61,6 +62,15 @@ public interface MessagingService
 	 * @throws ServiceException
 	 */
 	public void processMerchantGifts(final MerchantGiftJob job, final List<RecipientStatus> recipientStatuses) throws ServiceException;
+	
+	/**
+	 * Batch give DealOffer to recipients
+	 * 
+	 * @param job
+	 * @param recipientStatuses
+	 * @throws ServiceException
+	 */
+	public void processDealOfferPurchases(final DealOfferPurchaseJob job, final List<RecipientStatus> recipientStatuses) throws ServiceException;
 
 	/**
 	 * Updates the state of a messaging job

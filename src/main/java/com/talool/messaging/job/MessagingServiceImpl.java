@@ -18,11 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.googlecode.genericdao.search.Search;
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.FactoryManager;
 import com.talool.core.SearchOptions;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.ServiceException;
 import com.talool.domain.DealAcquireImpl;
+import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.job.MessagingJobImpl;
 import com.talool.messaging.MessagingFactory;
 import com.talool.persistence.QueryHelper;
@@ -268,6 +270,47 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 			throw new ServiceException("problem updating sends", ex);
 		}
 
+	}
+	
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void processDealOfferPurchases(final DealOfferPurchaseJob job, final List<RecipientStatus> recipientStatuses) throws ServiceException
+	{
+		final Map<UUID, RecipientStatus> purchaseMap = new HashMap<UUID, RecipientStatus>();
+
+		// step #1 - batch generating purchases
+		for (RecipientStatus recipient : recipientStatuses)
+		{
+			final DealOfferPurchase purchase = new DealOfferPurchaseImpl(recipient.getCustomer(), job.getDealOffer());
+			ServiceFactory.get().getTaloolService().save(purchase);
+
+			UUID purchaseId = purchase.getId();
+			purchaseMap.put(purchaseId, recipient);
+
+			// it is safer to remove the recipient here rather than wait for the gift to be created.
+			// a rare worst case is that on error below, a recipient will never get the email, but we are guarnateed they will
+			// not get a dup deal
+			daoDispatcher.remove(recipient);
+		}
+
+		// step #1 - its ok to ensure the merchants Merchant DealAcquires are saved first
+		getCurrentSession().flush();
+		getCurrentSession().clear();
+		
+		// TODO create an email and activity
+		
+		try
+		{
+			final Query updateSends = sessionFactory.getCurrentSession().createQuery(
+					"update DealOfferJobImpl set sends=sends + :sends where id=:jobId");
+			updateSends.setParameter("sends", recipientStatuses.size());
+			updateSends.setParameter("jobId", job.getId());
+			updateSends.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("problem updating sends", ex);
+		}
 	}
 
 	@Override
