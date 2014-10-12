@@ -284,7 +284,7 @@ public final class QueryHelper
 	public static final String DEAL_ACQUIRES = "select distinct dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d "
 			+ "left join fetch d.image left join fetch d.merchant as m left join fetch m.locations as l "
 			+ "left join fetch l.merchantImage left join fetch l.logo "
-			+ "where dealAcquire.deal.merchant.id=:merchantId and dealAcquire.customer.id=:customerId";
+			+ "where dealAcquire.deal.merchant.id=:merchantId and dealAcquire.customer.id=:customerId and dealAcquire.expires > :expiresAfter";
 
 	private static final String MERCHANT_ACQUIRES = "select distinct merchant from MerchantImpl merchant, DealAcquireImpl da, "
 			+ "DealImpl d left join fetch merchant.locations where da.customer.id=:customerId "
