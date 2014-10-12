@@ -1,6 +1,6 @@
 package com.talool.messaging.job;
 
-import com.talool.core.DealOffer;
+import java.util.UUID;
 
 /**
  * DealOffer Job Interface
@@ -10,18 +10,20 @@ import com.talool.core.DealOffer;
  */
 public interface DealOfferPurchaseJob extends MessagingJob
 {
+	public static final String dealOfferIdKey = "DealOfferId";
+	public static final String dealOfferPurchaseJobTitleKey = "dealOfferPurchaseJobTitle";
 	/**
-	 * Sets the deal offer
+	 * Sets the deal offer id
 	 * 
 	 * @param deal
 	 */
-	public void setDealOffer(final DealOffer offer);
+	public void setDealOfferId(final UUID offerId);
 
 	/**
-	 * Gets the deal offer
+	 * Gets the deal offer id
 	 * 
 	 * @return
 	 */
-	public DealOffer getDealOffer();
+	public UUID getDealOfferId();
 
 }

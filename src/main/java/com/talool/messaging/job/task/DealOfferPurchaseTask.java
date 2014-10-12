@@ -56,14 +56,14 @@ public class DealOfferPurchaseTask extends AbstractMessagingTask<DealOfferPurcha
 			{
 				if (result.getTotalResults() == 0)
 				{
-					LOG.warn(String.format("Empty recipients for DealOfferTask with jobId %d and deal '%s'", messagingJob.getId(),
-							messagingJob.getDealOffer().getTitle()));
+					LOG.warn(String.format("Empty recipients for DealOfferTask with jobId %d and offer id '%s'", messagingJob.getId(),
+							messagingJob.getDealOfferId()));
 
 					return messagingJob;
 				}
 
-				LOG.info(String.format("Starting DealOfferTask with jobId %d deal '%s' recipients %d", messagingJob.getId(), messagingJob
-						.getDealOffer().getTitle(), totalRecipients));
+				LOG.info(String.format("Starting DealOfferTask with jobId %d offer id '%s' recipients %d", messagingJob.getId(), 
+						messagingJob.getDealOfferId(), totalRecipients));
 
 				// persist started state
 				setJobAsStarted();
