@@ -12,6 +12,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.messaging.job.DealOfferPurchaseJob;
+import com.talool.utils.KeyValue;
 
 /**
  * 
@@ -38,14 +39,14 @@ public class DealOfferPurchaseJobImpl extends MessagingJobImpl implements DealOf
 	@Override
 	public void setDealOfferId(UUID offerId)
 	{
-		this.getProperties().createOrReplace(dealOfferIdKey, offerId.toString());
+		this.getProperties().createOrReplace(KeyValue.dealOfferIdKey, offerId.toString());
 	}
 
 	@Override
 	public UUID getDealOfferId()
 	{
 		UUID id = null;
-		String idStr = this.getProperties().getAsString(dealOfferIdKey);
+		String idStr = this.getProperties().getAsString(KeyValue.dealOfferIdKey);
 		if (idStr != null)
 		{
 			id = UUID.fromString(idStr);
