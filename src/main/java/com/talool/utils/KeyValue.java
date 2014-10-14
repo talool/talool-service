@@ -30,6 +30,7 @@ public class KeyValue implements Serializable
 	// deal offer purchase job
 	public static final String dealOfferIdKey = "DealOfferId";
 	public static final String dealOfferPurchaseJobTitleKey = "dealOfferPurchaseJobTitle";
+	public static final String dealOfferPurchaseJobNotesKey = "dealOfferPurchaseJobNotes";
 
 	// braintree stuff
 	public static final String braintreeSubmerchantId = "bt_submerch_id";

@@ -63,6 +63,9 @@ public class ServiceConfig extends PropertiesConfiguration
 	public static final String MESSAGING_JOB_MANAGER_SLEEP_SECS = "messaging.job.manager.sleep.secs";
 	public static final String MESSAGING_JOB_MANAGER_TASK_MAX_ATTEMPTS = "messaging.job.manager.task.max.attempts";
 	public static final String MESSAGING_JOB_MANAGER_TASK_BATCH_SIZE = "messaging.job.manager.task.batch.size";
+	
+	public static final String DEAL_OFFER_PURCHASE_JOB_SUBJ = "purchase.job.subject";
+	public static final String DEAL_OFFER_PURCHASE_JOB_TEMPLATE = "purchase.job.template";
 
 	// private static final String UPLOAD_LOGO_MAX_SIZE_BYTES =
 	// "upload.logo.max.size.bytes";
@@ -187,6 +190,16 @@ public class ServiceConfig extends PropertiesConfiguration
 	public String getMerchantRegistrationSubj()
 	{
 		return getString(MERCHANT_REGISTRATION_SUBJ);
+	}
+	
+	public String getDealOfferPurchaseJobTemplate()
+	{
+		return getString(DEAL_OFFER_PURCHASE_JOB_TEMPLATE);
+	}
+
+	public String getDealOfferPurchaseJobSubj()
+	{
+		return getString(DEAL_OFFER_PURCHASE_JOB_SUBJ);
 	}
 
 	public String getPasswordRecoveryTemplate()

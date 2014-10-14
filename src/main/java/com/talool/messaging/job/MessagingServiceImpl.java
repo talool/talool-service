@@ -307,8 +307,7 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 			// not get a dup deal
 			daoDispatcher.remove(recipient);
 		}
-
-		// step #1 - its ok to ensure the merchants Merchant DealAcquires are saved first
+		// its ok to ensure the merchants Merchant DealAcquires are saved first
 		getCurrentSession().flush();
 		getCurrentSession().clear();
 		

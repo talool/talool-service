@@ -13,6 +13,7 @@ import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantCodeGroup;
 import com.talool.core.gift.Gift;
 import com.talool.service.ServiceConfig;
+import com.talool.utils.KeyValue;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -33,7 +34,7 @@ public final class FreemarkerUtil
 
 	public enum TemplateType
 	{
-		Registration, Gift, ResetPassword, Feedback, Fundraiser, MerchantRegistration, TrackingCode
+		Registration, Gift, ResetPassword, Feedback, Fundraiser, MerchantRegistration, TrackingCode, PurchaseJob
 	}
 
 	private FreemarkerUtil() throws IOException
@@ -128,6 +129,25 @@ public final class FreemarkerUtil
 		sb.append(ServiceConfig.get().getGiftLink()).append(gift.getId());
 		data.put("giftLink", ServiceConfig.get().getGiftLink() + gift.getId());
 		data.put("name", gift.getFromCustomer().getFirstName() + " " + gift.getFromCustomer().getLastName());
+		StringWriter stringWriter = new StringWriter();
+		template.process(data, stringWriter);
+
+		return stringWriter.toString();
+
+	}
+	
+	public String renderPurchaseJobEmail(final DealOfferPurchase purchase) throws IOException, TemplateException
+	{
+		final Template template = freemarkerConfig.getTemplate(ServiceConfig.get().getDealOfferPurchaseJobTemplate());
+
+		// Build the data-model
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("offerTitle", purchase.getDealOffer().getTitle());
+		data.put("offerSummary", purchase.getDealOffer().getSummary());
+		data.put("publisherName", purchase.getDealOffer().getMerchant().getName());
+		data.put("publisherNotes", purchase.getProperties().getAsString(KeyValue.dealOfferPurchaseJobNotesKey));
+		data.put("fullName", purchase.getCustomer().getFullName());
+		
 		StringWriter stringWriter = new StringWriter();
 		template.process(data, stringWriter);
 

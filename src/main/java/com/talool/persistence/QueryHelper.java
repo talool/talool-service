@@ -348,6 +348,25 @@ public final class QueryHelper
 			+ "JOIN (SELECT merchant_location_id, merchant_id, city, state_province_county, create_dt FROM merchant_location ml1 "
 			+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
 			+ "ON (d.merchant_id = l.merchant_id) " + "WHERE d.deal_offer_id = :offerId";
+	
+	private static final String DEAL_SUMMARY_BY_DEAL_ID = "SELECT d.deal_id AS dealId, d.deal_offer_id AS offerId, d.merchant_id AS merchantId, d.title AS title, d.summary AS summary, d.details AS details, "
+			+ "d.expires AS expires, d.is_active AS isActive, l.city AS merchantCity, l.state_province_county AS merchantState, "
+			+ "(SELECT array_to_string(array(SELECT DISTINCT t.name FROM tag AS t, deal_tag AS dt WHERE dt.deal_id = d.deal_id AND dt.tag_id = t.tag_id),', ')) AS tags, "
+			+ "(SELECT mm.media_url FROM merchant_media AS mm WHERE mm.merchant_media_id = d.image_id) AS imageUrl,"
+			+ "(SELECT m.merchant_name FROM merchant AS m WHERE m.merchant_id = d.merchant_id) AS merchantName,"
+			+ "(SELECT m.merchant_name FROM merchant AS m, merchant_account AS ma "
+			+ "WHERE ma.merchant_id = m.merchant_id AND ma.merchant_account_id = d.created_by_merchant_account_id) AS createdByMerchantName,"
+			+ "(SELECT m.merchant_id FROM merchant AS m, merchant_account AS ma "
+			+ "WHERE ma.merchant_id = m.merchant_id AND ma.merchant_account_id = d.created_by_merchant_account_id) AS createdByMerchantId,"
+			+ "(SELECT o.title FROM deal_offer AS o WHERE o.deal_offer_id = d.deal_offer_id) AS offerTitle,"
+			+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id) AS acquireCount,"
+			+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND da.acquire_status = 'REDEEMED') AS redemptionCount,"
+			+ "(SELECT count(*) FROM deal_acquire AS da WHERE da.deal_id = d.deal_id AND "
+			+ "(da.acquire_status = 'PENDING_ACCEPT_CUSTOMER_SHARE' OR da.acquire_status = 'ACCEPTED_CUSTOMER_SHARE' OR da.acquire_status = 'REJECTED_CUSTOMER_SHARE')) AS giftCount "
+			+ "FROM deal AS d "
+			+ "JOIN (SELECT merchant_location_id, merchant_id, city, state_province_county, create_dt FROM merchant_location ml1 "
+			+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_id = ml2.merchant_id ORDER BY create_dt LIMIT 1)) l "
+			+ "ON (d.merchant_id = l.merchant_id) " + "WHERE d.deal_id = :dealId";
 
 	private static final String DEAL_SUMMARY_CNT = "SELECT count(*) AS totalResults FROM deal AS d WHERE d.deal_offer_id = :offerId";
 
@@ -442,6 +461,7 @@ public final class QueryHelper
 				EMPTY_IMMUTABLE_PROPS),
 
 		DealSummary(DEAL_SUMMARY, EMPTY_IMMUTABLE_PROPS), DealSummaryCnt(DEAL_SUMMARY_CNT, EMPTY_IMMUTABLE_PROPS),
+		DealSummaryByDealId(DEAL_SUMMARY_BY_DEAL_ID, EMPTY_IMMUTABLE_PROPS),
 
 		PublisherDailyCodeCnt(PUBLISHER_DAILY_CODE_CNT, EMPTY_IMMUTABLE_PROPS),
 
