@@ -334,4 +334,16 @@ public interface MerchantService extends HibernateService
 			final SearchOptions searchOpts, final boolean calculateTotalResults) throws ServiceException;
 
 	public long getMerchantCodeSummaryCount(final UUID merchantId) throws ServiceException;
+	
+	/**
+	 * Deletes the deal if it has no DealAcquires.
+	 * Otherwise, it moves the deal to a Kirke book for the publisher and throws a service exception
+	 * 
+	 * @param dealId
+	 * @param merchantAccountId
+	 * @throws ServiceException
+	 */
+	public void deleteDealSafely(final UUID dealId, final Long merchantAccountId) throws ServiceException;
+	
+	public DealSummary getDealSummary(final UUID dealId) throws ServiceException;
 }

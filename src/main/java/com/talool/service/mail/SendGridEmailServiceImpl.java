@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
 import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantCodeGroup;
@@ -175,6 +176,12 @@ public class SendGridEmailServiceImpl implements EmailService
 			case TrackingCode:
 				emailBody = FreemarkerUtil.get().renderTrackingCodeEmail((EmailTrackingCodeEntity) obj);
 				break;
+				
+			case PurchaseJob:
+				emailBody = FreemarkerUtil.get().renderPurchaseJobEmail((DealOfferPurchase) obj);
+				break;
+			default:
+				break;
 
 		}
 
@@ -270,5 +277,25 @@ public class SendGridEmailServiceImpl implements EmailService
 		sendGridParams.addUniqueArg("emailGiftId", emailRequestParams.getEntity().getId().toString());
 
 		sendEmail(sendGridParams);
+	}
+
+	@Override
+	public void sendDealOfferPurchaseJobEmail(
+			EmailRequestParams<DealOfferPurchase> emailRequestParams, final String emailCategory)
+			throws ServiceException {
+		
+		final EmailParams emailParams = new EmailParams(ServiceConfig.get().getDealOfferPurchaseJobSubj(), 
+				emailRequestParams.getEntity().getCustomer().getEmail(),
+				ServiceConfig.get().getMailFrom());
+
+		final EmailRequest<DealOfferPurchase> sendGridParams = new EmailRequest<DealOfferPurchase>();
+		sendGridParams.setEmailParams(emailParams);
+		sendGridParams.setCategory(emailCategory);
+		sendGridParams.setTemplateType(TemplateType.PurchaseJob);
+		sendGridParams.setEntity(emailRequestParams.getEntity());
+		sendGridParams.addUniqueArg("dealOfferPurchaseId", emailRequestParams.getEntity().getId().toString());
+
+		sendEmail(sendGridParams);
+		
 	}
 }

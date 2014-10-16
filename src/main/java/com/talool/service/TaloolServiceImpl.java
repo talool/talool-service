@@ -53,6 +53,7 @@ import com.talool.core.DealOffer;
 import com.talool.core.DealOfferGeoSummariesResult;
 import com.talool.core.DealOfferGeoSummary;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DealType;
 import com.talool.core.FactoryManager;
 import com.talool.core.Location;
 import com.talool.core.MediaType;
@@ -3485,5 +3486,137 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			throw new ServiceException("problem refund/void transactionId: " + transactionId, e);
 		}
 
+	}
+
+	@Override
+	public void deleteDealSafely(UUID dealId, Long merchantAccountId) throws ServiceException 
+	{
+		final String kirkeTitle = "Talool Tools Admin Book";
+		final DealSummary summary = getDealSummary(dealId);
+		Deal deal = getDeal(dealId);
+		if (summary.getDealCount() == 0)
+		{
+			deleteDeal(deal.getId());
+		}
+		else if (deal.getDealOffer().getType() == DealType.KIRKE_BOOK)
+		{
+			// throw exception if the count is > 0 and the deal is already in a Kirke book
+			throw new ServiceException(ErrorCode.DEAL_CAN_NOT_BE_DELETED, "This deal is in a "+kirkeTitle+" and can not be deleted.");
+		}
+		else
+		{
+			// Get a Kirke Book
+			final String originalBookTitle = deal.getDealOffer().getTitle();
+			DealOffer kirkeBook = null;
+			Merchant publisher = deal.getDealOffer().getMerchant();
+			List<DealOffer> offers = getDealOffersByMerchantId(publisher.getId());
+			for (DealOffer offer : offers)
+			{
+				if (offer.getType() == DealType.KIRKE_BOOK)
+				{
+					kirkeBook = offer;
+					break;
+				}
+			}
+			if (kirkeBook == null)
+			{
+				// create a Kirke Book
+				final MerchantAccount createdByMerchant = getMerchantAccountById(merchantAccountId);
+				kirkeBook = new DealOfferImpl(publisher, createdByMerchant);
+				kirkeBook.setUpdatedByMerchantAccount(createdByMerchant);
+				kirkeBook.setTitle(kirkeTitle);
+				kirkeBook.setActive(false);
+				kirkeBook.setDealType(DealType.KIRKE_BOOK);
+				kirkeBook.setPrice(1000.0f);
+				kirkeBook.setScheduledEndDate(new Date());
+				kirkeBook.setScheduledStartDate(new Date());
+				kirkeBook.setSummary("This book was created by Talool Tools.  You can't sell this book, but you can move its deals into other books you'd like to sell.");
+				save(kirkeBook);
+			}
+			
+			// Move it so it can't be sold
+			deal.setDealOffer(kirkeBook);
+			
+			// Expire it so it can't be used
+			// TODO This will lead to unhappy customers.  Do we really want to do this?
+			Calendar c = Calendar.getInstance();
+			c.roll(Calendar.DAY_OF_YEAR, -62); // about 2 months ago, so app logic will cause it to be hidden
+			deal.setExpires(c.getTime());
+			deal.setActive(false);
+			
+			// save it
+			merge(deal);
+			daoDispatcher.flush(DealImpl.class);
+			daoDispatcher.refresh((DealImpl) deal);
+			
+			// throw exception so we know the deal was moved rather than deleted.
+			StringBuilder sb = new StringBuilder("This deal was moved to your ");
+			sb.append(kirkeTitle)
+				.append(" so it will no longer be for sale in ")
+				.append(originalBookTitle)
+				.append(".  The expiration date of this deal was also changed ")
+				.append("so it can not be used by customers who acquired the deal previously.");
+			throw new ServiceException(ErrorCode.DEAL_MOVED_NOT_DELETED, sb.toString());
+		}
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRED)
+	private void deleteDeal(final UUID id) throws ServiceException {
+		try
+		{
+			Query query = getCurrentSession().createSQLQuery(
+					"delete from deal_tag where deal_id=:dealId").setParameter("dealId",
+					id, PostgresUUIDType.INSTANCE);
+			query.executeUpdate();
+			
+			query = getCurrentSession().createQuery("delete from DealImpl where id=:dealId").setParameter("dealId", id);
+			query.executeUpdate();
+		}
+		catch (Exception e)
+		{
+			throw new ServiceException("Problem deleteing deal id " + id, e);
+		}
+	}
+
+	@Override
+	public DealSummary getDealSummary(UUID dealId) throws ServiceException {
+		DealSummary summary = null;
+		try
+		{
+
+			String newSql = QueryHelper.buildQuery(QueryType.DealSummaryByDealId, null, null, true);
+
+			SQLQuery query = sessionFactory.getCurrentSession().createSQLQuery(newSql);
+			query.setResultTransformer(Transformers.aliasToBean(DealSummary.class));
+			query.addScalar("dealId", PostgresUUIDType.INSTANCE);
+			query.addScalar("offerId", PostgresUUIDType.INSTANCE);
+			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("createdByMerchantId", PostgresUUIDType.INSTANCE);
+			query.addScalar("title", StandardBasicTypes.STRING);
+			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("details", StandardBasicTypes.STRING);
+			query.addScalar("tags", StandardBasicTypes.STRING);
+			query.addScalar("imageUrl", StandardBasicTypes.STRING);
+			query.addScalar("merchantName", StandardBasicTypes.STRING);
+			query.addScalar("merchantCity", StandardBasicTypes.STRING);
+			query.addScalar("merchantState", StandardBasicTypes.STRING);
+			query.addScalar("createdByMerchantName", StandardBasicTypes.STRING);
+			query.addScalar("offerTitle", StandardBasicTypes.STRING);
+			query.addScalar("expires", StandardBasicTypes.DATE);
+			query.addScalar("isActive", StandardBasicTypes.BOOLEAN);
+			query.addScalar("acquireCount", StandardBasicTypes.INTEGER);
+			query.addScalar("redemptionCount", StandardBasicTypes.INTEGER);
+			query.addScalar("giftCount", StandardBasicTypes.INTEGER);
+
+			query.setParameter("dealId", dealId, PostgresUUIDType.INSTANCE);
+
+			summary = (DealSummary) query.uniqueResult();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("Problem getDealSummary: " + ex.getMessage(), ex);
+		}
+		
+		return summary;
 	}
 }

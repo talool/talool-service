@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.MerchantAccount;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.EmailService;
@@ -228,6 +229,14 @@ public class EmailServiceImpl implements EmailService
 			throws ServiceException
 	{
 		throw new ServiceException("UNSUPPORTED FUNCTION");
+	}
+
+	@Override
+	public void sendDealOfferPurchaseJobEmail(
+			EmailRequestParams<DealOfferPurchase> emailRequestParams, final String emailCategory)
+			throws ServiceException {
+		throw new ServiceException("UNSUPPORTED FUNCTION");
+		
 	}
 
 }

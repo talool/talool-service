@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.googlecode.genericdao.search.Search;
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
+import com.talool.core.DealOffer;
+import com.talool.core.DealOfferPurchase;
 import com.talool.core.FactoryManager;
 import com.talool.core.SearchOptions;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.ServiceException;
+import com.talool.core.service.TaloolService;
 import com.talool.domain.DealAcquireImpl;
+import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.job.MessagingJobImpl;
 import com.talool.messaging.MessagingFactory;
 import com.talool.persistence.QueryHelper;
@@ -30,7 +35,9 @@ import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.service.AbstractHibernateService;
 import com.talool.service.MessagingService;
 import com.talool.service.ServiceFactory;
+import com.talool.service.mail.EmailRequestParams;
 import com.talool.stats.PaginatedResult;
+import com.talool.utils.KeyValue;
 
 /**
  * Implementation of MessagingJobService
@@ -45,6 +52,7 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingServiceImpl.class);
 	private static final String MERCHANT_GIFT_EMAIL_CATEGORY = "MerchantGiftJob";
+	private static final String DEAL_OFFER_PURCHASE_EMAIL_CATEGORY = "DealOfferPurchaseJob";
 
 	public MessagingServiceImpl()
 	{}
@@ -268,6 +276,68 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 			throw new ServiceException("problem updating sends", ex);
 		}
 
+	}
+	
+	@Override
+	@Transactional(propagation = Propagation.NESTED)
+	public void processDealOfferPurchases(final DealOfferPurchaseJob job, final List<RecipientStatus> recipientStatuses) throws ServiceException
+	{
+		final Map<UUID, DealOfferPurchase> purchaseMap = new HashMap<UUID, DealOfferPurchase>();
+		final TaloolService taloolService = ServiceFactory.get().getTaloolService();
+		final DealOffer offer = taloolService.getDealOffer(job.getDealOfferId());
+		
+		StringBuilder sb = new StringBuilder("Free Deal Offer");
+		if (StringUtils.isNotEmpty(job.getJobNotes()))
+		{
+			sb.append(": ").append(job.getJobNotes());
+		}
+		final String message = sb.toString();
+		String notes = job.getProperties().getAsString(KeyValue.dealOfferPurchaseJobNotesKey);
+
+		// step #1 - batch generating purchases
+		for (RecipientStatus recipient : recipientStatuses)
+		{
+			final DealOfferPurchase purchase = new DealOfferPurchaseImpl(recipient.getCustomer(), offer);
+			
+			purchase.getProperties().createOrReplace(KeyValue.dealOfferPurchaseJobTitleKey, message);
+			purchase.getProperties().createOrReplace(KeyValue.dealOfferPurchaseJobNotesKey, notes);
+			taloolService.save(purchase);
+
+			purchaseMap.put(recipient.getCustomer().getId(), purchase);
+
+			// it is safer to remove the recipient here rather than wait for the gift to be created.
+			// a rare worst case is that on error below, a recipient will never get the email, but we are guarnateed they will
+			// not get a dup deal
+			daoDispatcher.remove(recipient);
+		}
+		// its ok to ensure the merchants Merchant DealAcquires are saved first
+		getCurrentSession().flush();
+		getCurrentSession().clear();
+		
+		// TODO create an activity
+		
+		// the category set on the email message for Sendgrid
+		final String emailCategory = DEAL_OFFER_PURCHASE_EMAIL_CATEGORY + "-" + job.getId();
+		// send the emails
+		for (Entry<UUID, DealOfferPurchase> entry : purchaseMap.entrySet())
+		{
+			EmailRequestParams<DealOfferPurchase> emailRequestParams = new EmailRequestParams<DealOfferPurchase>(entry.getValue());
+			ServiceFactory.get().getEmailService()
+					.sendDealOfferPurchaseJobEmail(emailRequestParams, emailCategory);
+		}
+		
+		try
+		{
+			final Query updateSends = sessionFactory.getCurrentSession().createQuery(
+					"update MessagingJobImpl set sends=sends + :sends where id=:jobId");
+			updateSends.setParameter("sends", recipientStatuses.size());
+			updateSends.setParameter("jobId", job.getId());
+			updateSends.executeUpdate();
+		}
+		catch (Exception ex)
+		{
+			throw new ServiceException("problem updating sends", ex);
+		}
 	}
 
 	@Override
