@@ -511,6 +511,17 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId, final SearchOptions searchOpts)
 			throws ServiceException
 	{
+		Calendar c = Calendar.getInstance();
+		c.roll(Calendar.YEAR, -100);
+		Date expiresAfter = c.getTime(); // 100 years ago
+		return getDealAcquires(customerId, merchantId, searchOpts, expiresAfter);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId, final SearchOptions searchOpts, final Date expiresAfter)
+			throws ServiceException
+	{
 		try
 		{
 			final String newSql = QueryHelper.buildQuery(QueryType.DealAcquires, null, searchOpts, true);
@@ -518,6 +529,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 			final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
 			query.setParameter("customerId", customerId);
 			query.setParameter("merchantId", merchantId);
+			query.setParameter("expiresAfter", expiresAfter);
 			QueryHelper.applyOffsetLimit(query, searchOpts);
 
 			TaloolStatsDClient.get().count(Action.get_deal_acquires, null, null, requestHeaders.get());

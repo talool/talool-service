@@ -14,7 +14,7 @@ import com.talool.service.ServiceFactory;
  * @author clintz
  * 
  */
-public abstract class AbstractMessagingTask<T extends MessagingJob> implements Callable<MerchantGiftJob>
+public abstract class AbstractMessagingTask<T extends MessagingJob> implements Callable<MessagingJob>
 {
 	protected final T messagingJob;
 

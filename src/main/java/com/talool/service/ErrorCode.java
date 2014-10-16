@@ -30,6 +30,8 @@ public enum ErrorCode
 			4003, "We couldn't locate that address on the map.  Please review the address and try again."),
 
 	MERCHANT_CODE_IS_NOT_VALID(4004, "Code is not valid"),
+	DEAL_MOVED_NOT_DELETED(4005, "Deal was moved, not deleted"),
+	DEAL_CAN_NOT_BE_DELETED(4006, "Deal can not be deleted from this book"),
 
 	BRAINTREE_INVALID_WEBHOOK_PARAMS(5000, "Invalid Webhook Params"), BRAINTREE_SUBMERCHANT_ID_NOT_FOUND(5001, "Sub Merchant ID not found");
 

@@ -1,5 +1,6 @@
 package com.talool.core.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,6 +71,9 @@ public interface CustomerService extends HibernateService, RequestHeaderSupport
 	public List<Relationship> getRelationshipsTo(final UUID customerId) throws ServiceException;
 
 	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId, final SearchOptions searchOptions)
+			throws ServiceException;
+	
+	public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId, final SearchOptions searchOptions, final Date expiresAfter)
 			throws ServiceException;
 
 	public List<DealOfferPurchase> getDealOfferPurchasesByCustomerId(final UUID customerId) throws ServiceException;
