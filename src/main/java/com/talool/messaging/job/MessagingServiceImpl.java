@@ -35,6 +35,7 @@ import com.talool.persistence.QueryHelper.QueryType;
 import com.talool.service.AbstractHibernateService;
 import com.talool.service.MessagingService;
 import com.talool.service.ServiceFactory;
+import com.talool.service.mail.EmailRequestParams;
 import com.talool.stats.PaginatedResult;
 import com.talool.utils.KeyValue;
 
@@ -51,6 +52,7 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MessagingServiceImpl.class);
 	private static final String MERCHANT_GIFT_EMAIL_CATEGORY = "MerchantGiftJob";
+	private static final String DEAL_OFFER_PURCHASE_EMAIL_CATEGORY = "DealOfferPurchaseJob";
 
 	public MessagingServiceImpl()
 	{}
@@ -280,7 +282,7 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 	@Transactional(propagation = Propagation.NESTED)
 	public void processDealOfferPurchases(final DealOfferPurchaseJob job, final List<RecipientStatus> recipientStatuses) throws ServiceException
 	{
-		final Map<UUID, RecipientStatus> purchaseMap = new HashMap<UUID, RecipientStatus>();
+		final Map<UUID, DealOfferPurchase> purchaseMap = new HashMap<UUID, DealOfferPurchase>();
 		final TaloolService taloolService = ServiceFactory.get().getTaloolService();
 		final DealOffer offer = taloolService.getDealOffer(job.getDealOfferId());
 		
@@ -290,6 +292,7 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 			sb.append(": ").append(job.getJobNotes());
 		}
 		final String message = sb.toString();
+		String notes = job.getProperties().getAsString(KeyValue.dealOfferPurchaseJobNotesKey);
 
 		// step #1 - batch generating purchases
 		for (RecipientStatus recipient : recipientStatuses)
@@ -297,10 +300,10 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 			final DealOfferPurchase purchase = new DealOfferPurchaseImpl(recipient.getCustomer(), offer);
 			
 			purchase.getProperties().createOrReplace(KeyValue.dealOfferPurchaseJobTitleKey, message);
+			purchase.getProperties().createOrReplace(KeyValue.dealOfferPurchaseJobNotesKey, notes);
 			taloolService.save(purchase);
 
-			UUID purchaseId = purchase.getId();
-			purchaseMap.put(purchaseId, recipient);
+			purchaseMap.put(recipient.getCustomer().getId(), purchase);
 
 			// it is safer to remove the recipient here rather than wait for the gift to be created.
 			// a rare worst case is that on error below, a recipient will never get the email, but we are guarnateed they will
@@ -311,7 +314,17 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 		getCurrentSession().flush();
 		getCurrentSession().clear();
 		
-		// TODO create an email and activity
+		// TODO create an activity
+		
+		// the category set on the email message for Sendgrid
+		final String emailCategory = DEAL_OFFER_PURCHASE_EMAIL_CATEGORY + "-" + job.getId();
+		// send the emails
+		for (Entry<UUID, DealOfferPurchase> entry : purchaseMap.entrySet())
+		{
+			EmailRequestParams<DealOfferPurchase> emailRequestParams = new EmailRequestParams<DealOfferPurchase>(entry.getValue());
+			ServiceFactory.get().getEmailService()
+					.sendDealOfferPurchaseJobEmail(emailRequestParams, emailCategory);
+		}
 		
 		try
 		{

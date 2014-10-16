@@ -6,6 +6,8 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.talool.core.Customer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.Merchant;
@@ -145,7 +147,13 @@ public final class FreemarkerUtil
 		data.put("offerTitle", purchase.getDealOffer().getTitle());
 		data.put("offerSummary", purchase.getDealOffer().getSummary());
 		data.put("publisherName", purchase.getDealOffer().getMerchant().getName());
-		data.put("publisherNotes", purchase.getProperties().getAsString(KeyValue.dealOfferPurchaseJobNotesKey));
+		
+		String notes = purchase.getProperties().getAsString(KeyValue.dealOfferPurchaseJobNotesKey);
+		if (StringUtils.isEmpty(notes))
+		{
+			notes = "";
+		}
+		data.put("publisherNotes", notes);
 		data.put("fullName", purchase.getCustomer().getFullName());
 		
 		StringWriter stringWriter = new StringWriter();
