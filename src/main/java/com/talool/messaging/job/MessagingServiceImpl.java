@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.hibernate.Query;
-import org.postgis.Point;
+import org.hibernatespatial.GeometryUserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -18,15 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.googlecode.genericdao.search.Search;
+import com.maxmind.geoip2.model.CityResponse;
 import com.talool.core.AcquireStatus;
 import com.talool.core.Customer;
-import com.talool.core.CustomerLocation;
+import com.talool.core.DevicePresence;
 import com.talool.core.FactoryManager;
 import com.talool.core.SearchOptions;
 import com.talool.core.gift.EmailGift;
 import com.talool.core.service.ServiceException;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.job.MessagingJobImpl;
+import com.talool.geo.MaxMindUtil;
 import com.talool.messaging.MessagingFactory;
 import com.talool.persistence.QueryHelper;
 import com.talool.persistence.QueryHelper.QueryType;
@@ -262,29 +264,51 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ServiceException.class)
-  public void updateCustomerLocations(final List<CustomerLocation> customerLocations) throws ServiceException {
+  public void updateDevicePresences(final List<DevicePresence> mobilePresences) throws ServiceException {
     try {
       Query query = null;
 
-      if (CollectionUtils.isEmpty(customerLocations)) {
+      if (CollectionUtils.isEmpty(mobilePresences)) {
         return;
       }
 
-      for (CustomerLocation location : customerLocations) {
-        final Point point = new Point(location.getLocation().getLongitude(), location.getLocation().getLatitude());
-        point.setSrid(4326);
-        query = sessionFactory.getCurrentSession().createQuery("update CustomerImpl set lastLocation=:point where id=:customerId");
-        query.setParameter("point", point);
-        query.setParameter("id", location.getCustomerId());
 
+
+      // updates will obey hibernate.jdbc.batch_size
+      for (DevicePresence presence : mobilePresences) {
+
+        final CityResponse response = MaxMindUtil.get().lookup(presence.getIp());
+        if (response != null) {
+          query =
+              sessionFactory
+                  .getCurrentSession()
+                  .createQuery(
+                      "update CustomerImpl set lastMobilePresence.lastLocation=:point,lastMobilePresence.city=:city,lastMobilePresence.state=:state,lastMobilePresence.zip=:zip,lastMobilePresence.country=:country,lastMobilePresence.ip=:ip where id=:customerId");
+          query.setParameter("city", response.getCity().getName());
+          query.setParameter("state", response.getMostSpecificSubdivision().getIsoCode());
+          query.setParameter("zip", response.getPostal().getCode());
+          query.setParameter("country", response.getCountry().getIsoCode());
+
+        } else {
+          query =
+              sessionFactory.getCurrentSession().createQuery(
+                  "update CustomerImpl set lastMobilePresence.lastLocation=:point,lastMobilePresence.ip=:ip where id=:customerId");
+        }
+
+        query.setParameter("point", presence.getLocation(), GeometryUserType.TYPE);
+        query.setParameter("customerId", presence.getCustomerId());
+        query.setParameter("ip", presence.getIp());
+        query.executeUpdate();
       }
 
 
-      query.executeUpdate();
+
     } catch (Exception ex) {
-      throw new ServiceException("Problem updating jobState", ex);
+      throw new ServiceException("Problem updating customerLocations", ex);
     }
 
   }
+
+
 
 }

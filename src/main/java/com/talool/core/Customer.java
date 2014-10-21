@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -75,8 +74,8 @@ public interface Customer extends IdentifiableUUID, Serializable, TimeAware {
 
   public void setIsEmailValid(final boolean isValid);
 
-  public Geometry getLastLocation();
+  public DevicePresence getLastMobilePresence();
 
-  public void setLastLocation(Geometry location);
+  public void setLastMobilePresence(DevicePresence mobilePresence);
 
 }

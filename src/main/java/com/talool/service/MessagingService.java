@@ -3,7 +3,7 @@ package com.talool.service;
 import java.util.List;
 
 import com.talool.core.Customer;
-import com.talool.core.CustomerLocation;
+import com.talool.core.DevicePresence;
 import com.talool.core.SearchOptions;
 import com.talool.core.service.ServiceException;
 import com.talool.messaging.job.JobState;
@@ -72,10 +72,10 @@ public interface MessagingService {
    */
   public void updateMessagingJobState(final Long jobId, final JobState jobState) throws ServiceException;
 
-  public void updateCustomerLocations(final List<CustomerLocation> customerLocations) throws ServiceException;
-
   public void save(final Object entity) throws ServiceException;
 
   public void merge(final Object entity) throws ServiceException;
+
+  public void updateDevicePresences(final List<DevicePresence> devicePresences) throws ServiceException;
 
 }
