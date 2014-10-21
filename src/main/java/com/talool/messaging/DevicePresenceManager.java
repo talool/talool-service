@@ -15,6 +15,7 @@ import com.maxmind.geoip2.model.CityResponse;
 import com.talool.core.DevicePresence;
 import com.talool.geo.MaxMindUtil;
 
+
 /**
  * A singleton DevicePresence manager responsible for efficiently updating device presence
  * 
@@ -31,6 +32,27 @@ public final class DevicePresenceManager {
   private volatile boolean isRunning = false;
   private DevicePresenceManagerThread geoLocationManagerThread;
   private final ConcurrentLinkedQueue<DevicePresence> queue = new ConcurrentLinkedQueue<DevicePresence>();
+
+
+  private DevicePresenceManager() {
+    geoLocationManagerThread = new DevicePresenceManagerThread("GeoLocationManagerThread");
+    isRunning = true;
+    geoLocationManagerThread.start();
+  }
+
+  public static DevicePresenceManager get() {
+    return INSTANCE;
+  }
+
+  /**
+   * Non-blocking/asynchronous update of a DevicePresence. This method will also decorate with
+   * MaxMind location data if a valid IP address is set
+   * 
+   * @param devicePresence
+   */
+  public void updateDevicePresence(final DevicePresence devicePresence) {
+    queue.add(devicePresence);
+  }
 
 
   private class DevicePresenceManagerThread extends Thread {
@@ -75,41 +97,16 @@ public final class DevicePresenceManager {
 
           updateDevicePresences(customerLocations);
           customerLocations.clear();
-
-          try {
-            Thread.sleep(SLEEP_TIME_IN_MILLS);
-          } catch (InterruptedException e) {
-            // purposely void
-          }
-
-        
+        }
       }
-
-  public static DevicePresenceManager get() {
-    return INSTANCE;
-  }
-
-  private DevicePresenceManager() {
-    geoLocationManagerThread = new DevicePresenceManagerThread("GeoLocationManagerThread");
-    isRunning = true;
-    geoLocationManagerThread.start();
-  }
+    }
 
 
+    void updateDevicePresences(final List<DevicePresence> devicePresences) {
 
-  void updateDevicePresences(final List<DevicePresence> devicePresences) {
+    }
+
+
 
   }
-
-
-  /**
-   * Non-blocking/asynchronous update of a DevicePresence. This method will also decorate with
-   * MaxMind location data if a valid IP address is set
-   * 
-   * @param devicePresence
-   */
-  public void updateDevicePresence(final DevicePresence devicePresence) {
-    queue.add(devicePresence);
-  }
-
 }
