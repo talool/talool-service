@@ -8,6 +8,7 @@ import java.util.Map;
  * @author clintz
  * 
  */
+
 public enum ErrorCode {
   UNKNOWN(0, "Unknown"), VALID_EMAIL_REQUIRED(100, "Valid email required"), PASS_REQUIRED(101, "Password is required"), PASS_CONFIRM_MUST_MATCH(102,
       "Password confirmation does not match"), PASS_RESET_CODE_REQUIRED(103, "Password reset code required"), PASS_RESET_CODE_EXPIRED(104,
@@ -28,6 +29,8 @@ public enum ErrorCode {
       "We couldn't locate that address on the map.  Please review the address and try again."),
 
   MERCHANT_CODE_IS_NOT_VALID(4004, "Code is not valid"),
+
+  DEAL_MOVED_NOT_DELETED(4005, "Deal was moved, not deleted"), DEAL_CAN_NOT_BE_DELETED(4006, "Deal can not be deleted from this book"),
 
   BRAINTREE_INVALID_WEBHOOK_PARAMS(5000, "Invalid Webhook Params"), BRAINTREE_SUBMERCHANT_ID_NOT_FOUND(5001, "Sub Merchant ID not found");
 
@@ -58,5 +61,6 @@ public enum ErrorCode {
     this.code = code;
     this.message = message;
   }
+
 
 }

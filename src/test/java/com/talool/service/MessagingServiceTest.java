@@ -14,6 +14,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 
 import com.talool.core.Customer;
 import com.talool.core.Deal;
+import com.talool.core.DealOffer;
 import com.talool.core.DevicePresence;
 import com.talool.core.DomainFactory;
 import com.talool.core.FactoryManager;
@@ -22,6 +23,7 @@ import com.talool.core.MerchantAccount;
 import com.talool.core.service.InvalidInputException;
 import com.talool.core.service.ServiceException;
 import com.talool.messaging.MessagingFactory;
+import com.talool.messaging.job.DealOfferPurchaseJob;
 import com.talool.messaging.job.MerchantGiftJob;
 
 @TestExecutionListeners(TransactionalTestExecutionListener.class)
@@ -43,12 +45,14 @@ public class MessagingServiceTest extends HibernateFunctionalTestBase {
       // List<MessagingJob> jobs =
       // ServiceFactory.get().getMessagingService().getMessagingJobsByMerchantAccount(2l);
 
+
       List<Customer> targetedCustomers = new ArrayList<Customer>();
       // targetedCustomers.add(customerService.getCustomerByEmail("douglasmccuen@yahoo.com"));
       // targetedCustomers.add(customerService.getCustomerByEmail("doug@talool.com"));
       targetedCustomers.add(customerService.getCustomerByEmail("christopher.justin@gmail.com"));
       targetedCustomers.add(customerService.getCustomerByEmail("chris@talool.com"));
       // targetedCustomers.add(customerService.getCustomerByEmail("chris@talool.com"));
+
 
       Customer fromCustomer = customerService.getCustomerByEmail("chris@talool.com");
 
@@ -59,6 +63,32 @@ public class MessagingServiceTest extends HibernateFunctionalTestBase {
       MerchantGiftJob job =
           MessagingFactory.newMerchantGiftJob(deal.getMerchant(), merchantAccount, fromCustomer, deal, new Date(), "some job notes");
 
+
+
+      ServiceFactory.get().getMessagingService().scheduleMessagingJob(job, targetedCustomers);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  @Test
+  public void testSchedulingDealOfferPurchaseJob() throws ServiceException, InvalidInputException {
+    try {
+
+      List<Customer> targetedCustomers = new ArrayList<Customer>();
+      targetedCustomers.add(customerService.getCustomerByEmail("douglasmccuen@yahoo.com"));
+      targetedCustomers.add(customerService.getCustomerByEmail("doug@talool.com"));
+      // targetedCustomers.add(customerService.getCustomerByEmail("christopher.justin@gmail.com"));
+      // targetedCustomers.add(customerService.getCustomerByEmail("chris@talool.com"));
+      // targetedCustomers.add(customerService.getCustomerByEmail("chris@talool.com"));
+
+      Customer fromCustomer = customerService.getCustomerByEmail("chris@talool.com");
+      MerchantAccount merchantAccount = taloolService.getMerchantAccountById(2l); // chris@talool.com
+
+      // Deal Offer Purchase Job Test
+      DealOffer offer = taloolService.getDealOffers().get(0);
+      DealOfferPurchaseJob job =
+          MessagingFactory.newDealOfferPurchaseJob(offer.getMerchant(), merchantAccount, fromCustomer, offer, new Date(), "some job notes");
       ServiceFactory.get().getMessagingService().scheduleMessagingJob(job, targetedCustomers);
     } catch (Exception ex) {
       ex.printStackTrace();

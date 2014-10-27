@@ -1,0 +1,27 @@
+<#import "/lib/talool.ftl" as oo>
+<#assign labelColor="#9b9b9b">
+<#assign detailColor="#2b2b2b">
+
+<@oo.emailContainer title="It is your lucky day!" cobrand="" max=500 min=360>
+	
+	<div style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;line-height:21px">
+		${fullName},
+		<br/><br/>
+		${publisherNotes}
+		<br/><br/>
+		<br/><br/>
+		<b>Here is what ${publisherName} says about ${offerTitle}.</b>
+		<br/><br/>
+		${offerSummary}
+	</div>
+	
+	<div style="font-family:${oo.fontFamily};font-weight:normal;font-size:15px;line-height:21px">
+		<br/><br/>
+		<hr/>
+		<br/>
+		<b>About Talool</b>
+		<br/>
+		${oo.aboutUs}
+	</div>
+	
+</@oo.emailContainer>			

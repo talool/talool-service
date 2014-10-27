@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
@@ -103,10 +102,13 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 @Repository
 public class CustomerServiceImpl extends AbstractHibernateService implements CustomerService {
   private static final Logger LOG = LoggerFactory.getLogger(CustomerServiceImpl.class);
+
   private static final String IGNORE_TEST_EMAIL_DOMAIN = "test.talool.com";
+
   private static final ThreadLocal<Map<String, String>> requestHeaders = new ThreadLocal<Map<String, String>>();
 
   private UniqueCodeStrategy redemptionCodeStrategy;
+
   private EventBus purchaseEventBus = new EventBus("PurchaseEventBus");
 
   public CustomerServiceImpl() {
@@ -360,7 +362,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     }
 
     try {
-
       query = statelessSession.getNamedQuery("redeemDealAcquire");
       redemptionCode = redemptionCodeStrategy.generateCode();
       query.setParameter("dealAcquireStatus", AcquireStatus.REDEEMED);
@@ -428,12 +429,23 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
   @SuppressWarnings("unchecked")
   @Override
   public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId, final SearchOptions searchOpts) throws ServiceException {
+    Calendar c = Calendar.getInstance();
+    c.roll(Calendar.YEAR, -100);
+    Date expiresAfter = c.getTime(); // 100 years ago
+    return getDealAcquires(customerId, merchantId, searchOpts, expiresAfter);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<DealAcquire> getDealAcquires(final UUID customerId, final UUID merchantId, final SearchOptions searchOpts, final Date expiresAfter)
+      throws ServiceException {
     try {
       final String newSql = QueryHelper.buildQuery(QueryType.DealAcquires, null, searchOpts, true);
 
       final Query query = sessionFactory.getCurrentSession().createQuery(newSql);
       query.setParameter("customerId", customerId);
       query.setParameter("merchantId", merchantId);
+      query.setParameter("expiresAfter", expiresAfter);
       QueryHelper.applyOffsetLimit(query, searchOpts);
 
       TaloolStatsDClient.get().count(Action.get_deal_acquires, null, null, requestHeaders.get());
@@ -864,62 +876,40 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     return giftOwnership;
   }
 
-
-  /**
-   * If gift has not already been assigned to an existing customer and the gift has not been
-   * accepted already, we are free to assign the gift to the receipientCustomerId
-   */
   @Override
   @Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
   public DealAcquire acceptGift(final UUID giftId, final UUID receipientCustomerId) throws ServiceException {
-    final Customer receivingCustomer = getCustomerById(receipientCustomerId);
-    final Gift gift = daoDispatcher.find(GiftImpl.class, giftId);
+    final GiftOwnership giftOwnership = validateGiftOwnership(giftId, receipientCustomerId);
 
-    if (gift == null) {
-      throw new ServiceException(String.format("giftRequestId %s does not exist", giftId));
-    }
+    final DealAcquire dac = giftOwnership.gift.getDealAcquire();
 
-    if (gift.getGiftStatus() == GiftStatus.ACCEPTED) {
-      throw new ServiceException(ErrorCode.GIFT_ALREADY_ACCEPTED, "accepted by " + gift.getToCustomer().getEmail());
-    }
-
-    // if no toCustomer then this gift hasn't been assigned to a customer yet (they don't exist)
-    final Optional<Customer> toCustomer = Optional.fromNullable(gift.getToCustomer());
-    if (toCustomer.isPresent()) {
-      if (!toCustomer.get().getId().equals(receipientCustomerId)) {
-        throw new ServiceException(ErrorCode.NOT_GIFT_RECIPIENT, String.format("The gift was sent to %s and cannot be claimed by %s", toCustomer
-            .get().getEmail(), receivingCustomer.getEmail()));
-      }
-    }
-
-    final DealAcquire dac = gift.getDealAcquire();
     dac.setAcquireStatus(AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
     // dac.setSharedByCustomer(dac.getCustomer());
-    dac.setCustomer(receivingCustomer);
+    dac.setCustomer(giftOwnership.receivingCustomer);
+
     // update deal acquire
     daoDispatcher.save(dac);
 
     // update gift request
-    gift.setToCustomer(receivingCustomer);
-    gift.setGiftStatus(GiftStatus.ACCEPTED);
-    daoDispatcher.save(gift);
+    giftOwnership.gift.setGiftStatus(GiftStatus.ACCEPTED);
+    daoDispatcher.save(giftOwnership.gift);
 
     try {
-      Activity activity = ActivityFactory.createFriendAccept(gift);
+      Activity activity = ActivityFactory.createFriendAccept(giftOwnership.gift);
       ServiceFactory.get().getActivityService().save(activity);
     } catch (Exception e) {
       LOG.error("Problem creating createFriendAccept: " + e.getLocalizedMessage(), e);
     }
 
     try {
-      setClosedState(gift, true);
+      setClosedState(giftOwnership.gift, true);
     } catch (Exception e) {
       LOG.error(
           String.format("Problem finding/persisting closedState on activity. receipCustomerId %s giftId %s", receipientCustomerId.toString(), giftId),
           e);
     }
 
-    TaloolStatsDClient.get().count(Action.gift, SubAction.accept, gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
+    TaloolStatsDClient.get().count(Action.gift, SubAction.accept, giftOwnership.gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
 
     return dac;
 
@@ -1745,4 +1735,5 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       throw new ServiceException("Problem getCustomers with criteria", ex);
     }
   }
+
 }
