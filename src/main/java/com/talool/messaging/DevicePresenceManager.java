@@ -13,7 +13,11 @@ import org.slf4j.LoggerFactory;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import com.talool.core.DevicePresence;
+import com.talool.core.service.ServiceException;
 import com.talool.geo.MaxMindUtil;
+import com.talool.service.ServiceFactory;
+import com.talool.utils.MobileUserAgentParser;
+import com.talool.utils.MobileUserAgentParser.MobileUserAgent;
 
 
 /**
@@ -27,17 +31,16 @@ public final class DevicePresenceManager {
   private static final Logger LOG = LoggerFactory.getLogger(DevicePresenceManager.class);
   private static final DevicePresenceManager INSTANCE = new DevicePresenceManager();
   private static final int MAX_BATCH_SIZE = 100;
-  private static final long SLEEP_TIME_IN_MILLS = 30000; // 30 secs
 
   private volatile boolean isRunning = false;
-  private DevicePresenceManagerThread geoLocationManagerThread;
+  private DevicePresenceManagerThread devicePresenceManagerThread;
   private final ConcurrentLinkedQueue<DevicePresence> queue = new ConcurrentLinkedQueue<DevicePresence>();
 
 
   private DevicePresenceManager() {
-    geoLocationManagerThread = new DevicePresenceManagerThread("GeoLocationManagerThread");
+    devicePresenceManagerThread = new DevicePresenceManagerThread("devicePresenceManagerThread");
     isRunning = true;
-    geoLocationManagerThread.start();
+    devicePresenceManagerThread.start();
   }
 
   public static DevicePresenceManager get() {
@@ -47,6 +50,7 @@ public final class DevicePresenceManager {
   /**
    * Non-blocking/asynchronous update of a DevicePresence. This method will also decorate with
    * MaxMind location data if a valid IP address is set
+   * 
    * 
    * @param devicePresence
    */
@@ -73,20 +77,27 @@ public final class DevicePresenceManager {
             try {
               cityResponse = MaxMindUtil.get().lookup(devicePresence.getIp());
             } catch (UnknownHostException e) {
-              // TODO Auto-generated catch block
-              e.printStackTrace();
+              LOG.error(e.getLocalizedMessage(), e);
             } catch (IOException e) {
-              // TODO Auto-generated catch block
-              e.printStackTrace();
+              LOG.error(e.getLocalizedMessage(), e);
             } catch (GeoIp2Exception e) {
-              // TODO Auto-generated catch block
-              e.printStackTrace();
+              LOG.error(e.getLocalizedMessage(), e);
             }
             if (cityResponse != null) {
               devicePresence.setCity(cityResponse.getCity().getName());
               devicePresence.setStateCode(cityResponse.getMostSpecificSubdivision().getIsoCode());
               devicePresence.setZip(cityResponse.getPostal().getCode());
               devicePresence.setCountry(cityResponse.getCountry().getIsoCode());
+            }
+            if (devicePresence.getUserAgent() != null) {
+
+              MobileUserAgent agent = MobileUserAgentParser.parse(devicePresence.getUserAgent());
+              if (agent != null) {
+                devicePresence.setTaloolVersion(agent.getAppVersion());
+                devicePresence.setDeviceType(agent.getOsName());
+                devicePresence.setDeviceOsVersion(agent.getOsName());
+              }
+
             }
 
             customerLocations.add(devicePresence);
@@ -95,18 +106,21 @@ public final class DevicePresenceManager {
 
           elements = 0;
 
-          updateDevicePresences(customerLocations);
+          try {
+            ServiceFactory.get().getMessagingService().updateDevicePresences(customerLocations);
+          } catch (ServiceException e) {
+            LOG.error("Problem updating " + customerLocations.size() + " device presences", e);
+          }
           customerLocations.clear();
+
+          try {
+            // sleeping for 20 seconds to simply try a larger batch on the queue poll
+            sleep(20000);
+          } catch (InterruptedException e) {
+            // ignore
+          }
         }
       }
     }
-
-
-    void updateDevicePresences(final List<DevicePresence> devicePresences) {
-
-    }
-
-
-
   }
 }

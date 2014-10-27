@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * 
  */
 public class MobileUserAgentParser {
-  private static final Pattern ua = Pattern.compile("Talool/(.*) \\((iPhone; CPU |Linux; )(Android|iPhone)[ ](OS )?([._0-9]*)(.*)\\)");
+  private static final Pattern MUA = Pattern.compile("Talool/(.*) \\((iPhone; CPU |Linux; )(Android|iPhone)[ ](OS )?([._0-9]*).*\\)");
 
   /**
    * An immutable class representing the various parts of a Talool mobile user-agent string
@@ -58,7 +58,7 @@ public class MobileUserAgentParser {
   }
 
   public static MobileUserAgent parse(final String userAgent) {
-    final Matcher matcher = ua.matcher(userAgent);
+    final Matcher matcher = MUA.matcher(userAgent);
     MobileUserAgent mua = null;
 
     if (matcher.matches()) {

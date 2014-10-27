@@ -74,8 +74,4 @@ public interface Customer extends IdentifiableUUID, Serializable, TimeAware {
 
   public void setIsEmailValid(final boolean isValid);
 
-  public DevicePresence getLastMobilePresence();
-
-  public void setLastMobilePresence(DevicePresence mobilePresence);
-
 }

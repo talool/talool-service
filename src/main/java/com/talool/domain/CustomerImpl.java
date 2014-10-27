@@ -21,13 +21,11 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Target;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.talool.core.Customer;
-import com.talool.core.DevicePresence;
 import com.talool.core.Sex;
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
@@ -81,10 +79,6 @@ public class CustomerImpl implements Customer {
   @MapKey(name = "socialNetwork")
   @JoinColumn(name = "customer_id")
   private final Map<SocialNetwork, CustomerSocialAccount> socialAccounts = new HashMap<SocialNetwork, CustomerSocialAccount>();
-
-  @Embedded
-  @Target(DevicePresenceImpl.class)
-  private DevicePresence lastMobilePresence;
 
   @Embedded
   private CreatedUpdated createdUpdated;
@@ -254,15 +248,6 @@ public class CustomerImpl implements Customer {
     this.isValidEmail = isValid;
   }
 
-  @Override
-  public DevicePresence getLastMobilePresence() {
-    return lastMobilePresence;
-  }
-
-  @Override
-  public void setLastMobilePresence(DevicePresence mobilePresence) {
-    this.lastMobilePresence = mobilePresence;
-  }
 
 
 }

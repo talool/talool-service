@@ -65,51 +65,22 @@ public class MessagingServiceTest extends HibernateFunctionalTestBase {
     }
   }
 
-  @Test
-  public void testJobManager() throws ServiceException, InvalidInputException {
-    LOG.info("waiting");
-  }
 
-  @Test
-  public void testUpdateCustomerLocations() throws ServiceException {
 
-    List<DevicePresence> mobilePresences = new ArrayList<DevicePresence>();
+  public void testDevicePresence() throws ServiceException {
     Location location = domainFactory.newLocation(-105.281686, 40.017663);
+    List<DevicePresence> mobilePresences = new ArrayList<DevicePresence>();
 
     DevicePresence presence = FactoryManager.get().getDomainFactory().newMobilePresence();
+    presence.setUserAgent("Talool/1.1.8 (Linux; Android 4.4.2; Samsung SPH-L720)");
     presence.setIp("71.237.43.59");
+    presence.setDeviceId("sd98239090237823");
     presence.setCustomerId(UUID.fromString("d26b2473-56db-42ff-bc62-eb67aa7f96b9"));
     presence.setLocation(FactoryManager.get().getDomainFactory().newPoint(location));
     mobilePresences.add(presence);
 
-    presence = FactoryManager.get().getDomainFactory().newMobilePresence();
-    presence.setIp("71.237.43.59");
-    presence.setCustomerId(UUID.fromString("7f7002e2-7dfa-4fe6-9c21-1bbc91439970"));
-    presence.setLocation(FactoryManager.get().getDomainFactory().newPoint(location));
-    mobilePresences.add(presence);
-
-    presence = FactoryManager.get().getDomainFactory().newMobilePresence();
-    presence.setIp("71.237.43.59");
-    presence.setCustomerId(UUID.fromString("84881ffd-703c-463e-9428-8a4f33115370"));
-    presence.setLocation(FactoryManager.get().getDomainFactory().newPoint(location));
-    mobilePresences.add(presence);
-
-    presence = FactoryManager.get().getDomainFactory().newMobilePresence();
-    presence.setIp("71.237.43.59");
-    presence.setCustomerId(UUID.fromString("014fd7ee-0cdb-4d9b-ab62-f635f956301e"));
-    presence.setLocation(FactoryManager.get().getDomainFactory().newPoint(location));
-    mobilePresences.add(presence);
-
-    presence = FactoryManager.get().getDomainFactory().newMobilePresence();
-    presence.setIp("71.237.43.59");
-    presence.setCustomerId(UUID.fromString("02e30d24-a6f8-4d2e-bf7d-9bbec0d62acc"));
-    presence.setLocation(FactoryManager.get().getDomainFactory().newPoint(location));
-    mobilePresences.add(presence);
-
-
-
     ServiceFactory.get().getMessagingService().updateDevicePresences(mobilePresences);
-
-    System.out.println("Got here");
   }
+
+
 }

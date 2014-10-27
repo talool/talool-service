@@ -18,7 +18,11 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 </bean>           
 
-
+<bean id="maxMindDbUtil" class="com.talool.geo.MaxMindUtil"
+		factory-method="createInstance">
+		<constructor-arg value="${maxmind.city.db}" />
+	</bean>
+	
 <bean id="messagingJobManager" class="com.talool.messaging.job.MessagingJobManager" factory-method="createInstance">
   <constructor-arg ref="messagingServiceImpl" />
 </bean>

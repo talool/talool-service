@@ -25,18 +25,18 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 
 @Entity
-@Table(name = "customer_presence", catalog = "public")
+@Table(name = "device_presence", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DevicePresenceImpl implements DevicePresence {
-
   @Id
   @GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
   @GeneratedValue(generator = "uuid_gen")
   @Type(type = "pg-uuid")
-  @Column(name = "customer_presence_id", unique = true, nullable = false)
+  @Column(name = "device_presence_id", unique = true, nullable = false)
   private UUID id;
 
-  @Column(name = "customer_id", nullable = false, insertable = false, updatable = false)
+  @Type(type = "pg-uuid")
+  @Column(name = "customer_id", nullable = false, insertable = true, updatable = false)
   private UUID customerId;
 
   @Type(type = "geomType")
@@ -46,10 +46,13 @@ public class DevicePresenceImpl implements DevicePresence {
   @Column(name = "device_id", nullable = false)
   private String deviceId;
 
-  @Column(name = "device_type", nullable = false)
+  @Column(name = "device_type", nullable = true)
   private String deviceType;
 
-  @Column(name = "talool_version", nullable = false)
+  @Column(name = "device_os_version", nullable = true)
+  private String deviceOsVersion;
+
+  @Column(name = "talool_version", nullable = true)
   private String taloolVersion;
 
   @Column(name = "user_agent", nullable = false)
@@ -66,6 +69,9 @@ public class DevicePresenceImpl implements DevicePresence {
 
   @Column(name = "zip", nullable = true)
   private String zip;
+
+  @Column(name = "device_token", nullable = true)
+  private String deviceToken;
 
   @Column(name = "country", nullable = true)
   private String country;
@@ -219,6 +225,30 @@ public class DevicePresenceImpl implements DevicePresence {
   @Override
   public Date getUpdated() {
     return updated;
+  }
+
+  @Override
+  public String getDeviceToken() {
+    return deviceToken;
+  }
+
+  @Override
+  public void setDeviceToken(String deviceToken) {
+    this.deviceToken = deviceToken;
+  }
+
+  @Override
+  public String getDeviceOsVersion() {
+    return deviceOsVersion;
+  }
+
+  @Override
+  public void setDeviceOsVersion(String deviceOsVersion) {
+    this.deviceOsVersion = deviceOsVersion;
+  }
+
+  public void setId(final UUID id) {
+    this.id = id;
   }
 
 }

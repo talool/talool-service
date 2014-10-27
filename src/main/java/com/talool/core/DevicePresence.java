@@ -15,6 +15,7 @@ public interface DevicePresence extends IdentifiableUUID {
 
   public UUID getCustomerId();
 
+
   public void setCustomerId(final UUID customerId);
 
   /**
@@ -30,6 +31,10 @@ public interface DevicePresence extends IdentifiableUUID {
    * @param deviceId
    */
   public void setDeviceId(final String deviceId);
+
+  public String getDeviceOsVersion();
+
+  public void setDeviceOsVersion(final String deviceOsVersion);
 
   /**
    * Gets the mobile device type (Android, iOS, etc)
@@ -88,5 +93,21 @@ public interface DevicePresence extends IdentifiableUUID {
   public void setCountry(final String country);
 
   public Date getUpdated();
+
+  /**
+   * Gets the device token which if an Android device is a gcmDeviceToken and on iOS it is the
+   * apnDeviceToken
+   * 
+   * @return
+   */
+  public String getDeviceToken();
+
+  /**
+   * Sets the device token which if an Android device is a gcmDeviceToken and on iOS it is the
+   * apnDeviceToken
+   * 
+   * @param deviceToken
+   */
+  public void setDeviceToken(String deviceToken);
 
 }
