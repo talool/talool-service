@@ -21,6 +21,7 @@ import com.talool.core.MerchantAccount;
 import com.talool.core.MerchantIdentity;
 import com.talool.core.MerchantLocation;
 import com.talool.core.MerchantMedia;
+import com.talool.core.DevicePresence;
 import com.talool.core.Relationship;
 import com.talool.core.RelationshipStatus;
 import com.talool.core.Tag;
@@ -36,6 +37,10 @@ import com.talool.domain.activity.ActivityImpl;
 import com.talool.domain.gift.EmailGiftImpl;
 import com.talool.domain.social.CustomerSocialAccountImpl;
 import com.talool.domain.social.MerchantSocialAccountImpl;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * Default Factory for all domain objects
@@ -43,237 +48,215 @@ import com.talool.domain.social.MerchantSocialAccountImpl;
  * @author clintz
  * 
  */
-final class DomainFactoryImpl implements DomainFactory
-{
-	private static final Logger LOG = LoggerFactory.getLogger(DomainFactoryImpl.class);
+final class DomainFactoryImpl implements DomainFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(DomainFactoryImpl.class);
 
-	public DomainFactoryImpl()
-	{}
+  public DomainFactoryImpl() {}
 
-	@Override
-	public CustomerSocialAccount newCustomerSocialAccount(final String socialNetworkName)
-	{
-		CustomerSocialAccount sac = null;
-		try
-		{
-			SocialNetwork snet = FactoryManager.get().getServiceFactory().getTaloolService()
-					.getSocialNetwork(SocialNetwork.NetworkName.valueOf(socialNetworkName));
+  @Override
+  public CustomerSocialAccount newCustomerSocialAccount(final String socialNetworkName) {
+    CustomerSocialAccount sac = null;
+    try {
+      SocialNetwork snet =
+          FactoryManager.get().getServiceFactory().getTaloolService().getSocialNetwork(SocialNetwork.NetworkName.valueOf(socialNetworkName));
 
-			sac = new CustomerSocialAccountImpl();
-			sac.setSocialNetwork(snet);
-		}
-		catch (Exception e)
-		{
-			LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
-		}
+      sac = new CustomerSocialAccountImpl();
+      sac.setSocialNetwork(snet);
+    } catch (Exception e) {
+      LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
+    }
 
-		return sac;
-	}
+    return sac;
+  }
 
-	@Override
-	public MerchantSocialAccount newMerchantSocialAccount(final String socialNetworkName)
-	{
-		MerchantSocialAccount sac = null;
-		try
-		{
-			SocialNetwork snet = FactoryManager.get().getServiceFactory().getTaloolService()
-					.getSocialNetwork(SocialNetwork.NetworkName.valueOf(socialNetworkName));
+  @Override
+  public MerchantSocialAccount newMerchantSocialAccount(final String socialNetworkName) {
+    MerchantSocialAccount sac = null;
+    try {
+      SocialNetwork snet =
+          FactoryManager.get().getServiceFactory().getTaloolService().getSocialNetwork(SocialNetwork.NetworkName.valueOf(socialNetworkName));
 
-			sac = new MerchantSocialAccountImpl();
-			sac.setSocialNetwork(snet);
-		}
-		catch (Exception e)
-		{
-			LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
-		}
+      sac = new MerchantSocialAccountImpl();
+      sac.setSocialNetwork(snet);
+    } catch (Exception e) {
+      LOG.error("Problem getSocialNetwork " + socialNetworkName, e);
+    }
 
-		return sac;
-	}
+    return sac;
+  }
 
-	@Override
-	public Merchant newMerchant()
-	{
-		return newMerchant(false);
-	}
+  @Override
+  public Merchant newMerchant() {
+    return newMerchant(false);
+  }
 
-	@Override
-	public Deal newDeal(final DealOffer dealOffer)
-	{
-		return new DealImpl(dealOffer);
-	}
+  @Override
+  public Deal newDeal(final DealOffer dealOffer) {
+    return new DealImpl(dealOffer);
+  }
 
-	@Override
-	public DealOfferPurchase newDealOfferPurchase(final DealOffer dealOffer, final Customer customer)
-	{
-		return new DealOfferPurchaseImpl(customer, dealOffer);
-	}
+  @Override
+  public DealOfferPurchase newDealOfferPurchase(final DealOffer dealOffer, final Customer customer) {
+    return new DealOfferPurchaseImpl(customer, dealOffer);
+  }
 
-	@Override
-	public Customer newCustomer()
-	{
-		return new CustomerImpl();
-	}
+  @Override
+  public Customer newCustomer() {
+    return new CustomerImpl();
+  }
 
-	@Override
-	public Location newLocation(final Double longitude, final Double latitude)
-	{
-		return new LocationImpl(longitude, latitude);
-	}
+  @Override
+  public Location newLocation(final Double longitude, final Double latitude) {
+    return new LocationImpl(longitude, latitude);
+  }
 
-	@Override
-	public MerchantLocation newMerchantLocation()
-	{
-		return new MerchantLocationImpl();
-	}
+  @Override
+  public MerchantLocation newMerchantLocation() {
+    return new MerchantLocationImpl();
+  }
 
-	@Override
-	public Tag newTag(String tagName)
-	{
-		Tag tag = new TagImpl();
-		tag.setName(tagName.trim().toLowerCase());
-		return tag;
-	}
+  @Override
+  public Tag newTag(String tagName) {
+    Tag tag = new TagImpl();
+    tag.setName(tagName.trim().toLowerCase());
+    return tag;
+  }
 
-	@Override
-	public MerchantAccount newMerchantAccount(final Merchant merchant)
-	{
-		return new MerchantAccountImpl(merchant);
-	}
+  @Override
+  public MerchantAccount newMerchantAccount(final Merchant merchant) {
+    return new MerchantAccountImpl(merchant);
+  }
 
-	@Override
-	public DealOffer newDealOffer(final Merchant merchant, final MerchantAccount createdByMerchant)
-	{
-		DealOffer dealOffer = new DealOfferImpl(merchant, createdByMerchant);
-		dealOffer.setUpdatedByMerchantAccount(createdByMerchant);
-		dealOffer.setActive(false);
-		return dealOffer;
-	}
+  @Override
+  public DealOffer newDealOffer(final Merchant merchant, final MerchantAccount createdByMerchant) {
+    DealOffer dealOffer = new DealOfferImpl(merchant, createdByMerchant);
+    dealOffer.setUpdatedByMerchantAccount(createdByMerchant);
+    dealOffer.setActive(false);
+    return dealOffer;
+  }
 
-	@Override
-	public DealOfferPurchase newDealOfferPurchase(Customer customer, DealOffer dealOffer)
-	{
-		return new DealOfferPurchaseImpl(customer, dealOffer);
-	}
+  @Override
+  public DealOfferPurchase newDealOfferPurchase(Customer customer, DealOffer dealOffer) {
+    return new DealOfferPurchaseImpl(customer, dealOffer);
+  }
 
-	@Override
-	public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer, final RelationshipStatus status)
-	{
-		final Relationship rel = new RelationshipImpl();
-		rel.setFromCustomer(fromCustomer);
-		rel.setToCustomer(toCustomer);
-		rel.setRelationshipStatus(status);
-		return rel;
-	}
+  @Override
+  public Relationship newRelationship(final Customer fromCustomer, final Customer toCustomer, final RelationshipStatus status) {
+    final Relationship rel = new RelationshipImpl();
+    rel.setFromCustomer(fromCustomer);
+    rel.setToCustomer(toCustomer);
+    rel.setRelationshipStatus(status);
+    return rel;
+  }
 
-	@Override
-	public Deal newDeal(UUID merchantId, final MerchantAccount createdByMerchantAccount, final boolean setDefaults)
-	{
-		final Deal deal = new DealImpl(createdByMerchantAccount);
-		deal.setUpdatedByMerchantAccount(createdByMerchantAccount);
+  @Override
+  public Deal newDeal(UUID merchantId, final MerchantAccount createdByMerchantAccount, final boolean setDefaults) {
+    final Deal deal = new DealImpl(createdByMerchantAccount);
+    deal.setUpdatedByMerchantAccount(createdByMerchantAccount);
 
-		if (setDefaults)
-		{
-			deal.setMerchant(createdByMerchantAccount.getMerchant());
+    if (setDefaults) {
+      deal.setMerchant(createdByMerchantAccount.getMerchant());
 
-			TaloolService taloolService = FactoryManager.get().getServiceFactory().getTaloolService();
+      TaloolService taloolService = FactoryManager.get().getServiceFactory().getTaloolService();
 
-			/*
-			 * Grab a DealOffer from the logged in Merchant and use it's expiration date as the default for the Deal
-			 */
-			try
-			{
-				List<DealOffer> offers = taloolService.getDealOffersByMerchantId(createdByMerchantAccount.getMerchant().getId());
-				if (CollectionUtils.isNotEmpty(offers))
-				{
-					// TODO New Deals should default to the most recently updated
-					// DealOffer
-					DealOffer dealOffer = offers.get(0);
-					deal.setDealOffer(dealOffer);
-				}
+      /*
+       * Grab a DealOffer from the logged in Merchant and use it's expiration date as the default
+       * for the Deal
+       */
+      try {
+        List<DealOffer> offers = taloolService.getDealOffersByMerchantId(createdByMerchantAccount.getMerchant().getId());
+        if (CollectionUtils.isNotEmpty(offers)) {
+          // TODO New Deals should default to the most recently updated
+          // DealOffer
+          DealOffer dealOffer = offers.get(0);
+          deal.setDealOffer(dealOffer);
+        }
 
-			}
-			catch (ServiceException se)
-			{
-				LOG.error("Failed to get offers for logged in merchant", se);
-			}
+      } catch (ServiceException se) {
+        LOG.error("Failed to get offers for logged in merchant", se);
+      }
 
-			/*
-			 * Pass the Merchant's tags to the Deal by default TODO should use "reattach" rather than "refresh"
-			 */
-			try
-			{
-				Merchant merchant;
-				if (merchantId == null)
-				{
-					merchant = createdByMerchantAccount.getMerchant();
-				}
-				else
-				{
-					merchant = taloolService.getMerchantById(merchantId);
-				}
-				taloolService.refresh(merchant);
-				Set<Tag> tags = merchant.getTags();
-				if (CollectionUtils.isNotEmpty(tags))
-				{
-					deal.setTags(tags);
-				}
-			}
-			catch (ServiceException se)
-			{
-				LOG.error("Failed to reattach the merchant when getting tags", se);
-			}
-			catch (Exception e)
-			{
-				LOG.error("Failed to get tags for logged in merchant", e);
-			}
+      /*
+       * Pass the Merchant's tags to the Deal by default TODO should use "reattach" rather than
+       * "refresh"
+       */
+      try {
+        Merchant merchant;
+        if (merchantId == null) {
+          merchant = createdByMerchantAccount.getMerchant();
+        } else {
+          merchant = taloolService.getMerchantById(merchantId);
+        }
+        taloolService.refresh(merchant);
+        Set<Tag> tags = merchant.getTags();
+        if (CollectionUtils.isNotEmpty(tags)) {
+          deal.setTags(tags);
+        }
+      } catch (ServiceException se) {
+        LOG.error("Failed to reattach the merchant when getting tags", se);
+      } catch (Exception e) {
+        LOG.error("Failed to get tags for logged in merchant", e);
+      }
 
-		}
+    }
 
-		return deal;
-	}
+    return deal;
+  }
 
-	@Override
-	public MerchantIdentity newMerchantIdentity(final UUID id, final String name)
-	{
-		return new MerchantIdentityImpl(id, name);
-	}
+  @Override
+  public MerchantIdentity newMerchantIdentity(final UUID id, final String name) {
+    return new MerchantIdentityImpl(id, name);
+  }
 
-	@Override
-	public MerchantMedia newMedia(final UUID merchantId, final String mediaUrl, final MediaType mediaType)
-	{
-		final MerchantMediaImpl media = new MerchantMediaImpl();
-		media.setMediaUrl(mediaUrl);
-		media.setMerchantId(merchantId);
-		media.setMediaType(mediaType);
-		return media;
-	}
+  @Override
+  public MerchantMedia newMedia(final UUID merchantId, final String mediaUrl, final MediaType mediaType) {
+    final MerchantMediaImpl media = new MerchantMediaImpl();
+    media.setMediaUrl(mediaUrl);
+    media.setMerchantId(merchantId);
+    media.setMediaType(mediaType);
+    return media;
+  }
 
-	@Override
-	public Merchant newMerchant(boolean topLevelOnly)
-	{
-		Merchant merchant = new MerchantImpl();
+  @Override
+  public Merchant newMerchant(boolean topLevelOnly) {
+    Merchant merchant = new MerchantImpl();
 
-		if (!topLevelOnly)
-		{
-			MerchantLocation location = newMerchantLocation();
-			merchant.addLocation(location);
-		}
-		return merchant;
+    if (!topLevelOnly) {
+      MerchantLocation location = newMerchantLocation();
+      merchant.addLocation(location);
+    }
+    return merchant;
 
-	}
+  }
 
-	@Override
-	public Activity newActivity(final ActivityEvent activityType, final UUID customerId)
-	{
-		final ActivityImpl act = new ActivityImpl();
-		act.setActivityEvent(activityType);
-		act.setCustomerId(customerId);
-		return act;
-	}
+  @Override
+  public Activity newActivity(final ActivityEvent activityType, final UUID customerId) {
+    final ActivityImpl act = new ActivityImpl();
+    act.setActivityEvent(activityType);
+    act.setCustomerId(customerId);
+    return act;
+  }
 
-	@Override
-	public EmailGift newEmailGift()
-	{
-		return new EmailGiftImpl();
-	}
+  @Override
+  public EmailGift newEmailGift() {
+    return new EmailGiftImpl();
+  }
+
+  @Override
+  public Point newPoint(final Location location) {
+    // TODO GeometryFactory should be thread-safe, but i am not sure. We may need to upgrade
+    final GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
+    final com.vividsolutions.jts.geom.Point point =
+        (location == null || location.getLatitude() == null || location.getLongitude() == null) ? null : factory.createPoint(new Coordinate(location
+            .getLongitude(), location.getLatitude()));
+
+    return point;
+
+
+  }
+
+  @Override
+  public DevicePresence newMobilePresence() {
+    return new DevicePresenceImpl();
+  }
 }

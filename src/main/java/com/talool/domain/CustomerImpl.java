@@ -35,254 +35,219 @@ import com.talool.service.EncryptService;
 @Entity
 @Table(name = "customer", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
-public class CustomerImpl implements Customer
-{
-	private static final Logger LOG = LoggerFactory.getLogger(CustomerImpl.class);
+public class CustomerImpl implements Customer {
+  private static final Logger LOG = LoggerFactory.getLogger(CustomerImpl.class);
 
-	private static final long serialVersionUID = 2498058366640693644L;
+  private static final long serialVersionUID = 2498058366640693644L;
 
-	@Id
-	@GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
-	@GeneratedValue(generator = "uuid_gen")
-	@Type(type = "pg-uuid")
-	@Column(name = "customer_id", unique = true, nullable = false)
-	private UUID id;
+  @Id
+  @GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
+  @GeneratedValue(generator = "uuid_gen")
+  @Type(type = "pg-uuid")
+  @Column(name = "customer_id", unique = true, nullable = false)
+  private UUID id;
 
-	@Type(type = "sexType")
-	@Column(name = "sex_t", nullable = true, columnDefinition = "sex_type")
-	private Sex sex;
+  @Type(type = "sexType")
+  @Column(name = "sex_t", nullable = true, columnDefinition = "sex_type")
+  private Sex sex;
 
-	@Column(name = "birth_date", unique = false, nullable = true)
-	private Date birthDate;
+  @Column(name = "birth_date", unique = false, nullable = true)
+  private Date birthDate;
 
-	@Column(name = "first_name", unique = false, nullable = true, length = 64)
-	private String firstName;
+  @Column(name = "first_name", unique = false, nullable = true, length = 64)
+  private String firstName;
 
-	@Column(name = "last_name", unique = false, nullable = true, length = 64)
-	private String lastName;
+  @Column(name = "last_name", unique = false, nullable = true, length = 64)
+  private String lastName;
 
-	@Column(name = "email", unique = true, nullable = true, length = 128)
-	private String email;
+  @Column(name = "email", unique = true, nullable = true, length = 128)
+  private String email;
 
-	@Column(name = "password", unique = false, nullable = false, length = 64)
-	private String password;
+  @Column(name = "password", unique = false, nullable = false, length = 64)
+  private String password;
 
-	@Column(name = "reset_pw_code", length = 32)
-	private String resetPassordCode;
+  @Column(name = "reset_pw_code", length = 32)
+  private String resetPassordCode;
 
-	@Column(name = "reset_pw_expires")
-	private Date resetPassordExpires;
+  @Column(name = "reset_pw_expires")
+  private Date resetPassordExpires;
 
-	@Column(name = "valid_email")
-	private Boolean isValidEmail;
+  @Column(name = "valid_email")
+  private Boolean isValidEmail;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = CustomerSocialAccountImpl.class, orphanRemoval = true)
-	@MapKey(name = "socialNetwork")
-	@JoinColumn(name = "customer_id")
-	private final Map<SocialNetwork, CustomerSocialAccount> socialAccounts = new HashMap<SocialNetwork, CustomerSocialAccount>();
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = CustomerSocialAccountImpl.class, orphanRemoval = true)
+  @MapKey(name = "socialNetwork")
+  @JoinColumn(name = "customer_id")
+  private final Map<SocialNetwork, CustomerSocialAccount> socialAccounts = new HashMap<SocialNetwork, CustomerSocialAccount>();
 
-	@Embedded
-	private CreatedUpdated createdUpdated;
+  @Embedded
+  private CreatedUpdated createdUpdated;
 
-	@Override
-	public UUID getId()
-	{
-		return id;
-	}
+  @Override
+  public UUID getId() {
+    return id;
+  }
 
-	@Override
-	public String getFirstName()
-	{
-		return firstName;
-	}
+  @Override
+  public String getFirstName() {
+    return firstName;
+  }
 
-	@Override
-	public String getLastName()
-	{
-		return lastName;
-	}
+  @Override
+  public String getLastName() {
+    return lastName;
+  }
 
-	@Override
-	public String getEmail()
-	{
-		return email;
-	}
+  @Override
+  public String getEmail() {
+    return email;
+  }
 
-	@Override
-	public Date getCreated()
-	{
-		return createdUpdated.getCreated();
-	}
+  @Override
+  public Date getCreated() {
+    return createdUpdated.getCreated();
+  }
 
-	@Override
-	public Date getUpdated()
-	{
-		return createdUpdated.getUpdated();
-	}
+  @Override
+  public Date getUpdated() {
+    return createdUpdated.getUpdated();
+  }
 
-	@Override
-	public Date getBirthDate()
-	{
-		return birthDate;
-	}
+  @Override
+  public Date getBirthDate() {
+    return birthDate;
+  }
 
-	@Override
-	public String getPassword()
-	{
-		return password;
-	}
+  @Override
+  public String getPassword() {
+    return password;
+  }
 
-	@Override
-	public String toString()
-	{
-		return ReflectionToStringBuilder.toString(this);
-	}
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-		{
-			return true;
-		}
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
 
-		if (obj == null)
-		{
-			return false;
-		}
+    if (obj == null) {
+      return false;
+    }
 
-		if (!(obj instanceof CustomerImpl))
-		{
-			return false;
-		}
+    if (!(obj instanceof CustomerImpl)) {
+      return false;
+    }
 
-		final CustomerImpl other = (CustomerImpl) obj;
+    final CustomerImpl other = (CustomerImpl) obj;
 
-		if (getId() != other.getId())
-		{
-			return false;
-		}
+    if (getId() != other.getId()) {
+      return false;
+    }
 
-		return new EqualsBuilder().append(getFirstName(), other.getFirstName())
-				.append(getLastName(), other.getLastName()).append(getEmail(), other.getEmail()).isEquals();
-	}
+    return new EqualsBuilder().append(getFirstName(), other.getFirstName()).append(getLastName(), other.getLastName())
+        .append(getEmail(), other.getEmail()).isEquals();
+  }
 
-	@Override
-	public int hashCode()
-	{
-		return new HashCodeBuilder(17, 37).append(getFirstName()).append(getLastName())
-				.append(getEmail()).hashCode();
-	}
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).append(getFirstName()).append(getLastName()).append(getEmail()).hashCode();
+  }
 
-	@Override
-	public void setFirstName(String firstName)
-	{
-		this.firstName = firstName;
-	}
+  @Override
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-	@Override
-	public void setLastName(String lastName)
-	{
-		this.lastName = lastName;
-	}
+  @Override
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-	@Override
-	public void setEmail(String email)
-	{
-		this.email = email == null ? null : email.toLowerCase();
-	}
+  @Override
+  public void setEmail(String email) {
+    this.email = email == null ? null : email.toLowerCase();
+  }
 
-	@Override
-	public void setPassword(String password)
-	{
-		try
-		{
-			this.password = EncryptService.MD5(password);
-		}
-		catch (Exception e)
-		{
-			LOG.error("Problem encrypting password");
-		}
+  @Override
+  public void setPassword(String password) {
+    try {
+      this.password = EncryptService.MD5(password);
+    } catch (Exception e) {
+      LOG.error("Problem encrypting password");
+    }
 
-	}
+  }
 
-	@Override
-	public Sex getSex()
-	{
-		return sex;
-	}
+  @Override
+  public Sex getSex() {
+    return sex;
+  }
 
-	@Override
-	public void setSex(Sex sex)
-	{
-		this.sex = sex;
-	}
+  @Override
+  public void setSex(Sex sex) {
+    this.sex = sex;
+  }
 
-	@Override
-	public void setBirthDate(Date birthDate)
-	{
-		this.birthDate = birthDate;
-	}
+  @Override
+  public void setBirthDate(Date birthDate) {
+    this.birthDate = birthDate;
+  }
 
-	@Override
-	public Map<SocialNetwork, CustomerSocialAccount> getSocialAccounts()
-	{
-		return socialAccounts;
-	}
+  @Override
+  public Map<SocialNetwork, CustomerSocialAccount> getSocialAccounts() {
+    return socialAccounts;
+  }
 
-	@Override
-	public void addSocialAccount(final CustomerSocialAccount socialAccount)
-	{
-		socialAccounts.put(socialAccount.getSocialNetwork(), socialAccount);
-	}
+  @Override
+  public void addSocialAccount(final CustomerSocialAccount socialAccount) {
+    socialAccounts.put(socialAccount.getSocialNetwork(), socialAccount);
+  }
 
-	@Override
-	public void removeSocialAccount(final CustomerSocialAccount socialAccount)
-	{
-		socialAccounts.remove(socialAccount.getSocialNetwork());
+  @Override
+  public void removeSocialAccount(final CustomerSocialAccount socialAccount) {
+    socialAccounts.remove(socialAccount.getSocialNetwork());
 
-	}
+  }
 
-	@Override
-	public String getFullName()
-	{
-		return firstName + " " + lastName;
-	}
+  @Override
+  public String getFullName() {
+    return firstName + " " + lastName;
+  }
 
-	@Override
-	public void setResetPasswordCode(String code)
-	{
-		this.resetPassordCode = code;
-	}
+  @Override
+  public void setResetPasswordCode(String code) {
+    this.resetPassordCode = code;
+  }
 
-	@Override
-	public String getResetPasswordCode()
-	{
-		return resetPassordCode;
-	}
+  @Override
+  public String getResetPasswordCode() {
+    return resetPassordCode;
+  }
 
-	@Override
-	public void setResetPasswordExpires(Date expires)
-	{
-		this.resetPassordExpires = expires;
-	}
+  @Override
+  public void setResetPasswordExpires(Date expires) {
+    this.resetPassordExpires = expires;
+  }
 
-	@Override
-	public Date getResetPasswordExpires()
-	{
-		return resetPassordExpires;
-	}
+  @Override
+  public Date getResetPasswordExpires() {
+    return resetPassordExpires;
+  }
 
-	@Override
-	public boolean isEmailValid()
-	{
-		return (isValidEmail == null || isValidEmail == true) ? true : false;
-	}
+  @Override
+  public boolean isEmailValid() {
+    return (isValidEmail == null || isValidEmail == true) ? true : false;
+  }
 
-	@Override
-	public void setIsEmailValid(boolean isValid)
-	{
-		this.isValidEmail = isValid;
-	}
+  @Override
+  public void setIsEmailValid(boolean isValid) {
+    this.isValidEmail = isValid;
+  }
+
+
 
 }
