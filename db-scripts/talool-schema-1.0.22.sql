@@ -25,5 +25,8 @@ ALTER TABLE public.device_presence OWNER TO talool;
 ALTER TABLE ONLY device_presence ADD CONSTRAINT "FK_DevicePresence_Customer" FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
 
 CREATE TRIGGER device_presence_update_dt BEFORE UPDATE ON device_presence FOR EACH ROW EXECUTE PROCEDURE update_dt_column();
+
+alter table device_presence alter column device_id TYPE character varying(64);
+
 COMMIT;
 
