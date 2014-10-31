@@ -41,6 +41,16 @@ public final class DevicePresenceManager {
     devicePresenceManagerThread = new DevicePresenceManagerThread("devicePresenceManagerThread");
     isRunning = true;
     devicePresenceManagerThread.start();
+
+    // adding shutdown hook to gracefully stop messaging manager
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        // prevent new tasks from being submitted
+        LOG.info("Shutting down MessagingJobManager.  No new tasks will be submitted..");
+        isRunning = false;
+      }
+    });
   }
 
   public static DevicePresenceManager get() {
@@ -72,55 +82,59 @@ public final class DevicePresenceManager {
       CityResponse cityResponse = null;
 
       while (isRunning) {
-        while ((devicePresence = queue.poll()) != null && (elements <= MAX_BATCH_SIZE)) {
-          if (StringUtils.isNotEmpty(devicePresence.getIp())) {
-            try {
-              cityResponse = MaxMindUtil.get().lookup(devicePresence.getIp());
-            } catch (UnknownHostException e) {
-              LOG.error(e.getLocalizedMessage(), e);
-            } catch (IOException e) {
-              LOG.error(e.getLocalizedMessage(), e);
-            } catch (GeoIp2Exception e) {
-              LOG.error(e.getLocalizedMessage(), e);
-            }
-            if (cityResponse != null) {
-              devicePresence.setCity(cityResponse.getCity().getName());
-              devicePresence.setStateCode(cityResponse.getMostSpecificSubdivision().getIsoCode());
-              devicePresence.setZip(cityResponse.getPostal().getCode());
-              devicePresence.setCountry(cityResponse.getCountry().getIsoCode());
-            }
-            if (devicePresence.getUserAgent() != null) {
+        try {
+          while ((devicePresence = queue.poll()) != null && (elements <= MAX_BATCH_SIZE)) {
+            if (StringUtils.isNotEmpty(devicePresence.getIp())) {
+              try {
+                cityResponse = MaxMindUtil.get().lookup(devicePresence.getIp());
+                if (cityResponse != null) {
+                  devicePresence.setCity(cityResponse.getCity().getName());
+                  devicePresence.setStateCode(cityResponse.getMostSpecificSubdivision().getIsoCode());
+                  devicePresence.setZip(cityResponse.getPostal().getCode());
+                  devicePresence.setCountry(cityResponse.getCountry().getIsoCode());
+                }
+              } catch (UnknownHostException e) {
+                LOG.error(e.getLocalizedMessage(), e);
+              } catch (IOException e) {
+                LOG.error(e.getLocalizedMessage(), e);
+              } catch (GeoIp2Exception e) {
+                LOG.error(e.getLocalizedMessage(), e);
+              }
+            } // end if
 
+            if (devicePresence.getUserAgent() != null) {
               MobileUserAgent agent = MobileUserAgentParser.parse(devicePresence.getUserAgent());
               if (agent != null) {
                 devicePresence.setTaloolVersion(agent.getAppVersion());
                 devicePresence.setDeviceType(agent.getOsName());
                 devicePresence.setDeviceOsVersion(agent.getOsName());
               }
-
             }
 
             customerLocations.add(devicePresence);
             elements++;
-          }
-
-          elements = 0;
+          } // end while
 
           try {
             ServiceFactory.get().getMessagingService().updateDevicePresences(customerLocations);
           } catch (ServiceException e) {
             LOG.error("Problem updating " + customerLocations.size() + " device presences", e);
           }
+
+          elements = 0;
           customerLocations.clear();
 
           try {
-            // sleeping for 20 seconds to simply try a larger batch on the queue poll
-            sleep(20000);
+            // sleeping for 5 seconds to simply try a larger batch on the queue poll
+            sleep(5000);
           } catch (InterruptedException e) {
             // ignore
           }
+        } catch (Exception e) {
+          LOG.error(e.getLocalizedMessage(), e);
         }
-      }
+      } // end while isRunning
+
     }
   }
 }

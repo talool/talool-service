@@ -62,7 +62,7 @@ public class MaxMindUtil {
 
   public static void main(String args[]) throws UnknownHostException, IOException, GeoIp2Exception {
 
-    CityResponse response = MaxMindUtil.createInstance().lookup("71.237.43.59");
+    CityResponse response = MaxMindUtil.createInstance().lookup("166.170.43.138");
 
 
     System.out.println(response.getCity().getName());

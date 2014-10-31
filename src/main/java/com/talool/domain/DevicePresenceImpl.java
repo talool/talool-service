@@ -168,13 +168,14 @@ public class DevicePresenceImpl implements DevicePresence {
     final DevicePresenceImpl other = (DevicePresenceImpl) obj;
 
     return new EqualsBuilder().append(getCustomerId(), other.getCustomerId()).append(getLocation(), other.getLocation())
-        .append(getIp(), other.getIp()).append(getCity(), other.getCity()).append(getStateCode(), other.getStateCode()).isEquals();
+        .append(getIp(), other.getIp()).append(getCity(), other.getCity()).append(getStateCode(), other.getStateCode())
+        .append(getDeviceId(), other.getDeviceId()).isEquals();
   }
 
   @Override
   public int hashCode() {
     return new HashCodeBuilder(17, 37).append(getCustomerId()).append(getLocation()).append(getIp()).append(getCity()).append(getStateCode())
-        .hashCode();
+        .append(getDeviceId()).hashCode();
   }
 
   @Override
