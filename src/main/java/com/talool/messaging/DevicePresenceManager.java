@@ -78,7 +78,7 @@ public final class DevicePresenceManager {
     public void run() {
       DevicePresence devicePresence = null;
       int elements = 0;
-      final List<DevicePresence> customerLocations = new ArrayList<DevicePresence>();
+      final List<DevicePresence> devicePresences = new ArrayList<DevicePresence>();
       CityResponse cityResponse = null;
 
       while (isRunning) {
@@ -111,18 +111,18 @@ public final class DevicePresenceManager {
               }
             }
 
-            customerLocations.add(devicePresence);
+            devicePresences.add(devicePresence);
             elements++;
           } // end while
 
           try {
-            ServiceFactory.get().getMessagingService().updateDevicePresences(customerLocations);
+            ServiceFactory.get().getMessagingService().updateDevicePresences(devicePresences);
           } catch (ServiceException e) {
-            LOG.error("Problem updating " + customerLocations.size() + " device presences", e);
+            LOG.error("Problem updating " + devicePresences.size() + " device presences", e);
           }
 
           elements = 0;
-          customerLocations.clear();
+          devicePresences.clear();
 
           try {
             // sleeping for 5 seconds to simply try a larger batch on the queue poll
@@ -131,7 +131,12 @@ public final class DevicePresenceManager {
             // ignore
           }
         } catch (Exception e) {
-          LOG.error(e.getLocalizedMessage(), e);
+          LOG.error("Problem inside devicePresence thread:", e);
+        } finally {
+          // for safety, lets make sure we don't memory leak on exceptions. its ok if we lost a
+          // batch of updates
+          elements = 0;
+          devicePresences.clear();
         }
       } // end while isRunning
 
