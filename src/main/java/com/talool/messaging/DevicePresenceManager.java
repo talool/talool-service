@@ -107,7 +107,7 @@ public final class DevicePresenceManager {
               if (agent != null) {
                 devicePresence.setTaloolVersion(agent.getAppVersion());
                 devicePresence.setDeviceType(agent.getOsName());
-                devicePresence.setDeviceOsVersion(agent.getOsName());
+                devicePresence.setDeviceOsVersion(agent.getOsVersion());
               }
             }
 
