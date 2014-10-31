@@ -1,14 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.talool</groupId>
 		<artifactId>talool-base</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
+		<version>1.0.5</version>
 	</parent>
 	<artifactId>talool-service</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.23-SNAPSHOT</version>
+	<version>1.0.24-SNAPSHOT</version>
 	<name>Talool Service</name>
 	<scm>
 		<connection>scm:git:git@github.com:talool/talool-service.git</connection>
@@ -113,7 +112,7 @@
 		<dependency>
 			<groupId>com.talool</groupId>
 			<artifactId>talool-thrift</artifactId>
-			<version>1.0.10-SNAPSHOT</version>
+			<version>1.0.10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgis</groupId>
