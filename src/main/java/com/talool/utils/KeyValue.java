@@ -26,6 +26,11 @@ public class KeyValue implements Serializable
 	public static final String publisherTermsAcceptedV1 = "publisher_tos_v1_accepted";
 	public static final String merchantAgreementAcceptedV1 = "merchant_agreement_v1_accepted";
 	public static final String merchantCustomerId = "merchant_customer_id";
+	
+	// deal offer purchase job
+	public static final String dealOfferIdKey = "DealOfferId";
+	public static final String dealOfferPurchaseJobTitleKey = "dealOfferPurchaseJobTitle";
+	public static final String dealOfferPurchaseJobNotesKey = "dealOfferPurchaseJobNotes";
 
 	// braintree stuff
 	public static final String braintreeSubmerchantId = "bt_submerch_id";

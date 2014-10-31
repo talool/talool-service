@@ -7,5 +7,5 @@ package com.talool.service.mail;
  */
 public enum EmailCategory
 {
-	PasswordRecovery, Gift, Registration, Merchant, Customer, MerchantCodeGroup
+	PasswordRecovery, Gift, Registration, Merchant, Customer, MerchantCodeGroup, DealOfferPurchaseJob
 }

@@ -12,13 +12,18 @@
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
             http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
+<import resource="./taloolCommon.xml" />
 
 <bean id="messagingServiceImpl" class="com.talool.messaging.job.MessagingServiceImpl" >
 		<property name="daoDispatcher" ref="daoDispatcher" />
 		<property name="sessionFactory" ref="sessionFactory" />
 </bean>           
 
-
+<bean id="maxMindDbUtil" class="com.talool.geo.MaxMindUtil"
+		factory-method="createInstance">
+		<constructor-arg value="${maxmind.city.db}" />
+	</bean>
+	
 <bean id="messagingJobManager" class="com.talool.messaging.job.MessagingJobManager" factory-method="createInstance">
   <constructor-arg ref="messagingServiceImpl" />
 </bean>
