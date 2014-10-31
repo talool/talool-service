@@ -9,7 +9,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
-import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.StatelessSession;
+import org.hibernate.Transaction;
 import org.hibernate.type.PostgresUUIDType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,7 +272,6 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, rollbackFor = ServiceException.class)
   /**
    * TODO - Rewrite with better batch insert/update logic.  Postgres does not support a MySQL like "upsert" on duplicate key update.  This could be written much more efficiently.
    */
@@ -282,25 +282,29 @@ public class MessagingServiceImpl extends AbstractHibernateService implements Me
         return;
       }
 
+      StatelessSession statelessSession = getSessionFactory().openStatelessSession();
+      Transaction transaction = statelessSession.beginTransaction();
+
       for (DevicePresence presence : mobilePresences) {
         try {
-          Query query = getCurrentSession().getNamedQuery("getDevicePresenceId");
+          Query query = statelessSession.getNamedQuery("getDevicePresenceId");
           query.setParameter("customerId", presence.getCustomerId(), PostgresUUIDType.INSTANCE);
           query.setParameter("deviceId", presence.getDeviceId());
 
           UUID presenceId = (UUID) query.uniqueResult();
           if (presenceId != null) {
             ((DevicePresenceImpl) presence).setId(presenceId);
-            getCurrentSession().saveOrUpdate(presence);
+            statelessSession.update(presence);
           } else {
-            getCurrentSession().save(presence);
+            statelessSession.insert(presence);
           }
-
-          getCurrentSession().flush();
-        } catch (ConstraintViolationException ex) {
-          LOG.error("constraint violation", ex);
+        } catch (Exception ex) {
+          LOG.error("Problem updating/inserting devicePresence", ex);
         }
       }
+
+      transaction.commit();
+      statelessSession.close();
 
     } catch (Exception ex) {
       throw new ServiceException("Problem updating customerLocations", ex);
