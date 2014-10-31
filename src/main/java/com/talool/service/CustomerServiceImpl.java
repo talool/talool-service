@@ -188,7 +188,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       final CustomerImpl customerImpl = ((CustomerImpl) (account));
       // set encrypted password
       customerImpl.setPassword(password);
-      customerImpl.setEmail(customerImpl.getEmail().toLowerCase());
+      customerImpl.setEmail(customerImpl.getEmail().toLowerCase().trim());
 
       save((CustomerImpl) account);
       daoDispatcher.flush(CustomerImpl.class);
@@ -221,7 +221,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
     }
 
-    search.addFilterEqual("email", email.toLowerCase());
+    search.addFilterEqual("email", email.toLowerCase().trim());
     try {
       search.addFilterEqual("password", EncryptService.MD5(password));
     } catch (Exception ex) {
