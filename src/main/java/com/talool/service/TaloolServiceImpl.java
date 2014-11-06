@@ -1643,6 +1643,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
 			query.addScalar("title", StandardBasicTypes.STRING);
 			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 			query.addScalar("locationName", StandardBasicTypes.STRING);
 			query.addScalar("address1", StandardBasicTypes.STRING);
 			query.addScalar("address2", StandardBasicTypes.STRING);
@@ -1717,6 +1718,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
 			query.addScalar("title", StandardBasicTypes.STRING);
 			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 			query.addScalar("locationName", StandardBasicTypes.STRING);
 			query.addScalar("address1", StandardBasicTypes.STRING);
 			query.addScalar("address2", StandardBasicTypes.STRING);
@@ -1795,6 +1797,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
 			query.addScalar("title", StandardBasicTypes.STRING);
 			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 			query.addScalar("locationName", StandardBasicTypes.STRING);
 			query.addScalar("address1", StandardBasicTypes.STRING);
 			query.addScalar("address2", StandardBasicTypes.STRING);
@@ -1872,6 +1875,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 			query.addScalar("merchantId", PostgresUUIDType.INSTANCE);
 			query.addScalar("title", StandardBasicTypes.STRING);
 			query.addScalar("summary", StandardBasicTypes.STRING);
+			query.addScalar("properties", StandardBasicTypes.STRING);
 			query.addScalar("locationName", StandardBasicTypes.STRING);
 			query.addScalar("address1", StandardBasicTypes.STRING);
 			query.addScalar("address2", StandardBasicTypes.STRING);

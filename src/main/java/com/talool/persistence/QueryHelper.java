@@ -35,7 +35,7 @@ public final class QueryHelper
 			+ "and d.deal_offer_id = dof.deal_offer_id and m.merchant_id=d.merchant_id " + "group by dof.deal_offer_id ";
 	// "order by totalMerchants desc";
 
-	private static final String DEAL_OFFER_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
+	private static final String DEAL_OFFER_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary,  %%o.properties AS properties, "
 			+ "o.deal_type as offerType, o.price as price,o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
 			+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
 			+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
@@ -48,7 +48,7 @@ public final class QueryHelper
 			+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
 			+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) ";
 
-	private static final String DEAL_OFFER_TITLE_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
+	private static final String DEAL_OFFER_TITLE_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary,  %%o.properties AS properties, "
 			+ "o.deal_type as offerType, o.price as price, o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
 			+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
 			+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
@@ -61,7 +61,7 @@ public final class QueryHelper
 			+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
 			+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) " + "where o.title like :title ";
 
-	private static final String PUBLISHER_DEAL_OFFER_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
+	private static final String PUBLISHER_DEAL_OFFER_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary,  %%o.properties AS properties, "
 			+ "o.deal_type as offerType, o.price as price, o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
 			+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
 			+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"
@@ -74,7 +74,7 @@ public final class QueryHelper
 			+ "WHERE (merchant_location_id, create_dt) IN (SELECT merchant_location_id, create_dt FROM merchant_location ml2 WHERE ml1.merchant_location_id = ml2.merchant_location_id ORDER BY create_dt LIMIT 1)) l "
 			+ "ON (o.geom = l.geom AND o.merchant_id = l.merchant_id) " + "where o.merchant_id=:publisherMerchantId ";
 
-	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary, "
+	private static final String PUBLISHER_DEAL_OFFER_TITLE_SUMMARY = "select DISTINCT o.deal_offer_id as offerId, o.merchant_id as merchantId, o.title as title, o.summary as summary,  %%o.properties AS properties, "
 			+ "o.deal_type as offerType, o.price as price, o.scheduled_start_dt as scheduledStartDate, o.scheduled_end_dt as scheduledEndDate, o.is_active as isActive,"
 			+ "l.merchant_location_name AS locationName, l.address1 AS address1, l.address2 AS address2, l.city AS city, l.state_province_county AS state, "
 			+ "(select media_url from merchant_media as mm where mm.merchant_media_id = o.deal_offer_background_id) as backgroundUrl,"

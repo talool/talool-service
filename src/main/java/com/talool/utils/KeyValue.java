@@ -53,7 +53,8 @@ public class KeyValue implements Serializable {
 
   public static final String jobId = "job_id";
 
-  public static final String maxAcquires = "max_acquires";
+  public static final String limitOnePurchasePerCustomer = "one_per_customer_boolean";
+  public static final String limitPurchaseInventory = "purchase_inventory_limit";
 
   public String key;
   public String value;
