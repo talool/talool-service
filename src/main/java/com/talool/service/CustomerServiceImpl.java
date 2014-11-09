@@ -42,6 +42,7 @@ import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DealType;
 import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
 import com.talool.core.Location;
@@ -67,6 +68,8 @@ import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
 import com.talool.domain.FavoriteMerchantImpl;
+import com.talool.domain.PropertyCriteria;
+import com.talool.domain.PropertyCriteria.Filter;
 import com.talool.domain.RelationshipImpl;
 import com.talool.domain.activity.ActivityImpl;
 import com.talool.domain.gift.EmailGiftImpl;
@@ -1647,12 +1650,33 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     DealOfferPurchase dop = null;
     Merchant fundraiser = null;
     Merchant publisher = null;
+    final String deviceId = requestHeaders.get().get(KeyValue.deviceId);
 
     try {
       // TODO Optimize the heavy call which pulls dealOffers - maybe ehcache
       // DealOffers
       dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
+
+      // checking if dealOffer has limits - we may be limiting the number of purchases a customer
+      if (dealOffer.getProperties().exists(KeyValue.limitOnePurchasePerCustomer)) {
+        final PropertyCriteria pc = new PropertyCriteria();
+        if (StringUtils.isNotEmpty(deviceId)) {
+          pc.setFilters(Filter.equal(KeyValue.deviceId, deviceId));
+        }
+        final List<UUID> purchaseIds = ServiceFactory.get().getTaloolService().getDealOfferPurchaseIds(customerId, dealOfferId, pc);
+        if (CollectionUtils.isNotEmpty(purchaseIds)) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("limitOnePurchasePerCustomer reached: customerId: %s dealOfferId: %d", customerId, dealOfferId));
+          }
+          throw new ServiceException(ErrorCode.LIMIT_ONE_PURCHASE_PER_CUSTOMER);
+        }
+
+      }
       customer = ServiceFactory.get().getCustomerService().getCustomerById(customerId);
+
+      if (customer == null) {
+        throw new NotFoundException("customer", customerId == null ? null : customerId.toString());
+      }
 
       if (paymentProperties.containsKey(KeyValue.merchantCode)) {
         String merchantCode = paymentProperties.get(KeyValue.merchantCode);
@@ -1663,23 +1687,24 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       throw se;
     }
 
-    if (dealOffer == null) {
-      throw new NotFoundException("deal offer", dealOfferId == null ? null : dealOfferId.toString());
-    }
-
-    if (customer == null) {
-      throw new NotFoundException("customer", customerId == null ? null : customerId.toString());
-    }
-
-    try {
-      publisher = dealOffer.getMerchant();
-      transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher, fundraiser);
-    } catch (ProcessorException e) {
-      throw new ServiceException(ErrorCode.GENERAL_PROCESSOR_ERROR, e);
+    // Braintree transactions only if a Paid Book
+    if (dealOffer.getType() != DealType.FREE_BOOK) {
+      try {
+        publisher = dealOffer.getMerchant();
+        transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher, fundraiser);
+      } catch (ProcessorException e) {
+        throw new ServiceException(ErrorCode.GENERAL_PROCESSOR_ERROR, e);
+      }
     }
 
     if (transactionResult.isSuccess()) {
       try {
+
+        // store deviceId header
+        if (StringUtils.isNotEmpty(deviceId)) {
+          paymentProperties.put(KeyValue.deviceId, deviceId);
+        }
+
         dop = createDealOfferPurchase(customer, dealOffer, transactionResult, paymentProperties);
         getCurrentSession().flush();
         if (LOG.isDebugEnabled()) {

@@ -53,6 +53,11 @@ public class KeyValue implements Serializable {
 
   public static final String jobId = "job_id";
 
+  // API headers below stored as the raw format in which they are received
+
+  // android/ios deviceId header
+  public static final String deviceId = "deviceid";
+
   public static final String limitOnePurchasePerCustomer = "one_per_customer_boolean";
   public static final String limitPurchaseInventory = "purchase_inventory_limit";
 

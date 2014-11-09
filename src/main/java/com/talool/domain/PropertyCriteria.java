@@ -11,299 +11,241 @@ import org.apache.commons.collections.CollectionUtils;
  * @author clintz
  * 
  */
-public class PropertyCriteria
-{
-	private List<Filter> filters;
+public class PropertyCriteria {
+  private List<Filter> filters;
 
-	public void setFilters(final Filter... filters)
-	{
-		this.filters = new ArrayList<Filter>(filters.length);
-		this.filters.addAll(Arrays.asList(filters));
-	}
+  public void setFilters(final Filter... filters) {
+    this.filters = new ArrayList<Filter>(filters.length);
+    this.filters.addAll(Arrays.asList(filters));
+  }
 
-	public static class Filter
-	{
-		String key;
-		String val;
-		Type type;
-		List<Filter> groupedFilters;
+  public boolean hasFilters() {
+    return filters != null && filters.size() > 0;
+  }
 
-		public enum Type
-		{
-			ValueEqual, ValueNotEqual, KeyExists, KeyDoesNotExist, KeyDoesNotExistOrPropertiesNull, AND, OR
-		}
+  public static class Filter {
+    String key;
+    String val;
+    Type type;
+    List<Filter> groupedFilters;
 
-		Filter(String key, String val, Type type)
-		{
-			this.key = key;
-			this.val = val;
-			this.type = type;
-		}
+    public enum Type {
+      ValueEqual, ValueNotEqual, KeyExists, KeyDoesNotExist, KeyDoesNotExistOrPropertiesNull, AND, OR
+    }
 
-		public static Filter equal(String key, String value)
-		{
-			return new Filter(key, value, Type.ValueEqual);
-		}
+    Filter(String key, String val, Type type) {
+      this.key = key;
+      this.val = val;
+      this.type = type;
+    }
 
-		public static Filter equal(String key, Integer value)
-		{
-			return new Filter(key, Integer.toString(value), Type.ValueEqual);
-		}
+    public static Filter equal(String key, String value) {
+      return new Filter(key, value, Type.ValueEqual);
+    }
 
-		public static Filter equal(String key, Long value)
-		{
-			return new Filter(key, Long.toString(value), Type.ValueEqual);
-		}
+    public static Filter equal(String key, Integer value) {
+      return new Filter(key, Integer.toString(value), Type.ValueEqual);
+    }
 
-		public static Filter equal(String key, Boolean value)
-		{
-			return new Filter(key, Boolean.toString(value), Type.ValueEqual);
-		}
+    public static Filter equal(String key, Long value) {
+      return new Filter(key, Long.toString(value), Type.ValueEqual);
+    }
 
-		public static Filter equal(String key, Double value)
-		{
-			return new Filter(key, Double.toString(value), Type.ValueEqual);
-		}
+    public static Filter equal(String key, Boolean value) {
+      return new Filter(key, Boolean.toString(value), Type.ValueEqual);
+    }
 
-		public static Filter notEqual(String key, String value)
-		{
-			return new Filter(key, value, Type.ValueNotEqual);
-		}
+    public static Filter equal(String key, Double value) {
+      return new Filter(key, Double.toString(value), Type.ValueEqual);
+    }
 
-		public static Filter notEqual(String key, Integer value)
-		{
-			return new Filter(key, Integer.toString(value), Type.ValueNotEqual);
-		}
+    public static Filter notEqual(String key, String value) {
+      return new Filter(key, value, Type.ValueNotEqual);
+    }
 
-		public static Filter notEqual(String key, Long value)
-		{
-			return new Filter(key, Long.toString(value), Type.ValueNotEqual);
-		}
+    public static Filter notEqual(String key, Integer value) {
+      return new Filter(key, Integer.toString(value), Type.ValueNotEqual);
+    }
 
-		public static Filter notEqual(String key, Boolean value)
-		{
-			return new Filter(key, Boolean.toString(value), Type.ValueNotEqual);
-		}
+    public static Filter notEqual(String key, Long value) {
+      return new Filter(key, Long.toString(value), Type.ValueNotEqual);
+    }
 
-		public static Filter notEqual(String key, Double value)
-		{
-			return new Filter(key, Double.toString(value), Type.ValueNotEqual);
-		}
+    public static Filter notEqual(String key, Boolean value) {
+      return new Filter(key, Boolean.toString(value), Type.ValueNotEqual);
+    }
 
-		public static Filter keyExists(String key)
-		{
-			return new Filter(key, null, Type.KeyExists);
-		}
+    public static Filter notEqual(String key, Double value) {
+      return new Filter(key, Double.toString(value), Type.ValueNotEqual);
+    }
 
-		/**
-		 * Only filters entities with properties
-		 * 
-		 * @param key
-		 * @return
-		 */
-		public static Filter keyDoesNotExist(String key)
-		{
-			return new Filter(key, null, Type.KeyDoesNotExist);
-		}
+    public static Filter keyExists(String key) {
+      return new Filter(key, null, Type.KeyExists);
+    }
 
-		/**
-		 * Returns entities where the key doesn't exist. Entities with null
-		 * properites will be returned
-		 * 
-		 * @param key
-		 * @return
-		 */
-		public static Filter keyDoesNotExistOrPropertiesNull(final String key)
-		{
-			return new Filter(key, null, Type.KeyDoesNotExistOrPropertiesNull);
-		}
+    /**
+     * Only filters entities with properties
+     * 
+     * @param key
+     * @return
+     */
+    public static Filter keyDoesNotExist(String key) {
+      return new Filter(key, null, Type.KeyDoesNotExist);
+    }
 
-		public static Filter and(final Filter... filters)
-		{
-			Filter filter = new Filter(null, null, Type.AND);
-			filter.groupedFilters = new ArrayList<Filter>();
-			filter.groupedFilters.addAll(Arrays.asList(filters));
-			return filter;
-		}
+    /**
+     * Returns entities where the key doesn't exist. Entities with null properites will be returned
+     * 
+     * @param key
+     * @return
+     */
+    public static Filter keyDoesNotExistOrPropertiesNull(final String key) {
+      return new Filter(key, null, Type.KeyDoesNotExistOrPropertiesNull);
+    }
 
-		public static Filter or(final Filter... filters)
-		{
-			Filter filter = new Filter(null, null, Type.OR);
-			filter.groupedFilters = new ArrayList<Filter>();
-			filter.groupedFilters.addAll(Arrays.asList(filters));
-			return filter;
-		}
-	}
+    public static Filter and(final Filter... filters) {
+      Filter filter = new Filter(null, null, Type.AND);
+      filter.groupedFilters = new ArrayList<Filter>();
+      filter.groupedFilters.addAll(Arrays.asList(filters));
+      return filter;
+    }
 
-	private String buildFilterClause(final Filter filter, final String propertyColumnName)
-	{
-		final StringBuilder sb = new StringBuilder();
+    public static Filter or(final Filter... filters) {
+      Filter filter = new Filter(null, null, Type.OR);
+      filter.groupedFilters = new ArrayList<Filter>();
+      filter.groupedFilters.addAll(Arrays.asList(filters));
+      return filter;
+    }
+  }
 
-		switch (filter.type)
-		{
-			case AND:
-			case OR:
+  private String buildFilterClause(final Filter filter, final String propertyColumnName) {
+    final StringBuilder sb = new StringBuilder();
 
-				if (CollectionUtils.isNotEmpty(filter.groupedFilters))
-				{
-					sb.append(" ");
+    switch (filter.type) {
+      case AND:
+      case OR:
 
-					if (filter.groupedFilters.size() == 1)
-					{
-						sb.append(buildFilterClause(filter.groupedFilters.get(0), propertyColumnName));
-						sb.append(" ");
-					}
-					else
-					{
-						for (Filter f : filter.groupedFilters)
-						{
-							if (sb.toString().equals(" "))
-							{
-								sb.append(buildFilterClause(f, propertyColumnName));
-							}
-							else
-							{
-								sb.append(filter.type.toString()).append(" ").append(buildFilterClause(f, propertyColumnName));
-							}
+        if (CollectionUtils.isNotEmpty(filter.groupedFilters)) {
+          sb.append(" ");
 
-						}
-					}
-				}
+          if (filter.groupedFilters.size() == 1) {
+            sb.append(buildFilterClause(filter.groupedFilters.get(0), propertyColumnName));
+            sb.append(" ");
+          } else {
+            for (Filter f : filter.groupedFilters) {
+              if (sb.toString().equals(" ")) {
+                sb.append(buildFilterClause(f, propertyColumnName));
+              } else {
+                sb.append(filter.type.toString()).append(" ").append(buildFilterClause(f, propertyColumnName));
+              }
 
-				break;
+            }
+          }
+        }
 
-			case ValueEqual:
-				sb.append("hs_value(").append(propertyColumnName).append(",'").append(filter.key).append("') = '").append(filter.val).append("' ");
-				break;
+        break;
 
-			case ValueNotEqual:
-				sb.append("hs_value(").append(propertyColumnName).append(",'").append(filter.key).append("') != '").append(filter.val).append("' ");
-				break;
+      case ValueEqual:
+        sb.append("hs_value(").append(propertyColumnName).append(",'").append(filter.key).append("') = '").append(filter.val).append("' ");
+        break;
 
-			case KeyExists:
-				sb.append("hs_key_exist(").append(propertyColumnName).append(",'").append(filter.key).append("') = true ");
-				break;
+      case ValueNotEqual:
+        sb.append("hs_value(").append(propertyColumnName).append(",'").append(filter.key).append("') != '").append(filter.val).append("' ");
+        break;
 
-			case KeyDoesNotExistOrPropertiesNull:
-				sb.append("(").append(propertyColumnName).append(" is null OR ").
-						append(" hs_key_exist(").append(propertyColumnName).append(",'").append(filter.key).append("') = false ) ");
-				break;
+      case KeyExists:
+        sb.append("hs_key_exist(").append(propertyColumnName).append(",'").append(filter.key).append("') = true ");
+        break;
 
-			case KeyDoesNotExist:
-				sb.append("hs_key_exist(").append(propertyColumnName).append(",'").append(filter.key).append("') = false ");
-				break;
+      case KeyDoesNotExistOrPropertiesNull:
+        sb.append("(").append(propertyColumnName).append(" is null OR ").append(" hs_key_exist(").append(propertyColumnName).append(",'")
+            .append(filter.key).append("') = false ) ");
+        break;
 
-		}
+      case KeyDoesNotExist:
+        sb.append("hs_key_exist(").append(propertyColumnName).append(",'").append(filter.key).append("') = false ");
+        break;
 
-		return sb.toString();
-	}
+    }
 
-	public String buildFilterClause(final String propertyColumnName)
-	{
-		final StringBuilder sb = new StringBuilder();
+    return sb.toString();
+  }
 
-		for (Filter filter : filters)
-		{
-			sb.append(buildFilterClause(filter, propertyColumnName));
+  public String buildFilterClause(final String propertyColumnName) {
+    final StringBuilder sb = new StringBuilder();
 
-		}
+    for (Filter filter : filters) {
+      sb.append(buildFilterClause(filter, propertyColumnName));
 
-		return sb.toString();
+    }
 
-	}
-	
-	// TODO another quick hack to make the a property search work for MerchantSummary objects
-	private String buildRawFilterClause(final Filter filter, final String propertyColumnName)
-	{
-		final StringBuilder sb = new StringBuilder();
+    return sb.toString();
 
-		switch (filter.type)
-		{
-			case AND:
-				if (CollectionUtils.isNotEmpty(filter.groupedFilters))
-				{
-					sb.append(" ");
+  }
 
-					if (filter.groupedFilters.size() == 1)
-					{
-						sb.append(buildRawFilterClause(filter.groupedFilters.get(0), propertyColumnName));
-						sb.append(" ");
-					}
-					else
-					{
-						boolean firstFilter = true;
-						for (Filter f : filter.groupedFilters)
-						{
-							if (firstFilter)
-							{
-								sb.append(buildRawFilterClause(f, propertyColumnName));
-								firstFilter = false;
-							}
-							else
-							{
-								sb.append(filter.type.toString()).append(" ").append(buildRawFilterClause(f, propertyColumnName));
-							}
+  // TODO another quick hack to make the a property search work for MerchantSummary objects
+  private String buildRawFilterClause(final Filter filter, final String propertyColumnName) {
+    final StringBuilder sb = new StringBuilder();
 
-						}
-					}
-				}
-				break;
-			case ValueEqual:
-				sb.append(propertyColumnName)
-				  .append("->'")
-				  .append(filter.key)
-				  .append("'='")
-				  .append(filter.val)
-				  .append("' ");
-				break;
-			case KeyDoesNotExistOrPropertiesNull:
-				sb.append("(")
-				  .append(propertyColumnName)
-				  .append(" is null OR exist(")
-				  .append(propertyColumnName)
-				  .append(", '")
-				  .append(filter.key)
-				  .append("')=false OR ")
-				  .append(propertyColumnName)
-				  .append("->'")
-				  .append(filter.key)
-				  .append("'='false') ")
-				  ;
-				break;
-			default:
-				break;
-		}
+    switch (filter.type) {
+      case AND:
+        if (CollectionUtils.isNotEmpty(filter.groupedFilters)) {
+          sb.append(" ");
 
-		return sb.toString();
-	}
-	
-	// TODO another quick hack to make the a property search work for MerchantSummary objects
-	public String buildRawFilterClause(final String propertyColumnName)
-	{
-		final StringBuilder sb = new StringBuilder(" AND (");
-		for (Filter filter : filters)
-		{
-			sb.append(buildRawFilterClause(filter, propertyColumnName));
-		}
-		return sb.append(") ").toString();
-	}
+          if (filter.groupedFilters.size() == 1) {
+            sb.append(buildRawFilterClause(filter.groupedFilters.get(0), propertyColumnName));
+            sb.append(" ");
+          } else {
+            boolean firstFilter = true;
+            for (Filter f : filter.groupedFilters) {
+              if (firstFilter) {
+                sb.append(buildRawFilterClause(f, propertyColumnName));
+                firstFilter = false;
+              } else {
+                sb.append(filter.type.toString()).append(" ").append(buildRawFilterClause(f, propertyColumnName));
+              }
 
-	public static void main(String args[])
-	{
-		PropertyCriteria criteria = new PropertyCriteria();
-		// criteria.addFilters(
-		// Filter.or(Filter.equal("fundraising_book", "1"),
-		// Filter.equal("fundraising_book", "2"),
-		// Filter.equal("fundraising_book", "3")
-		//
-		// ));
+            }
+          }
+        }
+        break;
+      case ValueEqual:
+        sb.append(propertyColumnName).append("->'").append(filter.key).append("'='").append(filter.val).append("' ");
+        break;
+      case KeyDoesNotExistOrPropertiesNull:
+        sb.append("(").append(propertyColumnName).append(" is null OR exist(").append(propertyColumnName).append(", '").append(filter.key)
+            .append("')=false OR ").append(propertyColumnName).append("->'").append(filter.key).append("'='false') ");
+        break;
+      default:
+        break;
+    }
 
-		criteria.setFilters(Filter.and(Filter.equal("fundraising_book", "1"),
-				Filter.notEqual("first_name", "chris")));
+    return sb.toString();
+  }
 
-		String clause = criteria.buildFilterClause("props");
+  // TODO another quick hack to make the a property search work for MerchantSummary objects
+  public String buildRawFilterClause(final String propertyColumnName) {
+    final StringBuilder sb = new StringBuilder(" AND (");
+    for (Filter filter : filters) {
+      sb.append(buildRawFilterClause(filter, propertyColumnName));
+    }
+    return sb.append(") ").toString();
+  }
 
-		System.out.println(clause);
+  public static void main(String args[]) {
+    PropertyCriteria criteria = new PropertyCriteria();
+    // criteria.addFilters(
+    // Filter.or(Filter.equal("fundraising_book", "1"),
+    // Filter.equal("fundraising_book", "2"),
+    // Filter.equal("fundraising_book", "3")
+    //
+    // ));
 
-	}
+    criteria.setFilters(Filter.and(Filter.equal("fundraising_book", "1"), Filter.notEqual("first_name", "chris")));
+
+    String clause = criteria.buildFilterClause("props");
+
+    System.out.println(clause);
+
+  }
 }
