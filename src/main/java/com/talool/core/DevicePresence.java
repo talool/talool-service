@@ -1,5 +1,6 @@
 package com.talool.core;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author clintz
  * 
  */
-public interface DevicePresence extends IdentifiableUUID {
+public interface DevicePresence extends IdentifiableUUID, Serializable {
 
   public UUID getCustomerId();
 

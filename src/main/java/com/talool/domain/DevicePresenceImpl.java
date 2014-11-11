@@ -28,7 +28,10 @@ import com.vividsolutions.jts.geom.Geometry;
 @Table(name = "device_presence", catalog = "public")
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class DevicePresenceImpl implements DevicePresence {
-  @Id
+
+	private static final long serialVersionUID = 1L;
+
+@Id
   @GenericGenerator(name = "uuid_gen", strategy = "com.talool.hibernate.UUIDGenerator")
   @GeneratedValue(generator = "uuid_gen")
   @Type(type = "pg-uuid")
