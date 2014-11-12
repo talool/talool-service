@@ -1697,14 +1697,12 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       }
     }
 
-    if (transactionResult.isSuccess()) {
+    if (dealOffer.getType() == DealType.FREE_BOOK || transactionResult.isSuccess()) {
       try {
-
         // store deviceId header
         if (StringUtils.isNotEmpty(deviceId)) {
           paymentProperties.put(KeyValue.deviceId, deviceId);
         }
-
         dop = createDealOfferPurchase(customer, dealOffer, transactionResult, paymentProperties);
         getCurrentSession().flush();
         if (LOG.isDebugEnabled()) {
@@ -1713,15 +1711,15 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
         TaloolStatsDClient.get().count(Action.purchase, SubAction.credit_card_nonce, dealOfferId, requestHeaders.get());
       } catch (ServiceException e) {
         try {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("rolling back braintree transaction " + customer.getEmail());
+          if (transactionResult != null) {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("rolling back braintree transaction " + customer.getEmail());
+            }
+            rollbackPaymentTransaction(customerId, dealOfferId, transactionResult, e);
           }
-
-          rollbackPaymentTransaction(customerId, dealOfferId, transactionResult, e);
         } catch (ProcessorException pe) {
           LOG.error("Transaction not rolled back with processor! " + pe.getMessage(), pe);
         }
-
         throw e;
       }
 
