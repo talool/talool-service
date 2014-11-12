@@ -1652,12 +1652,18 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     DealOfferPurchase dop = null;
     Merchant fundraiser = null;
     Merchant publisher = null;
+    boolean freeBook = false;
     final String deviceId = requestHeaders.get().get(KeyValue.deviceId);
+
 
     try {
       // TODO Optimize the heavy call which pulls dealOffers - maybe ehcache
       // DealOffers
       dealOffer = ServiceFactory.get().getTaloolService().getDealOffer(dealOfferId);
+      freeBook = dealOffer.getType() == DealType.FREE_BOOK || dealOffer.getPrice() == 0;
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(dealOffer.getTitle() + " is a free book.");
+      }
 
       // checking if dealOffer has limits - we may be limiting the number of purchases a customer
       if (dealOffer.getProperties().exists(KeyValue.limitOnePurchasePerCustomer)) {
@@ -1668,7 +1674,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
         final List<UUID> purchaseIds = ServiceFactory.get().getTaloolService().getDealOfferPurchaseIds(customerId, dealOfferId, pc);
         if (CollectionUtils.isNotEmpty(purchaseIds)) {
           if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("limitOnePurchasePerCustomer reached: customerId: %s dealOfferId: %d", customerId, dealOfferId));
+            LOG.debug(String.format("limitOnePurchasePerCustomer reached: customerId: %s dealOfferId: %s", customerId, dealOfferId));
           }
           throw new ServiceException(ErrorCode.LIMIT_ONE_PURCHASE_PER_CUSTOMER);
         }
@@ -1689,17 +1695,20 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       throw se;
     }
 
-    // Braintree transactions only if a Paid Book
-    if (dealOffer.getType() != DealType.FREE_BOOK) {
+    // Braintree transactions only if a Paid Book and price is not zero
+    if (!freeBook) {
       try {
         publisher = dealOffer.getMerchant();
         transactionResult = BraintreeUtil.get().processPaymentNonce(customer, dealOffer, nonce, publisher, fundraiser);
       } catch (ProcessorException e) {
         throw new ServiceException(ErrorCode.GENERAL_PROCESSOR_ERROR, e);
       }
+    } else {
+      // create "free" transaction
+      transactionResult = TransactionResult.successfulTransaction(null, null);
     }
 
-    if (dealOffer.getType() == DealType.FREE_BOOK || transactionResult.isSuccess()) {
+    if (transactionResult.isSuccess()) {
       try {
         // store deviceId header
         if (StringUtils.isNotEmpty(deviceId)) {
@@ -1761,18 +1770,17 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     }
   }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<DevicePresence> getDevicePresenceForCustomer(UUID customerId)
-			throws ServiceException {
-		List<DevicePresence> devices;
-		try {
-			final Search search = new Search(DevicePresenceImpl.class).addFilterEqual("customerId", customerId);
-			devices = (List<DevicePresence>) daoDispatcher.search(search);
-	    } catch (Exception ex) {
-	    	throw new ServiceException("Problem getting devices for customerId " + customerId, ex);
-	    }
-		return devices;
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<DevicePresence> getDevicePresenceForCustomer(UUID customerId) throws ServiceException {
+    List<DevicePresence> devices;
+    try {
+      final Search search = new Search(DevicePresenceImpl.class).addFilterEqual("customerId", customerId);
+      devices = (List<DevicePresence>) daoDispatcher.search(search);
+    } catch (Exception ex) {
+      throw new ServiceException("Problem getting devices for customerId " + customerId, ex);
+    }
+    return devices;
+  }
 
 }
