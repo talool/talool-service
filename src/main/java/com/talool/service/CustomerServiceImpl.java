@@ -43,6 +43,7 @@ import com.talool.core.DealAcquire;
 import com.talool.core.DealOffer;
 import com.talool.core.DealOfferPurchase;
 import com.talool.core.DealType;
+import com.talool.core.DevicePresence;
 import com.talool.core.FavoriteMerchant;
 import com.talool.core.IdentifiableUUID;
 import com.talool.core.Location;
@@ -67,6 +68,7 @@ import com.talool.domain.CustomerCriteria;
 import com.talool.domain.CustomerImpl;
 import com.talool.domain.DealAcquireImpl;
 import com.talool.domain.DealOfferPurchaseImpl;
+import com.talool.domain.DevicePresenceImpl;
 import com.talool.domain.FavoriteMerchantImpl;
 import com.talool.domain.PropertyCriteria;
 import com.talool.domain.PropertyCriteria.Filter;
@@ -1758,5 +1760,19 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       throw new ServiceException("Problem getCustomers with criteria", ex);
     }
   }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DevicePresence> getDevicePresenceForCustomer(UUID customerId)
+			throws ServiceException {
+		List<DevicePresence> devices;
+		try {
+			final Search search = new Search(DevicePresenceImpl.class).addFilterEqual("customerId", customerId);
+			devices = (List<DevicePresence>) daoDispatcher.search(search);
+	    } catch (Exception ex) {
+	    	throw new ServiceException("Problem getting devices for customerId " + customerId, ex);
+	    }
+		return devices;
+	}
 
 }
