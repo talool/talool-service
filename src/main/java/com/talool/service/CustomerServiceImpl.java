@@ -473,6 +473,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
       TaloolStatsDClient.get().count(Action.get_merchant_acquires, null, null, requestHeaders.get());
 
+
       return query.list();
     } catch (Exception ex) {
       throw new ServiceException(String.format("Problem getMerchantAcquires customerId %s", customerId), ex);

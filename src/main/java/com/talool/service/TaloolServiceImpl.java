@@ -1145,7 +1145,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
   @Override
   public DealOfferGeoSummariesResult getDealOfferGeoSummariesWithin(final Location location, final int maxMiles, final SearchOptions searchOpts,
-      final SearchOptions fallbackSearchOpts) throws ServiceException {
+      final SearchOptions fallbackSearchOpts, final boolean supportsFreeBooks) throws ServiceException {
     final List<DealOfferGeoSummary> summaries = new ArrayList<DealOfferGeoSummary>();
     boolean usingFallback = !isLocationAvailable(location);
     String newSql = null;
@@ -1187,7 +1187,10 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
             ImmutableMap.<String, Object>builder().put("point", point.toString()).put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles))
                 .build();
 
-        newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDsWithinMeters, params, searchOpts);
+        newSql =
+            QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDsWithinMeters : QueryType.ActivePaidDealOfferIDsWithinMeters,
+                params, searchOpts);
+
         query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
         query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
         query.addScalar("distanceInMeters", StandardBasicTypes.DOUBLE);
@@ -1200,7 +1203,8 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
       // fall back because location is unavailable, then fall back to query
       if (CollectionUtils.isEmpty(summaries) && fallbackSearchOpts != null) {
         usingFallback = true;
-        newSql = QueryHelper.buildQuery(QueryType.ActiveDealOfferIDs, null, fallbackSearchOpts);
+        newSql =
+            QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDs : QueryType.ActivePaidDealOfferIDs, null, fallbackSearchOpts);
         query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
         query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
         query.setResultTransformer(resultTransformer);
