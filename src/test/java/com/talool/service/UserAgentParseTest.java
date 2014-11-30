@@ -1,5 +1,8 @@
 package com.talool.service;
 
+import java.util.LinkedList;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,6 +50,39 @@ public class UserAgentParseTest {
 
     mua = MobileUserAgentParser.parse(cocoaUnknown);
     Assert.assertNull(mua);
+
+
+  }
+
+
+  @Test
+  public void testMe() {
+
+    // LinkedHashMap<String, Integer> lm = new LinkedHashMap<String, Integer>(100, .75f, true);
+    // lm.put("ann", 3);
+    // lm.put("chris", 3);
+    // lm.put("brian", 2);
+    // lm.put("chris", 3);
+    // lm.put("brian", 2);
+    // lm.put("chris", 3);
+    // lm.put("brian", 2);
+    // lm.put("ann", 3);
+    //
+    // for (Entry<String, Integer> en : lm.entrySet()) {
+    // System.out.println(en.getKey() + "; " + en.getValue());
+    // }
+
+
+    LinkedList<String> list = new LinkedList();
+
+    list.add("chris");
+    list.add("billy");
+    list.add("john");
+
+    System.out.println(list.poll());
+
+    CountDownLatch latch = new CountDownLatch(3);
+
 
 
   }

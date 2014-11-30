@@ -9,6 +9,7 @@ import com.talool.core.Customer;
 import com.talool.core.Deal;
 import com.talool.core.DealAcquire;
 import com.talool.core.DealOfferPurchase;
+import com.talool.core.DevicePresence;
 import com.talool.core.Location;
 import com.talool.core.Merchant;
 import com.talool.core.Relationship;
@@ -283,5 +284,7 @@ public interface CustomerService extends HibernateService, RequestHeaderSupport
 	 * @throws ServiceException
 	 */
 	public void giveGiftBackToGiver(final UUID giftId, final String reason) throws ServiceException;
+	
+	public List<DevicePresence> getDevicePresenceForCustomer(final UUID customerId) throws ServiceException;
 
 }
