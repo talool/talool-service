@@ -19,6 +19,9 @@ public enum ErrorCode {
       "Cannot gift deal due to acquire status"), CUSTOMER_NOT_FOUND(1005, "Customer not found"), EMAIL_REQUIRED(1006, "Email is required"), EMAIL_OR_PASS_INVALID(
       1007, "Invalid email or password"), NOT_GIFT_RECIPIENT(1008, "Not the gift recipient"), GIFT_ALREADY_ACCEPTED(1009, "Gift already accepted"),
 
+  LIMIT_ONE_PURCHASE_PER_CUSTOMER(1010, "Limit one purchase per customer has been reached"),
+
+
   GENERAL_PROCESSOR_ERROR(1500, "Unknown processor error"),
 
   MAIL_TEMPLATE_NOT_FOUND(2004, "Mail template not found"), ACTIVIATION_CODE_NOT_FOUND(3000, "Activiation code not found"), ACTIVIATION_CODE_ALREADY_ACTIVATED(

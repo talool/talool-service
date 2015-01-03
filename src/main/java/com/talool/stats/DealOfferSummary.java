@@ -36,6 +36,7 @@ public final class DealOfferSummary implements Serializable
 	private Long redemptionCount;
 	private Date scheduledStartDate;
 	private Date scheduledEndDate;
+	private String properties;
 
 	public UUID getOfferId()
 	{
@@ -278,6 +279,14 @@ public final class DealOfferSummary implements Serializable
 		}
 
 		return scheduled;
+	}
+
+	public String getProperties() {
+		return properties;
+	}
+
+	public void setProperties(String properties) {
+		this.properties = properties;
 	}
 
 }
