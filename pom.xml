@@ -7,13 +7,13 @@
 	</parent>
 	<artifactId>talool-service</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.26-SNAPSHOT</version>
+	<version>1.0.26</version>
 	<name>Talool Service</name>
 	<scm>
 		<connection>scm:git:git@github.com:talool/talool-service.git</connection>
 		<url>scm:git:git@github.com:talool/talool-service.git</url>
 		<developerConnection>scm:git:git@github.com:talool/talool-service.git</developerConnection>
-	  <tag>talool-service-1.0.25</tag>
+	  <tag>talool-service-1.0.26</tag>
   </scm>
 	<properties>
 		<hibernate.version>3.6.10.Final</hibernate.version>
