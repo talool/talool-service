@@ -3,17 +3,17 @@
 	<parent>
 		<groupId>com.talool</groupId>
 		<artifactId>talool-base</artifactId>
-		<version>1.0.5</version>
+		<version>1.0.7</version>
 	</parent>
 	<artifactId>talool-service</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.30</version>
+	<version>1.1.5-SNAPSHOT</version>
 	<name>Talool Service</name>
 	<scm>
 		<connection>scm:git:git@github.com:talool/talool-service.git</connection>
 		<url>scm:git:git@github.com:talool/talool-service.git</url>
 		<developerConnection>scm:git:git@github.com:talool/talool-service.git</developerConnection>
-	  <tag>talool-service-1.0.26</tag>
+	  <tag>HEAD</tag>
   </scm>
 	<properties>
 		<hibernate.version>3.6.10.Final</hibernate.version>
@@ -30,7 +30,7 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>talool-maven-release</id>
+			<id>talool-maven-releases</id>
 			<url>http://maven.talool.com:8081/nexus/content/repositories/releases/</url>
 			<releases>
 				<enabled>true</enabled>
