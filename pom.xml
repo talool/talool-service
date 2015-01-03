@@ -7,7 +7,7 @@
 	</parent>
 	<artifactId>talool-service</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1.1-SNAPSHOT</version>
+	<version>1.1.2-SNAPSHOT</version>
 	<name>Talool Service</name>
 	<scm>
 		<connection>scm:git:git@github.com:talool/talool-service.git</connection>
@@ -30,7 +30,7 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>talool-maven-release</id>
+			<id>talool-maven-releases</id>
 			<url>http://maven.talool.com:8081/nexus/content/repositories/releases/</url>
 			<releases>
 				<enabled>true</enabled>
