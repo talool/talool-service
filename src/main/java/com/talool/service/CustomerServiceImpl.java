@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.googlecode.genericdao.dao.hibernate.DAODispatcher;
@@ -847,6 +848,86 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     }
   }
 
+
+
+  /**
+   * If gift has not already been assigned to an existing customer and the gift has not been
+   * accepted already, we are free to assign the gift to the receipientCustomerId
+   */
+  @Override
+  @Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
+  public DealAcquire acceptGift(final UUID giftId, final UUID receipientCustomerId) throws ServiceException {
+    final Customer receivingCustomer = getCustomerById(receipientCustomerId);
+    final Gift gift = daoDispatcher.find(GiftImpl.class, giftId);
+
+    if (gift == null) {
+      throw new ServiceException(String.format("giftRequestId %s does not exist", giftId));
+    }
+
+    if (gift.getGiftStatus() == GiftStatus.ACCEPTED) {
+      throw new ServiceException(ErrorCode.GIFT_ALREADY_ACCEPTED, "accepted by " + gift.getToCustomer().getEmail());
+    }
+
+    // if no toCustomer then this gift hasn't been assigned to a customer yet (they don't exist)
+    final Optional<Customer> toCustomer = Optional.fromNullable(gift.getToCustomer());
+    if (toCustomer.isPresent()) {
+      if (!toCustomer.get().getId().equals(receipientCustomerId)) {
+        throw new ServiceException(ErrorCode.NOT_GIFT_RECIPIENT, String.format("The gift was sent to %s and cannot be claimed by %s", toCustomer
+            .get().getEmail(), receivingCustomer.getEmail()));
+      }
+    }
+
+    final DealAcquire dac = gift.getDealAcquire();
+    dac.setAcquireStatus(AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
+    // dac.setSharedByCustomer(dac.getCustomer());
+    dac.setCustomer(receivingCustomer);
+    // update deal acquire
+    daoDispatcher.save(dac);
+
+    // update gift request
+    gift.setToCustomer(receivingCustomer);
+    gift.setGiftStatus(GiftStatus.ACCEPTED);
+    daoDispatcher.save(gift);
+
+    try {
+      Activity activity = ActivityFactory.createFriendAccept(gift);
+      ServiceFactory.get().getActivityService().save(activity);
+    } catch (Exception e) {
+      LOG.error("Problem creating createFriendAccept: " + e.getLocalizedMessage(), e);
+    }
+
+    try {
+      setClosedState(gift, true);
+    } catch (Exception e) {
+      LOG.error(
+          String.format("Problem finding/persisting closedState on activity. receipCustomerId %s giftId %s", receipientCustomerId.toString(), giftId),
+          e);
+    }
+
+    TaloolStatsDClient.get().count(Action.gift, SubAction.accept, gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
+
+    return dac;
+
+  }
+
+  @Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
+  private void setClosedState(final Gift gift, final boolean isClosed) throws TException {
+    final Search search = new Search(ActivityImpl.class);
+    search.addFilterEqual("giftId", gift.getId());
+    search.addFilterEqual("customerId", gift.getToCustomer().getId());
+
+    final Activity act = (Activity) daoDispatcher.searchUnique(search);
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Closing state on gift activity - activityId: " + act.getId());
+    }
+
+    ActivityFactory.setActionTaken(act, isClosed);
+
+    daoDispatcher.save(act);
+    TaloolStatsDClient.get().count(Action.activity_action_taken, null, null, requestHeaders.get());
+  }
+
   private GiftOwnership validateGiftOwnership(final UUID giftRequestId, final UUID customerId) throws ServiceException {
     final Gift giftRequest = daoDispatcher.find(GiftImpl.class, giftRequestId);
     if (giftRequest == null) {
@@ -880,63 +961,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     }
 
     return giftOwnership;
-  }
-
-  @Override
-  @Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
-  public DealAcquire acceptGift(final UUID giftId, final UUID receipientCustomerId) throws ServiceException {
-    final GiftOwnership giftOwnership = validateGiftOwnership(giftId, receipientCustomerId);
-
-    final DealAcquire dac = giftOwnership.gift.getDealAcquire();
-
-    dac.setAcquireStatus(AcquireStatus.ACCEPTED_CUSTOMER_SHARE);
-    // dac.setSharedByCustomer(dac.getCustomer());
-    dac.setCustomer(giftOwnership.receivingCustomer);
-
-    // update deal acquire
-    daoDispatcher.save(dac);
-
-    // update gift request
-    giftOwnership.gift.setGiftStatus(GiftStatus.ACCEPTED);
-    daoDispatcher.save(giftOwnership.gift);
-
-    try {
-      Activity activity = ActivityFactory.createFriendAccept(giftOwnership.gift);
-      ServiceFactory.get().getActivityService().save(activity);
-    } catch (Exception e) {
-      LOG.error("Problem creating createFriendAccept: " + e.getLocalizedMessage(), e);
-    }
-
-    try {
-      setClosedState(giftOwnership.gift, true);
-    } catch (Exception e) {
-      LOG.error(
-          String.format("Problem finding/persisting closedState on activity. receipCustomerId %s giftId %s", receipientCustomerId.toString(), giftId),
-          e);
-    }
-
-    TaloolStatsDClient.get().count(Action.gift, SubAction.accept, giftOwnership.gift.getDealAcquire().getDeal().getId(), requestHeaders.get());
-
-    return dac;
-
-  }
-
-  @Transactional(propagation = Propagation.NESTED, rollbackFor = ServiceException.class)
-  private void setClosedState(final Gift gift, final boolean isClosed) throws TException {
-    final Search search = new Search(ActivityImpl.class);
-    search.addFilterEqual("giftId", gift.getId());
-    search.addFilterEqual("customerId", gift.getToCustomer().getId());
-
-    final Activity act = (Activity) daoDispatcher.searchUnique(search);
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Closing state on gift activity - activityId: " + act.getId());
-    }
-
-    ActivityFactory.setActionTaken(act, isClosed);
-
-    daoDispatcher.save(act);
-    TaloolStatsDClient.get().count(Action.activity_action_taken, null, null, requestHeaders.get());
   }
 
   @Override
