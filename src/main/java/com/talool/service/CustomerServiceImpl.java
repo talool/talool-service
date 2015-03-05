@@ -124,7 +124,6 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
   @Override
   @Transactional(propagation = Propagation.NESTED)
   public void createAccount(final Customer customer, final String password, final UUID whiteLabelPublisherMerchantId) throws ServiceException {
-
     if (!EmailValidator.getInstance().isValid(customer.getEmail())) {
       throw new ServiceException(ErrorCode.VALID_EMAIL_REQUIRED);
     }
@@ -144,10 +143,14 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
     final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
     final List<Activity> activities = new ArrayList<Activity>();
+    Merchant whiteLabelMerchant = null;
 
     try {
+      if (whiteLabelPublisherMerchantId != null) {
+        whiteLabelMerchant = ServiceFactory.get().getTaloolService().getMerchantById(whiteLabelPublisherMerchantId);
+      }
       // add welcome message!
-      activities.add(ActivityFactory.createWelcome(customer.getId(), gifts.size()));
+      activities.add(ActivityFactory.createWelcome(customer.getId(), gifts.size(), whiteLabelMerchant));
     } catch (Exception ex) {
       LOG.error("Problem creating welcome activity: " + ex.getLocalizedMessage(), ex);
     }
