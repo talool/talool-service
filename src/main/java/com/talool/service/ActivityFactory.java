@@ -220,7 +220,7 @@ public final class ActivityFactory {
     ActivityLink_t link = null;
 
     if (whiteLabelMerchant == null) {
-      title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.WELCOME_TITLE + " Talool");
+      title = BundleUtil.render(BundleType.ACTIVITY, Locale.ENGLISH, ActivityBundle.WELCOME_TITLE, "Talool");
       link = new ActivityLink_t(LinkType.EXTERNAL, ServiceConfig.get().getConsumersLink());
 
     } else {
