@@ -1145,11 +1145,13 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
 
   @Override
   public DealOfferGeoSummariesResult getDealOfferGeoSummariesWithin(final Location location, final int maxMiles, final SearchOptions searchOpts,
-      final SearchOptions fallbackSearchOpts, final boolean supportsFreeBooks) throws ServiceException {
-    final List<DealOfferGeoSummary> summaries = new ArrayList<DealOfferGeoSummary>();
-    boolean usingFallback = !isLocationAvailable(location);
+      final SearchOptions fallbackSearchOpts, final boolean supportsFreeBooks, final UUID whiteLabelPublisherMerchantId) throws ServiceException {
     String newSql = null;
     SQLQuery query = null;
+
+    boolean usingFallback = !isLocationAvailable(location);
+    final List<DealOfferGeoSummary> summaries = new ArrayList<DealOfferGeoSummary>();
+    final Map<String, Object> params = new HashMap<String, Object>();
 
     final ResultTransformer resultTransformer = new ResultTransformer() {
       private static final long serialVersionUID = 1L;
@@ -1183,13 +1185,20 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
       if (!usingFallback) {
         final Point point = new Point(location.getLongitude(), location.getLatitude());
         point.setSrid(4326);
-        final ImmutableMap<String, Object> params =
-            ImmutableMap.<String, Object>builder().put("point", point.toString()).put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles))
-                .build();
+        params.put("point", point.toString());
+        params.put("distanceInMeters", SpatialUtils.milesToMeters(maxMiles));
 
-        newSql =
-            QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDsWithinMeters : QueryType.ActivePaidDealOfferIDsWithinMeters,
-                params, searchOpts);
+        if (whiteLabelPublisherMerchantId != null) {
+          params.put("publisherMerchantId", whiteLabelPublisherMerchantId);
+          newSql =
+              QueryHelper.buildQuery(supportsFreeBooks ? QueryType.WhiteLabelActivePaidAndFreeDealOfferIDsWithinMeters
+                  : QueryType.WhiteLabelActivePaidDealOfferIDsWithinMeters, params, searchOpts);
+        } else {
+          newSql =
+              QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDsWithinMeters
+                  : QueryType.ActivePaidDealOfferIDsWithinMeters, params, searchOpts);
+        }
+
 
         query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
         query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
@@ -1203,8 +1212,18 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
       // fall back because location is unavailable, then fall back to query
       if (CollectionUtils.isEmpty(summaries) && fallbackSearchOpts != null) {
         usingFallback = true;
-        newSql =
-            QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDs : QueryType.ActivePaidDealOfferIDs, null, fallbackSearchOpts);
+        if (whiteLabelPublisherMerchantId != null) {
+          params.clear();
+          params.put("publisherMerchantId", whiteLabelPublisherMerchantId);
+          newSql =
+              QueryHelper.buildQuery(supportsFreeBooks ? QueryType.WhiteLabelActivePaidAndFreeDealOfferIDs
+                  : QueryType.WhiteLabelActivePaidDealOfferIDs, params, fallbackSearchOpts);
+        } else {
+          newSql =
+              QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDs : QueryType.ActivePaidDealOfferIDs, null,
+                  fallbackSearchOpts);
+        }
+
         query = getSessionFactory().getCurrentSession().createSQLQuery(newSql);
         query.addScalar("dealOfferId", PostgresUUIDType.INSTANCE);
         query.setResultTransformer(resultTransformer);

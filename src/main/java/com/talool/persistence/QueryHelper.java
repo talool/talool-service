@@ -312,16 +312,50 @@ public final class QueryHelper {
           + "where (dof.price>0 OR dof.deal_type!='FREE_BOOK') AND dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true)";
 
   /**
+   * Gets white label paid and free deal offers
+   */
+  public static final String WHITE_LABEL_ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS_WITHIN_METERS =
+      "select dof.deal_offer_id as dealOfferId,"
+          + "ST_Distance( dof.geom, '${point}',true) as distanceInMeters "
+          + "from public.deal_offer as dof "
+          + "where dof.merchant_id='${publisherMerchantId}' and dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true)";
+
+  /**
+   * Gets only white label paid deal offers
+   */
+  public static final String WHITE_LABEL_ACTIVE_PAID_DEAL_OFFER_IDS_WITHIN_METERS =
+      "select dof.deal_offer_id as dealOfferId,"
+          + "ST_Distance( dof.geom, '${point}',true) as distanceInMeters "
+          + "from public.deal_offer as dof "
+          + "where dof.merchant_id='${publisherMerchantId}' AND (dof.price>0 OR dof.deal_type!='FREE_BOOK') AND dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true)";
+
+
+  /**
    * Gets paid and free deal offers
    */
-  public static final String ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS = "select deal_offer_id as dealOfferId " + "from public.deal_offer "
+  public static final String ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS = "select deal_offer_id as dealOfferId from public.deal_offer "
       + "where is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt";
 
   /**
    * Gets only PAID deal offers
    */
-  public static final String ACTIVE_PAID_DEAL_OFFER_IDS = "select deal_offer_id as dealOfferId " + "from public.deal_offer "
+  public static final String ACTIVE_PAID_DEAL_OFFER_IDS = "select deal_offer_id as dealOfferId from public.deal_offer "
       + "where (price>0 OR deal_type!='FREE_BOOK') AND is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt";
+
+  /**
+   * Filters by publisher and gets paid and free deal offers
+   */
+  public static final String WHITE_LABEL_ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS = "select deal_offer_id as dealOfferId " + "from public.deal_offer "
+      + "where merchant_id='${publisherMerchantId}' AND is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt";
+
+  /**
+   * Filters by publisher and gets only PAID deal offers
+   */
+  public static final String WHITE_LABEL_ACTIVE_PAID_DEAL_OFFER_IDS =
+      "select deal_offer_id as dealOfferId "
+          + "from public.deal_offer "
+          + "where merchant_id='${publisherMerchantId}' AND (price>0 OR deal_type!='FREE_BOOK') AND is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt";
+
 
 
   public static final String DEAL_ACQUIRES = "select distinct dealAcquire from DealAcquireImpl as dealAcquire left join fetch dealAcquire.deal as d "
@@ -437,9 +471,17 @@ public final class QueryHelper {
 
     ActivePaidDealOfferIDsWithinMeters(ACTIVE_PAID_DEAL_OFFER_IDS_WITHIN_METERS, EMPTY_IMMUTABLE_PROPS),
 
+    WhiteLabelActivePaidAndFreeDealOfferIDsWithinMeters(WHITE_LABEL_ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS_WITHIN_METERS, EMPTY_IMMUTABLE_PROPS),
+
+    WhiteLabelActivePaidDealOfferIDsWithinMeters(WHITE_LABEL_ACTIVE_PAID_DEAL_OFFER_IDS_WITHIN_METERS, EMPTY_IMMUTABLE_PROPS),
+
     ActivePaidAndFreeDealOfferIDs(ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS, EMPTY_IMMUTABLE_PROPS),
 
     ActivePaidDealOfferIDs(ACTIVE_PAID_DEAL_OFFER_IDS, EMPTY_IMMUTABLE_PROPS),
+
+    WhiteLabelActivePaidAndFreeDealOfferIDs(WHITE_LABEL_ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS, EMPTY_IMMUTABLE_PROPS),
+
+    WhiteLabelActivePaidDealOfferIDs(WHITE_LABEL_ACTIVE_PAID_DEAL_OFFER_IDS, EMPTY_IMMUTABLE_PROPS),
 
     DealAcquires(DEAL_ACQUIRES, EMPTY_IMMUTABLE_PROPS),
 

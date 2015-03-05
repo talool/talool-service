@@ -61,6 +61,8 @@ public class KeyValue implements Serializable {
   public static final String limitOnePurchasePerCustomer = "one_per_customer_boolean";
   public static final String limitPurchaseInventory = "purchase_inventory_limit";
 
+  public static final String whiteLabelMerchId = "white_label_merch_id";
+
   public String key;
   public String value;
 

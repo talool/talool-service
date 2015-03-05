@@ -161,8 +161,9 @@ public interface MerchantService extends HibernateService {
   public void replaceMerchantMedia(final UUID mediaId, final UUID replacementMediaId, final MediaType mediaType) throws ServiceException;
 
   /**
-   * Gets active and non-expired DealOffer summaries within maxMiles of a location. If the location
-   * is null or fields are zero or null then the fallbackSearchOptions are used.
+   * Filters by the publisher (i.e. if whiteLabelPublisherMerchantId is not null) and gets active
+   * and non-expired DealOffer summaries within maxMiles of a location. If the location is null or
+   * fields are zero or null then the fallbackSearchOptions are used.
    * 
    * @param location
    * @param maxMiles
@@ -172,7 +173,7 @@ public interface MerchantService extends HibernateService {
    * @throws ServiceException
    */
   public DealOfferGeoSummariesResult getDealOfferGeoSummariesWithin(final Location location, final int maxMiles, final SearchOptions searchOptions,
-      final SearchOptions fallbackSearchOptions, final boolean supportsFreeBooks) throws ServiceException;
+      final SearchOptions fallbackSearchOptions, final boolean supportsFreeBooks, final UUID whiteLabelPublisherMerchantId) throws ServiceException;
 
   public Map<UUID, DealOfferMetrics> getDealOfferMetrics() throws ServiceException;
 
