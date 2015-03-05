@@ -123,8 +123,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
   @Override
   @Transactional(propagation = Propagation.NESTED)
-  public void createAccount(final Customer customer, final String password) throws ServiceException {
-
+  public void createAccount(final Customer customer, final String password, final UUID whiteLabelPublisherMerchantId) throws ServiceException {
     if (!EmailValidator.getInstance().isValid(customer.getEmail())) {
       throw new ServiceException(ErrorCode.VALID_EMAIL_REQUIRED);
     }
@@ -133,7 +132,7 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       throw new ServiceException(ErrorCode.PASS_REQUIRED);
     }
 
-    createAccount(AccountType.CUS, customer, password);
+    createAccount(AccountType.CUS, customer, password, whiteLabelPublisherMerchantId);
 
     // We are not sending registration emails in order to avoid 3rd-part email
     // costs
@@ -144,10 +143,14 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
 
     final List<Gift> gifts = getGifts(customer.getId(), GiftStatus.values());
     final List<Activity> activities = new ArrayList<Activity>();
+    Merchant whiteLabelMerchant = null;
 
     try {
+      if (whiteLabelPublisherMerchantId != null) {
+        whiteLabelMerchant = ServiceFactory.get().getTaloolService().getMerchantById(whiteLabelPublisherMerchantId);
+      }
       // add welcome message!
-      activities.add(ActivityFactory.createWelcome(customer.getId(), gifts.size()));
+      activities.add(ActivityFactory.createWelcome(customer.getId(), gifts.size(), whiteLabelMerchant));
     } catch (Exception ex) {
       LOG.error("Problem creating welcome activity: " + ex.getLocalizedMessage(), ex);
     }
@@ -185,7 +188,8 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
     Customer receivingCustomer;
   }
 
-  private void createAccount(final AccountType accountType, final IdentifiableUUID account, final String password) throws ServiceException {
+  private void createAccount(final AccountType accountType, final IdentifiableUUID account, final String password,
+      final UUID whiteLabelPublisherMerchantId) throws ServiceException {
     try {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Creating accountType:" + accountType + ": " + account.toString());
@@ -195,6 +199,10 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       // set encrypted password
       customerImpl.setPassword(password);
       customerImpl.setEmail(customerImpl.getEmail().toLowerCase().trim());
+
+      if (whiteLabelPublisherMerchantId != null) {
+        customerImpl.setWhiteLabelMerchantId(whiteLabelPublisherMerchantId);
+      }
 
       save((CustomerImpl) account);
       daoDispatcher.flush(CustomerImpl.class);

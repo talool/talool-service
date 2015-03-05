@@ -37,7 +37,6 @@ import com.talool.service.EncryptService;
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 public class CustomerImpl implements Customer {
   private static final Logger LOG = LoggerFactory.getLogger(CustomerImpl.class);
-
   private static final long serialVersionUID = 2498058366640693644L;
 
   @Id
@@ -82,6 +81,10 @@ public class CustomerImpl implements Customer {
 
   @Embedded
   private CreatedUpdated createdUpdated;
+
+  @Type(type = "pg-uuid")
+  @Column(name = "white_label_merchant_id", nullable = true)
+  private UUID whiteLabelMerchantId;
 
   @Override
   public UUID getId() {
@@ -246,6 +249,16 @@ public class CustomerImpl implements Customer {
   @Override
   public void setIsEmailValid(boolean isValid) {
     this.isValidEmail = isValid;
+  }
+
+  @Override
+  public UUID getWhiteLabelMerchantId() {
+    return whiteLabelMerchantId;
+  }
+
+  @Override
+  public void setWhiteLabelMerchantId(final UUID whiteLabelMerchantId) {
+    this.whiteLabelMerchantId = whiteLabelMerchantId;
   }
 
 

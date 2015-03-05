@@ -281,7 +281,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase {
   public void testDealOffersWithin() throws ServiceException, InterruptedException {
     SearchOptions searchOpts = new SearchOptions.Builder().maxResults(5).page(0).sortProperty("distanceInMeters").build();
 
-    DealOfferGeoSummariesResult result = taloolService.getDealOfferGeoSummariesWithin(Boulder_CO, 2000, searchOpts, null, true);
+    DealOfferGeoSummariesResult result = taloolService.getDealOfferGeoSummariesWithin(Boulder_CO, 2000, searchOpts, null, true, null);
 
     List<DealOfferGeoSummary> dealOffers = result.getSummaries();
 
@@ -1068,7 +1068,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase {
     Customer customer = createCustomer(TALOOL_IGNORED_TEST_DOMAIN);
     List<Merchant> merchants = new ArrayList<Merchant>();
 
-    customerService.createAccount(customer, "pass123");
+    customerService.createAccount(customer, "pass123", null);
     customerService.refresh(customer);
 
     for (int i = 0; i < numMerchants; i++) {
@@ -1104,7 +1104,7 @@ public class TaloolServiceTest extends HibernateFunctionalTestBase {
     Customer cust = createCustomer(TALOOL_IGNORED_TEST_DOMAIN);
 
     // create account
-    customerService.createAccount(cust, "pass123");
+    customerService.createAccount(cust, "pass123", null);
 
     // authenticate
     Customer cust2 = customerService.authenticateCustomer(cust.getEmail(), "pass123");

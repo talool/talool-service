@@ -3,6 +3,7 @@ package com.talool.core;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 import com.talool.core.social.CustomerSocialAccount;
 import com.talool.core.social.SocialNetwork;
@@ -73,5 +74,10 @@ public interface Customer extends IdentifiableUUID, Serializable, TimeAware {
   public boolean isEmailValid();
 
   public void setIsEmailValid(final boolean isValid);
+
+  public UUID getWhiteLabelMerchantId();
+
+  public void setWhiteLabelMerchantId(final UUID whiteLabelMerchantId);
+
 
 }
