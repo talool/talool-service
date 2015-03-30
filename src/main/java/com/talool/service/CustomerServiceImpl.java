@@ -93,6 +93,7 @@ import com.talool.utils.GraphiteConstants.Action;
 import com.talool.utils.GraphiteConstants.SubAction;
 import com.talool.utils.KeyValue;
 import com.talool.utils.TaloolStatsDClient;
+import com.talool.utils.ValidatorUtils;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -124,8 +125,19 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
   @Override
   @Transactional(propagation = Propagation.NESTED)
   public void createAccount(final Customer customer, final String password, final UUID whiteLabelPublisherMerchantId) throws ServiceException {
-    if (!EmailValidator.getInstance().isValid(customer.getEmail())) {
-      throw new ServiceException(ErrorCode.VALID_EMAIL_REQUIRED);
+
+    // Talool app only supports emails for now.
+    if (whiteLabelPublisherMerchantId == null) {
+      if (!EmailValidator.getInstance().isValid(customer.getEmail())) {
+        throw new ServiceException(ErrorCode.VALID_EMAIL_REQUIRED);
+      }
+    } else {
+      // we are validating white label usernames and emails in the same field
+      if (customer.getEmail().contains("@") && !EmailValidator.getInstance().isValid(customer.getEmail())) {
+        throw new ServiceException(ErrorCode.VALID_EMAIL_OPTIONAL);
+      } else if (!ValidatorUtils.isValidUsername(customer.getEmail())) {
+        throw new ServiceException(ErrorCode.VALID_USERNAME_OPTIONAL);
+      }
     }
 
     if (StringUtils.isEmpty(password)) {
