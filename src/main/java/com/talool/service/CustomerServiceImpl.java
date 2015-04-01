@@ -133,12 +133,15 @@ public class CustomerServiceImpl extends AbstractHibernateService implements Cus
       }
     } else {
       // we are validating white label usernames and emails in the same field
-      if (customer.getEmail().contains("@") && !EmailValidator.getInstance().isValid(customer.getEmail())) {
-        throw new ServiceException(ErrorCode.VALID_EMAIL_OPTIONAL);
+      if (customer.getEmail().contains("@")) {
+        if (!EmailValidator.getInstance().isValid(customer.getEmail())) {
+          throw new ServiceException(ErrorCode.VALID_EMAIL_OPTIONAL);
+        }
       } else if (!ValidatorUtils.isValidUsername(customer.getEmail())) {
         throw new ServiceException(ErrorCode.VALID_USERNAME_OPTIONAL);
       }
     }
+
 
     if (StringUtils.isEmpty(password)) {
       throw new ServiceException(ErrorCode.PASS_REQUIRED);
