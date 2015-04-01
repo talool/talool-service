@@ -63,6 +63,9 @@ public class KeyValue implements Serializable {
 
   public static final String whiteLabelMerchId = "white_label_merch_id";
 
+  // whiteLabelMerch is a boolean where true means the merchant is a white label merchant
+  public static final String whiteLabelMerch = "white_label_merch";
+
   public String key;
   public String value;
 

@@ -12,6 +12,7 @@ import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.Sort;
 import com.talool.core.SearchOptions;
 import com.talool.domain.PropertyCriteria;
+import com.talool.utils.KeyValue;
 
 /**
  * Query Helper for HQL and native SQL
@@ -299,8 +300,9 @@ public final class QueryHelper {
   public static final String ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS_WITHIN_METERS =
       "select dof.deal_offer_id as dealOfferId,"
           + "ST_Distance( dof.geom, '${point}',true) as distanceInMeters "
-          + "from public.deal_offer as dof "
-          + "where dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true)";
+          + "from public.deal_offer as dof, public.merchant as m "
+          + "where m.merchant_id=dof.merchant_id and dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true) "
+          + "and (exist(m.properties,'" + KeyValue.whiteLabelMerch + "')=false OR m.properties->'" + KeyValue.whiteLabelMerch + "'='false')";
 
   /**
    * Gets only paid deal offers
@@ -308,8 +310,9 @@ public final class QueryHelper {
   public static final String ACTIVE_PAID_DEAL_OFFER_IDS_WITHIN_METERS =
       "select dof.deal_offer_id as dealOfferId,"
           + "ST_Distance( dof.geom, '${point}',true) as distanceInMeters "
-          + "from public.deal_offer as dof "
-          + "where (dof.price>0 OR dof.deal_type!='FREE_BOOK') AND dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true)";
+          + "from public.deal_offer as dof,public.merchant as m  "
+          + "where m.merchant_id=dof.merchant_id and (dof.price>0 OR dof.deal_type!='FREE_BOOK') AND dof.is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt AND ST_DWithin(dof.geom,'${point}',${distanceInMeters},true) "
+          + "and (exist(m.properties,'" + KeyValue.whiteLabelMerch + "')=false OR m.properties->'" + KeyValue.whiteLabelMerch + "'='false')";
 
   /**
    * Gets white label paid and free deal offers
@@ -333,14 +336,18 @@ public final class QueryHelper {
   /**
    * Gets paid and free deal offers
    */
-  public static final String ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS = "select deal_offer_id as dealOfferId from public.deal_offer "
-      + "where is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt";
+  public static final String ACTIVE_PAID_AND_FREE_DEAL_OFFER_IDS =
+      "select deal_offer_id as dealOfferId from public.deal_offer as dof,public.merchant as m "
+          + "where dof.merchant_id=m.merchant_id and dof.is_active=true AND now() at time zone 'utc' BETWEEN dof.scheduled_start_dt AND dof.scheduled_end_dt "
+          + "and (exist(m.properties,'" + KeyValue.whiteLabelMerch + "')=false OR m.properties->'" + KeyValue.whiteLabelMerch + "'='false')";
 
   /**
    * Gets only PAID deal offers
    */
-  public static final String ACTIVE_PAID_DEAL_OFFER_IDS = "select deal_offer_id as dealOfferId from public.deal_offer "
-      + "where (price>0 OR deal_type!='FREE_BOOK') AND is_active=true AND now() at time zone 'utc' BETWEEN scheduled_start_dt AND scheduled_end_dt";
+  public static final String ACTIVE_PAID_DEAL_OFFER_IDS =
+      "select deal_offer_id as dealOfferId from public.deal_offer as dof,public.merchant as m "
+          + "where dof.merchant_id=m.merchant_id and (dof.price>0 OR dof.deal_type!='FREE_BOOK') AND dof.is_active=true AND now() at time zone 'utc' BETWEEN dof.scheduled_start_dt AND dof.scheduled_end_dt "
+          + "and (exist(m.properties,'" + KeyValue.whiteLabelMerch + "')=false OR m.properties->'" + KeyValue.whiteLabelMerch + "'='false')";
 
   /**
    * Filters by publisher and gets paid and free deal offers

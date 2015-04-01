@@ -1194,6 +1194,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
               QueryHelper.buildQuery(supportsFreeBooks ? QueryType.WhiteLabelActivePaidAndFreeDealOfferIDsWithinMeters
                   : QueryType.WhiteLabelActivePaidDealOfferIDsWithinMeters, params, searchOpts);
         } else {
+          // this query filters any white label merchant
           newSql =
               QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDsWithinMeters
                   : QueryType.ActivePaidDealOfferIDsWithinMeters, params, searchOpts);
@@ -1219,6 +1220,7 @@ public class TaloolServiceImpl extends AbstractHibernateService implements Taloo
               QueryHelper.buildQuery(supportsFreeBooks ? QueryType.WhiteLabelActivePaidAndFreeDealOfferIDs
                   : QueryType.WhiteLabelActivePaidDealOfferIDs, params, fallbackSearchOpts);
         } else {
+          // this query filters any white label merchant
           newSql =
               QueryHelper.buildQuery(supportsFreeBooks ? QueryType.ActivePaidAndFreeDealOfferIDs : QueryType.ActivePaidDealOfferIDs, null,
                   fallbackSearchOpts);
